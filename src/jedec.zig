@@ -31,6 +31,8 @@ pub fn JedecData(comptime w: u32, comptime h: u32) type {
                 }
             }
 
+            std.debug.assert(i == len);
+
             return self;
         }
 

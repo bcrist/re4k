@@ -7,201 +7,134 @@ build `file`.tt4: copy pla/`pla`.pla
 build `file`.jed: fit `file`.lci | `file`.tt4
 ]]
 
-function writeReadme (device, test_name, readme)
+local function writeReadme (device, test_name, readme)
     if readme ~= nil then
         fs.ensure_dir_exists(fs.compose_path(device.name, test_name))
         fs.put_file_contents(fs.compose_path(device.name, test_name, 'readme.md'), readme)
     end
 end
 
-function globalTest (device, test_name, variants, pla, readme)
-    writeReadme(device, test_name, readme)
-    local base = fs.compose_path(device.name, test_name)
-    fs.ensure_dir_exists(base)
-
-    for _, variant in ipairs(variants) do
-        local file = fs.compose_path(base, variant)
-        fs.put_file_contents(file..'.lci', '//[[!! include "lci"; write_lci_'..test_name..'(device.'..device.name..', "'..variant..'") ]]')
-        write_build { pla = pla, file = file }
+local function writeVariants (device, test_name, variants, pla, extra_path, extra_params, targets, test_name_suffix)
+    local base_path = fs.compose_path(device.name, test_name)
+    if extra_path ~= nil then
+        if type(extra_path) == 'table' then
+            base_path = fs.compose_path(base_path, table.unpack(extra_path))
+        else
+            base_path = fs.compose_path(base_path, extra_path)
+        end
     end
 
-    local csv = fs.compose_path(base, "fuses.csv")
+    local write_lci = 'write_lci_'..test_name
+    if test_name_suffix ~= nil then
+        write_lci = write_lci..test_name_suffix
+    end
+
+    fs.ensure_dir_exists(base_path)
+
+    for v, variant in ipairs(variants) do
+        local file = fs.compose_path(base_path, variant)
+        local limp = '//[[!! include "lci"; '..write_lci..'(device.'..device.name
+        if extra_params ~= nil then
+            if type(extra_params) == 'table' then
+                limp = limp..', '..table.concat(extra_params, ', ')
+            else
+                limp = limp..', '..extra_params
+            end
+        end
+        limp = limp..', "'..variant..'") ]]'
+        fs.put_file_contents(file..'.lci', limp)
+
+        if type(pla) == 'table' then
+            write_build { pla = pla[v], file = file }
+        else
+            write_build { pla = pla, file = file }
+        end
+    end
+
+    local csv
+    if targets == nil then
+        csv = fs.compose_path(base_path, "fuses.csv")
+    else
+        csv = base_path.."_fuses.csv"
+        targets[#targets+1] = csv
+    end
     write("build ", csv, ": udiff")
     for _, variant in ipairs(variants) do
-        write(" ", fs.compose_path(base, variant..".jed"))
+        write(" ", fs.compose_path(base_path, variant..".jed"))
     end
     nl()
     nl()
 
-    writeln("build ", test_name, ": phony ", csv)
+    return csv
+end
+
+local function writeMcVariants(device, test_name, variants, pla, mc, targets)
+    writeVariants(device, test_name, variants, pla, { 'glb'..mc.glb.index, 'mc'..mc.index }, { mc.glb.index, mc.index }, targets)
+end
+
+local function writePhony (test_name, targets)
+    write("build ", test_name, ": phony")
+    for _, target in ipairs(targets) do
+        write(" ", target)
+    end
+    nl()
     nl()
     default_targets[#default_targets+1] = test_name
+end
+
+function globalTest (device, test_name, variants, pla, readme)
+    writeReadme(device, test_name, readme)
+    local csv = writeVariants(device, test_name, variants, pla)
+    writePhony(test_name, { csv })
 end
 
 function perGlbTest (device, test_name, variants, pla, readme)
     local targets = {}
-
     writeReadme(device, test_name, readme)
-
     for glb in device.glbs() do
-        local base = fs.compose_path(device.name, test_name, 'glb'..glb)
-        fs.ensure_dir_exists(base)
-
-        for _, variant in ipairs(variants) do
-            local file = fs.compose_path(base, variant)
-            fs.put_file_contents(file..'.lci', '//[[!! include "lci"; write_lci_'..test_name..'(device.'..device.name..', '..glb..', "'..variant..'") ]]')
-            write_build { pla = pla, file = file }
-        end
-
-        local csv = base .. "_fuses.csv"
-        targets[#targets+1] = csv
-        write("build ", csv, ": udiff")
-        for _, variant in ipairs(variants) do
-            write(" ", fs.compose_path(base, variant..".jed"))
-        end
-        nl()
-        nl()
+        writeVariants(device, test_name, variants, pla, 'glb'..glb, glb, targets)
     end
-
-    write("build ", test_name, ": phony")
-    for _, target in ipairs(targets) do
-        write(" ", target)
-    end
-    nl()
-    nl()
-    default_targets[#default_targets+1] = test_name
-end
-
-function perOutputTest(device, test_name, variants, pla, readme)
-    local targets = {}
-
-    writeReadme(device, test_name, readme)
-
-    for _, glb in device.glbs() do
-        for _, mc in glb.mcs() do
-            if mc.pin ~= nil then
-                local base = fs.compose_path(device.name, test_name, 'glb'..glb.index, 'mc'..mc.index)
-                fs.ensure_dir_exists(base)
-
-                for _, variant in ipairs(variants) do
-                    local file = fs.compose_path(base, variant)
-                    fs.put_file_contents(file..'.lci', '//[[!! include "lci"; write_lci_'..test_name..'(device.'..device.name..', '..glb.index..', '..mc.index..', "'..variant..'") ]]')
-                    write_build { pla = pla, file = file }
-                end
-
-                local csv = base .. "_fuses.csv"
-                targets[#targets+1] = csv
-                write("build ", csv, ": udiff")
-                for _, variant in ipairs(variants) do
-                    write(" ", fs.compose_path(base, variant..".jed"))
-                end
-                nl()
-                nl()
-            end
-        end
-    end
-
-    write("build ", test_name, ": phony")
-    for _, target in ipairs(targets) do
-        write(" ", target)
-    end
-    nl()
-    nl()
-    default_targets[#default_targets+1] = test_name
-end
-
-function perInputTest(device, test_name, variants, pla, readme)
-    local targets = {}
-
-    writeReadme(device, test_name, readme)
-
-    for _, glb in device.glbs() do
-        for _, mc in glb.mcs() do
-            if mc.pin ~= nil then
-                local base = fs.compose_path(device.name, test_name, 'glb'..glb.index, 'mc'..mc.index)
-                fs.ensure_dir_exists(base)
-
-                for _, variant in ipairs(variants) do
-                    local file = fs.compose_path(base, variant)
-                    fs.put_file_contents(file..'.lci', '//[[!! include "lci"; write_lci_'..test_name..'(device.'..device.name..', '..glb.index..', '..mc.index..', "'..variant..'") ]]')
-                    write_build { pla = pla, file = file }
-                end
-
-                local csv = base .. "_fuses.csv"
-                targets[#targets+1] = csv
-                write("build ", csv, ": udiff")
-                for _, variant in ipairs(variants) do
-                    write(" ", fs.compose_path(base, variant..".jed"))
-                end
-                nl()
-                nl()
-            end
-        end
-    end
-
-    for _, clk in device.clks() do
-        local base = fs.compose_path(device.name, test_name, 'input', clk.name)
-        fs.ensure_dir_exists(base)
-
-        for _, variant in ipairs(variants) do
-            local file = fs.compose_path(base, variant)
-            fs.put_file_contents(file..'.lci', '//[[!! include "lci"; write_lci_'..test_name..'_clk(device.'..device.name..', '..clk.index..', "'..variant..'") ]]')
-            write_build { pla = pla, file = file }
-        end
-
-        local csv = base .. "_fuses.csv"
-        targets[#targets+1] = csv
-        write("build ", csv, ": udiff")
-        for _, variant in ipairs(variants) do
-            write(" ", fs.compose_path(base, variant..".jed"))
-        end
-        nl()
-        nl()
-    end
-
-    write("build ", test_name, ": phony")
-    for _, target in ipairs(targets) do
-        write(" ", target)
-    end
-    nl()
-    nl()
-    default_targets[#default_targets+1] = test_name
+    writePhony(test_name, targets)
 end
 
 function perMacrocellTest(device, test_name, variants, pla, readme)
     local targets = {}
-
     writeReadme(device, test_name, readme)
-
     for _, glb in device.glbs() do
         for _, mc in glb.mcs() do
-            local base = fs.compose_path(device.name, test_name, 'glb'..glb.index, 'mc'..mc.index)
-            fs.ensure_dir_exists(base)
-
-            for _, variant in ipairs(variants) do
-                local file = fs.compose_path(base, variant)
-                fs.put_file_contents(file..'.lci', '//[[!! include "lci"; write_lci_'..test_name..'(device.'..device.name..', '..glb.index..', '..mc.index..', "'..variant..'") ]]')
-                write_build { pla = pla, file = file }
-            end
-
-            local csv = base .. "_fuses.csv"
-            targets[#targets+1] = csv
-            write("build ", csv, ": udiff")
-            for _, variant in ipairs(variants) do
-                write(" ", fs.compose_path(base, variant..".jed"))
-            end
-            nl()
-            nl()
+            writeMcVariants(device, test_name, variants, pla, mc, targets)
         end
     end
+    writePhony(test_name, targets)
+end
 
-    write("build ", test_name, ": phony")
-    for _, target in ipairs(targets) do
-        write(" ", target)
+function perOutputTest(device, test_name, variants, pla, readme)
+    local targets = {}
+    writeReadme(device, test_name, readme)
+    for _, glb in device.glbs() do
+        for _, mc in glb.mcs() do
+            if mc.pin ~= nil then
+                writeMcVariants(device, test_name, variants, pla, mc, targets)
+            end
+        end
     end
-    nl()
-    nl()
-    default_targets[#default_targets+1] = test_name
+    writePhony(test_name, targets)
+end
+
+function perInputTest(device, test_name, variants, pla, readme)
+    local targets = {}
+    writeReadme(device, test_name, readme)
+    for _, glb in device.glbs() do
+        for _, mc in glb.mcs() do
+            if mc.pin ~= nil then
+                writeMcVariants(device, test_name, variants, pla, mc, targets)
+            end
+        end
+    end
+    for _, clk in device.clks() do
+        writeVariants(device, test_name, variants, pla, { 'input', clk.name }, clk.index, targets, '_clk')
+    end
+    writePhony(test_name, targets)
 end
 
 local dev = device.lc4032ze
