@@ -5,7 +5,7 @@ rule fit
 rule udiff
     command = zig-out/bin/jeddiff.exe $out -u $in
 
-##!! include 'build_ninja' !! 981 ##
+##!! include 'build_ninja' !! 1025 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 build lc4032ze\pull\glb0\mc0\OFF.tt4: copy pla/and_31in_1out.pla
 build lc4032ze\pull\glb0\mc0\OFF.jed: fit lc4032ze\pull\glb0\mc0\OFF.lci | lc4032ze\pull\glb0\mc0\OFF.tt4
@@ -983,6 +983,50 @@ build lc4032ze\zerohold\fuses.csv: udiff lc4032ze\zerohold\no.jed lc4032ze\zeroh
 
 build zerohold: phony lc4032ze\zerohold\fuses.csv
 
-default pull input_threshold od slew zerohold
+build lc4032ze\bclk01\glb0\passthru.tt4: copy pla/bclk_passthru.pla
+build lc4032ze\bclk01\glb0\passthru.jed: fit lc4032ze\bclk01\glb0\passthru.lci | lc4032ze\bclk01\glb0\passthru.tt4
+build lc4032ze\bclk01\glb0\invert_both.tt4: copy pla/bclk_both_inverted.pla
+build lc4032ze\bclk01\glb0\invert_both.jed: fit lc4032ze\bclk01\glb0\invert_both.lci | lc4032ze\bclk01\glb0\invert_both.tt4
+build lc4032ze\bclk01\glb0\clk0_comp.tt4: copy pla/bclk_clk0.pla
+build lc4032ze\bclk01\glb0\clk0_comp.jed: fit lc4032ze\bclk01\glb0\clk0_comp.lci | lc4032ze\bclk01\glb0\clk0_comp.tt4
+build lc4032ze\bclk01\glb0\clk1_comp.tt4: copy pla/bclk_clk1.pla
+build lc4032ze\bclk01\glb0\clk1_comp.jed: fit lc4032ze\bclk01\glb0\clk1_comp.lci | lc4032ze\bclk01\glb0\clk1_comp.tt4
+build lc4032ze\bclk01\glb0_fuses.csv: udiff lc4032ze\bclk01\glb0\passthru.jed lc4032ze\bclk01\glb0\invert_both.jed lc4032ze\bclk01\glb0\clk0_comp.jed lc4032ze\bclk01\glb0\clk1_comp.jed
+
+build lc4032ze\bclk01\glb1\passthru.tt4: copy pla/bclk_passthru.pla
+build lc4032ze\bclk01\glb1\passthru.jed: fit lc4032ze\bclk01\glb1\passthru.lci | lc4032ze\bclk01\glb1\passthru.tt4
+build lc4032ze\bclk01\glb1\invert_both.tt4: copy pla/bclk_both_inverted.pla
+build lc4032ze\bclk01\glb1\invert_both.jed: fit lc4032ze\bclk01\glb1\invert_both.lci | lc4032ze\bclk01\glb1\invert_both.tt4
+build lc4032ze\bclk01\glb1\clk0_comp.tt4: copy pla/bclk_clk0.pla
+build lc4032ze\bclk01\glb1\clk0_comp.jed: fit lc4032ze\bclk01\glb1\clk0_comp.lci | lc4032ze\bclk01\glb1\clk0_comp.tt4
+build lc4032ze\bclk01\glb1\clk1_comp.tt4: copy pla/bclk_clk1.pla
+build lc4032ze\bclk01\glb1\clk1_comp.jed: fit lc4032ze\bclk01\glb1\clk1_comp.lci | lc4032ze\bclk01\glb1\clk1_comp.tt4
+build lc4032ze\bclk01\glb1_fuses.csv: udiff lc4032ze\bclk01\glb1\passthru.jed lc4032ze\bclk01\glb1\invert_both.jed lc4032ze\bclk01\glb1\clk0_comp.jed lc4032ze\bclk01\glb1\clk1_comp.jed
+
+build bclk01: phony lc4032ze\bclk01\glb0_fuses.csv lc4032ze\bclk01\glb1_fuses.csv
+
+build lc4032ze\bclk23\glb0\passthru.tt4: copy pla/bclk_passthru.pla
+build lc4032ze\bclk23\glb0\passthru.jed: fit lc4032ze\bclk23\glb0\passthru.lci | lc4032ze\bclk23\glb0\passthru.tt4
+build lc4032ze\bclk23\glb0\invert_both.tt4: copy pla/bclk_both_inverted.pla
+build lc4032ze\bclk23\glb0\invert_both.jed: fit lc4032ze\bclk23\glb0\invert_both.lci | lc4032ze\bclk23\glb0\invert_both.tt4
+build lc4032ze\bclk23\glb0\clk2_comp.tt4: copy pla/bclk_clk0.pla
+build lc4032ze\bclk23\glb0\clk2_comp.jed: fit lc4032ze\bclk23\glb0\clk2_comp.lci | lc4032ze\bclk23\glb0\clk2_comp.tt4
+build lc4032ze\bclk23\glb0\clk3_comp.tt4: copy pla/bclk_clk1.pla
+build lc4032ze\bclk23\glb0\clk3_comp.jed: fit lc4032ze\bclk23\glb0\clk3_comp.lci | lc4032ze\bclk23\glb0\clk3_comp.tt4
+build lc4032ze\bclk23\glb0_fuses.csv: udiff lc4032ze\bclk23\glb0\passthru.jed lc4032ze\bclk23\glb0\invert_both.jed lc4032ze\bclk23\glb0\clk2_comp.jed lc4032ze\bclk23\glb0\clk3_comp.jed
+
+build lc4032ze\bclk23\glb1\passthru.tt4: copy pla/bclk_passthru.pla
+build lc4032ze\bclk23\glb1\passthru.jed: fit lc4032ze\bclk23\glb1\passthru.lci | lc4032ze\bclk23\glb1\passthru.tt4
+build lc4032ze\bclk23\glb1\invert_both.tt4: copy pla/bclk_both_inverted.pla
+build lc4032ze\bclk23\glb1\invert_both.jed: fit lc4032ze\bclk23\glb1\invert_both.lci | lc4032ze\bclk23\glb1\invert_both.tt4
+build lc4032ze\bclk23\glb1\clk2_comp.tt4: copy pla/bclk_clk0.pla
+build lc4032ze\bclk23\glb1\clk2_comp.jed: fit lc4032ze\bclk23\glb1\clk2_comp.lci | lc4032ze\bclk23\glb1\clk2_comp.tt4
+build lc4032ze\bclk23\glb1\clk3_comp.tt4: copy pla/bclk_clk1.pla
+build lc4032ze\bclk23\glb1\clk3_comp.jed: fit lc4032ze\bclk23\glb1\clk3_comp.lci | lc4032ze\bclk23\glb1\clk3_comp.tt4
+build lc4032ze\bclk23\glb1_fuses.csv: udiff lc4032ze\bclk23\glb1\passthru.jed lc4032ze\bclk23\glb1\invert_both.jed lc4032ze\bclk23\glb1\clk2_comp.jed lc4032ze\bclk23\glb1\clk3_comp.jed
+
+build bclk23: phony lc4032ze\bclk23\glb0_fuses.csv lc4032ze\bclk23\glb1_fuses.csv
+
+default pull input_threshold od slew zerohold bclk01 bclk23
 
 ## ######################### END OF GENERATED CODE ######################### ##

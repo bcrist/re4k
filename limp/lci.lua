@@ -18,14 +18,18 @@ PartType = `device.part_number`;
 Speed = `device.speed_grade`;
 Operating_condition = `device.temp_grade`;
 Status = Production;
-EN_PinGLB = yes;
-EN_PinMacrocell = yes;
-Pin_MC_1to1 = yes;
 Default_Device_Io_Types=LVCMOS33,-;
+//EN_PinGLB = yes;
+//EN_PinMacrocell = yes;
+//Pin_MC_1to1 = yes;
+
+[Global Constraints]
+SPREAD_PLACEMENT=No;
 ]]
 
 write_mc_location_assignment = template [[`signal`=pin,`mc.pin.number`,-,`mc.glb.name`,`mc.index`;`nl]]
 write_clk_location_assignment = template [[`signal`=pin,`clk.number`,-,-,-;`nl]]
+write_node_location_assignment = template [[`signal`=node,-,-,`mc.glb.name`,`mc.index`;`nl]]
 write_io_type_constraint = template [[`signal`=`iostd`,pin,-,-;`nl]]
 
 function write_lci_32out (device, special_glb, special_mc)
@@ -192,6 +196,25 @@ end
 
 function write_lci_zerohold (device, yes_or_no)
     write_lci_common { device = device }
-    writeln '\n[Global Constraints]'
     writeln('Zero_hold_time=', yes_or_no, ';')
+end
+
+function write_lci_bclk (device, special_glb, clk0, clk1)
+    write_lci_common { device = device }
+    writeln '\n[Location Assignments]'
+    write_clk_location_assignment { signal = 'clk0', clk = device.clk(clk0) }
+    write_clk_location_assignment { signal = 'clk1', clk = device.clk(clk1) }
+    write_mc_location_assignment { signal = 'in0', mc = device.glb(special_glb).mc(0) }
+    write_mc_location_assignment { signal = 'in1', mc = device.glb(special_glb).mc(1) }
+    write_node_location_assignment { signal = 'co0', mc = device.glb(special_glb).mc(14) }
+    write_node_location_assignment { signal = 'co1', mc = device.glb(special_glb).mc(15) }
+    writeln '\n[Input Registers]'
+    writeln 'Default=INREG;'
+end
+
+function write_lci_bclk01 (device, special_glb)
+    write_lci_bclk(device, special_glb, 0, 1)
+end
+function write_lci_bclk23 (device, special_glb)
+    write_lci_bclk(device, special_glb, 2, 3)
 end

@@ -24,5 +24,4 @@
 * Usercode
 * Security bit
 * Global OE - polarity, 4x PTOE/BIE fuses
-* Block clocks - 4x fuses
 * OSCTIMER

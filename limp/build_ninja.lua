@@ -169,6 +169,9 @@ Registers whose data comes from product term logic are not affected by this fuse
 This fuse affects the entire chip.
 ]])
 
+perGlbTest(dev, 'bclk01', { 'passthru', 'invert_both', 'clk0_comp', 'clk1_comp' }, { 'bclk_passthru', 'bclk_both_inverted', 'bclk_clk0', 'bclk_clk1' })
+perGlbTest(dev, 'bclk23', { 'passthru', 'invert_both', 'clk2_comp', 'clk3_comp' }, { 'bclk_passthru', 'bclk_both_inverted', 'bclk_clk0', 'bclk_clk1' })
+
 
 write("default")
 for _, target in ipairs(default_targets) do

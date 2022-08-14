@@ -1,1 +1,68 @@
-//[[!! include "lci"; write_lci_slew(device.lc4032ze, 1, 15, "FAST") ]]
+//[[!! include "lci"; write_lci_slew(device.lc4032ze, 1, 15, "FAST") !! 68 ]]
+//[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
+[Revision]
+Parent = lc4k32e.lci;
+
+[Fitter Report Format]
+Detailed = yes;
+
+[Constraint Version]
+version = 1.0;
+
+[Device]
+Family = lc4k;
+PartNumber = LC4032ZE-5TN48C;
+Package = 48TQFP;
+PartType = LC4032ZE;
+Speed = -5.8;
+Operating_condition = COM;
+Status = Production;
+Default_Device_Io_Types=LVCMOS33,-;
+//EN_PinGLB = yes;
+//EN_PinMacrocell = yes;
+//Pin_MC_1to1 = yes;
+
+[Global Constraints]
+SPREAD_PLACEMENT=No;
+
+[Location Assignments]
+in=pin,43,-,-,-;
+out0=pin,44,-,A,0;
+out1=pin,45,-,A,1;
+out2=pin,46,-,A,2;
+out3=pin,47,-,A,3;
+out4=pin,48,-,A,4;
+out5=pin,2,-,A,5;
+out6=pin,3,-,A,6;
+out7=pin,4,-,A,7;
+out8=pin,7,-,A,8;
+out9=pin,8,-,A,9;
+out10=pin,9,-,A,10;
+out11=pin,10,-,A,11;
+out12=pin,14,-,A,12;
+out13=pin,15,-,A,13;
+out14=pin,16,-,A,14;
+out15=pin,17,-,A,15;
+out16=pin,20,-,B,0;
+out17=pin,21,-,B,1;
+out18=pin,22,-,B,2;
+out19=pin,23,-,B,3;
+out20=pin,24,-,B,4;
+out21=pin,26,-,B,5;
+out22=pin,27,-,B,6;
+out23=pin,28,-,B,7;
+out24=pin,31,-,B,8;
+out25=pin,32,-,B,9;
+out26=pin,33,-,B,10;
+out27=pin,34,-,B,11;
+out28=pin,38,-,B,12;
+out29=pin,39,-,B,13;
+out30=pin,40,-,B,14;
+out31=pin,41,-,B,15;
+
+
+[Slewrate]
+Default=FAST;
+FAST=out31;
+
+//[[ ######################### END OF GENERATED CODE ######################### ]]

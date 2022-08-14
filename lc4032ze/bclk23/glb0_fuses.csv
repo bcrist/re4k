@@ -1,0 +1,3 @@
+fuse,lc4032ze\bclk23\glb0\passthru.jed,lc4032ze\bclk23\glb0\invert_both.jed,lc4032ze\bclk23\glb0\clk2_comp.jed,lc4032ze\bclk23\glb0\clk3_comp.jed
+81:89,1,0,1,0
+82:89,1,0,0,1
