@@ -32,6 +32,8 @@ local glb_names = 'ABCDEFGHIJKLMNOP'
 function register_device (dev)
     local clk_pins = dev.clk_pins
     dev.clk_pins = nil
+    local clk_glbs = dev.clk_glbs
+    dev.clk_glbs = nil
 
     local io_pins = dev.io_pins
     dev.io_pins = nil
@@ -129,6 +131,11 @@ function register_device (dev)
     end
     dev.glb = function (index)
         return dev._glbs[index+1]
+    end
+
+    for clk_number, clk_glb_index in ipairs(clk_glbs) do
+        local clk_pin = dev._clks[clk_number]
+        clk_pin.glb = dev._glbs[clk_glb_index+1]
     end
 
     device[dev.name] = dev

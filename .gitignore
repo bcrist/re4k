@@ -18,5 +18,6 @@
 *.log
 *.lco
 *.fti
+*.cmi
 *_pin.csv
 LCIEdit.dum

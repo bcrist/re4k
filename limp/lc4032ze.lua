@@ -13,6 +13,7 @@ register_device {
     num_glbs = 2,
     num_pins = 48,
     clk_pins = { 43, 18, 19, 42 },
+    clk_glbs = { 0, 0, 1, 1 },
     io_pins = {
         A0 = 44,
         A1 = 45,

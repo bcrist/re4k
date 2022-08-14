@@ -159,7 +159,7 @@ SLOW should generally be used for any long traces or inter-board connections.
 FAST can be used for short traces where transmission line effects are unlikely.
 ]])
 
-globalTest(dev, 'zerohold', { 'no', 'yes' }, 'buf_1in_32out', [[
+globalTest(dev, 'zerohold', { 'no', 'yes' }, 'buf_1in_1out', [[
 When this fuse is enabled, registered inputs have an extra delay added to bring `tHOLD` down to 0.
 
 This also means the setup time is increased as well.
@@ -169,9 +169,14 @@ Registers whose data comes from product term logic are not affected by this fuse
 This fuse affects the entire chip.
 ]])
 
+-- globalTest(dev, 'security', { 'on', 'off' }, 'buf_1in_1out', [[
+-- Prevents reading flash?
+-- ]])
+
 perGlbTest(dev, 'bclk01', { 'passthru', 'invert_both', 'clk0_comp', 'clk1_comp' }, { 'bclk_passthru', 'bclk_both_inverted', 'bclk_clk0', 'bclk_clk1' })
 perGlbTest(dev, 'bclk23', { 'passthru', 'invert_both', 'clk2_comp', 'clk3_comp' }, { 'bclk_passthru', 'bclk_both_inverted', 'bclk_clk0', 'bclk_clk1' })
 
+perInputTest(dev, 'pgdf', { 'pg', 'pg_disabled' }, { 'pg2', 'pg1' })
 
 write("default")
 for _, target in ipairs(default_targets) do

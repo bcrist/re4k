@@ -1,0 +1,34 @@
+//[[!! include "lci"; write_lci_pgdf(device.lc4032ze, 0, 10, "pg") !! 34 ]]
+//[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
+[Revision]
+Parent = lc4k32e.lci;
+
+[Fitter Report Format]
+Detailed = yes;
+
+[Constraint Version]
+version = 1.0;
+
+[Device]
+Family = lc4k;
+PartNumber = LC4032ZE-5TN48C;
+Package = 48TQFP;
+PartType = LC4032ZE;
+Speed = -5.8;
+Operating_condition = COM;
+Status = Production;
+Default_Device_Io_Types=LVCMOS33,-;
+//EN_PinGLB = yes;
+//EN_PinMacrocell = yes;
+//Pin_MC_1to1 = yes;
+
+[Global Constraints]
+SPREAD_PLACEMENT=No;
+
+[Location Assignments]
+in_PG_E=pin,43,-,-,-;
+in1_PG_D=pin,9,-,A,10;
+in0_PG_D=pin,10,-,A,11;
+out=pin,14,-,A,12;
+
+//[[ ######################### END OF GENERATED CODE ######################### ]]

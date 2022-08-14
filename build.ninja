@@ -5,7 +5,7 @@ rule fit
 rule udiff
     command = zig-out/bin/jeddiff.exe $out -u $in
 
-##!! include 'build_ninja' !! 1025 ##
+##!! include 'build_ninja' !! 1243 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 build lc4032ze\pull\glb0\mc0\OFF.tt4: copy pla/and_31in_1out.pla
 build lc4032ze\pull\glb0\mc0\OFF.jed: fit lc4032ze\pull\glb0\mc0\OFF.lci | lc4032ze\pull\glb0\mc0\OFF.tt4
@@ -975,9 +975,9 @@ build lc4032ze\slew\glb1\mc15_fuses.csv: udiff lc4032ze\slew\glb1\mc15\SLOW.jed 
 
 build slew: phony lc4032ze\slew\glb0\mc0_fuses.csv lc4032ze\slew\glb0\mc1_fuses.csv lc4032ze\slew\glb0\mc2_fuses.csv lc4032ze\slew\glb0\mc3_fuses.csv lc4032ze\slew\glb0\mc4_fuses.csv lc4032ze\slew\glb0\mc5_fuses.csv lc4032ze\slew\glb0\mc6_fuses.csv lc4032ze\slew\glb0\mc7_fuses.csv lc4032ze\slew\glb0\mc8_fuses.csv lc4032ze\slew\glb0\mc9_fuses.csv lc4032ze\slew\glb0\mc10_fuses.csv lc4032ze\slew\glb0\mc11_fuses.csv lc4032ze\slew\glb0\mc12_fuses.csv lc4032ze\slew\glb0\mc13_fuses.csv lc4032ze\slew\glb0\mc14_fuses.csv lc4032ze\slew\glb0\mc15_fuses.csv lc4032ze\slew\glb1\mc0_fuses.csv lc4032ze\slew\glb1\mc1_fuses.csv lc4032ze\slew\glb1\mc2_fuses.csv lc4032ze\slew\glb1\mc3_fuses.csv lc4032ze\slew\glb1\mc4_fuses.csv lc4032ze\slew\glb1\mc5_fuses.csv lc4032ze\slew\glb1\mc6_fuses.csv lc4032ze\slew\glb1\mc7_fuses.csv lc4032ze\slew\glb1\mc8_fuses.csv lc4032ze\slew\glb1\mc9_fuses.csv lc4032ze\slew\glb1\mc10_fuses.csv lc4032ze\slew\glb1\mc11_fuses.csv lc4032ze\slew\glb1\mc12_fuses.csv lc4032ze\slew\glb1\mc13_fuses.csv lc4032ze\slew\glb1\mc14_fuses.csv lc4032ze\slew\glb1\mc15_fuses.csv
 
-build lc4032ze\zerohold\no.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\zerohold\no.tt4: copy pla/buf_1in_1out.pla
 build lc4032ze\zerohold\no.jed: fit lc4032ze\zerohold\no.lci | lc4032ze\zerohold\no.tt4
-build lc4032ze\zerohold\yes.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\zerohold\yes.tt4: copy pla/buf_1in_1out.pla
 build lc4032ze\zerohold\yes.jed: fit lc4032ze\zerohold\yes.lci | lc4032ze\zerohold\yes.tt4
 build lc4032ze\zerohold\fuses.csv: udiff lc4032ze\zerohold\no.jed lc4032ze\zerohold\yes.jed
 
@@ -1027,6 +1027,224 @@ build lc4032ze\bclk23\glb1_fuses.csv: udiff lc4032ze\bclk23\glb1\passthru.jed lc
 
 build bclk23: phony lc4032ze\bclk23\glb0_fuses.csv lc4032ze\bclk23\glb1_fuses.csv
 
-default pull input_threshold od slew zerohold bclk01 bclk23
+build lc4032ze\pgdf\glb0\mc0\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb0\mc0\pg.jed: fit lc4032ze\pgdf\glb0\mc0\pg.lci | lc4032ze\pgdf\glb0\mc0\pg.tt4
+build lc4032ze\pgdf\glb0\mc0\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb0\mc0\pg_disabled.jed: fit lc4032ze\pgdf\glb0\mc0\pg_disabled.lci | lc4032ze\pgdf\glb0\mc0\pg_disabled.tt4
+build lc4032ze\pgdf\glb0\mc0_fuses.csv: udiff lc4032ze\pgdf\glb0\mc0\pg.jed lc4032ze\pgdf\glb0\mc0\pg_disabled.jed
+
+build lc4032ze\pgdf\glb0\mc1\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb0\mc1\pg.jed: fit lc4032ze\pgdf\glb0\mc1\pg.lci | lc4032ze\pgdf\glb0\mc1\pg.tt4
+build lc4032ze\pgdf\glb0\mc1\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb0\mc1\pg_disabled.jed: fit lc4032ze\pgdf\glb0\mc1\pg_disabled.lci | lc4032ze\pgdf\glb0\mc1\pg_disabled.tt4
+build lc4032ze\pgdf\glb0\mc1_fuses.csv: udiff lc4032ze\pgdf\glb0\mc1\pg.jed lc4032ze\pgdf\glb0\mc1\pg_disabled.jed
+
+build lc4032ze\pgdf\glb0\mc2\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb0\mc2\pg.jed: fit lc4032ze\pgdf\glb0\mc2\pg.lci | lc4032ze\pgdf\glb0\mc2\pg.tt4
+build lc4032ze\pgdf\glb0\mc2\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb0\mc2\pg_disabled.jed: fit lc4032ze\pgdf\glb0\mc2\pg_disabled.lci | lc4032ze\pgdf\glb0\mc2\pg_disabled.tt4
+build lc4032ze\pgdf\glb0\mc2_fuses.csv: udiff lc4032ze\pgdf\glb0\mc2\pg.jed lc4032ze\pgdf\glb0\mc2\pg_disabled.jed
+
+build lc4032ze\pgdf\glb0\mc3\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb0\mc3\pg.jed: fit lc4032ze\pgdf\glb0\mc3\pg.lci | lc4032ze\pgdf\glb0\mc3\pg.tt4
+build lc4032ze\pgdf\glb0\mc3\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb0\mc3\pg_disabled.jed: fit lc4032ze\pgdf\glb0\mc3\pg_disabled.lci | lc4032ze\pgdf\glb0\mc3\pg_disabled.tt4
+build lc4032ze\pgdf\glb0\mc3_fuses.csv: udiff lc4032ze\pgdf\glb0\mc3\pg.jed lc4032ze\pgdf\glb0\mc3\pg_disabled.jed
+
+build lc4032ze\pgdf\glb0\mc4\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb0\mc4\pg.jed: fit lc4032ze\pgdf\glb0\mc4\pg.lci | lc4032ze\pgdf\glb0\mc4\pg.tt4
+build lc4032ze\pgdf\glb0\mc4\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb0\mc4\pg_disabled.jed: fit lc4032ze\pgdf\glb0\mc4\pg_disabled.lci | lc4032ze\pgdf\glb0\mc4\pg_disabled.tt4
+build lc4032ze\pgdf\glb0\mc4_fuses.csv: udiff lc4032ze\pgdf\glb0\mc4\pg.jed lc4032ze\pgdf\glb0\mc4\pg_disabled.jed
+
+build lc4032ze\pgdf\glb0\mc5\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb0\mc5\pg.jed: fit lc4032ze\pgdf\glb0\mc5\pg.lci | lc4032ze\pgdf\glb0\mc5\pg.tt4
+build lc4032ze\pgdf\glb0\mc5\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb0\mc5\pg_disabled.jed: fit lc4032ze\pgdf\glb0\mc5\pg_disabled.lci | lc4032ze\pgdf\glb0\mc5\pg_disabled.tt4
+build lc4032ze\pgdf\glb0\mc5_fuses.csv: udiff lc4032ze\pgdf\glb0\mc5\pg.jed lc4032ze\pgdf\glb0\mc5\pg_disabled.jed
+
+build lc4032ze\pgdf\glb0\mc6\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb0\mc6\pg.jed: fit lc4032ze\pgdf\glb0\mc6\pg.lci | lc4032ze\pgdf\glb0\mc6\pg.tt4
+build lc4032ze\pgdf\glb0\mc6\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb0\mc6\pg_disabled.jed: fit lc4032ze\pgdf\glb0\mc6\pg_disabled.lci | lc4032ze\pgdf\glb0\mc6\pg_disabled.tt4
+build lc4032ze\pgdf\glb0\mc6_fuses.csv: udiff lc4032ze\pgdf\glb0\mc6\pg.jed lc4032ze\pgdf\glb0\mc6\pg_disabled.jed
+
+build lc4032ze\pgdf\glb0\mc7\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb0\mc7\pg.jed: fit lc4032ze\pgdf\glb0\mc7\pg.lci | lc4032ze\pgdf\glb0\mc7\pg.tt4
+build lc4032ze\pgdf\glb0\mc7\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb0\mc7\pg_disabled.jed: fit lc4032ze\pgdf\glb0\mc7\pg_disabled.lci | lc4032ze\pgdf\glb0\mc7\pg_disabled.tt4
+build lc4032ze\pgdf\glb0\mc7_fuses.csv: udiff lc4032ze\pgdf\glb0\mc7\pg.jed lc4032ze\pgdf\glb0\mc7\pg_disabled.jed
+
+build lc4032ze\pgdf\glb0\mc8\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb0\mc8\pg.jed: fit lc4032ze\pgdf\glb0\mc8\pg.lci | lc4032ze\pgdf\glb0\mc8\pg.tt4
+build lc4032ze\pgdf\glb0\mc8\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb0\mc8\pg_disabled.jed: fit lc4032ze\pgdf\glb0\mc8\pg_disabled.lci | lc4032ze\pgdf\glb0\mc8\pg_disabled.tt4
+build lc4032ze\pgdf\glb0\mc8_fuses.csv: udiff lc4032ze\pgdf\glb0\mc8\pg.jed lc4032ze\pgdf\glb0\mc8\pg_disabled.jed
+
+build lc4032ze\pgdf\glb0\mc9\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb0\mc9\pg.jed: fit lc4032ze\pgdf\glb0\mc9\pg.lci | lc4032ze\pgdf\glb0\mc9\pg.tt4
+build lc4032ze\pgdf\glb0\mc9\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb0\mc9\pg_disabled.jed: fit lc4032ze\pgdf\glb0\mc9\pg_disabled.lci | lc4032ze\pgdf\glb0\mc9\pg_disabled.tt4
+build lc4032ze\pgdf\glb0\mc9_fuses.csv: udiff lc4032ze\pgdf\glb0\mc9\pg.jed lc4032ze\pgdf\glb0\mc9\pg_disabled.jed
+
+build lc4032ze\pgdf\glb0\mc10\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb0\mc10\pg.jed: fit lc4032ze\pgdf\glb0\mc10\pg.lci | lc4032ze\pgdf\glb0\mc10\pg.tt4
+build lc4032ze\pgdf\glb0\mc10\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb0\mc10\pg_disabled.jed: fit lc4032ze\pgdf\glb0\mc10\pg_disabled.lci | lc4032ze\pgdf\glb0\mc10\pg_disabled.tt4
+build lc4032ze\pgdf\glb0\mc10_fuses.csv: udiff lc4032ze\pgdf\glb0\mc10\pg.jed lc4032ze\pgdf\glb0\mc10\pg_disabled.jed
+
+build lc4032ze\pgdf\glb0\mc11\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb0\mc11\pg.jed: fit lc4032ze\pgdf\glb0\mc11\pg.lci | lc4032ze\pgdf\glb0\mc11\pg.tt4
+build lc4032ze\pgdf\glb0\mc11\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb0\mc11\pg_disabled.jed: fit lc4032ze\pgdf\glb0\mc11\pg_disabled.lci | lc4032ze\pgdf\glb0\mc11\pg_disabled.tt4
+build lc4032ze\pgdf\glb0\mc11_fuses.csv: udiff lc4032ze\pgdf\glb0\mc11\pg.jed lc4032ze\pgdf\glb0\mc11\pg_disabled.jed
+
+build lc4032ze\pgdf\glb0\mc12\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb0\mc12\pg.jed: fit lc4032ze\pgdf\glb0\mc12\pg.lci | lc4032ze\pgdf\glb0\mc12\pg.tt4
+build lc4032ze\pgdf\glb0\mc12\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb0\mc12\pg_disabled.jed: fit lc4032ze\pgdf\glb0\mc12\pg_disabled.lci | lc4032ze\pgdf\glb0\mc12\pg_disabled.tt4
+build lc4032ze\pgdf\glb0\mc12_fuses.csv: udiff lc4032ze\pgdf\glb0\mc12\pg.jed lc4032ze\pgdf\glb0\mc12\pg_disabled.jed
+
+build lc4032ze\pgdf\glb0\mc13\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb0\mc13\pg.jed: fit lc4032ze\pgdf\glb0\mc13\pg.lci | lc4032ze\pgdf\glb0\mc13\pg.tt4
+build lc4032ze\pgdf\glb0\mc13\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb0\mc13\pg_disabled.jed: fit lc4032ze\pgdf\glb0\mc13\pg_disabled.lci | lc4032ze\pgdf\glb0\mc13\pg_disabled.tt4
+build lc4032ze\pgdf\glb0\mc13_fuses.csv: udiff lc4032ze\pgdf\glb0\mc13\pg.jed lc4032ze\pgdf\glb0\mc13\pg_disabled.jed
+
+build lc4032ze\pgdf\glb0\mc14\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb0\mc14\pg.jed: fit lc4032ze\pgdf\glb0\mc14\pg.lci | lc4032ze\pgdf\glb0\mc14\pg.tt4
+build lc4032ze\pgdf\glb0\mc14\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb0\mc14\pg_disabled.jed: fit lc4032ze\pgdf\glb0\mc14\pg_disabled.lci | lc4032ze\pgdf\glb0\mc14\pg_disabled.tt4
+build lc4032ze\pgdf\glb0\mc14_fuses.csv: udiff lc4032ze\pgdf\glb0\mc14\pg.jed lc4032ze\pgdf\glb0\mc14\pg_disabled.jed
+
+build lc4032ze\pgdf\glb0\mc15\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb0\mc15\pg.jed: fit lc4032ze\pgdf\glb0\mc15\pg.lci | lc4032ze\pgdf\glb0\mc15\pg.tt4
+build lc4032ze\pgdf\glb0\mc15\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb0\mc15\pg_disabled.jed: fit lc4032ze\pgdf\glb0\mc15\pg_disabled.lci | lc4032ze\pgdf\glb0\mc15\pg_disabled.tt4
+build lc4032ze\pgdf\glb0\mc15_fuses.csv: udiff lc4032ze\pgdf\glb0\mc15\pg.jed lc4032ze\pgdf\glb0\mc15\pg_disabled.jed
+
+build lc4032ze\pgdf\glb1\mc0\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb1\mc0\pg.jed: fit lc4032ze\pgdf\glb1\mc0\pg.lci | lc4032ze\pgdf\glb1\mc0\pg.tt4
+build lc4032ze\pgdf\glb1\mc0\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb1\mc0\pg_disabled.jed: fit lc4032ze\pgdf\glb1\mc0\pg_disabled.lci | lc4032ze\pgdf\glb1\mc0\pg_disabled.tt4
+build lc4032ze\pgdf\glb1\mc0_fuses.csv: udiff lc4032ze\pgdf\glb1\mc0\pg.jed lc4032ze\pgdf\glb1\mc0\pg_disabled.jed
+
+build lc4032ze\pgdf\glb1\mc1\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb1\mc1\pg.jed: fit lc4032ze\pgdf\glb1\mc1\pg.lci | lc4032ze\pgdf\glb1\mc1\pg.tt4
+build lc4032ze\pgdf\glb1\mc1\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb1\mc1\pg_disabled.jed: fit lc4032ze\pgdf\glb1\mc1\pg_disabled.lci | lc4032ze\pgdf\glb1\mc1\pg_disabled.tt4
+build lc4032ze\pgdf\glb1\mc1_fuses.csv: udiff lc4032ze\pgdf\glb1\mc1\pg.jed lc4032ze\pgdf\glb1\mc1\pg_disabled.jed
+
+build lc4032ze\pgdf\glb1\mc2\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb1\mc2\pg.jed: fit lc4032ze\pgdf\glb1\mc2\pg.lci | lc4032ze\pgdf\glb1\mc2\pg.tt4
+build lc4032ze\pgdf\glb1\mc2\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb1\mc2\pg_disabled.jed: fit lc4032ze\pgdf\glb1\mc2\pg_disabled.lci | lc4032ze\pgdf\glb1\mc2\pg_disabled.tt4
+build lc4032ze\pgdf\glb1\mc2_fuses.csv: udiff lc4032ze\pgdf\glb1\mc2\pg.jed lc4032ze\pgdf\glb1\mc2\pg_disabled.jed
+
+build lc4032ze\pgdf\glb1\mc3\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb1\mc3\pg.jed: fit lc4032ze\pgdf\glb1\mc3\pg.lci | lc4032ze\pgdf\glb1\mc3\pg.tt4
+build lc4032ze\pgdf\glb1\mc3\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb1\mc3\pg_disabled.jed: fit lc4032ze\pgdf\glb1\mc3\pg_disabled.lci | lc4032ze\pgdf\glb1\mc3\pg_disabled.tt4
+build lc4032ze\pgdf\glb1\mc3_fuses.csv: udiff lc4032ze\pgdf\glb1\mc3\pg.jed lc4032ze\pgdf\glb1\mc3\pg_disabled.jed
+
+build lc4032ze\pgdf\glb1\mc4\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb1\mc4\pg.jed: fit lc4032ze\pgdf\glb1\mc4\pg.lci | lc4032ze\pgdf\glb1\mc4\pg.tt4
+build lc4032ze\pgdf\glb1\mc4\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb1\mc4\pg_disabled.jed: fit lc4032ze\pgdf\glb1\mc4\pg_disabled.lci | lc4032ze\pgdf\glb1\mc4\pg_disabled.tt4
+build lc4032ze\pgdf\glb1\mc4_fuses.csv: udiff lc4032ze\pgdf\glb1\mc4\pg.jed lc4032ze\pgdf\glb1\mc4\pg_disabled.jed
+
+build lc4032ze\pgdf\glb1\mc5\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb1\mc5\pg.jed: fit lc4032ze\pgdf\glb1\mc5\pg.lci | lc4032ze\pgdf\glb1\mc5\pg.tt4
+build lc4032ze\pgdf\glb1\mc5\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb1\mc5\pg_disabled.jed: fit lc4032ze\pgdf\glb1\mc5\pg_disabled.lci | lc4032ze\pgdf\glb1\mc5\pg_disabled.tt4
+build lc4032ze\pgdf\glb1\mc5_fuses.csv: udiff lc4032ze\pgdf\glb1\mc5\pg.jed lc4032ze\pgdf\glb1\mc5\pg_disabled.jed
+
+build lc4032ze\pgdf\glb1\mc6\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb1\mc6\pg.jed: fit lc4032ze\pgdf\glb1\mc6\pg.lci | lc4032ze\pgdf\glb1\mc6\pg.tt4
+build lc4032ze\pgdf\glb1\mc6\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb1\mc6\pg_disabled.jed: fit lc4032ze\pgdf\glb1\mc6\pg_disabled.lci | lc4032ze\pgdf\glb1\mc6\pg_disabled.tt4
+build lc4032ze\pgdf\glb1\mc6_fuses.csv: udiff lc4032ze\pgdf\glb1\mc6\pg.jed lc4032ze\pgdf\glb1\mc6\pg_disabled.jed
+
+build lc4032ze\pgdf\glb1\mc7\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb1\mc7\pg.jed: fit lc4032ze\pgdf\glb1\mc7\pg.lci | lc4032ze\pgdf\glb1\mc7\pg.tt4
+build lc4032ze\pgdf\glb1\mc7\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb1\mc7\pg_disabled.jed: fit lc4032ze\pgdf\glb1\mc7\pg_disabled.lci | lc4032ze\pgdf\glb1\mc7\pg_disabled.tt4
+build lc4032ze\pgdf\glb1\mc7_fuses.csv: udiff lc4032ze\pgdf\glb1\mc7\pg.jed lc4032ze\pgdf\glb1\mc7\pg_disabled.jed
+
+build lc4032ze\pgdf\glb1\mc8\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb1\mc8\pg.jed: fit lc4032ze\pgdf\glb1\mc8\pg.lci | lc4032ze\pgdf\glb1\mc8\pg.tt4
+build lc4032ze\pgdf\glb1\mc8\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb1\mc8\pg_disabled.jed: fit lc4032ze\pgdf\glb1\mc8\pg_disabled.lci | lc4032ze\pgdf\glb1\mc8\pg_disabled.tt4
+build lc4032ze\pgdf\glb1\mc8_fuses.csv: udiff lc4032ze\pgdf\glb1\mc8\pg.jed lc4032ze\pgdf\glb1\mc8\pg_disabled.jed
+
+build lc4032ze\pgdf\glb1\mc9\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb1\mc9\pg.jed: fit lc4032ze\pgdf\glb1\mc9\pg.lci | lc4032ze\pgdf\glb1\mc9\pg.tt4
+build lc4032ze\pgdf\glb1\mc9\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb1\mc9\pg_disabled.jed: fit lc4032ze\pgdf\glb1\mc9\pg_disabled.lci | lc4032ze\pgdf\glb1\mc9\pg_disabled.tt4
+build lc4032ze\pgdf\glb1\mc9_fuses.csv: udiff lc4032ze\pgdf\glb1\mc9\pg.jed lc4032ze\pgdf\glb1\mc9\pg_disabled.jed
+
+build lc4032ze\pgdf\glb1\mc10\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb1\mc10\pg.jed: fit lc4032ze\pgdf\glb1\mc10\pg.lci | lc4032ze\pgdf\glb1\mc10\pg.tt4
+build lc4032ze\pgdf\glb1\mc10\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb1\mc10\pg_disabled.jed: fit lc4032ze\pgdf\glb1\mc10\pg_disabled.lci | lc4032ze\pgdf\glb1\mc10\pg_disabled.tt4
+build lc4032ze\pgdf\glb1\mc10_fuses.csv: udiff lc4032ze\pgdf\glb1\mc10\pg.jed lc4032ze\pgdf\glb1\mc10\pg_disabled.jed
+
+build lc4032ze\pgdf\glb1\mc11\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb1\mc11\pg.jed: fit lc4032ze\pgdf\glb1\mc11\pg.lci | lc4032ze\pgdf\glb1\mc11\pg.tt4
+build lc4032ze\pgdf\glb1\mc11\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb1\mc11\pg_disabled.jed: fit lc4032ze\pgdf\glb1\mc11\pg_disabled.lci | lc4032ze\pgdf\glb1\mc11\pg_disabled.tt4
+build lc4032ze\pgdf\glb1\mc11_fuses.csv: udiff lc4032ze\pgdf\glb1\mc11\pg.jed lc4032ze\pgdf\glb1\mc11\pg_disabled.jed
+
+build lc4032ze\pgdf\glb1\mc12\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb1\mc12\pg.jed: fit lc4032ze\pgdf\glb1\mc12\pg.lci | lc4032ze\pgdf\glb1\mc12\pg.tt4
+build lc4032ze\pgdf\glb1\mc12\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb1\mc12\pg_disabled.jed: fit lc4032ze\pgdf\glb1\mc12\pg_disabled.lci | lc4032ze\pgdf\glb1\mc12\pg_disabled.tt4
+build lc4032ze\pgdf\glb1\mc12_fuses.csv: udiff lc4032ze\pgdf\glb1\mc12\pg.jed lc4032ze\pgdf\glb1\mc12\pg_disabled.jed
+
+build lc4032ze\pgdf\glb1\mc13\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb1\mc13\pg.jed: fit lc4032ze\pgdf\glb1\mc13\pg.lci | lc4032ze\pgdf\glb1\mc13\pg.tt4
+build lc4032ze\pgdf\glb1\mc13\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb1\mc13\pg_disabled.jed: fit lc4032ze\pgdf\glb1\mc13\pg_disabled.lci | lc4032ze\pgdf\glb1\mc13\pg_disabled.tt4
+build lc4032ze\pgdf\glb1\mc13_fuses.csv: udiff lc4032ze\pgdf\glb1\mc13\pg.jed lc4032ze\pgdf\glb1\mc13\pg_disabled.jed
+
+build lc4032ze\pgdf\glb1\mc14\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb1\mc14\pg.jed: fit lc4032ze\pgdf\glb1\mc14\pg.lci | lc4032ze\pgdf\glb1\mc14\pg.tt4
+build lc4032ze\pgdf\glb1\mc14\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb1\mc14\pg_disabled.jed: fit lc4032ze\pgdf\glb1\mc14\pg_disabled.lci | lc4032ze\pgdf\glb1\mc14\pg_disabled.tt4
+build lc4032ze\pgdf\glb1\mc14_fuses.csv: udiff lc4032ze\pgdf\glb1\mc14\pg.jed lc4032ze\pgdf\glb1\mc14\pg_disabled.jed
+
+build lc4032ze\pgdf\glb1\mc15\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\glb1\mc15\pg.jed: fit lc4032ze\pgdf\glb1\mc15\pg.lci | lc4032ze\pgdf\glb1\mc15\pg.tt4
+build lc4032ze\pgdf\glb1\mc15\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\glb1\mc15\pg_disabled.jed: fit lc4032ze\pgdf\glb1\mc15\pg_disabled.lci | lc4032ze\pgdf\glb1\mc15\pg_disabled.tt4
+build lc4032ze\pgdf\glb1\mc15_fuses.csv: udiff lc4032ze\pgdf\glb1\mc15\pg.jed lc4032ze\pgdf\glb1\mc15\pg_disabled.jed
+
+build lc4032ze\pgdf\input\CLK0\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\input\CLK0\pg.jed: fit lc4032ze\pgdf\input\CLK0\pg.lci | lc4032ze\pgdf\input\CLK0\pg.tt4
+build lc4032ze\pgdf\input\CLK0\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\input\CLK0\pg_disabled.jed: fit lc4032ze\pgdf\input\CLK0\pg_disabled.lci | lc4032ze\pgdf\input\CLK0\pg_disabled.tt4
+build lc4032ze\pgdf\input\CLK0_fuses.csv: udiff lc4032ze\pgdf\input\CLK0\pg.jed lc4032ze\pgdf\input\CLK0\pg_disabled.jed
+
+build lc4032ze\pgdf\input\CLK1\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\input\CLK1\pg.jed: fit lc4032ze\pgdf\input\CLK1\pg.lci | lc4032ze\pgdf\input\CLK1\pg.tt4
+build lc4032ze\pgdf\input\CLK1\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\input\CLK1\pg_disabled.jed: fit lc4032ze\pgdf\input\CLK1\pg_disabled.lci | lc4032ze\pgdf\input\CLK1\pg_disabled.tt4
+build lc4032ze\pgdf\input\CLK1_fuses.csv: udiff lc4032ze\pgdf\input\CLK1\pg.jed lc4032ze\pgdf\input\CLK1\pg_disabled.jed
+
+build lc4032ze\pgdf\input\CLK2\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\input\CLK2\pg.jed: fit lc4032ze\pgdf\input\CLK2\pg.lci | lc4032ze\pgdf\input\CLK2\pg.tt4
+build lc4032ze\pgdf\input\CLK2\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\input\CLK2\pg_disabled.jed: fit lc4032ze\pgdf\input\CLK2\pg_disabled.lci | lc4032ze\pgdf\input\CLK2\pg_disabled.tt4
+build lc4032ze\pgdf\input\CLK2_fuses.csv: udiff lc4032ze\pgdf\input\CLK2\pg.jed lc4032ze\pgdf\input\CLK2\pg_disabled.jed
+
+build lc4032ze\pgdf\input\CLK3\pg.tt4: copy pla/pg2.pla
+build lc4032ze\pgdf\input\CLK3\pg.jed: fit lc4032ze\pgdf\input\CLK3\pg.lci | lc4032ze\pgdf\input\CLK3\pg.tt4
+build lc4032ze\pgdf\input\CLK3\pg_disabled.tt4: copy pla/pg1.pla
+build lc4032ze\pgdf\input\CLK3\pg_disabled.jed: fit lc4032ze\pgdf\input\CLK3\pg_disabled.lci | lc4032ze\pgdf\input\CLK3\pg_disabled.tt4
+build lc4032ze\pgdf\input\CLK3_fuses.csv: udiff lc4032ze\pgdf\input\CLK3\pg.jed lc4032ze\pgdf\input\CLK3\pg_disabled.jed
+
+build pgdf: phony lc4032ze\pgdf\glb0\mc0_fuses.csv lc4032ze\pgdf\glb0\mc1_fuses.csv lc4032ze\pgdf\glb0\mc2_fuses.csv lc4032ze\pgdf\glb0\mc3_fuses.csv lc4032ze\pgdf\glb0\mc4_fuses.csv lc4032ze\pgdf\glb0\mc5_fuses.csv lc4032ze\pgdf\glb0\mc6_fuses.csv lc4032ze\pgdf\glb0\mc7_fuses.csv lc4032ze\pgdf\glb0\mc8_fuses.csv lc4032ze\pgdf\glb0\mc9_fuses.csv lc4032ze\pgdf\glb0\mc10_fuses.csv lc4032ze\pgdf\glb0\mc11_fuses.csv lc4032ze\pgdf\glb0\mc12_fuses.csv lc4032ze\pgdf\glb0\mc13_fuses.csv lc4032ze\pgdf\glb0\mc14_fuses.csv lc4032ze\pgdf\glb0\mc15_fuses.csv lc4032ze\pgdf\glb1\mc0_fuses.csv lc4032ze\pgdf\glb1\mc1_fuses.csv lc4032ze\pgdf\glb1\mc2_fuses.csv lc4032ze\pgdf\glb1\mc3_fuses.csv lc4032ze\pgdf\glb1\mc4_fuses.csv lc4032ze\pgdf\glb1\mc5_fuses.csv lc4032ze\pgdf\glb1\mc6_fuses.csv lc4032ze\pgdf\glb1\mc7_fuses.csv lc4032ze\pgdf\glb1\mc8_fuses.csv lc4032ze\pgdf\glb1\mc9_fuses.csv lc4032ze\pgdf\glb1\mc10_fuses.csv lc4032ze\pgdf\glb1\mc11_fuses.csv lc4032ze\pgdf\glb1\mc12_fuses.csv lc4032ze\pgdf\glb1\mc13_fuses.csv lc4032ze\pgdf\glb1\mc14_fuses.csv lc4032ze\pgdf\glb1\mc15_fuses.csv lc4032ze\pgdf\input\CLK0_fuses.csv lc4032ze\pgdf\input\CLK1_fuses.csv lc4032ze\pgdf\input\CLK2_fuses.csv lc4032ze\pgdf\input\CLK3_fuses.csv
+
+default pull input_threshold od slew zerohold bclk01 bclk23 pgdf
 
 ## ######################### END OF GENERATED CODE ######################### ##

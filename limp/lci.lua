@@ -199,6 +199,11 @@ function write_lci_zerohold (device, yes_or_no)
     writeln('Zero_hold_time=', yes_or_no, ';')
 end
 
+function write_lci_security (device, on_or_off)
+    write_lci_common { device = device }
+    writeln('Security=', on_or_off, ';')
+end
+
 function write_lci_bclk (device, special_glb, clk0, clk1)
     write_lci_common { device = device }
     writeln '\n[Location Assignments]'
@@ -217,4 +222,26 @@ function write_lci_bclk01 (device, special_glb)
 end
 function write_lci_bclk23 (device, special_glb)
     write_lci_bclk(device, special_glb, 2, 3)
+end
+
+
+function write_lci_pgdf (device, special_glb, special_mc, variant)
+    write_lci_common { device = device }
+    writeln '\n[Location Assignments]'
+    write_clk_location_assignment { signal = 'in_PG_E', clk = device.clk(0) }
+    write_mc_location_assignment { signal = 'in1_PG_D', mc = device.glb(special_glb).mc(special_mc) }
+    write_mc_location_assignment { signal = 'in0_PG_D', mc = device.glb(special_glb).mc((special_mc + 1) % 16) }
+    write_mc_location_assignment { signal = 'out', mc = device.glb(special_glb).mc((special_mc + 2) % 16) }
+end
+
+function write_lci_pgdf_clk (device, special_clk, variant)
+    write_lci_common { device = device }
+
+    local clk = device.clk(special_clk)
+
+    writeln '\n[Location Assignments]'
+    write_clk_location_assignment { signal = 'in1_PG_D', clk = clk }
+    write_mc_location_assignment { signal = 'in_PG_E', mc = device.glb(clk.glb.index or 0).mc(0) }
+    write_mc_location_assignment { signal = 'in0_PG_D', mc = device.glb(clk.glb.index or 0).mc(1) }
+    write_mc_location_assignment { signal = 'out', mc = device.glb(clk.glb.index or 0).mc(2) }
 end
