@@ -56,7 +56,7 @@ pub fn main() !void {
         try writer.print("{}:{}",.{ DeviceJed.getRow(fuse), DeviceJed.getColumn(fuse) });
 
         for (data.items) |d| {
-            const v = if (d.raw.isSet(fuse)) @as(u32, 1) else @as(u32, 0);
+            const v: u32 = if (d.raw.isSet(fuse)) 1 else 0;
             try writer.print(",{}", .{ v });
         }
         _ = try writer.write("\n");

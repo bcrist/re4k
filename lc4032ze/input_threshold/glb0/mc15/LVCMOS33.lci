@@ -1,1 +1,1 @@
-//[[!! include "lci"; write_lci_input_threshold(device.lc4032ze, "0", "15", "LVCMOS33") ]]
+//[[!! include "lci"; write_lci_input_threshold(device.lc4032ze, 0, 15, "LVCMOS33") ]]

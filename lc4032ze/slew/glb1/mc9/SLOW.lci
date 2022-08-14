@@ -1,1 +1,1 @@
-//[[!! include "lci"; write_lci_slew(device.lc4032ze, "1", "9", "SLOW") ]]
+//[[!! include "lci"; write_lci_slew(device.lc4032ze, 1, 9, "SLOW") ]]

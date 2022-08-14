@@ -1,1 +1,1 @@
-//[[!! include "lci"; write_lci_pull(device.lc4032ze, "1", "0", "DOWN") ]]
+//[[!! include "lci"; write_lci_pull(device.lc4032ze, 1, 0, "DOWN") ]]

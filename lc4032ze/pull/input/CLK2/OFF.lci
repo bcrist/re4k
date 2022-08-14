@@ -1,0 +1,1 @@
+//[[!! include "lci"; write_lci_pull_clk(device.lc4032ze, 2, "OFF") ]]

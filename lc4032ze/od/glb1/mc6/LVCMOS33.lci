@@ -1,1 +1,1 @@
-//[[!! include "lci"; write_lci_od(device.lc4032ze, "1", "6", "LVCMOS33") ]]
+//[[!! include "lci"; write_lci_od(device.lc4032ze, 1, 6, "LVCMOS33") ]]
