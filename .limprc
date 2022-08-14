@@ -1,0 +1,5 @@
+root_dir = fs.parent_path(limprc_path)
+file_dir = fs.parent_path(file_path)
+limp_dir = fs.compose_path(root_dir, 'limp')
+register_include_dir(file_dir)
+register_include_dir(limp_dir)

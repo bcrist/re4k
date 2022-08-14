@@ -1,0 +1,1 @@
+//[[!! include "lci"; write_lci_slew(device.lc4032ze, "1", "0", "SLOW") ]]

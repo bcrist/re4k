@@ -1,0 +1,22 @@
+# Zig
+**/zig-cache/
+**/zig-out/
+
+#VS
+**/.vscode/
+
+#Ninja
+.ninja_log
+
+#Lattice
+*.tt4
+*.jed
+*.ppn
+*.rpt
+*.stderr
+*.stdout
+*.log
+*.lco
+*.fti
+*_pin.csv
+LCIEdit.dum

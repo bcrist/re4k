@@ -1,0 +1,8 @@
+(dir pkg/tempallocator
+    (notest)
+    (pkg temp_allocator)
+)
+(dir src
+    (exe fit)
+    (exe jeddiff)
+)

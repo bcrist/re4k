@@ -1,0 +1,1 @@
+//[[!! include "lci"; write_lci_zerohold(device.lc4032ze, "no") ]]

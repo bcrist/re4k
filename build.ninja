@@ -1,0 +1,924 @@
+rule copy
+    command = cp $in $out
+rule fit
+    command = zig-out/bin/fit.exe $in
+rule udiff
+    command = zig-out/bin/jeddiff.exe $out -u $in
+
+##!! include 'build_ninja' !! 917 ##
+## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
+build lc4032ze\pull\glb0\mc0\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc0\OFF.jed: fit lc4032ze\pull\glb0\mc0\OFF.lci | lc4032ze\pull\glb0\mc0\OFF.tt4
+build lc4032ze\pull\glb0\mc0\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc0\UP.jed: fit lc4032ze\pull\glb0\mc0\UP.lci | lc4032ze\pull\glb0\mc0\UP.tt4
+build lc4032ze\pull\glb0\mc0\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc0\DOWN.jed: fit lc4032ze\pull\glb0\mc0\DOWN.lci | lc4032ze\pull\glb0\mc0\DOWN.tt4
+build lc4032ze\pull\glb0\mc0\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc0\HOLD.jed: fit lc4032ze\pull\glb0\mc0\HOLD.lci | lc4032ze\pull\glb0\mc0\HOLD.tt4
+build lc4032ze\pull\glb0\mc0_fuses.csv: udiff lc4032ze\pull\glb0\mc0\OFF.jed lc4032ze\pull\glb0\mc0\UP.jed lc4032ze\pull\glb0\mc0\DOWN.jed lc4032ze\pull\glb0\mc0\HOLD.jed
+
+build lc4032ze\pull\glb0\mc1\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc1\OFF.jed: fit lc4032ze\pull\glb0\mc1\OFF.lci | lc4032ze\pull\glb0\mc1\OFF.tt4
+build lc4032ze\pull\glb0\mc1\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc1\UP.jed: fit lc4032ze\pull\glb0\mc1\UP.lci | lc4032ze\pull\glb0\mc1\UP.tt4
+build lc4032ze\pull\glb0\mc1\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc1\DOWN.jed: fit lc4032ze\pull\glb0\mc1\DOWN.lci | lc4032ze\pull\glb0\mc1\DOWN.tt4
+build lc4032ze\pull\glb0\mc1\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc1\HOLD.jed: fit lc4032ze\pull\glb0\mc1\HOLD.lci | lc4032ze\pull\glb0\mc1\HOLD.tt4
+build lc4032ze\pull\glb0\mc1_fuses.csv: udiff lc4032ze\pull\glb0\mc1\OFF.jed lc4032ze\pull\glb0\mc1\UP.jed lc4032ze\pull\glb0\mc1\DOWN.jed lc4032ze\pull\glb0\mc1\HOLD.jed
+
+build lc4032ze\pull\glb0\mc10\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc10\OFF.jed: fit lc4032ze\pull\glb0\mc10\OFF.lci | lc4032ze\pull\glb0\mc10\OFF.tt4
+build lc4032ze\pull\glb0\mc10\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc10\UP.jed: fit lc4032ze\pull\glb0\mc10\UP.lci | lc4032ze\pull\glb0\mc10\UP.tt4
+build lc4032ze\pull\glb0\mc10\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc10\DOWN.jed: fit lc4032ze\pull\glb0\mc10\DOWN.lci | lc4032ze\pull\glb0\mc10\DOWN.tt4
+build lc4032ze\pull\glb0\mc10\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc10\HOLD.jed: fit lc4032ze\pull\glb0\mc10\HOLD.lci | lc4032ze\pull\glb0\mc10\HOLD.tt4
+build lc4032ze\pull\glb0\mc10_fuses.csv: udiff lc4032ze\pull\glb0\mc10\OFF.jed lc4032ze\pull\glb0\mc10\UP.jed lc4032ze\pull\glb0\mc10\DOWN.jed lc4032ze\pull\glb0\mc10\HOLD.jed
+
+build lc4032ze\pull\glb0\mc11\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc11\OFF.jed: fit lc4032ze\pull\glb0\mc11\OFF.lci | lc4032ze\pull\glb0\mc11\OFF.tt4
+build lc4032ze\pull\glb0\mc11\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc11\UP.jed: fit lc4032ze\pull\glb0\mc11\UP.lci | lc4032ze\pull\glb0\mc11\UP.tt4
+build lc4032ze\pull\glb0\mc11\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc11\DOWN.jed: fit lc4032ze\pull\glb0\mc11\DOWN.lci | lc4032ze\pull\glb0\mc11\DOWN.tt4
+build lc4032ze\pull\glb0\mc11\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc11\HOLD.jed: fit lc4032ze\pull\glb0\mc11\HOLD.lci | lc4032ze\pull\glb0\mc11\HOLD.tt4
+build lc4032ze\pull\glb0\mc11_fuses.csv: udiff lc4032ze\pull\glb0\mc11\OFF.jed lc4032ze\pull\glb0\mc11\UP.jed lc4032ze\pull\glb0\mc11\DOWN.jed lc4032ze\pull\glb0\mc11\HOLD.jed
+
+build lc4032ze\pull\glb0\mc12\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc12\OFF.jed: fit lc4032ze\pull\glb0\mc12\OFF.lci | lc4032ze\pull\glb0\mc12\OFF.tt4
+build lc4032ze\pull\glb0\mc12\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc12\UP.jed: fit lc4032ze\pull\glb0\mc12\UP.lci | lc4032ze\pull\glb0\mc12\UP.tt4
+build lc4032ze\pull\glb0\mc12\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc12\DOWN.jed: fit lc4032ze\pull\glb0\mc12\DOWN.lci | lc4032ze\pull\glb0\mc12\DOWN.tt4
+build lc4032ze\pull\glb0\mc12\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc12\HOLD.jed: fit lc4032ze\pull\glb0\mc12\HOLD.lci | lc4032ze\pull\glb0\mc12\HOLD.tt4
+build lc4032ze\pull\glb0\mc12_fuses.csv: udiff lc4032ze\pull\glb0\mc12\OFF.jed lc4032ze\pull\glb0\mc12\UP.jed lc4032ze\pull\glb0\mc12\DOWN.jed lc4032ze\pull\glb0\mc12\HOLD.jed
+
+build lc4032ze\pull\glb0\mc13\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc13\OFF.jed: fit lc4032ze\pull\glb0\mc13\OFF.lci | lc4032ze\pull\glb0\mc13\OFF.tt4
+build lc4032ze\pull\glb0\mc13\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc13\UP.jed: fit lc4032ze\pull\glb0\mc13\UP.lci | lc4032ze\pull\glb0\mc13\UP.tt4
+build lc4032ze\pull\glb0\mc13\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc13\DOWN.jed: fit lc4032ze\pull\glb0\mc13\DOWN.lci | lc4032ze\pull\glb0\mc13\DOWN.tt4
+build lc4032ze\pull\glb0\mc13\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc13\HOLD.jed: fit lc4032ze\pull\glb0\mc13\HOLD.lci | lc4032ze\pull\glb0\mc13\HOLD.tt4
+build lc4032ze\pull\glb0\mc13_fuses.csv: udiff lc4032ze\pull\glb0\mc13\OFF.jed lc4032ze\pull\glb0\mc13\UP.jed lc4032ze\pull\glb0\mc13\DOWN.jed lc4032ze\pull\glb0\mc13\HOLD.jed
+
+build lc4032ze\pull\glb0\mc14\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc14\OFF.jed: fit lc4032ze\pull\glb0\mc14\OFF.lci | lc4032ze\pull\glb0\mc14\OFF.tt4
+build lc4032ze\pull\glb0\mc14\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc14\UP.jed: fit lc4032ze\pull\glb0\mc14\UP.lci | lc4032ze\pull\glb0\mc14\UP.tt4
+build lc4032ze\pull\glb0\mc14\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc14\DOWN.jed: fit lc4032ze\pull\glb0\mc14\DOWN.lci | lc4032ze\pull\glb0\mc14\DOWN.tt4
+build lc4032ze\pull\glb0\mc14\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc14\HOLD.jed: fit lc4032ze\pull\glb0\mc14\HOLD.lci | lc4032ze\pull\glb0\mc14\HOLD.tt4
+build lc4032ze\pull\glb0\mc14_fuses.csv: udiff lc4032ze\pull\glb0\mc14\OFF.jed lc4032ze\pull\glb0\mc14\UP.jed lc4032ze\pull\glb0\mc14\DOWN.jed lc4032ze\pull\glb0\mc14\HOLD.jed
+
+build lc4032ze\pull\glb0\mc15\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc15\OFF.jed: fit lc4032ze\pull\glb0\mc15\OFF.lci | lc4032ze\pull\glb0\mc15\OFF.tt4
+build lc4032ze\pull\glb0\mc15\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc15\UP.jed: fit lc4032ze\pull\glb0\mc15\UP.lci | lc4032ze\pull\glb0\mc15\UP.tt4
+build lc4032ze\pull\glb0\mc15\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc15\DOWN.jed: fit lc4032ze\pull\glb0\mc15\DOWN.lci | lc4032ze\pull\glb0\mc15\DOWN.tt4
+build lc4032ze\pull\glb0\mc15\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc15\HOLD.jed: fit lc4032ze\pull\glb0\mc15\HOLD.lci | lc4032ze\pull\glb0\mc15\HOLD.tt4
+build lc4032ze\pull\glb0\mc15_fuses.csv: udiff lc4032ze\pull\glb0\mc15\OFF.jed lc4032ze\pull\glb0\mc15\UP.jed lc4032ze\pull\glb0\mc15\DOWN.jed lc4032ze\pull\glb0\mc15\HOLD.jed
+
+build lc4032ze\pull\glb0\mc2\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc2\OFF.jed: fit lc4032ze\pull\glb0\mc2\OFF.lci | lc4032ze\pull\glb0\mc2\OFF.tt4
+build lc4032ze\pull\glb0\mc2\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc2\UP.jed: fit lc4032ze\pull\glb0\mc2\UP.lci | lc4032ze\pull\glb0\mc2\UP.tt4
+build lc4032ze\pull\glb0\mc2\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc2\DOWN.jed: fit lc4032ze\pull\glb0\mc2\DOWN.lci | lc4032ze\pull\glb0\mc2\DOWN.tt4
+build lc4032ze\pull\glb0\mc2\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc2\HOLD.jed: fit lc4032ze\pull\glb0\mc2\HOLD.lci | lc4032ze\pull\glb0\mc2\HOLD.tt4
+build lc4032ze\pull\glb0\mc2_fuses.csv: udiff lc4032ze\pull\glb0\mc2\OFF.jed lc4032ze\pull\glb0\mc2\UP.jed lc4032ze\pull\glb0\mc2\DOWN.jed lc4032ze\pull\glb0\mc2\HOLD.jed
+
+build lc4032ze\pull\glb0\mc3\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc3\OFF.jed: fit lc4032ze\pull\glb0\mc3\OFF.lci | lc4032ze\pull\glb0\mc3\OFF.tt4
+build lc4032ze\pull\glb0\mc3\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc3\UP.jed: fit lc4032ze\pull\glb0\mc3\UP.lci | lc4032ze\pull\glb0\mc3\UP.tt4
+build lc4032ze\pull\glb0\mc3\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc3\DOWN.jed: fit lc4032ze\pull\glb0\mc3\DOWN.lci | lc4032ze\pull\glb0\mc3\DOWN.tt4
+build lc4032ze\pull\glb0\mc3\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc3\HOLD.jed: fit lc4032ze\pull\glb0\mc3\HOLD.lci | lc4032ze\pull\glb0\mc3\HOLD.tt4
+build lc4032ze\pull\glb0\mc3_fuses.csv: udiff lc4032ze\pull\glb0\mc3\OFF.jed lc4032ze\pull\glb0\mc3\UP.jed lc4032ze\pull\glb0\mc3\DOWN.jed lc4032ze\pull\glb0\mc3\HOLD.jed
+
+build lc4032ze\pull\glb0\mc4\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc4\OFF.jed: fit lc4032ze\pull\glb0\mc4\OFF.lci | lc4032ze\pull\glb0\mc4\OFF.tt4
+build lc4032ze\pull\glb0\mc4\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc4\UP.jed: fit lc4032ze\pull\glb0\mc4\UP.lci | lc4032ze\pull\glb0\mc4\UP.tt4
+build lc4032ze\pull\glb0\mc4\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc4\DOWN.jed: fit lc4032ze\pull\glb0\mc4\DOWN.lci | lc4032ze\pull\glb0\mc4\DOWN.tt4
+build lc4032ze\pull\glb0\mc4\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc4\HOLD.jed: fit lc4032ze\pull\glb0\mc4\HOLD.lci | lc4032ze\pull\glb0\mc4\HOLD.tt4
+build lc4032ze\pull\glb0\mc4_fuses.csv: udiff lc4032ze\pull\glb0\mc4\OFF.jed lc4032ze\pull\glb0\mc4\UP.jed lc4032ze\pull\glb0\mc4\DOWN.jed lc4032ze\pull\glb0\mc4\HOLD.jed
+
+build lc4032ze\pull\glb0\mc5\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc5\OFF.jed: fit lc4032ze\pull\glb0\mc5\OFF.lci | lc4032ze\pull\glb0\mc5\OFF.tt4
+build lc4032ze\pull\glb0\mc5\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc5\UP.jed: fit lc4032ze\pull\glb0\mc5\UP.lci | lc4032ze\pull\glb0\mc5\UP.tt4
+build lc4032ze\pull\glb0\mc5\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc5\DOWN.jed: fit lc4032ze\pull\glb0\mc5\DOWN.lci | lc4032ze\pull\glb0\mc5\DOWN.tt4
+build lc4032ze\pull\glb0\mc5\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc5\HOLD.jed: fit lc4032ze\pull\glb0\mc5\HOLD.lci | lc4032ze\pull\glb0\mc5\HOLD.tt4
+build lc4032ze\pull\glb0\mc5_fuses.csv: udiff lc4032ze\pull\glb0\mc5\OFF.jed lc4032ze\pull\glb0\mc5\UP.jed lc4032ze\pull\glb0\mc5\DOWN.jed lc4032ze\pull\glb0\mc5\HOLD.jed
+
+build lc4032ze\pull\glb0\mc6\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc6\OFF.jed: fit lc4032ze\pull\glb0\mc6\OFF.lci | lc4032ze\pull\glb0\mc6\OFF.tt4
+build lc4032ze\pull\glb0\mc6\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc6\UP.jed: fit lc4032ze\pull\glb0\mc6\UP.lci | lc4032ze\pull\glb0\mc6\UP.tt4
+build lc4032ze\pull\glb0\mc6\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc6\DOWN.jed: fit lc4032ze\pull\glb0\mc6\DOWN.lci | lc4032ze\pull\glb0\mc6\DOWN.tt4
+build lc4032ze\pull\glb0\mc6\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc6\HOLD.jed: fit lc4032ze\pull\glb0\mc6\HOLD.lci | lc4032ze\pull\glb0\mc6\HOLD.tt4
+build lc4032ze\pull\glb0\mc6_fuses.csv: udiff lc4032ze\pull\glb0\mc6\OFF.jed lc4032ze\pull\glb0\mc6\UP.jed lc4032ze\pull\glb0\mc6\DOWN.jed lc4032ze\pull\glb0\mc6\HOLD.jed
+
+build lc4032ze\pull\glb0\mc7\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc7\OFF.jed: fit lc4032ze\pull\glb0\mc7\OFF.lci | lc4032ze\pull\glb0\mc7\OFF.tt4
+build lc4032ze\pull\glb0\mc7\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc7\UP.jed: fit lc4032ze\pull\glb0\mc7\UP.lci | lc4032ze\pull\glb0\mc7\UP.tt4
+build lc4032ze\pull\glb0\mc7\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc7\DOWN.jed: fit lc4032ze\pull\glb0\mc7\DOWN.lci | lc4032ze\pull\glb0\mc7\DOWN.tt4
+build lc4032ze\pull\glb0\mc7\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc7\HOLD.jed: fit lc4032ze\pull\glb0\mc7\HOLD.lci | lc4032ze\pull\glb0\mc7\HOLD.tt4
+build lc4032ze\pull\glb0\mc7_fuses.csv: udiff lc4032ze\pull\glb0\mc7\OFF.jed lc4032ze\pull\glb0\mc7\UP.jed lc4032ze\pull\glb0\mc7\DOWN.jed lc4032ze\pull\glb0\mc7\HOLD.jed
+
+build lc4032ze\pull\glb0\mc8\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc8\OFF.jed: fit lc4032ze\pull\glb0\mc8\OFF.lci | lc4032ze\pull\glb0\mc8\OFF.tt4
+build lc4032ze\pull\glb0\mc8\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc8\UP.jed: fit lc4032ze\pull\glb0\mc8\UP.lci | lc4032ze\pull\glb0\mc8\UP.tt4
+build lc4032ze\pull\glb0\mc8\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc8\DOWN.jed: fit lc4032ze\pull\glb0\mc8\DOWN.lci | lc4032ze\pull\glb0\mc8\DOWN.tt4
+build lc4032ze\pull\glb0\mc8\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc8\HOLD.jed: fit lc4032ze\pull\glb0\mc8\HOLD.lci | lc4032ze\pull\glb0\mc8\HOLD.tt4
+build lc4032ze\pull\glb0\mc8_fuses.csv: udiff lc4032ze\pull\glb0\mc8\OFF.jed lc4032ze\pull\glb0\mc8\UP.jed lc4032ze\pull\glb0\mc8\DOWN.jed lc4032ze\pull\glb0\mc8\HOLD.jed
+
+build lc4032ze\pull\glb0\mc9\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc9\OFF.jed: fit lc4032ze\pull\glb0\mc9\OFF.lci | lc4032ze\pull\glb0\mc9\OFF.tt4
+build lc4032ze\pull\glb0\mc9\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc9\UP.jed: fit lc4032ze\pull\glb0\mc9\UP.lci | lc4032ze\pull\glb0\mc9\UP.tt4
+build lc4032ze\pull\glb0\mc9\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc9\DOWN.jed: fit lc4032ze\pull\glb0\mc9\DOWN.lci | lc4032ze\pull\glb0\mc9\DOWN.tt4
+build lc4032ze\pull\glb0\mc9\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb0\mc9\HOLD.jed: fit lc4032ze\pull\glb0\mc9\HOLD.lci | lc4032ze\pull\glb0\mc9\HOLD.tt4
+build lc4032ze\pull\glb0\mc9_fuses.csv: udiff lc4032ze\pull\glb0\mc9\OFF.jed lc4032ze\pull\glb0\mc9\UP.jed lc4032ze\pull\glb0\mc9\DOWN.jed lc4032ze\pull\glb0\mc9\HOLD.jed
+
+build lc4032ze\pull\glb1\mc0\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc0\OFF.jed: fit lc4032ze\pull\glb1\mc0\OFF.lci | lc4032ze\pull\glb1\mc0\OFF.tt4
+build lc4032ze\pull\glb1\mc0\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc0\UP.jed: fit lc4032ze\pull\glb1\mc0\UP.lci | lc4032ze\pull\glb1\mc0\UP.tt4
+build lc4032ze\pull\glb1\mc0\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc0\DOWN.jed: fit lc4032ze\pull\glb1\mc0\DOWN.lci | lc4032ze\pull\glb1\mc0\DOWN.tt4
+build lc4032ze\pull\glb1\mc0\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc0\HOLD.jed: fit lc4032ze\pull\glb1\mc0\HOLD.lci | lc4032ze\pull\glb1\mc0\HOLD.tt4
+build lc4032ze\pull\glb1\mc0_fuses.csv: udiff lc4032ze\pull\glb1\mc0\OFF.jed lc4032ze\pull\glb1\mc0\UP.jed lc4032ze\pull\glb1\mc0\DOWN.jed lc4032ze\pull\glb1\mc0\HOLD.jed
+
+build lc4032ze\pull\glb1\mc1\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc1\OFF.jed: fit lc4032ze\pull\glb1\mc1\OFF.lci | lc4032ze\pull\glb1\mc1\OFF.tt4
+build lc4032ze\pull\glb1\mc1\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc1\UP.jed: fit lc4032ze\pull\glb1\mc1\UP.lci | lc4032ze\pull\glb1\mc1\UP.tt4
+build lc4032ze\pull\glb1\mc1\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc1\DOWN.jed: fit lc4032ze\pull\glb1\mc1\DOWN.lci | lc4032ze\pull\glb1\mc1\DOWN.tt4
+build lc4032ze\pull\glb1\mc1\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc1\HOLD.jed: fit lc4032ze\pull\glb1\mc1\HOLD.lci | lc4032ze\pull\glb1\mc1\HOLD.tt4
+build lc4032ze\pull\glb1\mc1_fuses.csv: udiff lc4032ze\pull\glb1\mc1\OFF.jed lc4032ze\pull\glb1\mc1\UP.jed lc4032ze\pull\glb1\mc1\DOWN.jed lc4032ze\pull\glb1\mc1\HOLD.jed
+
+build lc4032ze\pull\glb1\mc10\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc10\OFF.jed: fit lc4032ze\pull\glb1\mc10\OFF.lci | lc4032ze\pull\glb1\mc10\OFF.tt4
+build lc4032ze\pull\glb1\mc10\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc10\UP.jed: fit lc4032ze\pull\glb1\mc10\UP.lci | lc4032ze\pull\glb1\mc10\UP.tt4
+build lc4032ze\pull\glb1\mc10\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc10\DOWN.jed: fit lc4032ze\pull\glb1\mc10\DOWN.lci | lc4032ze\pull\glb1\mc10\DOWN.tt4
+build lc4032ze\pull\glb1\mc10\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc10\HOLD.jed: fit lc4032ze\pull\glb1\mc10\HOLD.lci | lc4032ze\pull\glb1\mc10\HOLD.tt4
+build lc4032ze\pull\glb1\mc10_fuses.csv: udiff lc4032ze\pull\glb1\mc10\OFF.jed lc4032ze\pull\glb1\mc10\UP.jed lc4032ze\pull\glb1\mc10\DOWN.jed lc4032ze\pull\glb1\mc10\HOLD.jed
+
+build lc4032ze\pull\glb1\mc11\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc11\OFF.jed: fit lc4032ze\pull\glb1\mc11\OFF.lci | lc4032ze\pull\glb1\mc11\OFF.tt4
+build lc4032ze\pull\glb1\mc11\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc11\UP.jed: fit lc4032ze\pull\glb1\mc11\UP.lci | lc4032ze\pull\glb1\mc11\UP.tt4
+build lc4032ze\pull\glb1\mc11\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc11\DOWN.jed: fit lc4032ze\pull\glb1\mc11\DOWN.lci | lc4032ze\pull\glb1\mc11\DOWN.tt4
+build lc4032ze\pull\glb1\mc11\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc11\HOLD.jed: fit lc4032ze\pull\glb1\mc11\HOLD.lci | lc4032ze\pull\glb1\mc11\HOLD.tt4
+build lc4032ze\pull\glb1\mc11_fuses.csv: udiff lc4032ze\pull\glb1\mc11\OFF.jed lc4032ze\pull\glb1\mc11\UP.jed lc4032ze\pull\glb1\mc11\DOWN.jed lc4032ze\pull\glb1\mc11\HOLD.jed
+
+build lc4032ze\pull\glb1\mc12\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc12\OFF.jed: fit lc4032ze\pull\glb1\mc12\OFF.lci | lc4032ze\pull\glb1\mc12\OFF.tt4
+build lc4032ze\pull\glb1\mc12\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc12\UP.jed: fit lc4032ze\pull\glb1\mc12\UP.lci | lc4032ze\pull\glb1\mc12\UP.tt4
+build lc4032ze\pull\glb1\mc12\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc12\DOWN.jed: fit lc4032ze\pull\glb1\mc12\DOWN.lci | lc4032ze\pull\glb1\mc12\DOWN.tt4
+build lc4032ze\pull\glb1\mc12\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc12\HOLD.jed: fit lc4032ze\pull\glb1\mc12\HOLD.lci | lc4032ze\pull\glb1\mc12\HOLD.tt4
+build lc4032ze\pull\glb1\mc12_fuses.csv: udiff lc4032ze\pull\glb1\mc12\OFF.jed lc4032ze\pull\glb1\mc12\UP.jed lc4032ze\pull\glb1\mc12\DOWN.jed lc4032ze\pull\glb1\mc12\HOLD.jed
+
+build lc4032ze\pull\glb1\mc13\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc13\OFF.jed: fit lc4032ze\pull\glb1\mc13\OFF.lci | lc4032ze\pull\glb1\mc13\OFF.tt4
+build lc4032ze\pull\glb1\mc13\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc13\UP.jed: fit lc4032ze\pull\glb1\mc13\UP.lci | lc4032ze\pull\glb1\mc13\UP.tt4
+build lc4032ze\pull\glb1\mc13\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc13\DOWN.jed: fit lc4032ze\pull\glb1\mc13\DOWN.lci | lc4032ze\pull\glb1\mc13\DOWN.tt4
+build lc4032ze\pull\glb1\mc13\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc13\HOLD.jed: fit lc4032ze\pull\glb1\mc13\HOLD.lci | lc4032ze\pull\glb1\mc13\HOLD.tt4
+build lc4032ze\pull\glb1\mc13_fuses.csv: udiff lc4032ze\pull\glb1\mc13\OFF.jed lc4032ze\pull\glb1\mc13\UP.jed lc4032ze\pull\glb1\mc13\DOWN.jed lc4032ze\pull\glb1\mc13\HOLD.jed
+
+build lc4032ze\pull\glb1\mc14\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc14\OFF.jed: fit lc4032ze\pull\glb1\mc14\OFF.lci | lc4032ze\pull\glb1\mc14\OFF.tt4
+build lc4032ze\pull\glb1\mc14\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc14\UP.jed: fit lc4032ze\pull\glb1\mc14\UP.lci | lc4032ze\pull\glb1\mc14\UP.tt4
+build lc4032ze\pull\glb1\mc14\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc14\DOWN.jed: fit lc4032ze\pull\glb1\mc14\DOWN.lci | lc4032ze\pull\glb1\mc14\DOWN.tt4
+build lc4032ze\pull\glb1\mc14\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc14\HOLD.jed: fit lc4032ze\pull\glb1\mc14\HOLD.lci | lc4032ze\pull\glb1\mc14\HOLD.tt4
+build lc4032ze\pull\glb1\mc14_fuses.csv: udiff lc4032ze\pull\glb1\mc14\OFF.jed lc4032ze\pull\glb1\mc14\UP.jed lc4032ze\pull\glb1\mc14\DOWN.jed lc4032ze\pull\glb1\mc14\HOLD.jed
+
+build lc4032ze\pull\glb1\mc15\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc15\OFF.jed: fit lc4032ze\pull\glb1\mc15\OFF.lci | lc4032ze\pull\glb1\mc15\OFF.tt4
+build lc4032ze\pull\glb1\mc15\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc15\UP.jed: fit lc4032ze\pull\glb1\mc15\UP.lci | lc4032ze\pull\glb1\mc15\UP.tt4
+build lc4032ze\pull\glb1\mc15\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc15\DOWN.jed: fit lc4032ze\pull\glb1\mc15\DOWN.lci | lc4032ze\pull\glb1\mc15\DOWN.tt4
+build lc4032ze\pull\glb1\mc15\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc15\HOLD.jed: fit lc4032ze\pull\glb1\mc15\HOLD.lci | lc4032ze\pull\glb1\mc15\HOLD.tt4
+build lc4032ze\pull\glb1\mc15_fuses.csv: udiff lc4032ze\pull\glb1\mc15\OFF.jed lc4032ze\pull\glb1\mc15\UP.jed lc4032ze\pull\glb1\mc15\DOWN.jed lc4032ze\pull\glb1\mc15\HOLD.jed
+
+build lc4032ze\pull\glb1\mc2\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc2\OFF.jed: fit lc4032ze\pull\glb1\mc2\OFF.lci | lc4032ze\pull\glb1\mc2\OFF.tt4
+build lc4032ze\pull\glb1\mc2\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc2\UP.jed: fit lc4032ze\pull\glb1\mc2\UP.lci | lc4032ze\pull\glb1\mc2\UP.tt4
+build lc4032ze\pull\glb1\mc2\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc2\DOWN.jed: fit lc4032ze\pull\glb1\mc2\DOWN.lci | lc4032ze\pull\glb1\mc2\DOWN.tt4
+build lc4032ze\pull\glb1\mc2\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc2\HOLD.jed: fit lc4032ze\pull\glb1\mc2\HOLD.lci | lc4032ze\pull\glb1\mc2\HOLD.tt4
+build lc4032ze\pull\glb1\mc2_fuses.csv: udiff lc4032ze\pull\glb1\mc2\OFF.jed lc4032ze\pull\glb1\mc2\UP.jed lc4032ze\pull\glb1\mc2\DOWN.jed lc4032ze\pull\glb1\mc2\HOLD.jed
+
+build lc4032ze\pull\glb1\mc3\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc3\OFF.jed: fit lc4032ze\pull\glb1\mc3\OFF.lci | lc4032ze\pull\glb1\mc3\OFF.tt4
+build lc4032ze\pull\glb1\mc3\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc3\UP.jed: fit lc4032ze\pull\glb1\mc3\UP.lci | lc4032ze\pull\glb1\mc3\UP.tt4
+build lc4032ze\pull\glb1\mc3\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc3\DOWN.jed: fit lc4032ze\pull\glb1\mc3\DOWN.lci | lc4032ze\pull\glb1\mc3\DOWN.tt4
+build lc4032ze\pull\glb1\mc3\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc3\HOLD.jed: fit lc4032ze\pull\glb1\mc3\HOLD.lci | lc4032ze\pull\glb1\mc3\HOLD.tt4
+build lc4032ze\pull\glb1\mc3_fuses.csv: udiff lc4032ze\pull\glb1\mc3\OFF.jed lc4032ze\pull\glb1\mc3\UP.jed lc4032ze\pull\glb1\mc3\DOWN.jed lc4032ze\pull\glb1\mc3\HOLD.jed
+
+build lc4032ze\pull\glb1\mc4\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc4\OFF.jed: fit lc4032ze\pull\glb1\mc4\OFF.lci | lc4032ze\pull\glb1\mc4\OFF.tt4
+build lc4032ze\pull\glb1\mc4\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc4\UP.jed: fit lc4032ze\pull\glb1\mc4\UP.lci | lc4032ze\pull\glb1\mc4\UP.tt4
+build lc4032ze\pull\glb1\mc4\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc4\DOWN.jed: fit lc4032ze\pull\glb1\mc4\DOWN.lci | lc4032ze\pull\glb1\mc4\DOWN.tt4
+build lc4032ze\pull\glb1\mc4\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc4\HOLD.jed: fit lc4032ze\pull\glb1\mc4\HOLD.lci | lc4032ze\pull\glb1\mc4\HOLD.tt4
+build lc4032ze\pull\glb1\mc4_fuses.csv: udiff lc4032ze\pull\glb1\mc4\OFF.jed lc4032ze\pull\glb1\mc4\UP.jed lc4032ze\pull\glb1\mc4\DOWN.jed lc4032ze\pull\glb1\mc4\HOLD.jed
+
+build lc4032ze\pull\glb1\mc5\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc5\OFF.jed: fit lc4032ze\pull\glb1\mc5\OFF.lci | lc4032ze\pull\glb1\mc5\OFF.tt4
+build lc4032ze\pull\glb1\mc5\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc5\UP.jed: fit lc4032ze\pull\glb1\mc5\UP.lci | lc4032ze\pull\glb1\mc5\UP.tt4
+build lc4032ze\pull\glb1\mc5\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc5\DOWN.jed: fit lc4032ze\pull\glb1\mc5\DOWN.lci | lc4032ze\pull\glb1\mc5\DOWN.tt4
+build lc4032ze\pull\glb1\mc5\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc5\HOLD.jed: fit lc4032ze\pull\glb1\mc5\HOLD.lci | lc4032ze\pull\glb1\mc5\HOLD.tt4
+build lc4032ze\pull\glb1\mc5_fuses.csv: udiff lc4032ze\pull\glb1\mc5\OFF.jed lc4032ze\pull\glb1\mc5\UP.jed lc4032ze\pull\glb1\mc5\DOWN.jed lc4032ze\pull\glb1\mc5\HOLD.jed
+
+build lc4032ze\pull\glb1\mc6\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc6\OFF.jed: fit lc4032ze\pull\glb1\mc6\OFF.lci | lc4032ze\pull\glb1\mc6\OFF.tt4
+build lc4032ze\pull\glb1\mc6\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc6\UP.jed: fit lc4032ze\pull\glb1\mc6\UP.lci | lc4032ze\pull\glb1\mc6\UP.tt4
+build lc4032ze\pull\glb1\mc6\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc6\DOWN.jed: fit lc4032ze\pull\glb1\mc6\DOWN.lci | lc4032ze\pull\glb1\mc6\DOWN.tt4
+build lc4032ze\pull\glb1\mc6\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc6\HOLD.jed: fit lc4032ze\pull\glb1\mc6\HOLD.lci | lc4032ze\pull\glb1\mc6\HOLD.tt4
+build lc4032ze\pull\glb1\mc6_fuses.csv: udiff lc4032ze\pull\glb1\mc6\OFF.jed lc4032ze\pull\glb1\mc6\UP.jed lc4032ze\pull\glb1\mc6\DOWN.jed lc4032ze\pull\glb1\mc6\HOLD.jed
+
+build lc4032ze\pull\glb1\mc7\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc7\OFF.jed: fit lc4032ze\pull\glb1\mc7\OFF.lci | lc4032ze\pull\glb1\mc7\OFF.tt4
+build lc4032ze\pull\glb1\mc7\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc7\UP.jed: fit lc4032ze\pull\glb1\mc7\UP.lci | lc4032ze\pull\glb1\mc7\UP.tt4
+build lc4032ze\pull\glb1\mc7\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc7\DOWN.jed: fit lc4032ze\pull\glb1\mc7\DOWN.lci | lc4032ze\pull\glb1\mc7\DOWN.tt4
+build lc4032ze\pull\glb1\mc7\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc7\HOLD.jed: fit lc4032ze\pull\glb1\mc7\HOLD.lci | lc4032ze\pull\glb1\mc7\HOLD.tt4
+build lc4032ze\pull\glb1\mc7_fuses.csv: udiff lc4032ze\pull\glb1\mc7\OFF.jed lc4032ze\pull\glb1\mc7\UP.jed lc4032ze\pull\glb1\mc7\DOWN.jed lc4032ze\pull\glb1\mc7\HOLD.jed
+
+build lc4032ze\pull\glb1\mc8\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc8\OFF.jed: fit lc4032ze\pull\glb1\mc8\OFF.lci | lc4032ze\pull\glb1\mc8\OFF.tt4
+build lc4032ze\pull\glb1\mc8\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc8\UP.jed: fit lc4032ze\pull\glb1\mc8\UP.lci | lc4032ze\pull\glb1\mc8\UP.tt4
+build lc4032ze\pull\glb1\mc8\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc8\DOWN.jed: fit lc4032ze\pull\glb1\mc8\DOWN.lci | lc4032ze\pull\glb1\mc8\DOWN.tt4
+build lc4032ze\pull\glb1\mc8\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc8\HOLD.jed: fit lc4032ze\pull\glb1\mc8\HOLD.lci | lc4032ze\pull\glb1\mc8\HOLD.tt4
+build lc4032ze\pull\glb1\mc8_fuses.csv: udiff lc4032ze\pull\glb1\mc8\OFF.jed lc4032ze\pull\glb1\mc8\UP.jed lc4032ze\pull\glb1\mc8\DOWN.jed lc4032ze\pull\glb1\mc8\HOLD.jed
+
+build lc4032ze\pull\glb1\mc9\OFF.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc9\OFF.jed: fit lc4032ze\pull\glb1\mc9\OFF.lci | lc4032ze\pull\glb1\mc9\OFF.tt4
+build lc4032ze\pull\glb1\mc9\UP.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc9\UP.jed: fit lc4032ze\pull\glb1\mc9\UP.lci | lc4032ze\pull\glb1\mc9\UP.tt4
+build lc4032ze\pull\glb1\mc9\DOWN.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc9\DOWN.jed: fit lc4032ze\pull\glb1\mc9\DOWN.lci | lc4032ze\pull\glb1\mc9\DOWN.tt4
+build lc4032ze\pull\glb1\mc9\HOLD.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\pull\glb1\mc9\HOLD.jed: fit lc4032ze\pull\glb1\mc9\HOLD.lci | lc4032ze\pull\glb1\mc9\HOLD.tt4
+build lc4032ze\pull\glb1\mc9_fuses.csv: udiff lc4032ze\pull\glb1\mc9\OFF.jed lc4032ze\pull\glb1\mc9\UP.jed lc4032ze\pull\glb1\mc9\DOWN.jed lc4032ze\pull\glb1\mc9\HOLD.jed
+
+build pull: phony lc4032ze\pull\glb0\mc0_fuses.csv lc4032ze\pull\glb0\mc1_fuses.csv lc4032ze\pull\glb0\mc10_fuses.csv lc4032ze\pull\glb0\mc11_fuses.csv lc4032ze\pull\glb0\mc12_fuses.csv lc4032ze\pull\glb0\mc13_fuses.csv lc4032ze\pull\glb0\mc14_fuses.csv lc4032ze\pull\glb0\mc15_fuses.csv lc4032ze\pull\glb0\mc2_fuses.csv lc4032ze\pull\glb0\mc3_fuses.csv lc4032ze\pull\glb0\mc4_fuses.csv lc4032ze\pull\glb0\mc5_fuses.csv lc4032ze\pull\glb0\mc6_fuses.csv lc4032ze\pull\glb0\mc7_fuses.csv lc4032ze\pull\glb0\mc8_fuses.csv lc4032ze\pull\glb0\mc9_fuses.csv lc4032ze\pull\glb1\mc0_fuses.csv lc4032ze\pull\glb1\mc1_fuses.csv lc4032ze\pull\glb1\mc10_fuses.csv lc4032ze\pull\glb1\mc11_fuses.csv lc4032ze\pull\glb1\mc12_fuses.csv lc4032ze\pull\glb1\mc13_fuses.csv lc4032ze\pull\glb1\mc14_fuses.csv lc4032ze\pull\glb1\mc15_fuses.csv lc4032ze\pull\glb1\mc2_fuses.csv lc4032ze\pull\glb1\mc3_fuses.csv lc4032ze\pull\glb1\mc4_fuses.csv lc4032ze\pull\glb1\mc5_fuses.csv lc4032ze\pull\glb1\mc6_fuses.csv lc4032ze\pull\glb1\mc7_fuses.csv lc4032ze\pull\glb1\mc8_fuses.csv lc4032ze\pull\glb1\mc9_fuses.csv
+
+build lc4032ze\input_threshold\glb0\mc0\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc0\LVCMOS33.jed: fit lc4032ze\input_threshold\glb0\mc0\LVCMOS33.lci | lc4032ze\input_threshold\glb0\mc0\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb0\mc0\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc0\LVCMOS15.jed: fit lc4032ze\input_threshold\glb0\mc0\LVCMOS15.lci | lc4032ze\input_threshold\glb0\mc0\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb0\mc0_fuses.csv: udiff lc4032ze\input_threshold\glb0\mc0\LVCMOS33.jed lc4032ze\input_threshold\glb0\mc0\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb0\mc1\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc1\LVCMOS33.jed: fit lc4032ze\input_threshold\glb0\mc1\LVCMOS33.lci | lc4032ze\input_threshold\glb0\mc1\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb0\mc1\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc1\LVCMOS15.jed: fit lc4032ze\input_threshold\glb0\mc1\LVCMOS15.lci | lc4032ze\input_threshold\glb0\mc1\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb0\mc1_fuses.csv: udiff lc4032ze\input_threshold\glb0\mc1\LVCMOS33.jed lc4032ze\input_threshold\glb0\mc1\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb0\mc10\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc10\LVCMOS33.jed: fit lc4032ze\input_threshold\glb0\mc10\LVCMOS33.lci | lc4032ze\input_threshold\glb0\mc10\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb0\mc10\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc10\LVCMOS15.jed: fit lc4032ze\input_threshold\glb0\mc10\LVCMOS15.lci | lc4032ze\input_threshold\glb0\mc10\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb0\mc10_fuses.csv: udiff lc4032ze\input_threshold\glb0\mc10\LVCMOS33.jed lc4032ze\input_threshold\glb0\mc10\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb0\mc11\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc11\LVCMOS33.jed: fit lc4032ze\input_threshold\glb0\mc11\LVCMOS33.lci | lc4032ze\input_threshold\glb0\mc11\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb0\mc11\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc11\LVCMOS15.jed: fit lc4032ze\input_threshold\glb0\mc11\LVCMOS15.lci | lc4032ze\input_threshold\glb0\mc11\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb0\mc11_fuses.csv: udiff lc4032ze\input_threshold\glb0\mc11\LVCMOS33.jed lc4032ze\input_threshold\glb0\mc11\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb0\mc12\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc12\LVCMOS33.jed: fit lc4032ze\input_threshold\glb0\mc12\LVCMOS33.lci | lc4032ze\input_threshold\glb0\mc12\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb0\mc12\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc12\LVCMOS15.jed: fit lc4032ze\input_threshold\glb0\mc12\LVCMOS15.lci | lc4032ze\input_threshold\glb0\mc12\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb0\mc12_fuses.csv: udiff lc4032ze\input_threshold\glb0\mc12\LVCMOS33.jed lc4032ze\input_threshold\glb0\mc12\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb0\mc13\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc13\LVCMOS33.jed: fit lc4032ze\input_threshold\glb0\mc13\LVCMOS33.lci | lc4032ze\input_threshold\glb0\mc13\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb0\mc13\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc13\LVCMOS15.jed: fit lc4032ze\input_threshold\glb0\mc13\LVCMOS15.lci | lc4032ze\input_threshold\glb0\mc13\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb0\mc13_fuses.csv: udiff lc4032ze\input_threshold\glb0\mc13\LVCMOS33.jed lc4032ze\input_threshold\glb0\mc13\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb0\mc14\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc14\LVCMOS33.jed: fit lc4032ze\input_threshold\glb0\mc14\LVCMOS33.lci | lc4032ze\input_threshold\glb0\mc14\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb0\mc14\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc14\LVCMOS15.jed: fit lc4032ze\input_threshold\glb0\mc14\LVCMOS15.lci | lc4032ze\input_threshold\glb0\mc14\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb0\mc14_fuses.csv: udiff lc4032ze\input_threshold\glb0\mc14\LVCMOS33.jed lc4032ze\input_threshold\glb0\mc14\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb0\mc15\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc15\LVCMOS33.jed: fit lc4032ze\input_threshold\glb0\mc15\LVCMOS33.lci | lc4032ze\input_threshold\glb0\mc15\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb0\mc15\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc15\LVCMOS15.jed: fit lc4032ze\input_threshold\glb0\mc15\LVCMOS15.lci | lc4032ze\input_threshold\glb0\mc15\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb0\mc15_fuses.csv: udiff lc4032ze\input_threshold\glb0\mc15\LVCMOS33.jed lc4032ze\input_threshold\glb0\mc15\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb0\mc2\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc2\LVCMOS33.jed: fit lc4032ze\input_threshold\glb0\mc2\LVCMOS33.lci | lc4032ze\input_threshold\glb0\mc2\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb0\mc2\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc2\LVCMOS15.jed: fit lc4032ze\input_threshold\glb0\mc2\LVCMOS15.lci | lc4032ze\input_threshold\glb0\mc2\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb0\mc2_fuses.csv: udiff lc4032ze\input_threshold\glb0\mc2\LVCMOS33.jed lc4032ze\input_threshold\glb0\mc2\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb0\mc3\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc3\LVCMOS33.jed: fit lc4032ze\input_threshold\glb0\mc3\LVCMOS33.lci | lc4032ze\input_threshold\glb0\mc3\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb0\mc3\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc3\LVCMOS15.jed: fit lc4032ze\input_threshold\glb0\mc3\LVCMOS15.lci | lc4032ze\input_threshold\glb0\mc3\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb0\mc3_fuses.csv: udiff lc4032ze\input_threshold\glb0\mc3\LVCMOS33.jed lc4032ze\input_threshold\glb0\mc3\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb0\mc4\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc4\LVCMOS33.jed: fit lc4032ze\input_threshold\glb0\mc4\LVCMOS33.lci | lc4032ze\input_threshold\glb0\mc4\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb0\mc4\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc4\LVCMOS15.jed: fit lc4032ze\input_threshold\glb0\mc4\LVCMOS15.lci | lc4032ze\input_threshold\glb0\mc4\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb0\mc4_fuses.csv: udiff lc4032ze\input_threshold\glb0\mc4\LVCMOS33.jed lc4032ze\input_threshold\glb0\mc4\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb0\mc5\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc5\LVCMOS33.jed: fit lc4032ze\input_threshold\glb0\mc5\LVCMOS33.lci | lc4032ze\input_threshold\glb0\mc5\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb0\mc5\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc5\LVCMOS15.jed: fit lc4032ze\input_threshold\glb0\mc5\LVCMOS15.lci | lc4032ze\input_threshold\glb0\mc5\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb0\mc5_fuses.csv: udiff lc4032ze\input_threshold\glb0\mc5\LVCMOS33.jed lc4032ze\input_threshold\glb0\mc5\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb0\mc6\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc6\LVCMOS33.jed: fit lc4032ze\input_threshold\glb0\mc6\LVCMOS33.lci | lc4032ze\input_threshold\glb0\mc6\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb0\mc6\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc6\LVCMOS15.jed: fit lc4032ze\input_threshold\glb0\mc6\LVCMOS15.lci | lc4032ze\input_threshold\glb0\mc6\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb0\mc6_fuses.csv: udiff lc4032ze\input_threshold\glb0\mc6\LVCMOS33.jed lc4032ze\input_threshold\glb0\mc6\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb0\mc7\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc7\LVCMOS33.jed: fit lc4032ze\input_threshold\glb0\mc7\LVCMOS33.lci | lc4032ze\input_threshold\glb0\mc7\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb0\mc7\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc7\LVCMOS15.jed: fit lc4032ze\input_threshold\glb0\mc7\LVCMOS15.lci | lc4032ze\input_threshold\glb0\mc7\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb0\mc7_fuses.csv: udiff lc4032ze\input_threshold\glb0\mc7\LVCMOS33.jed lc4032ze\input_threshold\glb0\mc7\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb0\mc8\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc8\LVCMOS33.jed: fit lc4032ze\input_threshold\glb0\mc8\LVCMOS33.lci | lc4032ze\input_threshold\glb0\mc8\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb0\mc8\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc8\LVCMOS15.jed: fit lc4032ze\input_threshold\glb0\mc8\LVCMOS15.lci | lc4032ze\input_threshold\glb0\mc8\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb0\mc8_fuses.csv: udiff lc4032ze\input_threshold\glb0\mc8\LVCMOS33.jed lc4032ze\input_threshold\glb0\mc8\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb0\mc9\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc9\LVCMOS33.jed: fit lc4032ze\input_threshold\glb0\mc9\LVCMOS33.lci | lc4032ze\input_threshold\glb0\mc9\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb0\mc9\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb0\mc9\LVCMOS15.jed: fit lc4032ze\input_threshold\glb0\mc9\LVCMOS15.lci | lc4032ze\input_threshold\glb0\mc9\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb0\mc9_fuses.csv: udiff lc4032ze\input_threshold\glb0\mc9\LVCMOS33.jed lc4032ze\input_threshold\glb0\mc9\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb1\mc0\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc0\LVCMOS33.jed: fit lc4032ze\input_threshold\glb1\mc0\LVCMOS33.lci | lc4032ze\input_threshold\glb1\mc0\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb1\mc0\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc0\LVCMOS15.jed: fit lc4032ze\input_threshold\glb1\mc0\LVCMOS15.lci | lc4032ze\input_threshold\glb1\mc0\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb1\mc0_fuses.csv: udiff lc4032ze\input_threshold\glb1\mc0\LVCMOS33.jed lc4032ze\input_threshold\glb1\mc0\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb1\mc1\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc1\LVCMOS33.jed: fit lc4032ze\input_threshold\glb1\mc1\LVCMOS33.lci | lc4032ze\input_threshold\glb1\mc1\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb1\mc1\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc1\LVCMOS15.jed: fit lc4032ze\input_threshold\glb1\mc1\LVCMOS15.lci | lc4032ze\input_threshold\glb1\mc1\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb1\mc1_fuses.csv: udiff lc4032ze\input_threshold\glb1\mc1\LVCMOS33.jed lc4032ze\input_threshold\glb1\mc1\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb1\mc10\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc10\LVCMOS33.jed: fit lc4032ze\input_threshold\glb1\mc10\LVCMOS33.lci | lc4032ze\input_threshold\glb1\mc10\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb1\mc10\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc10\LVCMOS15.jed: fit lc4032ze\input_threshold\glb1\mc10\LVCMOS15.lci | lc4032ze\input_threshold\glb1\mc10\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb1\mc10_fuses.csv: udiff lc4032ze\input_threshold\glb1\mc10\LVCMOS33.jed lc4032ze\input_threshold\glb1\mc10\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb1\mc11\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc11\LVCMOS33.jed: fit lc4032ze\input_threshold\glb1\mc11\LVCMOS33.lci | lc4032ze\input_threshold\glb1\mc11\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb1\mc11\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc11\LVCMOS15.jed: fit lc4032ze\input_threshold\glb1\mc11\LVCMOS15.lci | lc4032ze\input_threshold\glb1\mc11\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb1\mc11_fuses.csv: udiff lc4032ze\input_threshold\glb1\mc11\LVCMOS33.jed lc4032ze\input_threshold\glb1\mc11\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb1\mc12\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc12\LVCMOS33.jed: fit lc4032ze\input_threshold\glb1\mc12\LVCMOS33.lci | lc4032ze\input_threshold\glb1\mc12\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb1\mc12\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc12\LVCMOS15.jed: fit lc4032ze\input_threshold\glb1\mc12\LVCMOS15.lci | lc4032ze\input_threshold\glb1\mc12\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb1\mc12_fuses.csv: udiff lc4032ze\input_threshold\glb1\mc12\LVCMOS33.jed lc4032ze\input_threshold\glb1\mc12\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb1\mc13\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc13\LVCMOS33.jed: fit lc4032ze\input_threshold\glb1\mc13\LVCMOS33.lci | lc4032ze\input_threshold\glb1\mc13\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb1\mc13\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc13\LVCMOS15.jed: fit lc4032ze\input_threshold\glb1\mc13\LVCMOS15.lci | lc4032ze\input_threshold\glb1\mc13\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb1\mc13_fuses.csv: udiff lc4032ze\input_threshold\glb1\mc13\LVCMOS33.jed lc4032ze\input_threshold\glb1\mc13\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb1\mc14\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc14\LVCMOS33.jed: fit lc4032ze\input_threshold\glb1\mc14\LVCMOS33.lci | lc4032ze\input_threshold\glb1\mc14\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb1\mc14\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc14\LVCMOS15.jed: fit lc4032ze\input_threshold\glb1\mc14\LVCMOS15.lci | lc4032ze\input_threshold\glb1\mc14\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb1\mc14_fuses.csv: udiff lc4032ze\input_threshold\glb1\mc14\LVCMOS33.jed lc4032ze\input_threshold\glb1\mc14\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb1\mc15\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc15\LVCMOS33.jed: fit lc4032ze\input_threshold\glb1\mc15\LVCMOS33.lci | lc4032ze\input_threshold\glb1\mc15\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb1\mc15\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc15\LVCMOS15.jed: fit lc4032ze\input_threshold\glb1\mc15\LVCMOS15.lci | lc4032ze\input_threshold\glb1\mc15\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb1\mc15_fuses.csv: udiff lc4032ze\input_threshold\glb1\mc15\LVCMOS33.jed lc4032ze\input_threshold\glb1\mc15\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb1\mc2\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc2\LVCMOS33.jed: fit lc4032ze\input_threshold\glb1\mc2\LVCMOS33.lci | lc4032ze\input_threshold\glb1\mc2\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb1\mc2\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc2\LVCMOS15.jed: fit lc4032ze\input_threshold\glb1\mc2\LVCMOS15.lci | lc4032ze\input_threshold\glb1\mc2\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb1\mc2_fuses.csv: udiff lc4032ze\input_threshold\glb1\mc2\LVCMOS33.jed lc4032ze\input_threshold\glb1\mc2\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb1\mc3\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc3\LVCMOS33.jed: fit lc4032ze\input_threshold\glb1\mc3\LVCMOS33.lci | lc4032ze\input_threshold\glb1\mc3\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb1\mc3\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc3\LVCMOS15.jed: fit lc4032ze\input_threshold\glb1\mc3\LVCMOS15.lci | lc4032ze\input_threshold\glb1\mc3\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb1\mc3_fuses.csv: udiff lc4032ze\input_threshold\glb1\mc3\LVCMOS33.jed lc4032ze\input_threshold\glb1\mc3\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb1\mc4\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc4\LVCMOS33.jed: fit lc4032ze\input_threshold\glb1\mc4\LVCMOS33.lci | lc4032ze\input_threshold\glb1\mc4\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb1\mc4\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc4\LVCMOS15.jed: fit lc4032ze\input_threshold\glb1\mc4\LVCMOS15.lci | lc4032ze\input_threshold\glb1\mc4\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb1\mc4_fuses.csv: udiff lc4032ze\input_threshold\glb1\mc4\LVCMOS33.jed lc4032ze\input_threshold\glb1\mc4\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb1\mc5\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc5\LVCMOS33.jed: fit lc4032ze\input_threshold\glb1\mc5\LVCMOS33.lci | lc4032ze\input_threshold\glb1\mc5\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb1\mc5\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc5\LVCMOS15.jed: fit lc4032ze\input_threshold\glb1\mc5\LVCMOS15.lci | lc4032ze\input_threshold\glb1\mc5\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb1\mc5_fuses.csv: udiff lc4032ze\input_threshold\glb1\mc5\LVCMOS33.jed lc4032ze\input_threshold\glb1\mc5\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb1\mc6\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc6\LVCMOS33.jed: fit lc4032ze\input_threshold\glb1\mc6\LVCMOS33.lci | lc4032ze\input_threshold\glb1\mc6\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb1\mc6\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc6\LVCMOS15.jed: fit lc4032ze\input_threshold\glb1\mc6\LVCMOS15.lci | lc4032ze\input_threshold\glb1\mc6\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb1\mc6_fuses.csv: udiff lc4032ze\input_threshold\glb1\mc6\LVCMOS33.jed lc4032ze\input_threshold\glb1\mc6\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb1\mc7\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc7\LVCMOS33.jed: fit lc4032ze\input_threshold\glb1\mc7\LVCMOS33.lci | lc4032ze\input_threshold\glb1\mc7\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb1\mc7\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc7\LVCMOS15.jed: fit lc4032ze\input_threshold\glb1\mc7\LVCMOS15.lci | lc4032ze\input_threshold\glb1\mc7\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb1\mc7_fuses.csv: udiff lc4032ze\input_threshold\glb1\mc7\LVCMOS33.jed lc4032ze\input_threshold\glb1\mc7\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb1\mc8\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc8\LVCMOS33.jed: fit lc4032ze\input_threshold\glb1\mc8\LVCMOS33.lci | lc4032ze\input_threshold\glb1\mc8\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb1\mc8\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc8\LVCMOS15.jed: fit lc4032ze\input_threshold\glb1\mc8\LVCMOS15.lci | lc4032ze\input_threshold\glb1\mc8\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb1\mc8_fuses.csv: udiff lc4032ze\input_threshold\glb1\mc8\LVCMOS33.jed lc4032ze\input_threshold\glb1\mc8\LVCMOS15.jed
+
+build lc4032ze\input_threshold\glb1\mc9\LVCMOS33.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc9\LVCMOS33.jed: fit lc4032ze\input_threshold\glb1\mc9\LVCMOS33.lci | lc4032ze\input_threshold\glb1\mc9\LVCMOS33.tt4
+build lc4032ze\input_threshold\glb1\mc9\LVCMOS15.tt4: copy pla/and_31in_1out.pla
+build lc4032ze\input_threshold\glb1\mc9\LVCMOS15.jed: fit lc4032ze\input_threshold\glb1\mc9\LVCMOS15.lci | lc4032ze\input_threshold\glb1\mc9\LVCMOS15.tt4
+build lc4032ze\input_threshold\glb1\mc9_fuses.csv: udiff lc4032ze\input_threshold\glb1\mc9\LVCMOS33.jed lc4032ze\input_threshold\glb1\mc9\LVCMOS15.jed
+
+build input_threshold: phony lc4032ze\input_threshold\glb0\mc0_fuses.csv lc4032ze\input_threshold\glb0\mc1_fuses.csv lc4032ze\input_threshold\glb0\mc10_fuses.csv lc4032ze\input_threshold\glb0\mc11_fuses.csv lc4032ze\input_threshold\glb0\mc12_fuses.csv lc4032ze\input_threshold\glb0\mc13_fuses.csv lc4032ze\input_threshold\glb0\mc14_fuses.csv lc4032ze\input_threshold\glb0\mc15_fuses.csv lc4032ze\input_threshold\glb0\mc2_fuses.csv lc4032ze\input_threshold\glb0\mc3_fuses.csv lc4032ze\input_threshold\glb0\mc4_fuses.csv lc4032ze\input_threshold\glb0\mc5_fuses.csv lc4032ze\input_threshold\glb0\mc6_fuses.csv lc4032ze\input_threshold\glb0\mc7_fuses.csv lc4032ze\input_threshold\glb0\mc8_fuses.csv lc4032ze\input_threshold\glb0\mc9_fuses.csv lc4032ze\input_threshold\glb1\mc0_fuses.csv lc4032ze\input_threshold\glb1\mc1_fuses.csv lc4032ze\input_threshold\glb1\mc10_fuses.csv lc4032ze\input_threshold\glb1\mc11_fuses.csv lc4032ze\input_threshold\glb1\mc12_fuses.csv lc4032ze\input_threshold\glb1\mc13_fuses.csv lc4032ze\input_threshold\glb1\mc14_fuses.csv lc4032ze\input_threshold\glb1\mc15_fuses.csv lc4032ze\input_threshold\glb1\mc2_fuses.csv lc4032ze\input_threshold\glb1\mc3_fuses.csv lc4032ze\input_threshold\glb1\mc4_fuses.csv lc4032ze\input_threshold\glb1\mc5_fuses.csv lc4032ze\input_threshold\glb1\mc6_fuses.csv lc4032ze\input_threshold\glb1\mc7_fuses.csv lc4032ze\input_threshold\glb1\mc8_fuses.csv lc4032ze\input_threshold\glb1\mc9_fuses.csv
+
+build lc4032ze\od\glb0\mc0\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc0\LVCMOS33.jed: fit lc4032ze\od\glb0\mc0\LVCMOS33.lci | lc4032ze\od\glb0\mc0\LVCMOS33.tt4
+build lc4032ze\od\glb0\mc0\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc0\LVCMOS33_OD.jed: fit lc4032ze\od\glb0\mc0\LVCMOS33_OD.lci | lc4032ze\od\glb0\mc0\LVCMOS33_OD.tt4
+build lc4032ze\od\glb0\mc0_fuses.csv: udiff lc4032ze\od\glb0\mc0\LVCMOS33.jed lc4032ze\od\glb0\mc0\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb0\mc1\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc1\LVCMOS33.jed: fit lc4032ze\od\glb0\mc1\LVCMOS33.lci | lc4032ze\od\glb0\mc1\LVCMOS33.tt4
+build lc4032ze\od\glb0\mc1\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc1\LVCMOS33_OD.jed: fit lc4032ze\od\glb0\mc1\LVCMOS33_OD.lci | lc4032ze\od\glb0\mc1\LVCMOS33_OD.tt4
+build lc4032ze\od\glb0\mc1_fuses.csv: udiff lc4032ze\od\glb0\mc1\LVCMOS33.jed lc4032ze\od\glb0\mc1\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb0\mc10\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc10\LVCMOS33.jed: fit lc4032ze\od\glb0\mc10\LVCMOS33.lci | lc4032ze\od\glb0\mc10\LVCMOS33.tt4
+build lc4032ze\od\glb0\mc10\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc10\LVCMOS33_OD.jed: fit lc4032ze\od\glb0\mc10\LVCMOS33_OD.lci | lc4032ze\od\glb0\mc10\LVCMOS33_OD.tt4
+build lc4032ze\od\glb0\mc10_fuses.csv: udiff lc4032ze\od\glb0\mc10\LVCMOS33.jed lc4032ze\od\glb0\mc10\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb0\mc11\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc11\LVCMOS33.jed: fit lc4032ze\od\glb0\mc11\LVCMOS33.lci | lc4032ze\od\glb0\mc11\LVCMOS33.tt4
+build lc4032ze\od\glb0\mc11\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc11\LVCMOS33_OD.jed: fit lc4032ze\od\glb0\mc11\LVCMOS33_OD.lci | lc4032ze\od\glb0\mc11\LVCMOS33_OD.tt4
+build lc4032ze\od\glb0\mc11_fuses.csv: udiff lc4032ze\od\glb0\mc11\LVCMOS33.jed lc4032ze\od\glb0\mc11\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb0\mc12\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc12\LVCMOS33.jed: fit lc4032ze\od\glb0\mc12\LVCMOS33.lci | lc4032ze\od\glb0\mc12\LVCMOS33.tt4
+build lc4032ze\od\glb0\mc12\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc12\LVCMOS33_OD.jed: fit lc4032ze\od\glb0\mc12\LVCMOS33_OD.lci | lc4032ze\od\glb0\mc12\LVCMOS33_OD.tt4
+build lc4032ze\od\glb0\mc12_fuses.csv: udiff lc4032ze\od\glb0\mc12\LVCMOS33.jed lc4032ze\od\glb0\mc12\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb0\mc13\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc13\LVCMOS33.jed: fit lc4032ze\od\glb0\mc13\LVCMOS33.lci | lc4032ze\od\glb0\mc13\LVCMOS33.tt4
+build lc4032ze\od\glb0\mc13\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc13\LVCMOS33_OD.jed: fit lc4032ze\od\glb0\mc13\LVCMOS33_OD.lci | lc4032ze\od\glb0\mc13\LVCMOS33_OD.tt4
+build lc4032ze\od\glb0\mc13_fuses.csv: udiff lc4032ze\od\glb0\mc13\LVCMOS33.jed lc4032ze\od\glb0\mc13\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb0\mc14\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc14\LVCMOS33.jed: fit lc4032ze\od\glb0\mc14\LVCMOS33.lci | lc4032ze\od\glb0\mc14\LVCMOS33.tt4
+build lc4032ze\od\glb0\mc14\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc14\LVCMOS33_OD.jed: fit lc4032ze\od\glb0\mc14\LVCMOS33_OD.lci | lc4032ze\od\glb0\mc14\LVCMOS33_OD.tt4
+build lc4032ze\od\glb0\mc14_fuses.csv: udiff lc4032ze\od\glb0\mc14\LVCMOS33.jed lc4032ze\od\glb0\mc14\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb0\mc15\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc15\LVCMOS33.jed: fit lc4032ze\od\glb0\mc15\LVCMOS33.lci | lc4032ze\od\glb0\mc15\LVCMOS33.tt4
+build lc4032ze\od\glb0\mc15\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc15\LVCMOS33_OD.jed: fit lc4032ze\od\glb0\mc15\LVCMOS33_OD.lci | lc4032ze\od\glb0\mc15\LVCMOS33_OD.tt4
+build lc4032ze\od\glb0\mc15_fuses.csv: udiff lc4032ze\od\glb0\mc15\LVCMOS33.jed lc4032ze\od\glb0\mc15\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb0\mc2\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc2\LVCMOS33.jed: fit lc4032ze\od\glb0\mc2\LVCMOS33.lci | lc4032ze\od\glb0\mc2\LVCMOS33.tt4
+build lc4032ze\od\glb0\mc2\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc2\LVCMOS33_OD.jed: fit lc4032ze\od\glb0\mc2\LVCMOS33_OD.lci | lc4032ze\od\glb0\mc2\LVCMOS33_OD.tt4
+build lc4032ze\od\glb0\mc2_fuses.csv: udiff lc4032ze\od\glb0\mc2\LVCMOS33.jed lc4032ze\od\glb0\mc2\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb0\mc3\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc3\LVCMOS33.jed: fit lc4032ze\od\glb0\mc3\LVCMOS33.lci | lc4032ze\od\glb0\mc3\LVCMOS33.tt4
+build lc4032ze\od\glb0\mc3\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc3\LVCMOS33_OD.jed: fit lc4032ze\od\glb0\mc3\LVCMOS33_OD.lci | lc4032ze\od\glb0\mc3\LVCMOS33_OD.tt4
+build lc4032ze\od\glb0\mc3_fuses.csv: udiff lc4032ze\od\glb0\mc3\LVCMOS33.jed lc4032ze\od\glb0\mc3\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb0\mc4\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc4\LVCMOS33.jed: fit lc4032ze\od\glb0\mc4\LVCMOS33.lci | lc4032ze\od\glb0\mc4\LVCMOS33.tt4
+build lc4032ze\od\glb0\mc4\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc4\LVCMOS33_OD.jed: fit lc4032ze\od\glb0\mc4\LVCMOS33_OD.lci | lc4032ze\od\glb0\mc4\LVCMOS33_OD.tt4
+build lc4032ze\od\glb0\mc4_fuses.csv: udiff lc4032ze\od\glb0\mc4\LVCMOS33.jed lc4032ze\od\glb0\mc4\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb0\mc5\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc5\LVCMOS33.jed: fit lc4032ze\od\glb0\mc5\LVCMOS33.lci | lc4032ze\od\glb0\mc5\LVCMOS33.tt4
+build lc4032ze\od\glb0\mc5\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc5\LVCMOS33_OD.jed: fit lc4032ze\od\glb0\mc5\LVCMOS33_OD.lci | lc4032ze\od\glb0\mc5\LVCMOS33_OD.tt4
+build lc4032ze\od\glb0\mc5_fuses.csv: udiff lc4032ze\od\glb0\mc5\LVCMOS33.jed lc4032ze\od\glb0\mc5\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb0\mc6\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc6\LVCMOS33.jed: fit lc4032ze\od\glb0\mc6\LVCMOS33.lci | lc4032ze\od\glb0\mc6\LVCMOS33.tt4
+build lc4032ze\od\glb0\mc6\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc6\LVCMOS33_OD.jed: fit lc4032ze\od\glb0\mc6\LVCMOS33_OD.lci | lc4032ze\od\glb0\mc6\LVCMOS33_OD.tt4
+build lc4032ze\od\glb0\mc6_fuses.csv: udiff lc4032ze\od\glb0\mc6\LVCMOS33.jed lc4032ze\od\glb0\mc6\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb0\mc7\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc7\LVCMOS33.jed: fit lc4032ze\od\glb0\mc7\LVCMOS33.lci | lc4032ze\od\glb0\mc7\LVCMOS33.tt4
+build lc4032ze\od\glb0\mc7\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc7\LVCMOS33_OD.jed: fit lc4032ze\od\glb0\mc7\LVCMOS33_OD.lci | lc4032ze\od\glb0\mc7\LVCMOS33_OD.tt4
+build lc4032ze\od\glb0\mc7_fuses.csv: udiff lc4032ze\od\glb0\mc7\LVCMOS33.jed lc4032ze\od\glb0\mc7\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb0\mc8\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc8\LVCMOS33.jed: fit lc4032ze\od\glb0\mc8\LVCMOS33.lci | lc4032ze\od\glb0\mc8\LVCMOS33.tt4
+build lc4032ze\od\glb0\mc8\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc8\LVCMOS33_OD.jed: fit lc4032ze\od\glb0\mc8\LVCMOS33_OD.lci | lc4032ze\od\glb0\mc8\LVCMOS33_OD.tt4
+build lc4032ze\od\glb0\mc8_fuses.csv: udiff lc4032ze\od\glb0\mc8\LVCMOS33.jed lc4032ze\od\glb0\mc8\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb0\mc9\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc9\LVCMOS33.jed: fit lc4032ze\od\glb0\mc9\LVCMOS33.lci | lc4032ze\od\glb0\mc9\LVCMOS33.tt4
+build lc4032ze\od\glb0\mc9\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb0\mc9\LVCMOS33_OD.jed: fit lc4032ze\od\glb0\mc9\LVCMOS33_OD.lci | lc4032ze\od\glb0\mc9\LVCMOS33_OD.tt4
+build lc4032ze\od\glb0\mc9_fuses.csv: udiff lc4032ze\od\glb0\mc9\LVCMOS33.jed lc4032ze\od\glb0\mc9\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb1\mc0\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc0\LVCMOS33.jed: fit lc4032ze\od\glb1\mc0\LVCMOS33.lci | lc4032ze\od\glb1\mc0\LVCMOS33.tt4
+build lc4032ze\od\glb1\mc0\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc0\LVCMOS33_OD.jed: fit lc4032ze\od\glb1\mc0\LVCMOS33_OD.lci | lc4032ze\od\glb1\mc0\LVCMOS33_OD.tt4
+build lc4032ze\od\glb1\mc0_fuses.csv: udiff lc4032ze\od\glb1\mc0\LVCMOS33.jed lc4032ze\od\glb1\mc0\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb1\mc1\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc1\LVCMOS33.jed: fit lc4032ze\od\glb1\mc1\LVCMOS33.lci | lc4032ze\od\glb1\mc1\LVCMOS33.tt4
+build lc4032ze\od\glb1\mc1\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc1\LVCMOS33_OD.jed: fit lc4032ze\od\glb1\mc1\LVCMOS33_OD.lci | lc4032ze\od\glb1\mc1\LVCMOS33_OD.tt4
+build lc4032ze\od\glb1\mc1_fuses.csv: udiff lc4032ze\od\glb1\mc1\LVCMOS33.jed lc4032ze\od\glb1\mc1\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb1\mc10\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc10\LVCMOS33.jed: fit lc4032ze\od\glb1\mc10\LVCMOS33.lci | lc4032ze\od\glb1\mc10\LVCMOS33.tt4
+build lc4032ze\od\glb1\mc10\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc10\LVCMOS33_OD.jed: fit lc4032ze\od\glb1\mc10\LVCMOS33_OD.lci | lc4032ze\od\glb1\mc10\LVCMOS33_OD.tt4
+build lc4032ze\od\glb1\mc10_fuses.csv: udiff lc4032ze\od\glb1\mc10\LVCMOS33.jed lc4032ze\od\glb1\mc10\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb1\mc11\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc11\LVCMOS33.jed: fit lc4032ze\od\glb1\mc11\LVCMOS33.lci | lc4032ze\od\glb1\mc11\LVCMOS33.tt4
+build lc4032ze\od\glb1\mc11\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc11\LVCMOS33_OD.jed: fit lc4032ze\od\glb1\mc11\LVCMOS33_OD.lci | lc4032ze\od\glb1\mc11\LVCMOS33_OD.tt4
+build lc4032ze\od\glb1\mc11_fuses.csv: udiff lc4032ze\od\glb1\mc11\LVCMOS33.jed lc4032ze\od\glb1\mc11\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb1\mc12\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc12\LVCMOS33.jed: fit lc4032ze\od\glb1\mc12\LVCMOS33.lci | lc4032ze\od\glb1\mc12\LVCMOS33.tt4
+build lc4032ze\od\glb1\mc12\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc12\LVCMOS33_OD.jed: fit lc4032ze\od\glb1\mc12\LVCMOS33_OD.lci | lc4032ze\od\glb1\mc12\LVCMOS33_OD.tt4
+build lc4032ze\od\glb1\mc12_fuses.csv: udiff lc4032ze\od\glb1\mc12\LVCMOS33.jed lc4032ze\od\glb1\mc12\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb1\mc13\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc13\LVCMOS33.jed: fit lc4032ze\od\glb1\mc13\LVCMOS33.lci | lc4032ze\od\glb1\mc13\LVCMOS33.tt4
+build lc4032ze\od\glb1\mc13\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc13\LVCMOS33_OD.jed: fit lc4032ze\od\glb1\mc13\LVCMOS33_OD.lci | lc4032ze\od\glb1\mc13\LVCMOS33_OD.tt4
+build lc4032ze\od\glb1\mc13_fuses.csv: udiff lc4032ze\od\glb1\mc13\LVCMOS33.jed lc4032ze\od\glb1\mc13\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb1\mc14\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc14\LVCMOS33.jed: fit lc4032ze\od\glb1\mc14\LVCMOS33.lci | lc4032ze\od\glb1\mc14\LVCMOS33.tt4
+build lc4032ze\od\glb1\mc14\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc14\LVCMOS33_OD.jed: fit lc4032ze\od\glb1\mc14\LVCMOS33_OD.lci | lc4032ze\od\glb1\mc14\LVCMOS33_OD.tt4
+build lc4032ze\od\glb1\mc14_fuses.csv: udiff lc4032ze\od\glb1\mc14\LVCMOS33.jed lc4032ze\od\glb1\mc14\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb1\mc15\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc15\LVCMOS33.jed: fit lc4032ze\od\glb1\mc15\LVCMOS33.lci | lc4032ze\od\glb1\mc15\LVCMOS33.tt4
+build lc4032ze\od\glb1\mc15\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc15\LVCMOS33_OD.jed: fit lc4032ze\od\glb1\mc15\LVCMOS33_OD.lci | lc4032ze\od\glb1\mc15\LVCMOS33_OD.tt4
+build lc4032ze\od\glb1\mc15_fuses.csv: udiff lc4032ze\od\glb1\mc15\LVCMOS33.jed lc4032ze\od\glb1\mc15\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb1\mc2\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc2\LVCMOS33.jed: fit lc4032ze\od\glb1\mc2\LVCMOS33.lci | lc4032ze\od\glb1\mc2\LVCMOS33.tt4
+build lc4032ze\od\glb1\mc2\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc2\LVCMOS33_OD.jed: fit lc4032ze\od\glb1\mc2\LVCMOS33_OD.lci | lc4032ze\od\glb1\mc2\LVCMOS33_OD.tt4
+build lc4032ze\od\glb1\mc2_fuses.csv: udiff lc4032ze\od\glb1\mc2\LVCMOS33.jed lc4032ze\od\glb1\mc2\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb1\mc3\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc3\LVCMOS33.jed: fit lc4032ze\od\glb1\mc3\LVCMOS33.lci | lc4032ze\od\glb1\mc3\LVCMOS33.tt4
+build lc4032ze\od\glb1\mc3\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc3\LVCMOS33_OD.jed: fit lc4032ze\od\glb1\mc3\LVCMOS33_OD.lci | lc4032ze\od\glb1\mc3\LVCMOS33_OD.tt4
+build lc4032ze\od\glb1\mc3_fuses.csv: udiff lc4032ze\od\glb1\mc3\LVCMOS33.jed lc4032ze\od\glb1\mc3\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb1\mc4\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc4\LVCMOS33.jed: fit lc4032ze\od\glb1\mc4\LVCMOS33.lci | lc4032ze\od\glb1\mc4\LVCMOS33.tt4
+build lc4032ze\od\glb1\mc4\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc4\LVCMOS33_OD.jed: fit lc4032ze\od\glb1\mc4\LVCMOS33_OD.lci | lc4032ze\od\glb1\mc4\LVCMOS33_OD.tt4
+build lc4032ze\od\glb1\mc4_fuses.csv: udiff lc4032ze\od\glb1\mc4\LVCMOS33.jed lc4032ze\od\glb1\mc4\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb1\mc5\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc5\LVCMOS33.jed: fit lc4032ze\od\glb1\mc5\LVCMOS33.lci | lc4032ze\od\glb1\mc5\LVCMOS33.tt4
+build lc4032ze\od\glb1\mc5\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc5\LVCMOS33_OD.jed: fit lc4032ze\od\glb1\mc5\LVCMOS33_OD.lci | lc4032ze\od\glb1\mc5\LVCMOS33_OD.tt4
+build lc4032ze\od\glb1\mc5_fuses.csv: udiff lc4032ze\od\glb1\mc5\LVCMOS33.jed lc4032ze\od\glb1\mc5\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb1\mc6\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc6\LVCMOS33.jed: fit lc4032ze\od\glb1\mc6\LVCMOS33.lci | lc4032ze\od\glb1\mc6\LVCMOS33.tt4
+build lc4032ze\od\glb1\mc6\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc6\LVCMOS33_OD.jed: fit lc4032ze\od\glb1\mc6\LVCMOS33_OD.lci | lc4032ze\od\glb1\mc6\LVCMOS33_OD.tt4
+build lc4032ze\od\glb1\mc6_fuses.csv: udiff lc4032ze\od\glb1\mc6\LVCMOS33.jed lc4032ze\od\glb1\mc6\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb1\mc7\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc7\LVCMOS33.jed: fit lc4032ze\od\glb1\mc7\LVCMOS33.lci | lc4032ze\od\glb1\mc7\LVCMOS33.tt4
+build lc4032ze\od\glb1\mc7\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc7\LVCMOS33_OD.jed: fit lc4032ze\od\glb1\mc7\LVCMOS33_OD.lci | lc4032ze\od\glb1\mc7\LVCMOS33_OD.tt4
+build lc4032ze\od\glb1\mc7_fuses.csv: udiff lc4032ze\od\glb1\mc7\LVCMOS33.jed lc4032ze\od\glb1\mc7\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb1\mc8\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc8\LVCMOS33.jed: fit lc4032ze\od\glb1\mc8\LVCMOS33.lci | lc4032ze\od\glb1\mc8\LVCMOS33.tt4
+build lc4032ze\od\glb1\mc8\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc8\LVCMOS33_OD.jed: fit lc4032ze\od\glb1\mc8\LVCMOS33_OD.lci | lc4032ze\od\glb1\mc8\LVCMOS33_OD.tt4
+build lc4032ze\od\glb1\mc8_fuses.csv: udiff lc4032ze\od\glb1\mc8\LVCMOS33.jed lc4032ze\od\glb1\mc8\LVCMOS33_OD.jed
+
+build lc4032ze\od\glb1\mc9\LVCMOS33.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc9\LVCMOS33.jed: fit lc4032ze\od\glb1\mc9\LVCMOS33.lci | lc4032ze\od\glb1\mc9\LVCMOS33.tt4
+build lc4032ze\od\glb1\mc9\LVCMOS33_OD.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\od\glb1\mc9\LVCMOS33_OD.jed: fit lc4032ze\od\glb1\mc9\LVCMOS33_OD.lci | lc4032ze\od\glb1\mc9\LVCMOS33_OD.tt4
+build lc4032ze\od\glb1\mc9_fuses.csv: udiff lc4032ze\od\glb1\mc9\LVCMOS33.jed lc4032ze\od\glb1\mc9\LVCMOS33_OD.jed
+
+build od: phony lc4032ze\od\glb0\mc0_fuses.csv lc4032ze\od\glb0\mc1_fuses.csv lc4032ze\od\glb0\mc10_fuses.csv lc4032ze\od\glb0\mc11_fuses.csv lc4032ze\od\glb0\mc12_fuses.csv lc4032ze\od\glb0\mc13_fuses.csv lc4032ze\od\glb0\mc14_fuses.csv lc4032ze\od\glb0\mc15_fuses.csv lc4032ze\od\glb0\mc2_fuses.csv lc4032ze\od\glb0\mc3_fuses.csv lc4032ze\od\glb0\mc4_fuses.csv lc4032ze\od\glb0\mc5_fuses.csv lc4032ze\od\glb0\mc6_fuses.csv lc4032ze\od\glb0\mc7_fuses.csv lc4032ze\od\glb0\mc8_fuses.csv lc4032ze\od\glb0\mc9_fuses.csv lc4032ze\od\glb1\mc0_fuses.csv lc4032ze\od\glb1\mc1_fuses.csv lc4032ze\od\glb1\mc10_fuses.csv lc4032ze\od\glb1\mc11_fuses.csv lc4032ze\od\glb1\mc12_fuses.csv lc4032ze\od\glb1\mc13_fuses.csv lc4032ze\od\glb1\mc14_fuses.csv lc4032ze\od\glb1\mc15_fuses.csv lc4032ze\od\glb1\mc2_fuses.csv lc4032ze\od\glb1\mc3_fuses.csv lc4032ze\od\glb1\mc4_fuses.csv lc4032ze\od\glb1\mc5_fuses.csv lc4032ze\od\glb1\mc6_fuses.csv lc4032ze\od\glb1\mc7_fuses.csv lc4032ze\od\glb1\mc8_fuses.csv lc4032ze\od\glb1\mc9_fuses.csv
+
+build lc4032ze\slew\glb0\mc0\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc0\SLOW.jed: fit lc4032ze\slew\glb0\mc0\SLOW.lci | lc4032ze\slew\glb0\mc0\SLOW.tt4
+build lc4032ze\slew\glb0\mc0\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc0\FAST.jed: fit lc4032ze\slew\glb0\mc0\FAST.lci | lc4032ze\slew\glb0\mc0\FAST.tt4
+build lc4032ze\slew\glb0\mc0_fuses.csv: udiff lc4032ze\slew\glb0\mc0\SLOW.jed lc4032ze\slew\glb0\mc0\FAST.jed
+
+build lc4032ze\slew\glb0\mc1\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc1\SLOW.jed: fit lc4032ze\slew\glb0\mc1\SLOW.lci | lc4032ze\slew\glb0\mc1\SLOW.tt4
+build lc4032ze\slew\glb0\mc1\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc1\FAST.jed: fit lc4032ze\slew\glb0\mc1\FAST.lci | lc4032ze\slew\glb0\mc1\FAST.tt4
+build lc4032ze\slew\glb0\mc1_fuses.csv: udiff lc4032ze\slew\glb0\mc1\SLOW.jed lc4032ze\slew\glb0\mc1\FAST.jed
+
+build lc4032ze\slew\glb0\mc10\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc10\SLOW.jed: fit lc4032ze\slew\glb0\mc10\SLOW.lci | lc4032ze\slew\glb0\mc10\SLOW.tt4
+build lc4032ze\slew\glb0\mc10\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc10\FAST.jed: fit lc4032ze\slew\glb0\mc10\FAST.lci | lc4032ze\slew\glb0\mc10\FAST.tt4
+build lc4032ze\slew\glb0\mc10_fuses.csv: udiff lc4032ze\slew\glb0\mc10\SLOW.jed lc4032ze\slew\glb0\mc10\FAST.jed
+
+build lc4032ze\slew\glb0\mc11\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc11\SLOW.jed: fit lc4032ze\slew\glb0\mc11\SLOW.lci | lc4032ze\slew\glb0\mc11\SLOW.tt4
+build lc4032ze\slew\glb0\mc11\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc11\FAST.jed: fit lc4032ze\slew\glb0\mc11\FAST.lci | lc4032ze\slew\glb0\mc11\FAST.tt4
+build lc4032ze\slew\glb0\mc11_fuses.csv: udiff lc4032ze\slew\glb0\mc11\SLOW.jed lc4032ze\slew\glb0\mc11\FAST.jed
+
+build lc4032ze\slew\glb0\mc12\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc12\SLOW.jed: fit lc4032ze\slew\glb0\mc12\SLOW.lci | lc4032ze\slew\glb0\mc12\SLOW.tt4
+build lc4032ze\slew\glb0\mc12\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc12\FAST.jed: fit lc4032ze\slew\glb0\mc12\FAST.lci | lc4032ze\slew\glb0\mc12\FAST.tt4
+build lc4032ze\slew\glb0\mc12_fuses.csv: udiff lc4032ze\slew\glb0\mc12\SLOW.jed lc4032ze\slew\glb0\mc12\FAST.jed
+
+build lc4032ze\slew\glb0\mc13\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc13\SLOW.jed: fit lc4032ze\slew\glb0\mc13\SLOW.lci | lc4032ze\slew\glb0\mc13\SLOW.tt4
+build lc4032ze\slew\glb0\mc13\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc13\FAST.jed: fit lc4032ze\slew\glb0\mc13\FAST.lci | lc4032ze\slew\glb0\mc13\FAST.tt4
+build lc4032ze\slew\glb0\mc13_fuses.csv: udiff lc4032ze\slew\glb0\mc13\SLOW.jed lc4032ze\slew\glb0\mc13\FAST.jed
+
+build lc4032ze\slew\glb0\mc14\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc14\SLOW.jed: fit lc4032ze\slew\glb0\mc14\SLOW.lci | lc4032ze\slew\glb0\mc14\SLOW.tt4
+build lc4032ze\slew\glb0\mc14\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc14\FAST.jed: fit lc4032ze\slew\glb0\mc14\FAST.lci | lc4032ze\slew\glb0\mc14\FAST.tt4
+build lc4032ze\slew\glb0\mc14_fuses.csv: udiff lc4032ze\slew\glb0\mc14\SLOW.jed lc4032ze\slew\glb0\mc14\FAST.jed
+
+build lc4032ze\slew\glb0\mc15\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc15\SLOW.jed: fit lc4032ze\slew\glb0\mc15\SLOW.lci | lc4032ze\slew\glb0\mc15\SLOW.tt4
+build lc4032ze\slew\glb0\mc15\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc15\FAST.jed: fit lc4032ze\slew\glb0\mc15\FAST.lci | lc4032ze\slew\glb0\mc15\FAST.tt4
+build lc4032ze\slew\glb0\mc15_fuses.csv: udiff lc4032ze\slew\glb0\mc15\SLOW.jed lc4032ze\slew\glb0\mc15\FAST.jed
+
+build lc4032ze\slew\glb0\mc2\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc2\SLOW.jed: fit lc4032ze\slew\glb0\mc2\SLOW.lci | lc4032ze\slew\glb0\mc2\SLOW.tt4
+build lc4032ze\slew\glb0\mc2\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc2\FAST.jed: fit lc4032ze\slew\glb0\mc2\FAST.lci | lc4032ze\slew\glb0\mc2\FAST.tt4
+build lc4032ze\slew\glb0\mc2_fuses.csv: udiff lc4032ze\slew\glb0\mc2\SLOW.jed lc4032ze\slew\glb0\mc2\FAST.jed
+
+build lc4032ze\slew\glb0\mc3\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc3\SLOW.jed: fit lc4032ze\slew\glb0\mc3\SLOW.lci | lc4032ze\slew\glb0\mc3\SLOW.tt4
+build lc4032ze\slew\glb0\mc3\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc3\FAST.jed: fit lc4032ze\slew\glb0\mc3\FAST.lci | lc4032ze\slew\glb0\mc3\FAST.tt4
+build lc4032ze\slew\glb0\mc3_fuses.csv: udiff lc4032ze\slew\glb0\mc3\SLOW.jed lc4032ze\slew\glb0\mc3\FAST.jed
+
+build lc4032ze\slew\glb0\mc4\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc4\SLOW.jed: fit lc4032ze\slew\glb0\mc4\SLOW.lci | lc4032ze\slew\glb0\mc4\SLOW.tt4
+build lc4032ze\slew\glb0\mc4\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc4\FAST.jed: fit lc4032ze\slew\glb0\mc4\FAST.lci | lc4032ze\slew\glb0\mc4\FAST.tt4
+build lc4032ze\slew\glb0\mc4_fuses.csv: udiff lc4032ze\slew\glb0\mc4\SLOW.jed lc4032ze\slew\glb0\mc4\FAST.jed
+
+build lc4032ze\slew\glb0\mc5\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc5\SLOW.jed: fit lc4032ze\slew\glb0\mc5\SLOW.lci | lc4032ze\slew\glb0\mc5\SLOW.tt4
+build lc4032ze\slew\glb0\mc5\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc5\FAST.jed: fit lc4032ze\slew\glb0\mc5\FAST.lci | lc4032ze\slew\glb0\mc5\FAST.tt4
+build lc4032ze\slew\glb0\mc5_fuses.csv: udiff lc4032ze\slew\glb0\mc5\SLOW.jed lc4032ze\slew\glb0\mc5\FAST.jed
+
+build lc4032ze\slew\glb0\mc6\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc6\SLOW.jed: fit lc4032ze\slew\glb0\mc6\SLOW.lci | lc4032ze\slew\glb0\mc6\SLOW.tt4
+build lc4032ze\slew\glb0\mc6\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc6\FAST.jed: fit lc4032ze\slew\glb0\mc6\FAST.lci | lc4032ze\slew\glb0\mc6\FAST.tt4
+build lc4032ze\slew\glb0\mc6_fuses.csv: udiff lc4032ze\slew\glb0\mc6\SLOW.jed lc4032ze\slew\glb0\mc6\FAST.jed
+
+build lc4032ze\slew\glb0\mc7\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc7\SLOW.jed: fit lc4032ze\slew\glb0\mc7\SLOW.lci | lc4032ze\slew\glb0\mc7\SLOW.tt4
+build lc4032ze\slew\glb0\mc7\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc7\FAST.jed: fit lc4032ze\slew\glb0\mc7\FAST.lci | lc4032ze\slew\glb0\mc7\FAST.tt4
+build lc4032ze\slew\glb0\mc7_fuses.csv: udiff lc4032ze\slew\glb0\mc7\SLOW.jed lc4032ze\slew\glb0\mc7\FAST.jed
+
+build lc4032ze\slew\glb0\mc8\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc8\SLOW.jed: fit lc4032ze\slew\glb0\mc8\SLOW.lci | lc4032ze\slew\glb0\mc8\SLOW.tt4
+build lc4032ze\slew\glb0\mc8\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc8\FAST.jed: fit lc4032ze\slew\glb0\mc8\FAST.lci | lc4032ze\slew\glb0\mc8\FAST.tt4
+build lc4032ze\slew\glb0\mc8_fuses.csv: udiff lc4032ze\slew\glb0\mc8\SLOW.jed lc4032ze\slew\glb0\mc8\FAST.jed
+
+build lc4032ze\slew\glb0\mc9\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc9\SLOW.jed: fit lc4032ze\slew\glb0\mc9\SLOW.lci | lc4032ze\slew\glb0\mc9\SLOW.tt4
+build lc4032ze\slew\glb0\mc9\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb0\mc9\FAST.jed: fit lc4032ze\slew\glb0\mc9\FAST.lci | lc4032ze\slew\glb0\mc9\FAST.tt4
+build lc4032ze\slew\glb0\mc9_fuses.csv: udiff lc4032ze\slew\glb0\mc9\SLOW.jed lc4032ze\slew\glb0\mc9\FAST.jed
+
+build lc4032ze\slew\glb1\mc0\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc0\SLOW.jed: fit lc4032ze\slew\glb1\mc0\SLOW.lci | lc4032ze\slew\glb1\mc0\SLOW.tt4
+build lc4032ze\slew\glb1\mc0\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc0\FAST.jed: fit lc4032ze\slew\glb1\mc0\FAST.lci | lc4032ze\slew\glb1\mc0\FAST.tt4
+build lc4032ze\slew\glb1\mc0_fuses.csv: udiff lc4032ze\slew\glb1\mc0\SLOW.jed lc4032ze\slew\glb1\mc0\FAST.jed
+
+build lc4032ze\slew\glb1\mc1\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc1\SLOW.jed: fit lc4032ze\slew\glb1\mc1\SLOW.lci | lc4032ze\slew\glb1\mc1\SLOW.tt4
+build lc4032ze\slew\glb1\mc1\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc1\FAST.jed: fit lc4032ze\slew\glb1\mc1\FAST.lci | lc4032ze\slew\glb1\mc1\FAST.tt4
+build lc4032ze\slew\glb1\mc1_fuses.csv: udiff lc4032ze\slew\glb1\mc1\SLOW.jed lc4032ze\slew\glb1\mc1\FAST.jed
+
+build lc4032ze\slew\glb1\mc10\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc10\SLOW.jed: fit lc4032ze\slew\glb1\mc10\SLOW.lci | lc4032ze\slew\glb1\mc10\SLOW.tt4
+build lc4032ze\slew\glb1\mc10\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc10\FAST.jed: fit lc4032ze\slew\glb1\mc10\FAST.lci | lc4032ze\slew\glb1\mc10\FAST.tt4
+build lc4032ze\slew\glb1\mc10_fuses.csv: udiff lc4032ze\slew\glb1\mc10\SLOW.jed lc4032ze\slew\glb1\mc10\FAST.jed
+
+build lc4032ze\slew\glb1\mc11\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc11\SLOW.jed: fit lc4032ze\slew\glb1\mc11\SLOW.lci | lc4032ze\slew\glb1\mc11\SLOW.tt4
+build lc4032ze\slew\glb1\mc11\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc11\FAST.jed: fit lc4032ze\slew\glb1\mc11\FAST.lci | lc4032ze\slew\glb1\mc11\FAST.tt4
+build lc4032ze\slew\glb1\mc11_fuses.csv: udiff lc4032ze\slew\glb1\mc11\SLOW.jed lc4032ze\slew\glb1\mc11\FAST.jed
+
+build lc4032ze\slew\glb1\mc12\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc12\SLOW.jed: fit lc4032ze\slew\glb1\mc12\SLOW.lci | lc4032ze\slew\glb1\mc12\SLOW.tt4
+build lc4032ze\slew\glb1\mc12\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc12\FAST.jed: fit lc4032ze\slew\glb1\mc12\FAST.lci | lc4032ze\slew\glb1\mc12\FAST.tt4
+build lc4032ze\slew\glb1\mc12_fuses.csv: udiff lc4032ze\slew\glb1\mc12\SLOW.jed lc4032ze\slew\glb1\mc12\FAST.jed
+
+build lc4032ze\slew\glb1\mc13\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc13\SLOW.jed: fit lc4032ze\slew\glb1\mc13\SLOW.lci | lc4032ze\slew\glb1\mc13\SLOW.tt4
+build lc4032ze\slew\glb1\mc13\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc13\FAST.jed: fit lc4032ze\slew\glb1\mc13\FAST.lci | lc4032ze\slew\glb1\mc13\FAST.tt4
+build lc4032ze\slew\glb1\mc13_fuses.csv: udiff lc4032ze\slew\glb1\mc13\SLOW.jed lc4032ze\slew\glb1\mc13\FAST.jed
+
+build lc4032ze\slew\glb1\mc14\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc14\SLOW.jed: fit lc4032ze\slew\glb1\mc14\SLOW.lci | lc4032ze\slew\glb1\mc14\SLOW.tt4
+build lc4032ze\slew\glb1\mc14\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc14\FAST.jed: fit lc4032ze\slew\glb1\mc14\FAST.lci | lc4032ze\slew\glb1\mc14\FAST.tt4
+build lc4032ze\slew\glb1\mc14_fuses.csv: udiff lc4032ze\slew\glb1\mc14\SLOW.jed lc4032ze\slew\glb1\mc14\FAST.jed
+
+build lc4032ze\slew\glb1\mc15\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc15\SLOW.jed: fit lc4032ze\slew\glb1\mc15\SLOW.lci | lc4032ze\slew\glb1\mc15\SLOW.tt4
+build lc4032ze\slew\glb1\mc15\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc15\FAST.jed: fit lc4032ze\slew\glb1\mc15\FAST.lci | lc4032ze\slew\glb1\mc15\FAST.tt4
+build lc4032ze\slew\glb1\mc15_fuses.csv: udiff lc4032ze\slew\glb1\mc15\SLOW.jed lc4032ze\slew\glb1\mc15\FAST.jed
+
+build lc4032ze\slew\glb1\mc2\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc2\SLOW.jed: fit lc4032ze\slew\glb1\mc2\SLOW.lci | lc4032ze\slew\glb1\mc2\SLOW.tt4
+build lc4032ze\slew\glb1\mc2\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc2\FAST.jed: fit lc4032ze\slew\glb1\mc2\FAST.lci | lc4032ze\slew\glb1\mc2\FAST.tt4
+build lc4032ze\slew\glb1\mc2_fuses.csv: udiff lc4032ze\slew\glb1\mc2\SLOW.jed lc4032ze\slew\glb1\mc2\FAST.jed
+
+build lc4032ze\slew\glb1\mc3\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc3\SLOW.jed: fit lc4032ze\slew\glb1\mc3\SLOW.lci | lc4032ze\slew\glb1\mc3\SLOW.tt4
+build lc4032ze\slew\glb1\mc3\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc3\FAST.jed: fit lc4032ze\slew\glb1\mc3\FAST.lci | lc4032ze\slew\glb1\mc3\FAST.tt4
+build lc4032ze\slew\glb1\mc3_fuses.csv: udiff lc4032ze\slew\glb1\mc3\SLOW.jed lc4032ze\slew\glb1\mc3\FAST.jed
+
+build lc4032ze\slew\glb1\mc4\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc4\SLOW.jed: fit lc4032ze\slew\glb1\mc4\SLOW.lci | lc4032ze\slew\glb1\mc4\SLOW.tt4
+build lc4032ze\slew\glb1\mc4\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc4\FAST.jed: fit lc4032ze\slew\glb1\mc4\FAST.lci | lc4032ze\slew\glb1\mc4\FAST.tt4
+build lc4032ze\slew\glb1\mc4_fuses.csv: udiff lc4032ze\slew\glb1\mc4\SLOW.jed lc4032ze\slew\glb1\mc4\FAST.jed
+
+build lc4032ze\slew\glb1\mc5\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc5\SLOW.jed: fit lc4032ze\slew\glb1\mc5\SLOW.lci | lc4032ze\slew\glb1\mc5\SLOW.tt4
+build lc4032ze\slew\glb1\mc5\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc5\FAST.jed: fit lc4032ze\slew\glb1\mc5\FAST.lci | lc4032ze\slew\glb1\mc5\FAST.tt4
+build lc4032ze\slew\glb1\mc5_fuses.csv: udiff lc4032ze\slew\glb1\mc5\SLOW.jed lc4032ze\slew\glb1\mc5\FAST.jed
+
+build lc4032ze\slew\glb1\mc6\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc6\SLOW.jed: fit lc4032ze\slew\glb1\mc6\SLOW.lci | lc4032ze\slew\glb1\mc6\SLOW.tt4
+build lc4032ze\slew\glb1\mc6\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc6\FAST.jed: fit lc4032ze\slew\glb1\mc6\FAST.lci | lc4032ze\slew\glb1\mc6\FAST.tt4
+build lc4032ze\slew\glb1\mc6_fuses.csv: udiff lc4032ze\slew\glb1\mc6\SLOW.jed lc4032ze\slew\glb1\mc6\FAST.jed
+
+build lc4032ze\slew\glb1\mc7\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc7\SLOW.jed: fit lc4032ze\slew\glb1\mc7\SLOW.lci | lc4032ze\slew\glb1\mc7\SLOW.tt4
+build lc4032ze\slew\glb1\mc7\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc7\FAST.jed: fit lc4032ze\slew\glb1\mc7\FAST.lci | lc4032ze\slew\glb1\mc7\FAST.tt4
+build lc4032ze\slew\glb1\mc7_fuses.csv: udiff lc4032ze\slew\glb1\mc7\SLOW.jed lc4032ze\slew\glb1\mc7\FAST.jed
+
+build lc4032ze\slew\glb1\mc8\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc8\SLOW.jed: fit lc4032ze\slew\glb1\mc8\SLOW.lci | lc4032ze\slew\glb1\mc8\SLOW.tt4
+build lc4032ze\slew\glb1\mc8\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc8\FAST.jed: fit lc4032ze\slew\glb1\mc8\FAST.lci | lc4032ze\slew\glb1\mc8\FAST.tt4
+build lc4032ze\slew\glb1\mc8_fuses.csv: udiff lc4032ze\slew\glb1\mc8\SLOW.jed lc4032ze\slew\glb1\mc8\FAST.jed
+
+build lc4032ze\slew\glb1\mc9\SLOW.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc9\SLOW.jed: fit lc4032ze\slew\glb1\mc9\SLOW.lci | lc4032ze\slew\glb1\mc9\SLOW.tt4
+build lc4032ze\slew\glb1\mc9\FAST.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\slew\glb1\mc9\FAST.jed: fit lc4032ze\slew\glb1\mc9\FAST.lci | lc4032ze\slew\glb1\mc9\FAST.tt4
+build lc4032ze\slew\glb1\mc9_fuses.csv: udiff lc4032ze\slew\glb1\mc9\SLOW.jed lc4032ze\slew\glb1\mc9\FAST.jed
+
+build slew: phony lc4032ze\slew\glb0\mc0_fuses.csv lc4032ze\slew\glb0\mc1_fuses.csv lc4032ze\slew\glb0\mc10_fuses.csv lc4032ze\slew\glb0\mc11_fuses.csv lc4032ze\slew\glb0\mc12_fuses.csv lc4032ze\slew\glb0\mc13_fuses.csv lc4032ze\slew\glb0\mc14_fuses.csv lc4032ze\slew\glb0\mc15_fuses.csv lc4032ze\slew\glb0\mc2_fuses.csv lc4032ze\slew\glb0\mc3_fuses.csv lc4032ze\slew\glb0\mc4_fuses.csv lc4032ze\slew\glb0\mc5_fuses.csv lc4032ze\slew\glb0\mc6_fuses.csv lc4032ze\slew\glb0\mc7_fuses.csv lc4032ze\slew\glb0\mc8_fuses.csv lc4032ze\slew\glb0\mc9_fuses.csv lc4032ze\slew\glb1\mc0_fuses.csv lc4032ze\slew\glb1\mc1_fuses.csv lc4032ze\slew\glb1\mc10_fuses.csv lc4032ze\slew\glb1\mc11_fuses.csv lc4032ze\slew\glb1\mc12_fuses.csv lc4032ze\slew\glb1\mc13_fuses.csv lc4032ze\slew\glb1\mc14_fuses.csv lc4032ze\slew\glb1\mc15_fuses.csv lc4032ze\slew\glb1\mc2_fuses.csv lc4032ze\slew\glb1\mc3_fuses.csv lc4032ze\slew\glb1\mc4_fuses.csv lc4032ze\slew\glb1\mc5_fuses.csv lc4032ze\slew\glb1\mc6_fuses.csv lc4032ze\slew\glb1\mc7_fuses.csv lc4032ze\slew\glb1\mc8_fuses.csv lc4032ze\slew\glb1\mc9_fuses.csv
+
+build lc4032ze\zerohold\no.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\zerohold\no.jed: fit lc4032ze\zerohold\no.lci | lc4032ze\zerohold\no.tt4
+build lc4032ze\zerohold\yes.tt4: copy pla/buf_1in_32out.pla
+build lc4032ze\zerohold\yes.jed: fit lc4032ze\zerohold\yes.lci | lc4032ze\zerohold\yes.tt4
+build lc4032ze\zerohold\fuses.csv: udiff lc4032ze\zerohold\no.jed lc4032ze\zerohold\yes.jed
+
+build zerohold: phony lc4032ze\zerohold\fuses.csv
+
+default pull input_threshold od slew zerohold
+
+## ######################### END OF GENERATED CODE ######################### ##
