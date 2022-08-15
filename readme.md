@@ -9,7 +9,6 @@
 
 # TODO: LC4032ZE
 * OE muxes
-* Power Guard PGDF
 * MC output selection (reg/comb)
 * MC clock configuration
 * MC CE configuration

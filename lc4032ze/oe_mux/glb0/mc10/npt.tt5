@@ -1,0 +1,23 @@
+#$ DATE Mon Aug 15 16:05:34 2022
+#$ MODULE  x
+#$ PINS 14 in0 in1 in2 in3 in4 goe0 goe1 goe2 goe3 out_goe0 out_goe1 out_goe2
+ out_goe3 out
+.type f
+.i 9
+.o 10
+.ilb in0 in1 in2 in3 in4 goe0 goe1 goe2 goe3
+.ob out_goe0 out_goe0.OE out_goe1 out_goe1.OE out_goe2 out_goe2.OE out_goe3
+ out_goe3.OE out out.OE-
+.phase 1111111110
+.p 10
+--------- 1010101000
+-----1--- 0100000000
+------1-- 0001000000
+-------1- 0000010000
+--------1 0000000100
+1-------- 0000000010
+-1------- 0000000010
+--1------ 0000000010
+---1----- 0000000010
+---11---- 0000000001
+.end

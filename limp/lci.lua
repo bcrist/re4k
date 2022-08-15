@@ -19,16 +19,14 @@ Speed = `device.speed_grade`;
 Operating_condition = `device.temp_grade`;
 Status = Production;
 Default_Device_Io_Types=LVCMOS33,-;
-//EN_PinGLB = yes;
-//EN_PinMacrocell = yes;
-//Pin_MC_1to1 = yes;
 
 [Global Constraints]
-SPREAD_PLACEMENT=No;
+Spread_Placement=No;
 ]]
 
 write_mc_location_assignment = template [[`signal`=pin,`mc.pin.number`,-,`mc.glb.name`,`mc.index`;`nl]]
-write_clk_location_assignment = template [[`signal`=pin,`clk.number`,-,-,-;`nl]]
+write_mc_pin_location_assignment = template [[`signal`=pin,`pin.number`,-,`mc.glb.name`,`mc.index`;`nl]]
+write_pin_location_assignment = template [[`signal`=pin,`pin.number`,-,-,-;`nl]]
 write_node_location_assignment = template [[`signal`=node,-,-,`mc.glb.name`,`mc.index`;`nl]]
 write_io_type_constraint = template [[`signal`=`iostd`,pin,-,-;`nl]]
 
@@ -37,9 +35,9 @@ function write_lci_32out (device, special_glb, special_mc)
      write_lci_common { device = device }
 
      writeln '\n[Location Assignments]'
-     write_clk_location_assignment {
+     write_pin_location_assignment {
          signal = 'in',
-         clk = device.clk(0)
+         pin = device.clk(0)
      }
      local n = 0
      local special_signal = ''
@@ -114,9 +112,9 @@ function write_lci_input_threshold_clk (device, special_clk, iostd)
     write_lci_common { device = device }
 
     writeln '\n[Location Assignments]'
-    write_clk_location_assignment {
+    write_pin_location_assignment {
         signal = 'in0',
-        clk = device.clk(special_clk)
+        pin = device.clk(special_clk)
     }
     write_mc_location_assignment {
         signal = 'out',
@@ -159,9 +157,9 @@ function write_lci_pull_clk (device, special_clk, pull_mode)
     write_lci_common { device = device }
 
     writeln '\n[Location Assignments]'
-    write_clk_location_assignment {
+    write_pin_location_assignment {
         signal = 'in0',
-        clk = device.clk(special_clk)
+        pin = device.clk(special_clk)
     }
     write_mc_location_assignment {
         signal = 'out',
@@ -207,8 +205,8 @@ end
 function write_lci_bclk (device, special_glb, clk0, clk1)
     write_lci_common { device = device }
     writeln '\n[Location Assignments]'
-    write_clk_location_assignment { signal = 'clk0', clk = device.clk(clk0) }
-    write_clk_location_assignment { signal = 'clk1', clk = device.clk(clk1) }
+    write_pin_location_assignment { signal = 'clk0', pin = device.clk(clk0) }
+    write_pin_location_assignment { signal = 'clk1', pin = device.clk(clk1) }
     write_mc_location_assignment { signal = 'in0', mc = device.glb(special_glb).mc(0) }
     write_mc_location_assignment { signal = 'in1', mc = device.glb(special_glb).mc(1) }
     write_node_location_assignment { signal = 'co0', mc = device.glb(special_glb).mc(14) }
@@ -225,23 +223,94 @@ function write_lci_bclk23 (device, special_glb)
 end
 
 
-function write_lci_pgdf (device, special_glb, special_mc, variant)
+function write_lci_pgdf (device, special_glb, special_mc)
     write_lci_common { device = device }
     writeln '\n[Location Assignments]'
-    write_clk_location_assignment { signal = 'in_PG_E', clk = device.clk(0) }
+    write_pin_location_assignment { signal = 'in_PG_E', pin = device.clk(0) }
     write_mc_location_assignment { signal = 'in1_PG_D', mc = device.glb(special_glb).mc(special_mc) }
     write_mc_location_assignment { signal = 'in0_PG_D', mc = device.glb(special_glb).mc((special_mc + 1) % 16) }
     write_mc_location_assignment { signal = 'out', mc = device.glb(special_glb).mc((special_mc + 2) % 16) }
 end
 
-function write_lci_pgdf_clk (device, special_clk, variant)
+function write_lci_pgdf_clk (device, special_clk)
     write_lci_common { device = device }
-
     local clk = device.clk(special_clk)
-
     writeln '\n[Location Assignments]'
-    write_clk_location_assignment { signal = 'in1_PG_D', clk = clk }
+    write_pin_location_assignment { signal = 'in1_PG_D', pin = clk }
     write_mc_location_assignment { signal = 'in_PG_E', mc = device.glb(clk.glb.index or 0).mc(0) }
     write_mc_location_assignment { signal = 'in0_PG_D', mc = device.glb(clk.glb.index or 0).mc(1) }
     write_mc_location_assignment { signal = 'out', mc = device.glb(clk.glb.index or 0).mc(2) }
 end
+
+function write_lci_goe0_polarity (device)
+    write_lci_common { device = device }
+    writeln '\n[Location Assignments]'
+    write_pin_location_assignment { signal = 'oe', pin = device.goe(0) }
+    write_mc_location_assignment { signal = 'in', mc = device.glb(0).mc(4) }
+    write_mc_location_assignment { signal = 'out', mc = device.glb(0).mc(5) }
+end
+
+function write_lci_goe1_polarity (device)
+    write_lci_common { device = device }
+    writeln '\n[Location Assignments]'
+    write_pin_location_assignment { signal = 'oe', pin = device.goe(1) }
+    write_mc_location_assignment { signal = 'in', mc = device.glb(0).mc(4) }
+    write_mc_location_assignment { signal = 'out', mc = device.glb(0).mc(5) }
+end
+
+-- function write_lci_goe23_polarity (device)
+--     write_lci_common { device = device }
+--     writeln '\n[Location Assignments]'
+--     write_mc_location_assignment { signal = 'oe0a', mc = device.glb(1).mc(1) }
+--     write_mc_location_assignment { signal = 'oe0b', mc = device.glb(1).mc(2) }
+--     write_mc_location_assignment { signal = 'oe1a', mc = device.glb(1).mc(3) }
+--     write_mc_location_assignment { signal = 'oe1b', mc = device.glb(1).mc(4) }
+
+--     write_mc_location_assignment { signal = 'in0', mc = device.glb(0).mc(1) }
+--     write_mc_location_assignment { signal = 'in1', mc = device.glb(0).mc(2) }
+--     write_mc_location_assignment { signal = 'out0', mc = device.glb(0).mc(3) }
+--     write_mc_location_assignment { signal = 'out1', mc = device.glb(0).mc(4) }
+-- end
+
+function write_lci_oe_mux (device, special_glb, special_mc, variant)
+    write_lci_common { device = device }
+
+    local glb = device.glb(special_glb)
+    local scratch_glb = device.glb((special_glb + 1) % device.num_glbs)
+
+    local scratch_base
+    if special_mc < 8 then
+        scratch_base = 8
+    else
+        scratch_base = 1
+    end
+
+    writeln '\n[Location Assignments]'
+
+    write_pin_location_assignment { signal = 'goe0', pin = device.goe(0) }
+    write_pin_location_assignment { signal = 'goe1', pin = device.goe(1) }
+    write_pin_location_assignment { signal = 'goe2', pin = scratch_glb.mc(1).pin }
+    write_pin_location_assignment { signal = 'goe3', pin = scratch_glb.mc(2).pin }
+    write_pin_location_assignment { signal = 'in0',  pin = scratch_glb.mc(3).pin }
+    write_pin_location_assignment { signal = 'in1',  pin = scratch_glb.mc(4).pin }
+    write_pin_location_assignment { signal = 'in2',  pin = scratch_glb.mc(5).pin }
+    write_pin_location_assignment { signal = 'in3',  pin = scratch_glb.mc(6).pin }
+    write_pin_location_assignment { signal = 'in4',  pin = scratch_glb.mc(7).pin }
+
+    write_mc_location_assignment { signal = 'out_goe0', mc = glb.mc(scratch_base) }
+    write_mc_location_assignment { signal = 'out_goe1', mc = glb.mc(scratch_base+1) }
+    write_mc_location_assignment { signal = 'out_goe2', mc = glb.mc(scratch_base+2) }
+    write_mc_location_assignment { signal = 'out_goe3', mc = glb.mc(scratch_base+3) }
+
+    local pin = glb.mc(special_mc).pin
+    if pin.type ~= 'IO' then
+        pin = glb.mc((special_mc + 1) % 16).pin
+    end
+    write_mc_pin_location_assignment { signal = 'out', mc = glb.mc(special_mc), pin = pin }
+
+    writeln '\n[TIMING CONSTRAINTS]'
+    writeln 'layer = OFF;'
+    writeln 'tPD_0 = 1, goe2, out_goe2;'
+    writeln 'tPD_0 = 1, goe3, out_goe3;'
+end
+

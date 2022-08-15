@@ -1,4 +1,4 @@
-//[[!! include "lci"; write_lci_pull(device.lc4032ze, 0, 4, "UP") !! 67 ]]
+//[[!! include "lci"; write_lci_pull(device.lc4032ze, 0, 4, "UP") !! 64 ]]
 //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
 [Revision]
 Parent = lc4k32e.lci;
@@ -18,12 +18,9 @@ Speed = -5.8;
 Operating_condition = COM;
 Status = Production;
 Default_Device_Io_Types=LVCMOS33,-;
-//EN_PinGLB = yes;
-//EN_PinMacrocell = yes;
-//Pin_MC_1to1 = yes;
 
 [Global Constraints]
-SPREAD_PLACEMENT=No;
+Spread_Placement=No;
 
 [Location Assignments]
 in0=pin,44,-,A,0;

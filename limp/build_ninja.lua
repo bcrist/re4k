@@ -7,14 +7,28 @@ build `file`.tt4: copy pla/`pla`.pla
 build `file`.jed: fit `file`.lci | `file`.tt4
 ]]
 
-local function writeReadme (device, test_name, readme)
+local function writeReadme (device, test_name, extra)
+    local t = type(extra)
+    local readme
+    if t == 'table' then
+        readme = extra.readme
+    elseif t == 'string' then
+        readme = extra
+    end
     if readme ~= nil then
         fs.ensure_dir_exists(fs.compose_path(device.name, test_name))
         fs.put_file_contents(fs.compose_path(device.name, test_name, 'readme.md'), readme)
     end
 end
 
-local function writeVariants (device, test_name, variants, pla, extra_path, extra_params, targets, test_name_suffix)
+local function writeVariants (device, test_name, variants, pla, extra_path, extra_params, targets, extra)
+    local diff_options
+    local test_name_suffix
+    if extra ~= nil then
+        diff_options = extra.diff_options
+        test_name_suffix = extra.test_name_suffix
+    end
+
     local base_path = fs.compose_path(device.name, test_name)
     if extra_path ~= nil then
         if type(extra_path) == 'table' then
@@ -58,18 +72,28 @@ local function writeVariants (device, test_name, variants, pla, extra_path, extr
         csv = base_path.."_fuses.csv"
         targets[#targets+1] = csv
     end
-    write("build ", csv, ": udiff")
+    write("build ", csv, ": diff")
     for _, variant in ipairs(variants) do
         write(" ", fs.compose_path(base_path, variant..".jed"))
     end
     nl()
+    if diff_options ~= nil then
+        writeln("    diff_options = ", diff_options)
+    end
     nl()
 
     return csv
 end
 
-local function writeMcVariants(device, test_name, variants, pla, mc, targets)
-    writeVariants(device, test_name, variants, pla, { 'glb'..mc.glb.index, 'mc'..mc.index }, { mc.glb.index, mc.index }, targets)
+local function writeMcVariants(device, test_name, variants, pla, mc, targets, extra)
+    if type(variants) == 'function' then
+        local new_pla
+        variants, new_pla = variants(mc)
+        pla = new_pla or pla
+    end
+    if variants ~= nil then
+        writeVariants(device, test_name, variants, pla, { 'glb'..mc.glb.index, 'mc'..mc.index }, { mc.glb.index, mc.index }, targets, extra)
+    end
 end
 
 local function writePhony (test_name, targets)
@@ -82,57 +106,63 @@ local function writePhony (test_name, targets)
     default_targets[#default_targets+1] = test_name
 end
 
-function globalTest (device, test_name, variants, pla, readme)
-    writeReadme(device, test_name, readme)
-    local csv = writeVariants(device, test_name, variants, pla)
+function globalTest (device, test_name, variants, pla, extra)
+    writeReadme(device, test_name, extra)
+    local csv = writeVariants(device, test_name, variants, pla, nil, nil, nil, extra)
     writePhony(test_name, { csv })
 end
 
-function perGlbTest (device, test_name, variants, pla, readme)
+function perGlbTest (device, test_name, variants, pla, extra)
     local targets = {}
-    writeReadme(device, test_name, readme)
+    writeReadme(device, test_name, extra)
     for glb in device.glbs() do
-        writeVariants(device, test_name, variants, pla, 'glb'..glb, glb, targets)
+        writeVariants(device, test_name, variants, pla, 'glb'..glb, glb, targets, extra)
     end
     writePhony(test_name, targets)
 end
 
-function perMacrocellTest(device, test_name, variants, pla, readme)
+function perMacrocellTest(device, test_name, variants, pla, extra)
     local targets = {}
-    writeReadme(device, test_name, readme)
+    writeReadme(device, test_name, extra)
     for _, glb in device.glbs() do
         for _, mc in glb.mcs() do
-            writeMcVariants(device, test_name, variants, pla, mc, targets)
+            writeMcVariants(device, test_name, variants, pla, mc, targets, extra)
         end
     end
     writePhony(test_name, targets)
 end
 
-function perOutputTest(device, test_name, variants, pla, readme)
+function perOutputTest(device, test_name, variants, pla, extra)
     local targets = {}
-    writeReadme(device, test_name, readme)
+    writeReadme(device, test_name, extra)
     for _, glb in device.glbs() do
         for _, mc in glb.mcs() do
             if mc.pin ~= nil then
-                writeMcVariants(device, test_name, variants, pla, mc, targets)
+                writeMcVariants(device, test_name, variants, pla, mc, targets, extra)
             end
         end
     end
     writePhony(test_name, targets)
 end
 
-function perInputTest(device, test_name, variants, pla, readme)
+function perInputTest(device, test_name, variants, pla, extra)
     local targets = {}
-    writeReadme(device, test_name, readme)
+    writeReadme(device, test_name, extra)
     for _, glb in device.glbs() do
         for _, mc in glb.mcs() do
             if mc.pin ~= nil then
-                writeMcVariants(device, test_name, variants, pla, mc, targets)
+                writeMcVariants(device, test_name, variants, pla, mc, targets, extra)
             end
         end
     end
+    if type(extra) ~= 'table' then
+        extra = {
+            readme = extra
+        }
+    end
+    extra.test_name_suffix = (extra.test_name_suffix or '')..'_clk'
     for _, clk in device.clks() do
-        writeVariants(device, test_name, variants, pla, { 'input', clk.name }, clk.index, targets, '_clk')
+        writeVariants(device, test_name, variants, pla, { 'input', clk.name }, clk.clk_index, targets, extra)
     end
     writePhony(test_name, targets)
 end
@@ -177,6 +207,55 @@ perGlbTest(dev, 'bclk01', { 'passthru', 'invert_both', 'clk0_comp', 'clk1_comp' 
 perGlbTest(dev, 'bclk23', { 'passthru', 'invert_both', 'clk2_comp', 'clk3_comp' }, { 'bclk_passthru', 'bclk_both_inverted', 'bclk_clk0', 'bclk_clk1' })
 
 perInputTest(dev, 'pgdf', { 'pg', 'pg_disabled' }, { 'pg2', 'pg1' })
+
+globalTest(dev, 'goe0_polarity', { 'active_high', 'active_low' }, { 'goe_active_high', 'goe_active_low' })
+globalTest(dev, 'goe1_polarity', { 'active_high', 'active_low' }, { 'goe_active_high', 'goe_active_low' })
+
+--I'm having trouble coming up with a way to force the fitter into inverting the PTOE polarity.  I tried setting up 2 terms in the PLA, where either of 2
+--input signals being 0 will enable an output.  That way it can't satisfy it using a single PT alone, but it didn't seem to figure out that it was possible
+--to fit using the PTOE inverter, and just failed the fit instead.
+--
+--One thing I haven't tried yet is setting up an active-high shared PTOE that's used for one thing, and then another one that's the same signal but active low.
+--Maybe it will realize it can use the inverter instead of allocating the second global PTOE?  Or maybe I can occupy the second PTOE slot with a PG/BIE.
+--
+--Alternatively since there's only a few fuses, maybe I can identify them by elimination at the end and manually test with hardware until it does what I want.
+-- globalTest(dev, 'goe23_polarity', { 'LL', 'LH', 'HL', 'HH' }, { 'shared_goe_ll', 'shared_goe_ll', 'shared_goe_hh', 'shared_goe_hh' })
+
+
+perOutputTest(dev, 'oe_mux', function (mc)
+    if mc.pin.type == 'IO' then
+        return {
+            'off',
+            'on',
+            'npt',
+            'pt',
+            'goe0',
+            'goe1',
+            --[['goe2', 'goe3']]
+        }, {
+            'oe_mux_off',
+            'oe_mux_on',
+            'oe_mux_npt',
+            'oe_mux_pt',
+            'oe_mux_goe0',
+            'oe_mux_goe1',
+        }
+    else
+        return {
+            'off',
+            'on',
+            'npt',
+            'pt',
+            --[['goe2', 'goe3']]
+        }, {
+            'oe_mux_off',
+            'oe_mux_on',
+            'oe_mux_npt',
+            'oe_mux_pt',
+        }
+    end
+end, nil, { diff_options = '--rows 92-94' })
+
 
 write("default")
 for _, target in ipairs(default_targets) do

@@ -1,0 +1,29 @@
+#$ MODULE x
+#$ PINS 14
+    in0 in1 in2 in3 in4
+    goe0 goe1 goe2 goe3
+    out_goe0 out_goe1 out_goe2 out_goe3
+    out
+#$ NODES 0
+.type fr
+.i 9
+.o 10
+.ilb
+    in0 in1 in2 in3 in4
+    goe0 goe1 goe2 goe3
+.ob
+    out out_goe0 out_goe1 out_goe2 out_goe3
+    out.OE- out_goe0.OE out_goe1.OE out_goe2.OE out_goe3.OE
+.phase 1111101111
+.p 11
+--------- -1111-----
+1-------- 1---------
+-1------- 1---------
+--1------ 1---------
+---1----- 1---------
+---11---- -----1----
+-----1--- ------1---
+------1-- -------1--
+-------1- --------1-
+--------1 ---------1
+.end

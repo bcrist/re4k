@@ -21,6 +21,12 @@ local function clk_iterator (dev, index)
     return index, dev._clks[index+1]
 end
 
+local function goe_iterator (dev, index)
+    if index == nil then index = 0 else index = index + 1 end
+    if index >= dev.num_goes then return end
+    return index, dev._goes[index+1]
+end
+
 local function pin_iterator (ctx, number)
     if number == nil then number = 1 else number = number + 1 end
     if number > ctx._np then return end
@@ -31,11 +37,12 @@ local glb_names = 'ABCDEFGHIJKLMNOP'
 
 function register_device (dev)
     local clk_pins = dev.clk_pins
-    dev.clk_pins = nil
     local clk_glbs = dev.clk_glbs
-    dev.clk_glbs = nil
-
+    local goe_pins = dev.goe_pins
     local io_pins = dev.io_pins
+    dev.clk_pins = nil
+    dev.clk_glbs = nil
+    dev.goe_pins = nil
     dev.io_pins = nil
 
     dev._pins = {}
@@ -47,30 +54,11 @@ function register_device (dev)
             type = 'PWR/JTAG'
         }
     end
-
     dev.pins = function ()
         return pin_iterator, dev
     end
     dev.pin = function (number)
         return dev._pins[number]
-    end
-
-    dev._clks = {}
-    dev.num_clks = #clk_pins
-    for clk_number, pin_number in ipairs(clk_pins) do
-        local index = clk_number - 1
-        local pin = dev._pins[pin_number]
-        pin.type = 'GCLK'
-        pin.name = 'CLK'..index
-        pin.index = index
-        dev._clks[clk_number] = pin
-    end
-
-    dev.clks = function ()
-        return clk_iterator, dev
-    end
-    dev.clk = function (index)
-        return dev._clks[index+1]
     end
 
     dev._glbs = {}
@@ -99,11 +87,7 @@ function register_device (dev)
                 pin.mc = mc_data
                 pin.glb = glb_data
                 pin.name = mc_data.name
-                if mc == 16 then
-                    pin.type = 'IO/GOE'
-                else
-                    pin.type = 'IO'
-                end
+                pin.type = 'IO'
                 glb_data._pins[#glb_data._pins+1] = pin
             end
 
@@ -125,7 +109,6 @@ function register_device (dev)
 
         dev._glbs[glb] = glb_data
     end
-
     dev.glbs = function ()
         return glb_iterator, dev
     end
@@ -133,9 +116,53 @@ function register_device (dev)
         return dev._glbs[index+1]
     end
 
+    dev._clks = {}
+    dev.num_clks = #clk_pins
+    for clk_number, pin_number in ipairs(clk_pins) do
+        local index = clk_number - 1
+        local pin = dev._pins[pin_number]
+        if pin.type == 'IO' then
+            pin.type = 'IO/CLK'
+            pin.name = pin.name..'/CLK'..index
+        else
+            pin.type = 'CLK'
+            pin.name = 'CLK'..index
+        end
+        
+        pin.clk_index = index
+        dev._clks[clk_number] = pin
+    end
     for clk_number, clk_glb_index in ipairs(clk_glbs) do
         local clk_pin = dev._clks[clk_number]
         clk_pin.glb = dev._glbs[clk_glb_index+1]
+    end
+    dev.clks = function ()
+        return clk_iterator, dev
+    end
+    dev.clk = function (index)
+        return dev._clks[index+1]
+    end
+
+    dev._goes = {}
+    dev.num_goes = #goe_pins
+    for goe_number, pin_number in ipairs(goe_pins) do
+        local index = goe_number - 1
+        local pin = dev._pins[pin_number]
+        if pin.type == 'IO' then
+            pin.type = 'IO/GOE'
+            pin.name = pin.name..'/GOE'..index
+        else
+            pin.type = 'GOE'
+            pin.name = 'GOE'..index
+        end
+        pin.goe_index = index
+        dev._goes[goe_number] = pin
+    end
+    dev.goes = function ()
+        return goe_iterator, dev
+    end
+    dev.goe = function (index)
+        return dev._goes[index+1]
     end
 
     device[dev.name] = dev

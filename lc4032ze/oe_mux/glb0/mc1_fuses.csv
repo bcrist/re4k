@@ -1,0 +1,4 @@
+fuse,lc4032ze\oe_mux\glb0\mc1\goe0.jed,lc4032ze\oe_mux\glb0\mc1\goe1.jed,lc4032ze\oe_mux\glb0\mc1\on.jed,lc4032ze\oe_mux\glb0\mc1\off.jed,lc4032ze\oe_mux\glb0\mc1\pt.jed,lc4032ze\oe_mux\glb0\mc1\npt.jed
+92:94,0,1,0,1,0,1
+93:94,1,1,1,1,0,0
+94:94,0,0,1,1,1,1

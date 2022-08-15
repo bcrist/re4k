@@ -1,0 +1,46 @@
+//[[!! include "lci"; write_lci_oe_mux(device.lc4032ze, 0, 11, "on") !! 46 ]]
+//[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
+[Revision]
+Parent = lc4k32e.lci;
+
+[Fitter Report Format]
+Detailed = yes;
+
+[Constraint Version]
+version = 1.0;
+
+[Device]
+Family = lc4k;
+PartNumber = LC4032ZE-5TN48C;
+Package = 48TQFP;
+PartType = LC4032ZE;
+Speed = -5.8;
+Operating_condition = COM;
+Status = Production;
+Default_Device_Io_Types=LVCMOS33,-;
+
+[Global Constraints]
+Spread_Placement=No;
+
+[Location Assignments]
+goe0=pin,44,-,-,-;
+goe1=pin,41,-,-,-;
+goe2=pin,21,-,-,-;
+goe3=pin,22,-,-,-;
+in0=pin,23,-,-,-;
+in1=pin,24,-,-,-;
+in2=pin,26,-,-,-;
+in3=pin,27,-,-,-;
+in4=pin,28,-,-,-;
+out_goe0=pin,45,-,A,1;
+out_goe1=pin,46,-,A,2;
+out_goe2=pin,47,-,A,3;
+out_goe3=pin,48,-,A,4;
+out=pin,10,-,A,11;
+
+[TIMING CONSTRAINTS]
+layer = OFF;
+tPD_0 = 1, goe2, out_goe2;
+tPD_0 = 1, goe3, out_goe3;
+
+//[[ ######################### END OF GENERATED CODE ######################### ]]
