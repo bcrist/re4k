@@ -1,4 +1,4 @@
-fuse,lc4032ze\oe_mux\glb0\mc5\goe0.jed,lc4032ze\oe_mux\glb0\mc5\goe1.jed,lc4032ze\oe_mux\glb0\mc5\on.jed,lc4032ze\oe_mux\glb0\mc5\off.jed,lc4032ze\oe_mux\glb0\mc5\pt.jed,lc4032ze\oe_mux\glb0\mc5\npt.jed
-92:114,0,1,0,1,0,1
-93:114,1,1,1,1,0,0
-94:114,0,0,1,1,1,1
+fuse,lc4032ze\oe_mux\glb0\mc5\off.jed,lc4032ze\oe_mux\glb0\mc5\on.jed,lc4032ze\oe_mux\glb0\mc5\npt.jed,lc4032ze\oe_mux\glb0\mc5\pt.jed,lc4032ze\oe_mux\glb0\mc5\goe0.jed,lc4032ze\oe_mux\glb0\mc5\goe1.jed
+92:114,1,0,1,0,0,1
+93:114,1,1,0,0,1,1
+94:114,1,1,1,1,0,0

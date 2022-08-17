@@ -23,8 +23,8 @@ Default_Device_Io_Types=LVCMOS33,-;
 Spread_Placement=No;
 
 [Location Assignments]
-goe0=pin,44,-,-,-;
-goe1=pin,41,-,-,-;
+goe0=pin,31,-,-,-;
+goe1=pin,32,-,-,-;
 goe2=pin,21,-,-,-;
 goe3=pin,22,-,-,-;
 in0=pin,23,-,-,-;
@@ -36,7 +36,7 @@ out_goe0=pin,7,-,A,8;
 out_goe1=pin,8,-,A,9;
 out_goe2=pin,9,-,A,10;
 out_goe3=pin,10,-,A,11;
-out=pin,45,-,A,0;
+out=pin,44,-,A,0;
 
 [TIMING CONSTRAINTS]
 layer = OFF;

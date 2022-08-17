@@ -256,6 +256,7 @@ perOutputTest(dev, 'oe_mux', function (mc)
     end
 end, nil, { diff_options = '--rows 92-94' })
 
+perOutputTest(dev, 'orm', { 'self', 'o1', 'o2', 'o3', 'o4', 'o5', 'o6', 'o7' }, 'buf_1in_16out' )
 
 write("default")
 for _, target in ipairs(default_targets) do

@@ -287,8 +287,13 @@ function write_lci_oe_mux (device, special_glb, special_mc, variant)
 
     writeln '\n[Location Assignments]'
 
-    write_pin_location_assignment { signal = 'goe0', pin = device.goe(0) }
-    write_pin_location_assignment { signal = 'goe1', pin = device.goe(1) }
+    if glb.mc(special_mc).pin.type ~= 'IO' then
+        write_pin_location_assignment { signal = 'goe0',  pin = scratch_glb.mc(8).pin }
+        write_pin_location_assignment { signal = 'goe1',  pin = scratch_glb.mc(9).pin }
+    else
+        write_pin_location_assignment { signal = 'goe0', pin = device.goe(0) }
+        write_pin_location_assignment { signal = 'goe1', pin = device.goe(1) }
+    end
     write_pin_location_assignment { signal = 'goe2', pin = scratch_glb.mc(1).pin }
     write_pin_location_assignment { signal = 'goe3', pin = scratch_glb.mc(2).pin }
     write_pin_location_assignment { signal = 'in0',  pin = scratch_glb.mc(3).pin }
@@ -302,11 +307,7 @@ function write_lci_oe_mux (device, special_glb, special_mc, variant)
     write_mc_location_assignment { signal = 'out_goe2', mc = glb.mc(scratch_base+2) }
     write_mc_location_assignment { signal = 'out_goe3', mc = glb.mc(scratch_base+3) }
 
-    local pin = glb.mc(special_mc).pin
-    if pin.type ~= 'IO' then
-        pin = glb.mc((special_mc + 1) % 16).pin
-    end
-    write_mc_pin_location_assignment { signal = 'out', mc = glb.mc(special_mc), pin = pin }
+    write_mc_location_assignment { signal = 'out', mc = glb.mc(special_mc) }
 
     writeln '\n[TIMING CONSTRAINTS]'
     writeln 'layer = OFF;'
@@ -314,3 +315,26 @@ function write_lci_oe_mux (device, special_glb, special_mc, variant)
     writeln 'tPD_0 = 1, goe3, out_goe3;'
 end
 
+function write_lci_orm (device, special_glb, special_mc, variant)
+    write_lci_common { device = device }
+
+    writeln '\n[Location Assignments]'
+    write_pin_location_assignment { signal = 'in',  pin = device.clk(0) }
+
+    local glb = device.glb(special_glb)
+
+    local mc = special_mc
+    if variant ~= 'self' then
+        mc = (mc + variant:sub(2)) % 16
+    end
+    
+    local n = 1
+    for i = 0, 15 do
+        if i ~= mc then
+            write_node_location_assignment { signal = 'out'..n, mc = glb.mc(i) }
+            n = n + 1
+        end
+    end
+
+    write_mc_pin_location_assignment { signal = 'out0', mc = glb.mc(mc), pin = glb.mc(special_mc).pin }
+end
