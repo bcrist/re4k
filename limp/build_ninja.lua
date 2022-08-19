@@ -54,8 +54,15 @@ local function writeVariants (device, test_name, variants, extra_path, extra_par
                 limp = limp..', '..extra_params
             end
         end
-        limp = limp..', "'..variant..'") ]]'
-        fs.put_file_contents(file..'.lci', limp)
+        limp = limp..', "'..variant..'") '
+
+        local limp_len = #limp
+        local old_limp = fs.get_file_contents(file..'.lci')
+        local old_limp_start = old_limp:sub(1,limp_len)
+        local old_limp_endtoken = old_limp:sub(limp_len+1,limp_len+2)
+        if old_limp_start ~= limp or old_limp_endtoken ~= '!!' then
+            fs.put_file_contents(file..'.lci', limp..']]')
+        end
 
         write_build { file = file }
     end
