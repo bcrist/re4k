@@ -1,0 +1,18 @@
+#$ MODULE x
+#$ PINS 8 ce0 ce1 clk gce in in2 in3 in4
+#$ NODES 5 ceo out out2 out3 out4
+.type f
+.i 8
+.o 13
+.ilb ce0 ce1 clk gce in in2 in3 in4
+.ob ceo out.C out.CE out.D out2.C out2.CE out2.D out3.C out3.CE out3.D out4.C out4.CE out4.D
+.phase 1111111111111
+.p 7
+11------ 1------------
+--1----- -1--1--1--1--
+---1---- --1--1--1--1-
+----1--- ---1---------
+-----1-- ------1------
+------1- ---------1---
+-------1 ------------1
+.end

@@ -9,7 +9,6 @@
 .ninja_log
 
 #Lattice
-*.tt4
 *.jed
 *.ppn
 *.rpt

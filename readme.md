@@ -8,7 +8,7 @@
 * Save as SVF
 
 # TODO: LC4032ZE
-* OE muxes
+* OE muxes (cleanup)
 * MC output selection (reg/comb)
 * MC clock configuration
 * MC CE configuration
@@ -19,8 +19,7 @@
 * MC Single PT routing mode
 * PT input switches
 * GLB signal selection muxes
-* Output routing muxes
 * Usercode
 * Security bit
-* Global OE - polarity, 4x PTOE/BIE fuses
+* Shared PTOE - polarity, 4x PTOE/BIE fuses
 * OSCTIMER

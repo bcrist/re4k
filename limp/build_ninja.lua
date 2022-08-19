@@ -3,7 +3,6 @@ include 'lc4032ze'
 local default_targets = {}
 
 local write_build = template [[
-build `file`.tt4: copy pla/`pla`.pla
 build `file`.jed: fit `file`.lci | `file`.tt4
 ]]
 
@@ -21,7 +20,7 @@ local function writeReadme (device, test_name, extra)
     end
 end
 
-local function writeVariants (device, test_name, variants, pla, extra_path, extra_params, targets, extra)
+local function writeVariants (device, test_name, variants, extra_path, extra_params, targets, extra)
     local diff_options
     local test_name_suffix
     if extra ~= nil then
@@ -58,11 +57,7 @@ local function writeVariants (device, test_name, variants, pla, extra_path, extr
         limp = limp..', "'..variant..'") ]]'
         fs.put_file_contents(file..'.lci', limp)
 
-        if type(pla) == 'table' then
-            write_build { pla = pla[v], file = file }
-        else
-            write_build { pla = pla, file = file }
-        end
+        write_build { file = file }
     end
 
     local csv
@@ -85,14 +80,12 @@ local function writeVariants (device, test_name, variants, pla, extra_path, extr
     return csv
 end
 
-local function writeMcVariants(device, test_name, variants, pla, mc, targets, extra)
+local function writeMcVariants(device, test_name, variants, mc, targets, extra)
     if type(variants) == 'function' then
-        local new_pla
-        variants, new_pla = variants(mc)
-        pla = new_pla or pla
+        variants = variants(mc)
     end
     if variants ~= nil then
-        writeVariants(device, test_name, variants, pla, { 'glb'..mc.glb.index, 'mc'..mc.index }, { mc.glb.index, mc.index }, targets, extra)
+        writeVariants(device, test_name, variants, { 'glb'..mc.glb.index, 'mc'..mc.index }, { mc.glb.index, mc.index }, targets, extra)
     end
 end
 
@@ -106,52 +99,52 @@ local function writePhony (test_name, targets)
     default_targets[#default_targets+1] = test_name
 end
 
-function globalTest (device, test_name, variants, pla, extra)
+function globalTest (device, test_name, variants, extra)
     writeReadme(device, test_name, extra)
-    local csv = writeVariants(device, test_name, variants, pla, nil, nil, nil, extra)
+    local csv = writeVariants(device, test_name, variants, nil, nil, nil, extra)
     writePhony(test_name, { csv })
 end
 
-function perGlbTest (device, test_name, variants, pla, extra)
+function perGlbTest (device, test_name, variants, extra)
     local targets = {}
     writeReadme(device, test_name, extra)
     for glb in device.glbs() do
-        writeVariants(device, test_name, variants, pla, 'glb'..glb, glb, targets, extra)
+        writeVariants(device, test_name, variants, 'glb'..glb, glb, targets, extra)
     end
     writePhony(test_name, targets)
 end
 
-function perMacrocellTest(device, test_name, variants, pla, extra)
+function perMacrocellTest(device, test_name, variants, extra)
     local targets = {}
     writeReadme(device, test_name, extra)
     for _, glb in device.glbs() do
         for _, mc in glb.mcs() do
-            writeMcVariants(device, test_name, variants, pla, mc, targets, extra)
+            writeMcVariants(device, test_name, variants, mc, targets, extra)
         end
     end
     writePhony(test_name, targets)
 end
 
-function perOutputTest(device, test_name, variants, pla, extra)
+function perOutputTest(device, test_name, variants, extra)
     local targets = {}
     writeReadme(device, test_name, extra)
     for _, glb in device.glbs() do
         for _, mc in glb.mcs() do
             if mc.pin ~= nil then
-                writeMcVariants(device, test_name, variants, pla, mc, targets, extra)
+                writeMcVariants(device, test_name, variants, mc, targets, extra)
             end
         end
     end
     writePhony(test_name, targets)
 end
 
-function perInputTest(device, test_name, variants, pla, extra)
+function perInputTest(device, test_name, variants, extra)
     local targets = {}
     writeReadme(device, test_name, extra)
     for _, glb in device.glbs() do
         for _, mc in glb.mcs() do
             if mc.pin ~= nil then
-                writeMcVariants(device, test_name, variants, pla, mc, targets, extra)
+                writeMcVariants(device, test_name, variants, mc, targets, extra)
             end
         end
     end
@@ -162,34 +155,34 @@ function perInputTest(device, test_name, variants, pla, extra)
     end
     extra.test_name_suffix = (extra.test_name_suffix or '')..'_clk'
     for _, clk in device.clks() do
-        writeVariants(device, test_name, variants, pla, { 'input', clk.name }, clk.clk_index, targets, extra)
+        writeVariants(device, test_name, variants, { 'input', clk.name }, clk.clk_index, targets, extra)
     end
     writePhony(test_name, targets)
 end
 
 local dev = device.lc4032ze
 
-perInputTest(dev, 'pull', { 'OFF', 'UP', 'DOWN', 'HOLD' }, 'and_31in_1out', [[
+perInputTest(dev, 'pull', { 'OFF', 'UP', 'DOWN', 'HOLD' }, [[
 2 fuses per I/O allow configuration of pull up, pull down, bus-hold, or high-Z input conditioning.
 ]])
-perInputTest(dev, 'input_threshold', { 'LVCMOS33', 'LVCMOS15' }, 'and_31in_1out', [[
+perInputTest(dev, 'input_threshold', { 'LVCMOS33', 'LVCMOS15' }, [[
 When an input expects to see 2.5V or higher inputs, this fuse should be used to increase the threshold voltage for that input.
 
 This probably also controls whether or not the 200mV input hysteresis should be applied (according to the datasheet it's active at 2.5V and 3.3V)
 ]])
-perOutputTest(dev, 'od', { 'LVCMOS33', 'LVCMOS33_OD' }, 'buf_1in_32out', [[
+perOutputTest(dev, 'od', { 'LVCMOS33', 'LVCMOS33_OD' }, [[
 One fuse per output controls whether the output is open-drain or totem-pole.
 
 Open-drain can also be emulated by outputing a constant low and using OE to enable or disable it, but that places a lot of limitation on how much logic can be done in the macrocell.
 ]])
-perOutputTest(dev, 'slew', { 'SLOW', 'FAST' }, 'buf_1in_32out', [[
+perOutputTest(dev, 'slew', { 'SLOW', 'FAST' }, [[
 One fuse per output controls the slew rate for that driver.
 
 SLOW should generally be used for any long traces or inter-board connections.
 FAST can be used for short traces where transmission line effects are unlikely.
 ]])
 
-globalTest(dev, 'zerohold', { 'no', 'yes' }, 'buf_1in_1out', [[
+globalTest(dev, 'zerohold', { 'no', 'yes' }, [[
 When this fuse is enabled, registered inputs have an extra delay added to bring `tHOLD` down to 0.
 
 This also means the setup time is increased as well.
@@ -203,15 +196,15 @@ This fuse affects the entire chip.
 -- Prevents reading flash?
 -- ]])
 
-perGlbTest(dev, 'bclk01', { 'passthru', 'invert_both', 'clk0_comp', 'clk1_comp' }, { 'bclk_passthru', 'bclk_both_inverted', 'bclk_clk0', 'bclk_clk1' })
-perGlbTest(dev, 'bclk23', { 'passthru', 'invert_both', 'clk2_comp', 'clk3_comp' }, { 'bclk_passthru', 'bclk_both_inverted', 'bclk_clk0', 'bclk_clk1' })
+perGlbTest(dev, 'bclk01', { 'passthru', 'invert_both', 'clk0_comp', 'clk1_comp' })
+perGlbTest(dev, 'bclk23', { 'passthru', 'invert_both', 'clk2_comp', 'clk3_comp' })
 
-perInputTest(dev, 'pgdf', { 'pg', 'pg_disabled' }, { 'pg2', 'pg1' })
+perInputTest(dev, 'pgdf', { 'pg', 'pg_disabled' })
 
-globalTest(dev, 'goe0_polarity', { 'active_high', 'active_low' }, { 'goe_active_high', 'goe_active_low' })
-globalTest(dev, 'goe1_polarity', { 'active_high', 'active_low' }, { 'goe_active_high', 'goe_active_low' })
+globalTest(dev, 'goe0_polarity', { 'active_high', 'active_low' })
+globalTest(dev, 'goe1_polarity', { 'active_high', 'active_low' })
 
---I'm having trouble coming up with a way to force the fitter into inverting the PTOE polarity.  I tried setting up 2 terms in the PLA, where either of 2
+--I'm having trouble coming up with a way to force the fitter into inverting the shared PTOE polarity.  I tried setting up 2 terms in the PLA, where either of 2
 --input signals being 0 will enable an output.  That way it can't satisfy it using a single PT alone, but it didn't seem to figure out that it was possible
 --to fit using the PTOE inverter, and just failed the fit instead.
 --
@@ -223,40 +216,31 @@ globalTest(dev, 'goe1_polarity', { 'active_high', 'active_low' }, { 'goe_active_
 
 
 perOutputTest(dev, 'oe_mux', function (mc)
-    if mc.pin.type == 'IO' then
-        return {
-            'off',
-            'on',
-            'npt',
-            'pt',
-            'goe0',
-            'goe1',
-            --[['goe2', 'goe3']]
-        }, {
-            'oe_mux_off',
-            'oe_mux_on',
-            'oe_mux_npt',
-            'oe_mux_pt',
-            'oe_mux_goe0',
-            'oe_mux_goe1',
-        }
-    else
-        return {
-            'off',
-            'on',
-            'npt',
-            'pt',
-            --[['goe2', 'goe3']]
-        }, {
-            'oe_mux_off',
-            'oe_mux_on',
-            'oe_mux_npt',
-            'oe_mux_pt',
-        }
-    end
-end, nil, { diff_options = '--rows 92-94' })
+    if mc.pin.type == 'IO' then return {
+        'off',
+        'on',
+        'npt',
+        'pt',
+        'goe0',
+        'goe1',
+        --[['goe2', 'goe3']]
+    } else return {
+        'off',
+        'on',
+        'npt',
+        'pt',
+        --[['goe2', 'goe3']]
+    } end
+end, { diff_options = '--rows 92-94', readme = [[
+TODO: fix extra fuses showing up for macrocells A0 and B15 (goe0/1 inputs)
+TODO: figure out how to select goe2/3
+]] })
 
-perOutputTest(dev, 'orm', { 'self', 'o1', 'o2', 'o3', 'o4', 'o5', 'o6', 'o7' }, 'buf_1in_16out' )
+perOutputTest(dev, 'orm', { 'self', 'o1', 'o2', 'o3', 'o4', 'o5', 'o6', 'o7' })
+
+perMacrocellTest(dev, 'reset_init', { 'SET', 'RESET' })
+
+perMacrocellTest(dev, 'ce_mux', { 'always', 'npt', 'pt', 'shared' }, { diff_options = '--rows 86-87'})
 
 write("default")
 for _, target in ipairs(default_targets) do

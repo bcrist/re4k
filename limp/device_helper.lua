@@ -1,6 +1,9 @@
 global('device')
 if device ~= nil then return end
 
+local setmetatable = setmetatable
+local ipairs = ipairs
+
 device = {}
 
 local function glb_iterator (dev, index)
@@ -35,6 +38,19 @@ end
 
 local glb_names = 'ABCDEFGHIJKLMNOP'
 
+local device_meta = {
+    class = 'device'
+}
+local pin_meta = {
+    class = 'pin'
+}
+local glb_meta = {
+    class = 'glb'
+}
+local mc_meta = {
+    class = 'mc'
+}
+
 function register_device (dev)
     local clk_pins = dev.clk_pins
     local clk_glbs = dev.clk_glbs
@@ -45,14 +61,18 @@ function register_device (dev)
     dev.goe_pins = nil
     dev.io_pins = nil
 
+    setmetatable(dev, device_meta)
+
     dev._pins = {}
     dev._np = dev.num_pins
     for pin_number = 1, dev.num_pins do
-        dev._pins[pin_number] = {
+        local pin = {
             number = pin_number,
             device = dev,
             type = 'PWR/JTAG'
         }
+        setmetatable(pin, pin_meta)
+        dev._pins[pin_number] = pin
     end
     dev.pins = function ()
         return pin_iterator, dev
@@ -70,6 +90,7 @@ function register_device (dev)
             _mcs = {},
             _pins = {},
         }
+        setmetatable(glb_data, glb_meta)
 
         for mc = 1, 16 do
             local mc_index = mc - 1
@@ -79,6 +100,7 @@ function register_device (dev)
                 glb = glb_data,
                 device = dev,
             }
+            setmetatable(mc_data, mc_meta)
 
             local pin_number = io_pins[mc_data.name]
             if pin_number ~= nil then
