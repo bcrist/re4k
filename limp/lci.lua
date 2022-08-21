@@ -451,3 +451,421 @@ function write_lci_ce_mux (device, special_glb, special_mc, variant)
     assign_node_location('out3', device.glb(special_glb).mc(scratch_base+1))
     assign_node_location('out4', device.glb(special_glb).mc(scratch_base+2))
 end
+
+function write_lci_pt_test (device, variant)
+    local pla = make_pla()
+    pla:pt({'a', 'b', 'c'}, 'dummy')
+    if variant == 'a' then
+        pla:pt('a', 'out')
+    elseif variant == 'b' then
+        pla:pt('b', 'out')
+    else
+        pla:pt({'a', 'b'}, 'out')
+    end
+    pla:write(variant..'.tt4')
+
+    write_lci_common { device = device }
+
+    writeln '\n[Location Assignments]'
+    assign_node_location('dummy', device.glb(0).mc(0))
+    assign_node_location('out', device.glb(0).mc(1))
+    assign_pin_location('a', device.glb(0).mc(2))
+    assign_pin_location('b', device.glb(0).mc(3))
+end
+
+function write_lci_pt_test2 (device, target_glb, variant)
+    local pla = make_pla()
+    pla:pt('in', 'out')
+    
+    write_lci_common { device = device }
+
+    writeln '\n[Location Assignments]'
+    assign_node_location('out', device.glb(target_glb))
+
+    local pin_number = variant:match('pin(%d+)')
+    if pin_number then
+        assign_pin_location('in', device.pin(pin_number + 0))
+    else
+        local glb, mc = variant:match('glb(%d+)_mc(%d+)')
+        assign_node_location('in', device.glb(glb).mc(mc))
+        pla:node('in')
+        pla:pt({}, 'in')
+    end
+    pla:write(variant..'.tt4')
+end
+
+local function parse_signal_list (device, str)
+    str = str:gsub(' ', ''):gsub('fbA', 'glb0_mc'):gsub('fbB', 'glb1_mc')
+
+    local signals = {}
+    for signal in str:gmatch('[^,\r\n]+') do
+        local pin_number = signal:match('pin(%d+)')
+        if pin_number then
+            signals[signal] = device.pin(pin_number + 0)
+        else
+            local glb, mc = signal:match('glb(%d+)_mc(%d+)')
+            signals[signal] = device.glb(glb).mc(mc)
+        end
+    end
+
+    local signals_list = {}
+    for signal in spairs(signals) do
+        signals_list[#signals_list+1] = signal
+    end
+
+    return signals, signals_list
+end
+
+function write_lci_pt_test3 (device)
+    local all_signals
+    local all_signals_list
+    all_signals, all_signals_list = parse_signal_list(device, [[
+        fb A5, fb B6, fb B15, pin 20, pin 27, pin 44
+        fb A3, fb A11, fb A15, pin 4, pin 14, pin 34
+        fb A2, fb A9, fb A13, fb B12, pin 19, pin 45
+        fb A12, pin 28, pin 31, pin 14, pin 44
+        fb A7, fb B7, pin 24, pin 32, pin 44, fb A15
+        fb A4, fb A14, fb B3, pin 18, pin 38, pin 4
+        fb B10, pin 8, pin 22, pin 40, pin 4, fb B7
+        fb A6, fb B1, fb B4, fb B13, pin 10, pin 45
+        fb A8, fb B0, pin 33, fb A3, pin 20, pin 45
+        fb B11, pin 9, pin 17, pin 47, fb B15, fb A9
+        pin 23, pin 26, pin 43, fb A2, fb B3, fb B11
+        pin 3, pin 21, fb A11, pin 47, fb A5
+        pin 16, pin 27, fb A3, fb B7, pin 31
+        fb A10, pin 2, pin 39, pin 14, fb A5, pin 9
+        fb A0, fb B9, pin 10, fb B0, fb A8
+        fb B5, fb B8, fb B14, pin 19, fb B15, pin 39
+        fb B2, pin 34, pin 18, fb B15, fb A7
+        fb A1, pin 15, pin 27, fb A11, pin 40
+        fb A13, fb A6, pin 17, fb B5, pin 38, pin 3
+        pin 7, pin 41, fb A4, fb A8, pin 19, pin 2
+        pin 46, pin 28, fb A0, fb B5, pin 18, fb B10
+        pin 42, pin 22, pin 7, fb B14
+        fb A13, pin 32, pin 41, pin 10
+        pin 48, fb B11, pin 2, fb B6
+        fb B4, pin 40, fb A4, pin 3, pin 24
+        pin 21, fb A6, fb A1, pin 42
+        pin 26, pin 42, pin 17, fb A7, fb A12
+        fb B1, pin 31, pin 20, pin 38
+        fb A14, pin 33, pin 46
+        fb B10, pin 48, fb B4, pin 7, pin 23, fb A1
+        pin 9, fb A4, pin 32, pin 22
+        fb A7, pin 15, fb A2, pin 39, fb B1
+        pin 34, pin 24, fb B14, pin 26, fb B12
+        fb B13, pin 21, fb A10, pin 41
+        fb A9, fb A3, pin 46, pin 8
+        pin 43, fb B8, pin 33
+]])
+
+    local signals = {}
+    local signal_list = {}
+    local pick_signal = function (signal)
+        if signals[signal] then return end
+        for i, sig in ipairs(signal_list) do
+            if sig == signal then
+                table.remove(all_signals_list, i)
+                break
+            end
+        end
+        signal_list[#signal_list+1] = signal
+        signals[signal] = all_signals[signal]
+    end
+
+    local signal_limit = 36
+
+    while #signal_list < signal_limit do
+        local signal = all_signals_list[math.random(#all_signals_list)]
+        pick_signal(signal)
+    end
+
+    write_lci_common { device = device }
+    writeln 'Adjust_input_assignments=On;'
+
+    writeln '\n[Location Assignments]'
+
+    local pla = make_pla()
+    for name, info in spairs(signals) do
+        if getmetatable(info).class == 'pin' then
+            assign_pin_location(name, info)
+        else
+            pla:node(name)
+            pla:pt({}, name)
+            assign_node_location(name, info)
+        end
+    end
+
+    pla:pt(signal_list, 'out')
+    assign_node_location('out', device.glb(0))
+
+    pla:write('test.tt4')
+end
+
+
+local gi_map = {
+    gi0 = { 'fb A5' },
+    gi1 = { 'fb A3' },
+    gi2 = { 'fb A2' },
+    gi3 = { 'fb A12' },
+    gi4 = { 'fb A7' },
+    gi5 = { 'fb A4' },
+    gi6 = { 'fb B10' },
+    gi7 = { 'fb A6' },
+    gi8 = { 'fb A8' },
+    gi9 = { 'fb B11' },
+    gi10 = { 'pin 23' },
+    gi11 = { 'pin 3' },
+    gi12 = { 'pin 16' },
+    gi13 = { 'fb A10' },
+    gi14 = { 'fb A0' },
+    gi15 = { 'fb B5' },
+    gi16 = { 'fb B2' },
+    gi17 = { 'fb A1' },
+    gi18 = { 'fb A13', 'fb A2' },
+    gi19 = { 'pin 7' },
+    gi20 = { 'pin 46' },
+    gi21 = { 'pin 42' },
+    gi22 = { 'pin 32', 'fb A7' },
+    gi23 = { 'pin 48' },
+    gi24 = { 'fb B4', [[
+        fb A6, fb B1, fb B13, pin 10, pin 45, fb A13, pin 17, fb B5, pin 38, pin 3, pin 31,
+        pin 20, pin 38, fb A10, fb B11, fb A8, fb B0, pin 33, fb A3, pin 20, pin 45, fb A2, fb A9, fb A13, fb B12, pin 19, pin 45
+    ]] },
+    gi25 = { 'pin 21', 'pin 3, fb A11, pin 47, fb A5, pin 28, fb A13, fb A6, pin 17, fb B5, pin 38, fb B4, pin 40, fb A4, pin 24, fb B2, fb A3' },
+    gi26 = { 'pin 26', 'pin 23' },
+    gi27 = { 'fb B1', 'fb A6, fb A13, fb A2, fb B4' },
+    gi28 = { 'fb A14', 'fb A4' },
+    gi29 = { 'pin 7', [[
+        pin 41, fb A4, fb A8, pin 19, pin 2
+        pin 42, pin 22, fb B14, fb B3, fb B9
+    ]] },
+    gi30 = { 'pin 9', 'fb B11, fb A10' },
+    gi31 = { 'pin 15', 'fb A1' },
+    gi32 = { 'pin 34', 'fb A3, fb B2' },
+    gi33 = { 'fb B13', 'fb A6, fb B1, fb B4' },
+    gi34 = { 'fb A9', 'fb A2, fb B11, fb A13, fb B12, pin 19, pin 45' },
+    gi35 = { 'pin 43', 'pin 23, fb A0' },
+}
+
+function write_lci_pt0 (device, glb, mc, gi, variant)
+    local gi_data = gi_map['gi'..gi]
+
+    write_lci_common { device = device }
+
+    writeln '\n[Location Assignments]'
+
+    local pla = make_pla()
+    for name, info in spairs((parse_signal_list(device, gi_data[1]))) do
+        if getmetatable(info).class == 'pin' then
+            assign_pin_location(name, info)
+        elseif info.glb.index ~= glb or info.index > mc then
+            pla:node(name)
+            pla:pt({}, name..'.D')
+            assign_node_location(name, info)
+        end
+        if variant:sub(1,1) == 'n' then
+            name = '~'..name
+        end
+        local out_name = 'glb'..glb..'_mc'..mc
+        pla:pt(name, out_name..'.D')
+        assign_node_location(out_name, device.glb(glb).mc(mc))
+    end
+
+    if gi_data[2] ~= nil then
+        local other_signals
+        local other_signals_list
+        other_signals, other_signals_list = parse_signal_list(device, gi_data[2])
+        for name, info in spairs(other_signals) do
+            if getmetatable(info).class == 'pin' then
+                assign_pin_location(name, info)
+            elseif info.glb.index ~= glb or info.index > mc then
+                pla:node(name)
+                pla:pt({}, name..'.D')
+                assign_node_location(name, info)
+            end
+        end
+        pla:pt(other_signals_list, 'dummy')
+        assign_node_location('dummy', device.glb(glb))
+    end
+
+    for xmc_index = 0, mc - 1 do
+        local xmc = device.glb(glb).mc(xmc_index)
+        local name = 'glb'..glb..'_mc'..xmc_index
+        pla:pt('x0', name..'.D')
+        pla:pt('x1', name..'.D')
+        pla:pt('x2', name..'.D')
+        pla:pt('x3', name..'.D')
+        pla:pt('x4', name..'.D')
+        assign_node_location(name, xmc)
+    end
+
+    pla:write(variant..'.tt4')
+end
+
+
+function write_lci_pt1 (device, glb, mc, gi, variant)
+    local gi_data = gi_map['gi'..gi]
+
+    write_lci_common { device = device }
+
+    writeln '\n[Location Assignments]'
+
+    local pla = make_pla()
+    pla:node('asdf')
+    pla:node('fdsa')
+    pla:pt({'clk1', 'clk2'}, 'asdf.C')
+    pla:pt({'clk1', 'clk2'}, 'fdsa.C')
+    pla:pt({}, 'asdf.D')
+    pla:pt({}, 'fdsa.D')
+    assign_node_location('asdf', device.glb(glb))
+    assign_node_location('fdsa', device.glb(glb))
+
+    for name, info in spairs((parse_signal_list(device, gi_data[1]))) do
+        if getmetatable(info).class == 'pin' then
+            assign_pin_location(name, info)
+        elseif info.glb.index ~= glb or info.index ~= mc then
+            pla:node(name)
+            pla:pt({}, name..'.D')
+            assign_node_location(name, info)
+        end
+        if variant:sub(1,1) == 'n' then
+            name = '~'..name
+        end
+        local out_name = 'glb'..glb..'_mc'..mc
+        pla:pt(name, out_name..'.C')
+        pla:pt({}, out_name..'.D')
+        assign_node_location(out_name, device.glb(glb).mc(mc))
+    end
+
+    if gi_data[2] ~= nil then
+        local other_signals
+        local other_signals_list
+        other_signals, other_signals_list = parse_signal_list(device, gi_data[2])
+        for name, info in spairs(other_signals) do
+            if getmetatable(info).class == 'pin' then
+                assign_pin_location(name, info)
+            elseif info.glb.index ~= glb or info.index ~= mc then
+                pla:node(name)
+                pla:pt({}, name..'.D')
+                assign_node_location(name, info)
+            end
+        end
+        pla:pt(other_signals_list, 'dummy')
+        assign_node_location('dummy', device.glb(glb))
+    end
+
+    pla:write(variant..'.tt4')
+end
+
+function write_lci_pt2 (device, glb, mc, gi, variant)
+    local gi_data = gi_map['gi'..gi]
+
+    write_lci_common { device = device }
+
+    writeln '\n[Location Assignments]'
+
+    local pla = make_pla()
+    pla:node('asdf')
+    pla:node('fdsa')
+    pla:pt({'clk1', 'clk2'}, 'asdf.C')
+    pla:pt({'clk1', 'clk2'}, 'fdsa.C')
+    pla:pt({}, 'asdf.D')
+    pla:pt({}, 'fdsa.D')
+    assign_node_location('asdf', device.glb(glb))
+    assign_node_location('fdsa', device.glb(glb))
+
+    for name, info in spairs((parse_signal_list(device, gi_data[1]))) do
+        if getmetatable(info).class == 'pin' then
+            assign_pin_location(name, info)
+        elseif info.glb.index ~= glb or info.index ~= mc then
+            pla:node(name)
+            pla:pt({}, name..'.D')
+            assign_node_location(name, info)
+        end
+        if variant:sub(1,1) == 'n' then
+            name = '~'..name
+        end
+        local out_name = 'glb'..glb..'_mc'..mc
+        pla:pt(name, out_name..'.CE')
+        pla:pt({}, out_name..'.C')
+        pla:pt({}, out_name..'.D')
+        assign_node_location(out_name, device.glb(glb).mc(mc))
+    end
+
+    if gi_data[2] ~= nil then
+        local other_signals
+        local other_signals_list
+        other_signals, other_signals_list = parse_signal_list(device, gi_data[2])
+        for name, info in spairs(other_signals) do
+            if getmetatable(info).class == 'pin' then
+                assign_pin_location(name, info)
+            elseif info.glb.index ~= glb or info.index ~= mc then
+                pla:node(name)
+                pla:pt({}, name..'.D')
+                assign_node_location(name, info)
+            end
+        end
+        pla:pt(other_signals_list, 'dummy')
+        assign_node_location('dummy', device.glb(glb))
+    end
+
+    pla:write(variant..'.tt4')
+end
+
+function write_lci_pt3 (device, glb, mc, gi, variant)
+    local gi_data = gi_map['gi'..gi]
+
+    write_lci_common { device = device }
+
+    writeln '\n[Location Assignments]'
+
+    local pla = make_pla()
+    pla:node('asdf')
+    pla:node('fdsa')
+    pla:pt({'clk1', 'clk2'}, 'asdf.C')
+    pla:pt({'clk1', 'clk2'}, 'fdsa.C')
+    pla:pt({}, 'asdf.D')
+    pla:pt({}, 'fdsa.D')
+    assign_node_location('asdf', device.glb(glb))
+    assign_node_location('fdsa', device.glb(glb))
+
+    for name, info in spairs((parse_signal_list(device, gi_data[1]))) do
+        if getmetatable(info).class == 'pin' then
+            assign_pin_location(name, info)
+        elseif info.glb.index ~= glb or info.index ~= mc then
+            pla:node(name)
+            pla:pt({}, name..'.D')
+            assign_node_location(name, info)
+        end
+        if variant:sub(1,1) == 'n' then
+            name = '~'..name
+        end
+        local out_name = 'glb'..glb..'_mc'..mc
+        pla:pt(name, out_name..'.CLR')
+        pla:pt({}, out_name..'.C')
+        pla:pt({}, out_name..'.D')
+        assign_node_location(out_name, device.glb(glb).mc(mc))
+    end
+
+    if gi_data[2] ~= nil then
+        local other_signals
+        local other_signals_list
+        other_signals, other_signals_list = parse_signal_list(device, gi_data[2])
+        for name, info in spairs(other_signals) do
+            if getmetatable(info).class == 'pin' then
+                assign_pin_location(name, info)
+            elseif info.glb.index ~= glb or info.index ~= mc then
+                pla:node(name)
+                pla:pt({}, name..'.D')
+                assign_node_location(name, info)
+            end
+        end
+        pla:pt(other_signals_list, 'dummy')
+        assign_node_location('dummy', device.glb(glb))
+    end
+
+    writeln '\n[Register Powerup]'
+    writeln('Default=RESET;')
+
+    pla:write(variant..'.tt4')
+end

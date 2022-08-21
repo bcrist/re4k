@@ -1,0 +1,14 @@
+#$ MODULE x
+#$ PINS 2 clk1 clk2
+#$ NODES 4 asdf fdsa glb0_mc3 glb0_mc4
+.type f
+.i 3
+.o 7
+.ilb clk1 clk2 glb0_mc3
+.ob asdf.C asdf.D fdsa.C fdsa.D glb0_mc3.D glb0_mc4.C glb0_mc4.D
+.phase 1111111
+.p 3
+--- -1-11-1
+11- 1-1----
+--0 -----1-
+.end

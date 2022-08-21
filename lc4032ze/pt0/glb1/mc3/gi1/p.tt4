@@ -1,0 +1,18 @@
+#$ MODULE x
+#$ PINS 5 x0 x1 x2 x3 x4
+#$ NODES 5 glb0_mc3 glb1_mc0 glb1_mc1 glb1_mc2 glb1_mc3
+.type f
+.i 6
+.o 5
+.ilb glb0_mc3 x0 x1 x2 x3 x4
+.ob glb0_mc3.D glb1_mc0.D glb1_mc1.D glb1_mc2.D glb1_mc3.D
+.phase 11111
+.p 7
+------ 1----
+1----- ----1
+-1---- -111-
+--1--- -111-
+---1-- -111-
+----1- -111-
+-----1 -111-
+.end

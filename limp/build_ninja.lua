@@ -1,6 +1,7 @@
 include 'lc4032ze'
 
 local default_targets = {}
+local group_targets = {}
 
 local write_build = template [[
 build `file`.jed: fit `file`.lci | `file`.tt4
@@ -20,6 +21,8 @@ local function writeReadme (device, test_name, extra)
     end
 end
 
+local limp_end_tokens = { ['!!'] = true, [']]'] = true }
+
 local function writeVariants (device, test_name, variants, extra_path, extra_params, targets, extra)
     local diff_options
     local test_name_suffix
@@ -37,7 +40,7 @@ local function writeVariants (device, test_name, variants, extra_path, extra_par
         end
     end
 
-    local write_lci = 'write_lci_'..test_name
+    local write_lci = 'write_lci_'..(test_name:gsub('/', '_'))
     if test_name_suffix ~= nil then
         write_lci = write_lci..test_name_suffix
     end
@@ -58,9 +61,10 @@ local function writeVariants (device, test_name, variants, extra_path, extra_par
 
         local limp_len = #limp
         local old_limp = fs.get_file_contents(file..'.lci')
-        local old_limp_start = old_limp:sub(1,limp_len)
-        local old_limp_endtoken = old_limp:sub(limp_len+1,limp_len+2)
-        if old_limp_start ~= limp or old_limp_endtoken ~= '!!' then
+        if old_limp == nil
+                or old_limp:sub(1,limp_len) ~= limp
+                or limp_end_tokens[old_limp:sub(limp_len+1,limp_len+2)] == nil
+                then
             fs.put_file_contents(file..'.lci', limp..']]')
         end
 
@@ -72,7 +76,7 @@ local function writeVariants (device, test_name, variants, extra_path, extra_par
         csv = fs.compose_path(base_path, "fuses.csv")
     else
         csv = base_path.."_fuses.csv"
-        targets[#targets+1] = csv
+        targets[csv] = true
     end
     write("build ", csv, ": diff")
     for _, variant in ipairs(variants) do
@@ -96,29 +100,50 @@ local function writeMcVariants(device, test_name, variants, mc, targets, extra)
     end
 end
 
-local function writePhony (test_name, targets)
-    write("build ", test_name, ": phony")
-    for _, target in ipairs(targets) do
-        write(" ", target)
+local function writeGlbVariants(device, test_name, variants, glb, targets, extra)
+    if type(variants) == 'function' then
+        variants = variants(glb)
     end
-    nl()
-    nl()
-    default_targets[#default_targets+1] = test_name
+    if variants ~= nil then
+        writeVariants(device, test_name, variants, 'glb'..glb.index, glb.index, targets, extra)
+    end
+end
+
+local function addToGroup (group, targets)
+    local existing = group_targets[group]
+    if existing == nil then
+        group_targets[group] = targets
+    else
+        for target in pairs(targets) do
+            existing[target] = true
+        end
+    end
+    local parent = group:gsub('/[^/]+$', '')
+    if parent ~= group then
+        addToGroup(parent, {[group] = true})
+    else
+        default_targets[group] = true
+    end
 end
 
 function globalTest (device, test_name, variants, extra)
     writeReadme(device, test_name, extra)
-    local csv = writeVariants(device, test_name, variants, nil, nil, nil, extra)
-    writePhony(test_name, { csv })
+    if type(variants) == 'function' then
+        variants = variants(mc)
+    end
+    if variants ~= nil then
+        local csv = writeVariants(device, test_name, variants, nil, nil, nil, extra)
+        addToGroup(test_name, {[csv] = true })
+    end
 end
 
 function perGlbTest (device, test_name, variants, extra)
     local targets = {}
     writeReadme(device, test_name, extra)
-    for glb in device.glbs() do
-        writeVariants(device, test_name, variants, 'glb'..glb, glb, targets, extra)
+    for _, glb in device.glbs() do
+        writeGlbVariants(device, test_name, variants, glb, targets, extra)
     end
-    writePhony(test_name, targets)
+    addToGroup(test_name, targets)
 end
 
 function perMacrocellTest(device, test_name, variants, extra)
@@ -129,7 +154,7 @@ function perMacrocellTest(device, test_name, variants, extra)
             writeMcVariants(device, test_name, variants, mc, targets, extra)
         end
     end
-    writePhony(test_name, targets)
+    addToGroup(test_name, targets)
 end
 
 function perOutputTest(device, test_name, variants, extra)
@@ -142,7 +167,7 @@ function perOutputTest(device, test_name, variants, extra)
             end
         end
     end
-    writePhony(test_name, targets)
+    addToGroup(test_name, targets)
 end
 
 function perInputTest(device, test_name, variants, extra)
@@ -164,7 +189,7 @@ function perInputTest(device, test_name, variants, extra)
     for _, clk in device.clks() do
         writeVariants(device, test_name, variants, { 'input', clk.name }, clk.clk_index, targets, extra)
     end
-    writePhony(test_name, targets)
+    addToGroup(test_name, targets)
 end
 
 local dev = device.lc4032ze
@@ -249,8 +274,95 @@ perMacrocellTest(dev, 'reset_init', { 'SET', 'RESET' })
 
 perMacrocellTest(dev, 'ce_mux', { 'always', 'npt', 'pt', 'shared' }, { diff_options = '--rows 86-87'})
 
+
+-- for target_glb in dev.glbs() do
+--     local valid_input_types = { IO = true, CLK = true, ['IO/CLK'] = true, GOE = true, ['IO/GOE'] = true }
+--     local variants = { 'x', 'y' }
+
+--     local targets = {}
+--     for _, pin in dev.pins() do
+--         if valid_input_types[pin.type] then
+--             writeVariants(dev, 'grp_pin', { 'x', 'y' }, {'glb'..target_glb, 'pin'..pin.number}, {target_glb, pin.number}, targets)
+--         end
+--     end
+--     addToGroup('grp_pin/glb'..target_glb, targets)
+
+--     targets = {}
+--     for _, glb in dev.glbs() do
+--         for mc in glb.mcs() do
+--             writeVariants(dev, 'grp_fb', { 'x', 'y' }, {'glb'..target_glb, 'glb'..glb.index, 'mc'..mc}, {target_glb, glb.index, mc}, targets)
+--         end
+--     end
+--     addToGroup('grp_fb/glb'..target_glb, targets)
+-- end
+
+local gi_list = { 0, 1, 34, 35 }
+
+do
+    local variants = { 'p', 'n' }
+    local targets = {}
+    for _, glb in dev.glbs() do
+        for _, mc in glb.mcs() do
+            for _, gi in ipairs({ 0, 1 }) do
+                -- due to the shenanigans needed to prevent the fitter from stealing PTs from previous MCs, this only
+                -- works for lower GIs that are easier to fill with a specific signal
+                writeVariants(dev, 'pt0', variants, { 'glb'..mc.glb.index, 'mc'..mc.index, 'gi'..gi }, { mc.glb.index, mc.index, gi }, targets)
+            end
+        end
+    end
+    addToGroup('pt0', targets)
+end
+
+do
+    local variants = { 'p', 'n' }
+    local targets = {}
+    for _, glb in dev.glbs() do
+        for _, mc in glb.mcs() do
+            for _, gi in ipairs(gi_list) do
+                writeVariants(dev, 'pt1', variants, { 'glb'..mc.glb.index, 'mc'..mc.index, 'gi'..gi }, { mc.glb.index, mc.index, gi }, targets)
+            end
+        end
+    end
+    addToGroup('pt1', targets)
+end
+
+do
+    local variants = { 'p', 'n' }
+    local targets = {}
+    for _, glb in dev.glbs() do
+        for _, mc in glb.mcs() do
+            for _, gi in ipairs(gi_list) do
+                writeVariants(dev, 'pt2', variants, { 'glb'..mc.glb.index, 'mc'..mc.index, 'gi'..gi }, { mc.glb.index, mc.index, gi }, targets)
+            end
+        end
+    end
+    addToGroup('pt2', targets)
+end
+
+do
+    local variants = { 'p', 'n' }
+    local targets = {}
+    for _, glb in dev.glbs() do
+        for _, mc in glb.mcs() do
+            for _, gi in ipairs(gi_list) do
+                writeVariants(dev, 'pt3', variants, { 'glb'..mc.glb.index, 'mc'..mc.index, 'gi'..gi }, { mc.glb.index, mc.index, gi }, targets)
+            end
+        end
+    end
+    addToGroup('pt3', targets)
+end
+
+
+for group, targets in spairs(group_targets) do
+    write("build ", group, ": phony")
+    for target in spairs(targets) do
+        write(" ", target)
+    end
+    nl()
+end
+
 write("default")
-for _, target in ipairs(default_targets) do
+for target in spairs(default_targets) do
     write(" ", target)
 end
 nl()
