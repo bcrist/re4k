@@ -452,65 +452,23 @@ function write_lci_ce_mux (device, special_glb, special_mc, variant)
     assign_node_location('out4', device.glb(special_glb).mc(scratch_base+2))
 end
 
-function write_lci_pt_test (device, variant)
-    local pla = make_pla()
-    pla:pt({'a', 'b', 'c'}, 'dummy')
-    if variant == 'a' then
-        pla:pt('a', 'out')
-    elseif variant == 'b' then
-        pla:pt('b', 'out')
-    else
-        pla:pt({'a', 'b'}, 'out')
-    end
-    pla:write(variant..'.tt4')
-
-    write_lci_common { device = device }
-
-    writeln '\n[Location Assignments]'
-    assign_node_location('dummy', device.glb(0).mc(0))
-    assign_node_location('out', device.glb(0).mc(1))
-    assign_pin_location('a', device.glb(0).mc(2))
-    assign_pin_location('b', device.glb(0).mc(3))
-end
-
-function write_lci_pt_test2 (device, target_glb, variant)
-    local pla = make_pla()
-    pla:pt('in', 'out')
-    
-    write_lci_common { device = device }
-
-    writeln '\n[Location Assignments]'
-    assign_node_location('out', device.glb(target_glb))
-
-    local pin_number = variant:match('pin(%d+)')
-    if pin_number then
-        assign_pin_location('in', device.pin(pin_number + 0))
-    else
-        local glb, mc = variant:match('glb(%d+)_mc(%d+)')
-        assign_node_location('in', device.glb(glb).mc(mc))
-        pla:node('in')
-        pla:pt({}, 'in')
-    end
-    pla:write(variant..'.tt4')
-end
-
 local function parse_signal_list (device, str)
-    str = str:gsub(' ', ''):gsub('fbA', 'glb0_mc'):gsub('fbB', 'glb1_mc')
+    str = str:gsub('[ _]', ''):gsub('fbA', 'glb0_mc'):gsub('fbB', 'glb1_mc')
 
     local signals = {}
-    for signal in str:gmatch('[^,\r\n]+') do
-        local pin_number = signal:match('pin(%d+)')
-        if pin_number then
-            signals[signal] = device.pin(pin_number + 0)
-        else
-            local glb, mc = signal:match('glb(%d+)_mc(%d+)')
-            signals[signal] = device.glb(glb).mc(mc)
-        end
-    end
-
     local signals_list = {}
-    for signal in spairs(signals) do
-        signals_list[#signals_list+1] = signal
+    for signal in str:gmatch('[^,\r\n]+') do
+        if signals[signal] == nil then
+            
+            local pin_number = signal:match('pin(%d+)')
+            if pin_number then
+                signals[signal] = device.pin(pin_number + 0)
+            else
+                local glb, mc = signal:match('glb(%d+)_mc(%d+)')
+                signals[signal] = device.glb(glb).mc(mc)
+            end
+            signals_list[#signals_list+1] = signal
+        end
     end
 
     return signals, signals_list
@@ -869,3 +827,101 @@ function write_lci_pt3 (device, glb, mc, gi, variant)
 
     pla:write(variant..'.tt4')
 end
+
+local gi_map2 = {
+    gi3pin14 = 'fb A3',
+    gi3pin44 = 'pin 20',
+    gi3glb1_mc12 = [[
+        fb A2, fb A9, fb A13, fb B12, pin 19, pin 45, pin 23, pin 26, fb A14, pin 33,
+        pin 46, pin 23, pin 26, pin 43, fb A2, fb B3, fb B11, fb A4, fb A14, fb B3,
+        pin 18, pin 38, pin 4, fb A6, fb B1, fb B4, fb B13, pin 10, pin 45
+    ]],
+    gi4pin44 = 'pin 20, fb A12',
+    gi4glb0_mc15 = 'fb A3',
+
+    -- TODO gi5-35
+}
+
+function write_lci_grp (gi, device, glb, variant)
+    local gi_signals
+    local gi_signal_list
+    gi_signals, gi_signal_list = parse_signal_list(device, variant)
+
+    local signal_name = gi_signal_list[1]
+    local signal_info = gi_signals[signal_name]
+
+    local extra_signals = gi_map2['gi'..gi..signal_name]
+
+    write_lci_common { device = device }
+    writeln '\n[Location Assignments]'
+    local pla = make_pla()
+
+    if getmetatable(signal_info).class == 'pin' then
+        assign_pin_location(signal_name, signal_info)
+    else
+        pla:node(signal_name)
+        pla:pt({}, signal_name..'.D')
+        assign_node_location(signal_name, signal_info)
+    end
+    
+    pla:pt(signal_name, 'out')
+    assign_node_location('out', device.glb(glb))
+
+    if extra_signals ~= nil then
+        local other_signals
+        local other_signals_list
+        other_signals, other_signals_list = parse_signal_list(device, extra_signals)
+        for name, info in spairs(other_signals) do
+            if name ~= signal_name then
+                if getmetatable(info).class == 'pin' then
+                    assign_pin_location(name, info)
+                else
+                    pla:node(name)
+                    pla:pt({}, name..'.D')
+                    assign_node_location(name, info)
+                end
+            end
+        end
+        pla:pt(other_signals_list, 'dummy')
+        assign_node_location('dummy', device.glb(glb))
+    end
+
+    pla:write(variant..'.tt4')
+end
+
+write_lci_grp_gi0 = function(...) write_lci_grp(0, ...) end
+write_lci_grp_gi1 = function(...) write_lci_grp(1, ...) end
+write_lci_grp_gi2 = function(...) write_lci_grp(2, ...) end
+write_lci_grp_gi3 = function(...) write_lci_grp(3, ...) end
+write_lci_grp_gi4 = function(...) write_lci_grp(4, ...) end
+write_lci_grp_gi5 = function(...) write_lci_grp(5, ...) end
+write_lci_grp_gi6 = function(...) write_lci_grp(6, ...) end
+write_lci_grp_gi7 = function(...) write_lci_grp(7, ...) end
+write_lci_grp_gi8 = function(...) write_lci_grp(8, ...) end
+write_lci_grp_gi9 = function(...) write_lci_grp(9, ...) end
+write_lci_grp_gi10 = function(...) write_lci_grp(10, ...) end
+write_lci_grp_gi11 = function(...) write_lci_grp(11, ...) end
+write_lci_grp_gi12 = function(...) write_lci_grp(12, ...) end
+write_lci_grp_gi13 = function(...) write_lci_grp(13, ...) end
+write_lci_grp_gi14 = function(...) write_lci_grp(14, ...) end
+write_lci_grp_gi15 = function(...) write_lci_grp(15, ...) end
+write_lci_grp_gi16 = function(...) write_lci_grp(16, ...) end
+write_lci_grp_gi17 = function(...) write_lci_grp(17, ...) end
+write_lci_grp_gi18 = function(...) write_lci_grp(18, ...) end
+write_lci_grp_gi19 = function(...) write_lci_grp(19, ...) end
+write_lci_grp_gi20 = function(...) write_lci_grp(20, ...) end
+write_lci_grp_gi21 = function(...) write_lci_grp(21, ...) end
+write_lci_grp_gi22 = function(...) write_lci_grp(22, ...) end
+write_lci_grp_gi23 = function(...) write_lci_grp(23, ...) end
+write_lci_grp_gi24 = function(...) write_lci_grp(24, ...) end
+write_lci_grp_gi25 = function(...) write_lci_grp(25, ...) end
+write_lci_grp_gi26 = function(...) write_lci_grp(26, ...) end
+write_lci_grp_gi27 = function(...) write_lci_grp(27, ...) end
+write_lci_grp_gi28 = function(...) write_lci_grp(28, ...) end
+write_lci_grp_gi29 = function(...) write_lci_grp(29, ...) end
+write_lci_grp_gi30 = function(...) write_lci_grp(30, ...) end
+write_lci_grp_gi31 = function(...) write_lci_grp(31, ...) end
+write_lci_grp_gi32 = function(...) write_lci_grp(32, ...) end
+write_lci_grp_gi33 = function(...) write_lci_grp(33, ...) end
+write_lci_grp_gi34 = function(...) write_lci_grp(34, ...) end
+write_lci_grp_gi35 = function(...) write_lci_grp(35, ...) end

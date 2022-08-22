@@ -1,0 +1,52 @@
+//[[!! include "lci"; write_lci_grp_gi3(device.lc4032ze, 1, "fb_B12") !! 52 ]]
+//[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
+[Revision]
+Parent = lc4k32e.lci;
+
+[Fitter Report Format]
+Detailed = yes;
+
+[Constraint Version]
+version = 1.0;
+
+[Device]
+Family = lc4k;
+PartNumber = LC4032ZE-5TN48C;
+Package = 48TQFP;
+PartType = LC4032ZE;
+Speed = -5.8;
+Operating_condition = COM;
+Status = Production;
+Default_Device_Io_Types=LVCMOS33,-;
+
+[Global Constraints]
+Spread_Placement=No;
+
+[Location Assignments]
+glb1_mc12=node,-,-,B,12;
+out=node,-,-,B,-;
+glb0_mc13=node,-,-,A,13;
+glb0_mc14=node,-,-,A,14;
+glb0_mc2=node,-,-,A,2;
+glb0_mc4=node,-,-,A,4;
+glb0_mc6=node,-,-,A,6;
+glb0_mc9=node,-,-,A,9;
+glb1_mc1=node,-,-,B,1;
+glb1_mc11=node,-,-,B,11;
+glb1_mc13=node,-,-,B,13;
+glb1_mc3=node,-,-,B,3;
+glb1_mc4=node,-,-,B,4;
+pin10=pin,10,-,-,-;
+pin18=pin,18,-,-,-;
+pin19=pin,19,-,-,-;
+pin23=pin,23,-,-,-;
+pin26=pin,26,-,-,-;
+pin33=pin,33,-,-,-;
+pin38=pin,38,-,-,-;
+pin4=pin,4,-,-,-;
+pin43=pin,43,-,-,-;
+pin45=pin,45,-,-,-;
+pin46=pin,46,-,-,-;
+dummy=node,-,-,B,-;
+
+//[[ ######################### END OF GENERATED CODE ######################### ]]

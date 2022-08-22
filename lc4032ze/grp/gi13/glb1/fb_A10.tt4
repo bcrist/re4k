@@ -1,0 +1,13 @@
+#$ MODULE x
+#$ PINS 0
+#$ NODES 2 glb0_mc10 out
+.type f
+.i 1
+.o 2
+.ilb glb0_mc10
+.ob glb0_mc10.D out
+.phase 11
+.p 2
+- 1-
+1 -1
+.end

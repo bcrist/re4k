@@ -1,0 +1,13 @@
+#$ MODULE x
+#$ PINS 2 pin20 pin44
+#$ NODES 2 dummy out
+.type f
+.i 2
+.o 2
+.ilb pin20 pin44
+.ob dummy out
+.phase 11
+.p 2
+1- 1-
+-1 -1
+.end

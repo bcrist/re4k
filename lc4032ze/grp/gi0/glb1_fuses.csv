@@ -1,0 +1,7 @@
+fuse,lc4032ze\grp\gi0\glb1\pin_20.jed,lc4032ze\grp\gi0\glb1\pin_27.jed,lc4032ze\grp\gi0\glb1\fb_B6.jed,lc4032ze\grp\gi0\glb1\pin_44.jed,lc4032ze\grp\gi0\glb1\fb_B15.jed,lc4032ze\grp\gi0\glb1\fb_A5.jed
+0:0,0,1,1,1,1,1
+0:1,1,0,1,1,1,1
+0:2,1,1,0,1,1,1
+1:0,1,1,1,0,1,1
+1:1,1,1,1,1,0,1
+1:2,1,1,1,1,1,0

@@ -1,0 +1,14 @@
+#$ MODULE x
+#$ PINS 1 pin14
+#$ NODES 3 dummy glb0_mc3 out
+.type f
+.i 2
+.o 3
+.ilb glb0_mc3 pin14
+.ob dummy glb0_mc3.D out
+.phase 111
+.p 3
+-- -1-
+1- 1--
+-1 --1
+.end

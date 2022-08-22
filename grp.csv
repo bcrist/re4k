@@ -1,4 +1,5 @@
-00, fb A5, fb B6, fb B15, pin 20, pin 27, pin 44
+00, pin 20, pin 27, fb B6, pin 44, fb B15, fb A5
+
 01, fb A3, fb A11, fb A15, pin 4, pin 14, pin 34
 02, fb A2, fb A9, fb A13, fb B12, pin 19, pin 45
 03, fb A12, pin 28, pin 31, pin 14, pin 44, fb B12

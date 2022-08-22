@@ -40,7 +40,7 @@ local function writeVariants (device, test_name, variants, extra_path, extra_par
         end
     end
 
-    local write_lci = 'write_lci_'..(test_name:gsub('/', '_'))
+    local write_lci = 'write_lci_'..(test_name:gsub('[/\\]', '_'))
     if test_name_suffix ~= nil then
         write_lci = write_lci..test_name_suffix
     end
@@ -48,6 +48,7 @@ local function writeVariants (device, test_name, variants, extra_path, extra_par
     fs.ensure_dir_exists(base_path)
 
     for v, variant in ipairs(variants) do
+        variant = variant:gsub(' ', '_')
         local file = fs.compose_path(base_path, variant)
         local limp = '//[[!! include "lci"; '..write_lci..'(device.'..device.name
         if extra_params ~= nil then
@@ -80,6 +81,7 @@ local function writeVariants (device, test_name, variants, extra_path, extra_par
     end
     write("build ", csv, ": diff")
     for _, variant in ipairs(variants) do
+        variant = variant:gsub(' ', '_')
         write(" ", fs.compose_path(base_path, variant..".jed"))
     end
     nl()
@@ -118,7 +120,7 @@ local function addToGroup (group, targets)
             existing[target] = true
         end
     end
-    local parent = group:gsub('/[^/]+$', '')
+    local parent = group:gsub('[/\\][^/\\]+$', '')
     if parent ~= group then
         addToGroup(parent, {[group] = true})
     else
@@ -275,27 +277,6 @@ perMacrocellTest(dev, 'reset_init', { 'SET', 'RESET' })
 perMacrocellTest(dev, 'ce_mux', { 'always', 'npt', 'pt', 'shared' }, { diff_options = '--rows 86-87'})
 
 
--- for target_glb in dev.glbs() do
---     local valid_input_types = { IO = true, CLK = true, ['IO/CLK'] = true, GOE = true, ['IO/GOE'] = true }
---     local variants = { 'x', 'y' }
-
---     local targets = {}
---     for _, pin in dev.pins() do
---         if valid_input_types[pin.type] then
---             writeVariants(dev, 'grp_pin', { 'x', 'y' }, {'glb'..target_glb, 'pin'..pin.number}, {target_glb, pin.number}, targets)
---         end
---     end
---     addToGroup('grp_pin/glb'..target_glb, targets)
-
---     targets = {}
---     for _, glb in dev.glbs() do
---         for mc in glb.mcs() do
---             writeVariants(dev, 'grp_fb', { 'x', 'y' }, {'glb'..target_glb, 'glb'..glb.index, 'mc'..mc}, {target_glb, glb.index, mc}, targets)
---         end
---     end
---     addToGroup('grp_fb/glb'..target_glb, targets)
--- end
-
 local gi_list = { 0, 1, 34, 35 }
 
 do
@@ -351,6 +332,43 @@ do
     end
     addToGroup('pt3', targets)
 end
+
+perGlbTest(dev, 'grp\\gi0',  { 'pin 20', 'pin 27', 'fb B6',  'pin 44', 'fb B15', 'fb A5'  }, { diff_options = '--rows 0-1 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi1',  { 'fb A3',  'fb A11', 'fb A15', 'pin 4',  'pin 14', 'pin 34' }, { diff_options = '--rows 2-3 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi2',  { 'fb A2',  'fb A9',  'fb A13', 'fb B12', 'pin 19', 'pin 45' }, { diff_options = '--rows 4-5 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi3',  { 'fb A12', 'pin 28', 'pin 31', 'pin 14', 'pin 44', 'fb B12' }, { diff_options = '--rows 6-7 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi4',  { 'fb A7',  'fb B7',  'pin 24', 'pin 32', 'pin 44', 'fb A15' }, { diff_options = '--rows 8-9 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi5',  { 'fb A4',  'fb A14', 'fb B3',  'pin 18', 'pin 38', 'pin 4'  }, { diff_options = '--rows 10-11 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi6',  { 'fb B10', 'pin 8',  'pin 22', 'pin 40', 'pin 4',  'fb B7'  }, { diff_options = '--rows 12-13 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi7',  { 'fb A6',  'fb B1',  'fb B4',  'fb B13', 'pin 10', 'pin 45' }, { diff_options = '--rows 14-15 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi8',  { 'fb A8',  'fb B0',  'pin 33', 'fb A3',  'pin 20', 'pin 45' }, { diff_options = '--rows 16-17 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi9',  { 'fb B11', 'pin 9',  'pin 17', 'pin 47', 'fb B15', 'fb A9'  }, { diff_options = '--rows 18-19 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi10', { 'pin 23', 'pin 26', 'pin 43', 'fb A2',  'fb B3',  'fb B11' }, { diff_options = '--rows 20-21 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi11', { 'pin 3',  'pin 21', 'fb A11', 'pin 47', 'fb A5',  'pin 28' }, { diff_options = '--rows 22-23 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi12', { 'pin 16', 'pin 27', 'fb A3',  'fb B7',  'pin 31', 'pin 47' }, { diff_options = '--rows 24-25 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi13', { 'fb A10', 'pin 2',  'pin 39', 'pin 14', 'fb A5',  'pin 9'  }, { diff_options = '--rows 26-27 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi14', { 'fb A0',  'fb B9',  'pin 10', 'fb A8',  'pin 43', 'pin 8'  }, { diff_options = '--rows 28-29 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi15', { 'fb B5',  'fb B8',  'fb B14', 'pin 19', 'pin 39', 'fb B0'  }, { diff_options = '--rows 30-31 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi16', { 'fb B2',  'pin 34', 'pin 18', 'fb B15', 'fb A7',  'fb A10' }, { diff_options = '--rows 32-33 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi17', { 'fb A1',  'pin 15', 'pin 27', 'fb A11', 'pin 40', 'fb B9'  }, { diff_options = '--rows 34-35 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi18', { 'fb A13', 'fb A6',  'pin 17', 'fb B5',  'pin 38', 'pin 3'  }, { diff_options = '--rows 36-37 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi19', { 'pin 7',  'pin 41', 'fb A4',  'fb A8',  'pin 19', 'pin 2'  }, { diff_options = '--rows 38-39 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi20', { 'pin 46', 'pin 28', 'fb A0',  'fb B5',  'pin 18', 'fb B10' }, { diff_options = '--rows 40-41 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi21', { 'pin 42', 'pin 22', 'pin 7',  'fb B14', 'fb B3',  'fb B9'  }, { diff_options = '--rows 42-43 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi22', { 'fb A13', 'pin 32', 'pin 41', 'pin 10', 'fb A12', 'fb B8'  }, { diff_options = '--rows 44-45 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi23', { 'pin 48', 'fb B11', 'pin 2',  'fb B6',  'pin 16', 'fb B0'  }, { diff_options = '--rows 46-47 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi24', { 'fb B4',  'pin 40', 'fb A4',  'pin 3',  'pin 24', 'fb B2'  }, { diff_options = '--rows 48-49 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi25', { 'pin 21', 'fb A6',  'fb A1',  'pin 42', 'fb B6',  'fb B2'  }, { diff_options = '--rows 50-51 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi26', { 'pin 26', 'pin 42', 'pin 17', 'fb A7',  'fb A12', 'fb A0'  }, { diff_options = '--rows 52-53 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi27', { 'fb B1',  'pin 31', 'pin 20', 'pin 38', 'fb A10', 'fb B11' }, { diff_options = '--rows 54-55 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi28', { 'fb A14', 'pin 33', 'pin 46', 'pin 23', 'fb B12', 'fb B7'  }, { diff_options = '--rows 56-57 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi29', { 'fb B10', 'pin 48', 'fb B4',  'pin 7',  'pin 23', 'fb A1'  }, { diff_options = '--rows 58-59 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi30', { 'pin 9',  'fb A4',  'pin 32', 'pin 22', 'fb B5',  'pin 48' }, { diff_options = '--rows 60-61 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi31', { 'fb A7',  'pin 15', 'fb A2',  'pin 39', 'fb B1',  'fb B6'  }, { diff_options = '--rows 62-63 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi32', { 'pin 34', 'pin 24', 'fb B14', 'pin 26', 'fb B12', 'fb A8'  }, { diff_options = '--rows 64-65 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi33', { 'fb B13', 'pin 21', 'fb A10', 'pin 41', 'fb B10', 'fb A14' }, { diff_options = '--rows 66-67 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi34', { 'fb A9',  'fb A3',  'pin 46', 'pin 8',  'pin 15', 'fb B13' }, { diff_options = '--rows 68-69 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+perGlbTest(dev, 'grp\\gi35', { 'pin 43', 'fb B8',  'pin 33', 'fb A15', 'fb A9',  'pin 16' }, { diff_options = '--rows 70-71 --exclude 0:3-71:85 --exclude 0:89-71:171' })
 
 
 for group, targets in spairs(group_targets) do

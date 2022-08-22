@@ -3,7 +3,7 @@ rule fit
 rule diff
     command = zig-out/bin/jeddiff.exe $out $diff_options $in
 
-##!! include 'build_ninja' !! 3567 ##
+##!! include 'build_ninja' !! 4252 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 build lc4032ze\pull\glb0\mc0\OFF.jed: fit lc4032ze\pull\glb0\mc0\OFF.lci | lc4032ze\pull\glb0\mc0\OFF.tt4
 build lc4032ze\pull\glb0\mc0\UP.jed: fit lc4032ze\pull\glb0\mc0\UP.lci | lc4032ze\pull\glb0\mc0\UP.tt4
@@ -3549,11 +3549,696 @@ build lc4032ze\pt3\glb1\mc15\gi35\p.jed: fit lc4032ze\pt3\glb1\mc15\gi35\p.lci |
 build lc4032ze\pt3\glb1\mc15\gi35\n.jed: fit lc4032ze\pt3\glb1\mc15\gi35\n.lci | lc4032ze\pt3\glb1\mc15\gi35\n.tt4
 build lc4032ze\pt3\glb1\mc15\gi35_fuses.csv: diff lc4032ze\pt3\glb1\mc15\gi35\p.jed lc4032ze\pt3\glb1\mc15\gi35\n.jed
 
+build lc4032ze\grp\gi0\glb0\pin_20.jed: fit lc4032ze\grp\gi0\glb0\pin_20.lci | lc4032ze\grp\gi0\glb0\pin_20.tt4
+build lc4032ze\grp\gi0\glb0\pin_27.jed: fit lc4032ze\grp\gi0\glb0\pin_27.lci | lc4032ze\grp\gi0\glb0\pin_27.tt4
+build lc4032ze\grp\gi0\glb0\fb_B6.jed: fit lc4032ze\grp\gi0\glb0\fb_B6.lci | lc4032ze\grp\gi0\glb0\fb_B6.tt4
+build lc4032ze\grp\gi0\glb0\pin_44.jed: fit lc4032ze\grp\gi0\glb0\pin_44.lci | lc4032ze\grp\gi0\glb0\pin_44.tt4
+build lc4032ze\grp\gi0\glb0\fb_B15.jed: fit lc4032ze\grp\gi0\glb0\fb_B15.lci | lc4032ze\grp\gi0\glb0\fb_B15.tt4
+build lc4032ze\grp\gi0\glb0\fb_A5.jed: fit lc4032ze\grp\gi0\glb0\fb_A5.lci | lc4032ze\grp\gi0\glb0\fb_A5.tt4
+build lc4032ze\grp\gi0\glb0_fuses.csv: diff lc4032ze\grp\gi0\glb0\pin_20.jed lc4032ze\grp\gi0\glb0\pin_27.jed lc4032ze\grp\gi0\glb0\fb_B6.jed lc4032ze\grp\gi0\glb0\pin_44.jed lc4032ze\grp\gi0\glb0\fb_B15.jed lc4032ze\grp\gi0\glb0\fb_A5.jed
+    diff_options = --rows 0-1 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi0\glb1\pin_20.jed: fit lc4032ze\grp\gi0\glb1\pin_20.lci | lc4032ze\grp\gi0\glb1\pin_20.tt4
+build lc4032ze\grp\gi0\glb1\pin_27.jed: fit lc4032ze\grp\gi0\glb1\pin_27.lci | lc4032ze\grp\gi0\glb1\pin_27.tt4
+build lc4032ze\grp\gi0\glb1\fb_B6.jed: fit lc4032ze\grp\gi0\glb1\fb_B6.lci | lc4032ze\grp\gi0\glb1\fb_B6.tt4
+build lc4032ze\grp\gi0\glb1\pin_44.jed: fit lc4032ze\grp\gi0\glb1\pin_44.lci | lc4032ze\grp\gi0\glb1\pin_44.tt4
+build lc4032ze\grp\gi0\glb1\fb_B15.jed: fit lc4032ze\grp\gi0\glb1\fb_B15.lci | lc4032ze\grp\gi0\glb1\fb_B15.tt4
+build lc4032ze\grp\gi0\glb1\fb_A5.jed: fit lc4032ze\grp\gi0\glb1\fb_A5.lci | lc4032ze\grp\gi0\glb1\fb_A5.tt4
+build lc4032ze\grp\gi0\glb1_fuses.csv: diff lc4032ze\grp\gi0\glb1\pin_20.jed lc4032ze\grp\gi0\glb1\pin_27.jed lc4032ze\grp\gi0\glb1\fb_B6.jed lc4032ze\grp\gi0\glb1\pin_44.jed lc4032ze\grp\gi0\glb1\fb_B15.jed lc4032ze\grp\gi0\glb1\fb_A5.jed
+    diff_options = --rows 0-1 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi1\glb0\fb_A3.jed: fit lc4032ze\grp\gi1\glb0\fb_A3.lci | lc4032ze\grp\gi1\glb0\fb_A3.tt4
+build lc4032ze\grp\gi1\glb0\fb_A11.jed: fit lc4032ze\grp\gi1\glb0\fb_A11.lci | lc4032ze\grp\gi1\glb0\fb_A11.tt4
+build lc4032ze\grp\gi1\glb0\fb_A15.jed: fit lc4032ze\grp\gi1\glb0\fb_A15.lci | lc4032ze\grp\gi1\glb0\fb_A15.tt4
+build lc4032ze\grp\gi1\glb0\pin_4.jed: fit lc4032ze\grp\gi1\glb0\pin_4.lci | lc4032ze\grp\gi1\glb0\pin_4.tt4
+build lc4032ze\grp\gi1\glb0\pin_14.jed: fit lc4032ze\grp\gi1\glb0\pin_14.lci | lc4032ze\grp\gi1\glb0\pin_14.tt4
+build lc4032ze\grp\gi1\glb0\pin_34.jed: fit lc4032ze\grp\gi1\glb0\pin_34.lci | lc4032ze\grp\gi1\glb0\pin_34.tt4
+build lc4032ze\grp\gi1\glb0_fuses.csv: diff lc4032ze\grp\gi1\glb0\fb_A3.jed lc4032ze\grp\gi1\glb0\fb_A11.jed lc4032ze\grp\gi1\glb0\fb_A15.jed lc4032ze\grp\gi1\glb0\pin_4.jed lc4032ze\grp\gi1\glb0\pin_14.jed lc4032ze\grp\gi1\glb0\pin_34.jed
+    diff_options = --rows 2-3 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi1\glb1\fb_A3.jed: fit lc4032ze\grp\gi1\glb1\fb_A3.lci | lc4032ze\grp\gi1\glb1\fb_A3.tt4
+build lc4032ze\grp\gi1\glb1\fb_A11.jed: fit lc4032ze\grp\gi1\glb1\fb_A11.lci | lc4032ze\grp\gi1\glb1\fb_A11.tt4
+build lc4032ze\grp\gi1\glb1\fb_A15.jed: fit lc4032ze\grp\gi1\glb1\fb_A15.lci | lc4032ze\grp\gi1\glb1\fb_A15.tt4
+build lc4032ze\grp\gi1\glb1\pin_4.jed: fit lc4032ze\grp\gi1\glb1\pin_4.lci | lc4032ze\grp\gi1\glb1\pin_4.tt4
+build lc4032ze\grp\gi1\glb1\pin_14.jed: fit lc4032ze\grp\gi1\glb1\pin_14.lci | lc4032ze\grp\gi1\glb1\pin_14.tt4
+build lc4032ze\grp\gi1\glb1\pin_34.jed: fit lc4032ze\grp\gi1\glb1\pin_34.lci | lc4032ze\grp\gi1\glb1\pin_34.tt4
+build lc4032ze\grp\gi1\glb1_fuses.csv: diff lc4032ze\grp\gi1\glb1\fb_A3.jed lc4032ze\grp\gi1\glb1\fb_A11.jed lc4032ze\grp\gi1\glb1\fb_A15.jed lc4032ze\grp\gi1\glb1\pin_4.jed lc4032ze\grp\gi1\glb1\pin_14.jed lc4032ze\grp\gi1\glb1\pin_34.jed
+    diff_options = --rows 2-3 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi2\glb0\fb_A2.jed: fit lc4032ze\grp\gi2\glb0\fb_A2.lci | lc4032ze\grp\gi2\glb0\fb_A2.tt4
+build lc4032ze\grp\gi2\glb0\fb_A9.jed: fit lc4032ze\grp\gi2\glb0\fb_A9.lci | lc4032ze\grp\gi2\glb0\fb_A9.tt4
+build lc4032ze\grp\gi2\glb0\fb_A13.jed: fit lc4032ze\grp\gi2\glb0\fb_A13.lci | lc4032ze\grp\gi2\glb0\fb_A13.tt4
+build lc4032ze\grp\gi2\glb0\fb_B12.jed: fit lc4032ze\grp\gi2\glb0\fb_B12.lci | lc4032ze\grp\gi2\glb0\fb_B12.tt4
+build lc4032ze\grp\gi2\glb0\pin_19.jed: fit lc4032ze\grp\gi2\glb0\pin_19.lci | lc4032ze\grp\gi2\glb0\pin_19.tt4
+build lc4032ze\grp\gi2\glb0\pin_45.jed: fit lc4032ze\grp\gi2\glb0\pin_45.lci | lc4032ze\grp\gi2\glb0\pin_45.tt4
+build lc4032ze\grp\gi2\glb0_fuses.csv: diff lc4032ze\grp\gi2\glb0\fb_A2.jed lc4032ze\grp\gi2\glb0\fb_A9.jed lc4032ze\grp\gi2\glb0\fb_A13.jed lc4032ze\grp\gi2\glb0\fb_B12.jed lc4032ze\grp\gi2\glb0\pin_19.jed lc4032ze\grp\gi2\glb0\pin_45.jed
+    diff_options = --rows 4-5 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi2\glb1\fb_A2.jed: fit lc4032ze\grp\gi2\glb1\fb_A2.lci | lc4032ze\grp\gi2\glb1\fb_A2.tt4
+build lc4032ze\grp\gi2\glb1\fb_A9.jed: fit lc4032ze\grp\gi2\glb1\fb_A9.lci | lc4032ze\grp\gi2\glb1\fb_A9.tt4
+build lc4032ze\grp\gi2\glb1\fb_A13.jed: fit lc4032ze\grp\gi2\glb1\fb_A13.lci | lc4032ze\grp\gi2\glb1\fb_A13.tt4
+build lc4032ze\grp\gi2\glb1\fb_B12.jed: fit lc4032ze\grp\gi2\glb1\fb_B12.lci | lc4032ze\grp\gi2\glb1\fb_B12.tt4
+build lc4032ze\grp\gi2\glb1\pin_19.jed: fit lc4032ze\grp\gi2\glb1\pin_19.lci | lc4032ze\grp\gi2\glb1\pin_19.tt4
+build lc4032ze\grp\gi2\glb1\pin_45.jed: fit lc4032ze\grp\gi2\glb1\pin_45.lci | lc4032ze\grp\gi2\glb1\pin_45.tt4
+build lc4032ze\grp\gi2\glb1_fuses.csv: diff lc4032ze\grp\gi2\glb1\fb_A2.jed lc4032ze\grp\gi2\glb1\fb_A9.jed lc4032ze\grp\gi2\glb1\fb_A13.jed lc4032ze\grp\gi2\glb1\fb_B12.jed lc4032ze\grp\gi2\glb1\pin_19.jed lc4032ze\grp\gi2\glb1\pin_45.jed
+    diff_options = --rows 4-5 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi3\glb0\fb_A12.jed: fit lc4032ze\grp\gi3\glb0\fb_A12.lci | lc4032ze\grp\gi3\glb0\fb_A12.tt4
+build lc4032ze\grp\gi3\glb0\pin_28.jed: fit lc4032ze\grp\gi3\glb0\pin_28.lci | lc4032ze\grp\gi3\glb0\pin_28.tt4
+build lc4032ze\grp\gi3\glb0\pin_31.jed: fit lc4032ze\grp\gi3\glb0\pin_31.lci | lc4032ze\grp\gi3\glb0\pin_31.tt4
+build lc4032ze\grp\gi3\glb0\pin_14.jed: fit lc4032ze\grp\gi3\glb0\pin_14.lci | lc4032ze\grp\gi3\glb0\pin_14.tt4
+build lc4032ze\grp\gi3\glb0\pin_44.jed: fit lc4032ze\grp\gi3\glb0\pin_44.lci | lc4032ze\grp\gi3\glb0\pin_44.tt4
+build lc4032ze\grp\gi3\glb0\fb_B12.jed: fit lc4032ze\grp\gi3\glb0\fb_B12.lci | lc4032ze\grp\gi3\glb0\fb_B12.tt4
+build lc4032ze\grp\gi3\glb0_fuses.csv: diff lc4032ze\grp\gi3\glb0\fb_A12.jed lc4032ze\grp\gi3\glb0\pin_28.jed lc4032ze\grp\gi3\glb0\pin_31.jed lc4032ze\grp\gi3\glb0\pin_14.jed lc4032ze\grp\gi3\glb0\pin_44.jed lc4032ze\grp\gi3\glb0\fb_B12.jed
+    diff_options = --rows 6-7 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi3\glb1\fb_A12.jed: fit lc4032ze\grp\gi3\glb1\fb_A12.lci | lc4032ze\grp\gi3\glb1\fb_A12.tt4
+build lc4032ze\grp\gi3\glb1\pin_28.jed: fit lc4032ze\grp\gi3\glb1\pin_28.lci | lc4032ze\grp\gi3\glb1\pin_28.tt4
+build lc4032ze\grp\gi3\glb1\pin_31.jed: fit lc4032ze\grp\gi3\glb1\pin_31.lci | lc4032ze\grp\gi3\glb1\pin_31.tt4
+build lc4032ze\grp\gi3\glb1\pin_14.jed: fit lc4032ze\grp\gi3\glb1\pin_14.lci | lc4032ze\grp\gi3\glb1\pin_14.tt4
+build lc4032ze\grp\gi3\glb1\pin_44.jed: fit lc4032ze\grp\gi3\glb1\pin_44.lci | lc4032ze\grp\gi3\glb1\pin_44.tt4
+build lc4032ze\grp\gi3\glb1\fb_B12.jed: fit lc4032ze\grp\gi3\glb1\fb_B12.lci | lc4032ze\grp\gi3\glb1\fb_B12.tt4
+build lc4032ze\grp\gi3\glb1_fuses.csv: diff lc4032ze\grp\gi3\glb1\fb_A12.jed lc4032ze\grp\gi3\glb1\pin_28.jed lc4032ze\grp\gi3\glb1\pin_31.jed lc4032ze\grp\gi3\glb1\pin_14.jed lc4032ze\grp\gi3\glb1\pin_44.jed lc4032ze\grp\gi3\glb1\fb_B12.jed
+    diff_options = --rows 6-7 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi4\glb0\fb_A7.jed: fit lc4032ze\grp\gi4\glb0\fb_A7.lci | lc4032ze\grp\gi4\glb0\fb_A7.tt4
+build lc4032ze\grp\gi4\glb0\fb_B7.jed: fit lc4032ze\grp\gi4\glb0\fb_B7.lci | lc4032ze\grp\gi4\glb0\fb_B7.tt4
+build lc4032ze\grp\gi4\glb0\pin_24.jed: fit lc4032ze\grp\gi4\glb0\pin_24.lci | lc4032ze\grp\gi4\glb0\pin_24.tt4
+build lc4032ze\grp\gi4\glb0\pin_32.jed: fit lc4032ze\grp\gi4\glb0\pin_32.lci | lc4032ze\grp\gi4\glb0\pin_32.tt4
+build lc4032ze\grp\gi4\glb0\pin_44.jed: fit lc4032ze\grp\gi4\glb0\pin_44.lci | lc4032ze\grp\gi4\glb0\pin_44.tt4
+build lc4032ze\grp\gi4\glb0\fb_A15.jed: fit lc4032ze\grp\gi4\glb0\fb_A15.lci | lc4032ze\grp\gi4\glb0\fb_A15.tt4
+build lc4032ze\grp\gi4\glb0_fuses.csv: diff lc4032ze\grp\gi4\glb0\fb_A7.jed lc4032ze\grp\gi4\glb0\fb_B7.jed lc4032ze\grp\gi4\glb0\pin_24.jed lc4032ze\grp\gi4\glb0\pin_32.jed lc4032ze\grp\gi4\glb0\pin_44.jed lc4032ze\grp\gi4\glb0\fb_A15.jed
+    diff_options = --rows 8-9 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi4\glb1\fb_A7.jed: fit lc4032ze\grp\gi4\glb1\fb_A7.lci | lc4032ze\grp\gi4\glb1\fb_A7.tt4
+build lc4032ze\grp\gi4\glb1\fb_B7.jed: fit lc4032ze\grp\gi4\glb1\fb_B7.lci | lc4032ze\grp\gi4\glb1\fb_B7.tt4
+build lc4032ze\grp\gi4\glb1\pin_24.jed: fit lc4032ze\grp\gi4\glb1\pin_24.lci | lc4032ze\grp\gi4\glb1\pin_24.tt4
+build lc4032ze\grp\gi4\glb1\pin_32.jed: fit lc4032ze\grp\gi4\glb1\pin_32.lci | lc4032ze\grp\gi4\glb1\pin_32.tt4
+build lc4032ze\grp\gi4\glb1\pin_44.jed: fit lc4032ze\grp\gi4\glb1\pin_44.lci | lc4032ze\grp\gi4\glb1\pin_44.tt4
+build lc4032ze\grp\gi4\glb1\fb_A15.jed: fit lc4032ze\grp\gi4\glb1\fb_A15.lci | lc4032ze\grp\gi4\glb1\fb_A15.tt4
+build lc4032ze\grp\gi4\glb1_fuses.csv: diff lc4032ze\grp\gi4\glb1\fb_A7.jed lc4032ze\grp\gi4\glb1\fb_B7.jed lc4032ze\grp\gi4\glb1\pin_24.jed lc4032ze\grp\gi4\glb1\pin_32.jed lc4032ze\grp\gi4\glb1\pin_44.jed lc4032ze\grp\gi4\glb1\fb_A15.jed
+    diff_options = --rows 8-9 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi5\glb0\fb_A4.jed: fit lc4032ze\grp\gi5\glb0\fb_A4.lci | lc4032ze\grp\gi5\glb0\fb_A4.tt4
+build lc4032ze\grp\gi5\glb0\fb_A14.jed: fit lc4032ze\grp\gi5\glb0\fb_A14.lci | lc4032ze\grp\gi5\glb0\fb_A14.tt4
+build lc4032ze\grp\gi5\glb0\fb_B3.jed: fit lc4032ze\grp\gi5\glb0\fb_B3.lci | lc4032ze\grp\gi5\glb0\fb_B3.tt4
+build lc4032ze\grp\gi5\glb0\pin_18.jed: fit lc4032ze\grp\gi5\glb0\pin_18.lci | lc4032ze\grp\gi5\glb0\pin_18.tt4
+build lc4032ze\grp\gi5\glb0\pin_38.jed: fit lc4032ze\grp\gi5\glb0\pin_38.lci | lc4032ze\grp\gi5\glb0\pin_38.tt4
+build lc4032ze\grp\gi5\glb0\pin_4.jed: fit lc4032ze\grp\gi5\glb0\pin_4.lci | lc4032ze\grp\gi5\glb0\pin_4.tt4
+build lc4032ze\grp\gi5\glb0_fuses.csv: diff lc4032ze\grp\gi5\glb0\fb_A4.jed lc4032ze\grp\gi5\glb0\fb_A14.jed lc4032ze\grp\gi5\glb0\fb_B3.jed lc4032ze\grp\gi5\glb0\pin_18.jed lc4032ze\grp\gi5\glb0\pin_38.jed lc4032ze\grp\gi5\glb0\pin_4.jed
+    diff_options = --rows 10-11 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi5\glb1\fb_A4.jed: fit lc4032ze\grp\gi5\glb1\fb_A4.lci | lc4032ze\grp\gi5\glb1\fb_A4.tt4
+build lc4032ze\grp\gi5\glb1\fb_A14.jed: fit lc4032ze\grp\gi5\glb1\fb_A14.lci | lc4032ze\grp\gi5\glb1\fb_A14.tt4
+build lc4032ze\grp\gi5\glb1\fb_B3.jed: fit lc4032ze\grp\gi5\glb1\fb_B3.lci | lc4032ze\grp\gi5\glb1\fb_B3.tt4
+build lc4032ze\grp\gi5\glb1\pin_18.jed: fit lc4032ze\grp\gi5\glb1\pin_18.lci | lc4032ze\grp\gi5\glb1\pin_18.tt4
+build lc4032ze\grp\gi5\glb1\pin_38.jed: fit lc4032ze\grp\gi5\glb1\pin_38.lci | lc4032ze\grp\gi5\glb1\pin_38.tt4
+build lc4032ze\grp\gi5\glb1\pin_4.jed: fit lc4032ze\grp\gi5\glb1\pin_4.lci | lc4032ze\grp\gi5\glb1\pin_4.tt4
+build lc4032ze\grp\gi5\glb1_fuses.csv: diff lc4032ze\grp\gi5\glb1\fb_A4.jed lc4032ze\grp\gi5\glb1\fb_A14.jed lc4032ze\grp\gi5\glb1\fb_B3.jed lc4032ze\grp\gi5\glb1\pin_18.jed lc4032ze\grp\gi5\glb1\pin_38.jed lc4032ze\grp\gi5\glb1\pin_4.jed
+    diff_options = --rows 10-11 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi6\glb0\fb_B10.jed: fit lc4032ze\grp\gi6\glb0\fb_B10.lci | lc4032ze\grp\gi6\glb0\fb_B10.tt4
+build lc4032ze\grp\gi6\glb0\pin_8.jed: fit lc4032ze\grp\gi6\glb0\pin_8.lci | lc4032ze\grp\gi6\glb0\pin_8.tt4
+build lc4032ze\grp\gi6\glb0\pin_22.jed: fit lc4032ze\grp\gi6\glb0\pin_22.lci | lc4032ze\grp\gi6\glb0\pin_22.tt4
+build lc4032ze\grp\gi6\glb0\pin_40.jed: fit lc4032ze\grp\gi6\glb0\pin_40.lci | lc4032ze\grp\gi6\glb0\pin_40.tt4
+build lc4032ze\grp\gi6\glb0\pin_4.jed: fit lc4032ze\grp\gi6\glb0\pin_4.lci | lc4032ze\grp\gi6\glb0\pin_4.tt4
+build lc4032ze\grp\gi6\glb0\fb_B7.jed: fit lc4032ze\grp\gi6\glb0\fb_B7.lci | lc4032ze\grp\gi6\glb0\fb_B7.tt4
+build lc4032ze\grp\gi6\glb0_fuses.csv: diff lc4032ze\grp\gi6\glb0\fb_B10.jed lc4032ze\grp\gi6\glb0\pin_8.jed lc4032ze\grp\gi6\glb0\pin_22.jed lc4032ze\grp\gi6\glb0\pin_40.jed lc4032ze\grp\gi6\glb0\pin_4.jed lc4032ze\grp\gi6\glb0\fb_B7.jed
+    diff_options = --rows 12-13 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi6\glb1\fb_B10.jed: fit lc4032ze\grp\gi6\glb1\fb_B10.lci | lc4032ze\grp\gi6\glb1\fb_B10.tt4
+build lc4032ze\grp\gi6\glb1\pin_8.jed: fit lc4032ze\grp\gi6\glb1\pin_8.lci | lc4032ze\grp\gi6\glb1\pin_8.tt4
+build lc4032ze\grp\gi6\glb1\pin_22.jed: fit lc4032ze\grp\gi6\glb1\pin_22.lci | lc4032ze\grp\gi6\glb1\pin_22.tt4
+build lc4032ze\grp\gi6\glb1\pin_40.jed: fit lc4032ze\grp\gi6\glb1\pin_40.lci | lc4032ze\grp\gi6\glb1\pin_40.tt4
+build lc4032ze\grp\gi6\glb1\pin_4.jed: fit lc4032ze\grp\gi6\glb1\pin_4.lci | lc4032ze\grp\gi6\glb1\pin_4.tt4
+build lc4032ze\grp\gi6\glb1\fb_B7.jed: fit lc4032ze\grp\gi6\glb1\fb_B7.lci | lc4032ze\grp\gi6\glb1\fb_B7.tt4
+build lc4032ze\grp\gi6\glb1_fuses.csv: diff lc4032ze\grp\gi6\glb1\fb_B10.jed lc4032ze\grp\gi6\glb1\pin_8.jed lc4032ze\grp\gi6\glb1\pin_22.jed lc4032ze\grp\gi6\glb1\pin_40.jed lc4032ze\grp\gi6\glb1\pin_4.jed lc4032ze\grp\gi6\glb1\fb_B7.jed
+    diff_options = --rows 12-13 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi7\glb0\fb_A6.jed: fit lc4032ze\grp\gi7\glb0\fb_A6.lci | lc4032ze\grp\gi7\glb0\fb_A6.tt4
+build lc4032ze\grp\gi7\glb0\fb_B1.jed: fit lc4032ze\grp\gi7\glb0\fb_B1.lci | lc4032ze\grp\gi7\glb0\fb_B1.tt4
+build lc4032ze\grp\gi7\glb0\fb_B4.jed: fit lc4032ze\grp\gi7\glb0\fb_B4.lci | lc4032ze\grp\gi7\glb0\fb_B4.tt4
+build lc4032ze\grp\gi7\glb0\fb_B13.jed: fit lc4032ze\grp\gi7\glb0\fb_B13.lci | lc4032ze\grp\gi7\glb0\fb_B13.tt4
+build lc4032ze\grp\gi7\glb0\pin_10.jed: fit lc4032ze\grp\gi7\glb0\pin_10.lci | lc4032ze\grp\gi7\glb0\pin_10.tt4
+build lc4032ze\grp\gi7\glb0\pin_45.jed: fit lc4032ze\grp\gi7\glb0\pin_45.lci | lc4032ze\grp\gi7\glb0\pin_45.tt4
+build lc4032ze\grp\gi7\glb0_fuses.csv: diff lc4032ze\grp\gi7\glb0\fb_A6.jed lc4032ze\grp\gi7\glb0\fb_B1.jed lc4032ze\grp\gi7\glb0\fb_B4.jed lc4032ze\grp\gi7\glb0\fb_B13.jed lc4032ze\grp\gi7\glb0\pin_10.jed lc4032ze\grp\gi7\glb0\pin_45.jed
+    diff_options = --rows 14-15 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi7\glb1\fb_A6.jed: fit lc4032ze\grp\gi7\glb1\fb_A6.lci | lc4032ze\grp\gi7\glb1\fb_A6.tt4
+build lc4032ze\grp\gi7\glb1\fb_B1.jed: fit lc4032ze\grp\gi7\glb1\fb_B1.lci | lc4032ze\grp\gi7\glb1\fb_B1.tt4
+build lc4032ze\grp\gi7\glb1\fb_B4.jed: fit lc4032ze\grp\gi7\glb1\fb_B4.lci | lc4032ze\grp\gi7\glb1\fb_B4.tt4
+build lc4032ze\grp\gi7\glb1\fb_B13.jed: fit lc4032ze\grp\gi7\glb1\fb_B13.lci | lc4032ze\grp\gi7\glb1\fb_B13.tt4
+build lc4032ze\grp\gi7\glb1\pin_10.jed: fit lc4032ze\grp\gi7\glb1\pin_10.lci | lc4032ze\grp\gi7\glb1\pin_10.tt4
+build lc4032ze\grp\gi7\glb1\pin_45.jed: fit lc4032ze\grp\gi7\glb1\pin_45.lci | lc4032ze\grp\gi7\glb1\pin_45.tt4
+build lc4032ze\grp\gi7\glb1_fuses.csv: diff lc4032ze\grp\gi7\glb1\fb_A6.jed lc4032ze\grp\gi7\glb1\fb_B1.jed lc4032ze\grp\gi7\glb1\fb_B4.jed lc4032ze\grp\gi7\glb1\fb_B13.jed lc4032ze\grp\gi7\glb1\pin_10.jed lc4032ze\grp\gi7\glb1\pin_45.jed
+    diff_options = --rows 14-15 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi8\glb0\fb_A8.jed: fit lc4032ze\grp\gi8\glb0\fb_A8.lci | lc4032ze\grp\gi8\glb0\fb_A8.tt4
+build lc4032ze\grp\gi8\glb0\fb_B0.jed: fit lc4032ze\grp\gi8\glb0\fb_B0.lci | lc4032ze\grp\gi8\glb0\fb_B0.tt4
+build lc4032ze\grp\gi8\glb0\pin_33.jed: fit lc4032ze\grp\gi8\glb0\pin_33.lci | lc4032ze\grp\gi8\glb0\pin_33.tt4
+build lc4032ze\grp\gi8\glb0\fb_A3.jed: fit lc4032ze\grp\gi8\glb0\fb_A3.lci | lc4032ze\grp\gi8\glb0\fb_A3.tt4
+build lc4032ze\grp\gi8\glb0\pin_20.jed: fit lc4032ze\grp\gi8\glb0\pin_20.lci | lc4032ze\grp\gi8\glb0\pin_20.tt4
+build lc4032ze\grp\gi8\glb0\pin_45.jed: fit lc4032ze\grp\gi8\glb0\pin_45.lci | lc4032ze\grp\gi8\glb0\pin_45.tt4
+build lc4032ze\grp\gi8\glb0_fuses.csv: diff lc4032ze\grp\gi8\glb0\fb_A8.jed lc4032ze\grp\gi8\glb0\fb_B0.jed lc4032ze\grp\gi8\glb0\pin_33.jed lc4032ze\grp\gi8\glb0\fb_A3.jed lc4032ze\grp\gi8\glb0\pin_20.jed lc4032ze\grp\gi8\glb0\pin_45.jed
+    diff_options = --rows 16-17 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi8\glb1\fb_A8.jed: fit lc4032ze\grp\gi8\glb1\fb_A8.lci | lc4032ze\grp\gi8\glb1\fb_A8.tt4
+build lc4032ze\grp\gi8\glb1\fb_B0.jed: fit lc4032ze\grp\gi8\glb1\fb_B0.lci | lc4032ze\grp\gi8\glb1\fb_B0.tt4
+build lc4032ze\grp\gi8\glb1\pin_33.jed: fit lc4032ze\grp\gi8\glb1\pin_33.lci | lc4032ze\grp\gi8\glb1\pin_33.tt4
+build lc4032ze\grp\gi8\glb1\fb_A3.jed: fit lc4032ze\grp\gi8\glb1\fb_A3.lci | lc4032ze\grp\gi8\glb1\fb_A3.tt4
+build lc4032ze\grp\gi8\glb1\pin_20.jed: fit lc4032ze\grp\gi8\glb1\pin_20.lci | lc4032ze\grp\gi8\glb1\pin_20.tt4
+build lc4032ze\grp\gi8\glb1\pin_45.jed: fit lc4032ze\grp\gi8\glb1\pin_45.lci | lc4032ze\grp\gi8\glb1\pin_45.tt4
+build lc4032ze\grp\gi8\glb1_fuses.csv: diff lc4032ze\grp\gi8\glb1\fb_A8.jed lc4032ze\grp\gi8\glb1\fb_B0.jed lc4032ze\grp\gi8\glb1\pin_33.jed lc4032ze\grp\gi8\glb1\fb_A3.jed lc4032ze\grp\gi8\glb1\pin_20.jed lc4032ze\grp\gi8\glb1\pin_45.jed
+    diff_options = --rows 16-17 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi9\glb0\fb_B11.jed: fit lc4032ze\grp\gi9\glb0\fb_B11.lci | lc4032ze\grp\gi9\glb0\fb_B11.tt4
+build lc4032ze\grp\gi9\glb0\pin_9.jed: fit lc4032ze\grp\gi9\glb0\pin_9.lci | lc4032ze\grp\gi9\glb0\pin_9.tt4
+build lc4032ze\grp\gi9\glb0\pin_17.jed: fit lc4032ze\grp\gi9\glb0\pin_17.lci | lc4032ze\grp\gi9\glb0\pin_17.tt4
+build lc4032ze\grp\gi9\glb0\pin_47.jed: fit lc4032ze\grp\gi9\glb0\pin_47.lci | lc4032ze\grp\gi9\glb0\pin_47.tt4
+build lc4032ze\grp\gi9\glb0\fb_B15.jed: fit lc4032ze\grp\gi9\glb0\fb_B15.lci | lc4032ze\grp\gi9\glb0\fb_B15.tt4
+build lc4032ze\grp\gi9\glb0\fb_A9.jed: fit lc4032ze\grp\gi9\glb0\fb_A9.lci | lc4032ze\grp\gi9\glb0\fb_A9.tt4
+build lc4032ze\grp\gi9\glb0_fuses.csv: diff lc4032ze\grp\gi9\glb0\fb_B11.jed lc4032ze\grp\gi9\glb0\pin_9.jed lc4032ze\grp\gi9\glb0\pin_17.jed lc4032ze\grp\gi9\glb0\pin_47.jed lc4032ze\grp\gi9\glb0\fb_B15.jed lc4032ze\grp\gi9\glb0\fb_A9.jed
+    diff_options = --rows 18-19 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi9\glb1\fb_B11.jed: fit lc4032ze\grp\gi9\glb1\fb_B11.lci | lc4032ze\grp\gi9\glb1\fb_B11.tt4
+build lc4032ze\grp\gi9\glb1\pin_9.jed: fit lc4032ze\grp\gi9\glb1\pin_9.lci | lc4032ze\grp\gi9\glb1\pin_9.tt4
+build lc4032ze\grp\gi9\glb1\pin_17.jed: fit lc4032ze\grp\gi9\glb1\pin_17.lci | lc4032ze\grp\gi9\glb1\pin_17.tt4
+build lc4032ze\grp\gi9\glb1\pin_47.jed: fit lc4032ze\grp\gi9\glb1\pin_47.lci | lc4032ze\grp\gi9\glb1\pin_47.tt4
+build lc4032ze\grp\gi9\glb1\fb_B15.jed: fit lc4032ze\grp\gi9\glb1\fb_B15.lci | lc4032ze\grp\gi9\glb1\fb_B15.tt4
+build lc4032ze\grp\gi9\glb1\fb_A9.jed: fit lc4032ze\grp\gi9\glb1\fb_A9.lci | lc4032ze\grp\gi9\glb1\fb_A9.tt4
+build lc4032ze\grp\gi9\glb1_fuses.csv: diff lc4032ze\grp\gi9\glb1\fb_B11.jed lc4032ze\grp\gi9\glb1\pin_9.jed lc4032ze\grp\gi9\glb1\pin_17.jed lc4032ze\grp\gi9\glb1\pin_47.jed lc4032ze\grp\gi9\glb1\fb_B15.jed lc4032ze\grp\gi9\glb1\fb_A9.jed
+    diff_options = --rows 18-19 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi10\glb0\pin_23.jed: fit lc4032ze\grp\gi10\glb0\pin_23.lci | lc4032ze\grp\gi10\glb0\pin_23.tt4
+build lc4032ze\grp\gi10\glb0\pin_26.jed: fit lc4032ze\grp\gi10\glb0\pin_26.lci | lc4032ze\grp\gi10\glb0\pin_26.tt4
+build lc4032ze\grp\gi10\glb0\pin_43.jed: fit lc4032ze\grp\gi10\glb0\pin_43.lci | lc4032ze\grp\gi10\glb0\pin_43.tt4
+build lc4032ze\grp\gi10\glb0\fb_A2.jed: fit lc4032ze\grp\gi10\glb0\fb_A2.lci | lc4032ze\grp\gi10\glb0\fb_A2.tt4
+build lc4032ze\grp\gi10\glb0\fb_B3.jed: fit lc4032ze\grp\gi10\glb0\fb_B3.lci | lc4032ze\grp\gi10\glb0\fb_B3.tt4
+build lc4032ze\grp\gi10\glb0\fb_B11.jed: fit lc4032ze\grp\gi10\glb0\fb_B11.lci | lc4032ze\grp\gi10\glb0\fb_B11.tt4
+build lc4032ze\grp\gi10\glb0_fuses.csv: diff lc4032ze\grp\gi10\glb0\pin_23.jed lc4032ze\grp\gi10\glb0\pin_26.jed lc4032ze\grp\gi10\glb0\pin_43.jed lc4032ze\grp\gi10\glb0\fb_A2.jed lc4032ze\grp\gi10\glb0\fb_B3.jed lc4032ze\grp\gi10\glb0\fb_B11.jed
+    diff_options = --rows 20-21 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi10\glb1\pin_23.jed: fit lc4032ze\grp\gi10\glb1\pin_23.lci | lc4032ze\grp\gi10\glb1\pin_23.tt4
+build lc4032ze\grp\gi10\glb1\pin_26.jed: fit lc4032ze\grp\gi10\glb1\pin_26.lci | lc4032ze\grp\gi10\glb1\pin_26.tt4
+build lc4032ze\grp\gi10\glb1\pin_43.jed: fit lc4032ze\grp\gi10\glb1\pin_43.lci | lc4032ze\grp\gi10\glb1\pin_43.tt4
+build lc4032ze\grp\gi10\glb1\fb_A2.jed: fit lc4032ze\grp\gi10\glb1\fb_A2.lci | lc4032ze\grp\gi10\glb1\fb_A2.tt4
+build lc4032ze\grp\gi10\glb1\fb_B3.jed: fit lc4032ze\grp\gi10\glb1\fb_B3.lci | lc4032ze\grp\gi10\glb1\fb_B3.tt4
+build lc4032ze\grp\gi10\glb1\fb_B11.jed: fit lc4032ze\grp\gi10\glb1\fb_B11.lci | lc4032ze\grp\gi10\glb1\fb_B11.tt4
+build lc4032ze\grp\gi10\glb1_fuses.csv: diff lc4032ze\grp\gi10\glb1\pin_23.jed lc4032ze\grp\gi10\glb1\pin_26.jed lc4032ze\grp\gi10\glb1\pin_43.jed lc4032ze\grp\gi10\glb1\fb_A2.jed lc4032ze\grp\gi10\glb1\fb_B3.jed lc4032ze\grp\gi10\glb1\fb_B11.jed
+    diff_options = --rows 20-21 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi11\glb0\pin_3.jed: fit lc4032ze\grp\gi11\glb0\pin_3.lci | lc4032ze\grp\gi11\glb0\pin_3.tt4
+build lc4032ze\grp\gi11\glb0\pin_21.jed: fit lc4032ze\grp\gi11\glb0\pin_21.lci | lc4032ze\grp\gi11\glb0\pin_21.tt4
+build lc4032ze\grp\gi11\glb0\fb_A11.jed: fit lc4032ze\grp\gi11\glb0\fb_A11.lci | lc4032ze\grp\gi11\glb0\fb_A11.tt4
+build lc4032ze\grp\gi11\glb0\pin_47.jed: fit lc4032ze\grp\gi11\glb0\pin_47.lci | lc4032ze\grp\gi11\glb0\pin_47.tt4
+build lc4032ze\grp\gi11\glb0\fb_A5.jed: fit lc4032ze\grp\gi11\glb0\fb_A5.lci | lc4032ze\grp\gi11\glb0\fb_A5.tt4
+build lc4032ze\grp\gi11\glb0\pin_28.jed: fit lc4032ze\grp\gi11\glb0\pin_28.lci | lc4032ze\grp\gi11\glb0\pin_28.tt4
+build lc4032ze\grp\gi11\glb0_fuses.csv: diff lc4032ze\grp\gi11\glb0\pin_3.jed lc4032ze\grp\gi11\glb0\pin_21.jed lc4032ze\grp\gi11\glb0\fb_A11.jed lc4032ze\grp\gi11\glb0\pin_47.jed lc4032ze\grp\gi11\glb0\fb_A5.jed lc4032ze\grp\gi11\glb0\pin_28.jed
+    diff_options = --rows 22-23 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi11\glb1\pin_3.jed: fit lc4032ze\grp\gi11\glb1\pin_3.lci | lc4032ze\grp\gi11\glb1\pin_3.tt4
+build lc4032ze\grp\gi11\glb1\pin_21.jed: fit lc4032ze\grp\gi11\glb1\pin_21.lci | lc4032ze\grp\gi11\glb1\pin_21.tt4
+build lc4032ze\grp\gi11\glb1\fb_A11.jed: fit lc4032ze\grp\gi11\glb1\fb_A11.lci | lc4032ze\grp\gi11\glb1\fb_A11.tt4
+build lc4032ze\grp\gi11\glb1\pin_47.jed: fit lc4032ze\grp\gi11\glb1\pin_47.lci | lc4032ze\grp\gi11\glb1\pin_47.tt4
+build lc4032ze\grp\gi11\glb1\fb_A5.jed: fit lc4032ze\grp\gi11\glb1\fb_A5.lci | lc4032ze\grp\gi11\glb1\fb_A5.tt4
+build lc4032ze\grp\gi11\glb1\pin_28.jed: fit lc4032ze\grp\gi11\glb1\pin_28.lci | lc4032ze\grp\gi11\glb1\pin_28.tt4
+build lc4032ze\grp\gi11\glb1_fuses.csv: diff lc4032ze\grp\gi11\glb1\pin_3.jed lc4032ze\grp\gi11\glb1\pin_21.jed lc4032ze\grp\gi11\glb1\fb_A11.jed lc4032ze\grp\gi11\glb1\pin_47.jed lc4032ze\grp\gi11\glb1\fb_A5.jed lc4032ze\grp\gi11\glb1\pin_28.jed
+    diff_options = --rows 22-23 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi12\glb0\pin_16.jed: fit lc4032ze\grp\gi12\glb0\pin_16.lci | lc4032ze\grp\gi12\glb0\pin_16.tt4
+build lc4032ze\grp\gi12\glb0\pin_27.jed: fit lc4032ze\grp\gi12\glb0\pin_27.lci | lc4032ze\grp\gi12\glb0\pin_27.tt4
+build lc4032ze\grp\gi12\glb0\fb_A3.jed: fit lc4032ze\grp\gi12\glb0\fb_A3.lci | lc4032ze\grp\gi12\glb0\fb_A3.tt4
+build lc4032ze\grp\gi12\glb0\fb_B7.jed: fit lc4032ze\grp\gi12\glb0\fb_B7.lci | lc4032ze\grp\gi12\glb0\fb_B7.tt4
+build lc4032ze\grp\gi12\glb0\pin_31.jed: fit lc4032ze\grp\gi12\glb0\pin_31.lci | lc4032ze\grp\gi12\glb0\pin_31.tt4
+build lc4032ze\grp\gi12\glb0\pin_47.jed: fit lc4032ze\grp\gi12\glb0\pin_47.lci | lc4032ze\grp\gi12\glb0\pin_47.tt4
+build lc4032ze\grp\gi12\glb0_fuses.csv: diff lc4032ze\grp\gi12\glb0\pin_16.jed lc4032ze\grp\gi12\glb0\pin_27.jed lc4032ze\grp\gi12\glb0\fb_A3.jed lc4032ze\grp\gi12\glb0\fb_B7.jed lc4032ze\grp\gi12\glb0\pin_31.jed lc4032ze\grp\gi12\glb0\pin_47.jed
+    diff_options = --rows 24-25 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi12\glb1\pin_16.jed: fit lc4032ze\grp\gi12\glb1\pin_16.lci | lc4032ze\grp\gi12\glb1\pin_16.tt4
+build lc4032ze\grp\gi12\glb1\pin_27.jed: fit lc4032ze\grp\gi12\glb1\pin_27.lci | lc4032ze\grp\gi12\glb1\pin_27.tt4
+build lc4032ze\grp\gi12\glb1\fb_A3.jed: fit lc4032ze\grp\gi12\glb1\fb_A3.lci | lc4032ze\grp\gi12\glb1\fb_A3.tt4
+build lc4032ze\grp\gi12\glb1\fb_B7.jed: fit lc4032ze\grp\gi12\glb1\fb_B7.lci | lc4032ze\grp\gi12\glb1\fb_B7.tt4
+build lc4032ze\grp\gi12\glb1\pin_31.jed: fit lc4032ze\grp\gi12\glb1\pin_31.lci | lc4032ze\grp\gi12\glb1\pin_31.tt4
+build lc4032ze\grp\gi12\glb1\pin_47.jed: fit lc4032ze\grp\gi12\glb1\pin_47.lci | lc4032ze\grp\gi12\glb1\pin_47.tt4
+build lc4032ze\grp\gi12\glb1_fuses.csv: diff lc4032ze\grp\gi12\glb1\pin_16.jed lc4032ze\grp\gi12\glb1\pin_27.jed lc4032ze\grp\gi12\glb1\fb_A3.jed lc4032ze\grp\gi12\glb1\fb_B7.jed lc4032ze\grp\gi12\glb1\pin_31.jed lc4032ze\grp\gi12\glb1\pin_47.jed
+    diff_options = --rows 24-25 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi13\glb0\fb_A10.jed: fit lc4032ze\grp\gi13\glb0\fb_A10.lci | lc4032ze\grp\gi13\glb0\fb_A10.tt4
+build lc4032ze\grp\gi13\glb0\pin_2.jed: fit lc4032ze\grp\gi13\glb0\pin_2.lci | lc4032ze\grp\gi13\glb0\pin_2.tt4
+build lc4032ze\grp\gi13\glb0\pin_39.jed: fit lc4032ze\grp\gi13\glb0\pin_39.lci | lc4032ze\grp\gi13\glb0\pin_39.tt4
+build lc4032ze\grp\gi13\glb0\pin_14.jed: fit lc4032ze\grp\gi13\glb0\pin_14.lci | lc4032ze\grp\gi13\glb0\pin_14.tt4
+build lc4032ze\grp\gi13\glb0\fb_A5.jed: fit lc4032ze\grp\gi13\glb0\fb_A5.lci | lc4032ze\grp\gi13\glb0\fb_A5.tt4
+build lc4032ze\grp\gi13\glb0\pin_9.jed: fit lc4032ze\grp\gi13\glb0\pin_9.lci | lc4032ze\grp\gi13\glb0\pin_9.tt4
+build lc4032ze\grp\gi13\glb0_fuses.csv: diff lc4032ze\grp\gi13\glb0\fb_A10.jed lc4032ze\grp\gi13\glb0\pin_2.jed lc4032ze\grp\gi13\glb0\pin_39.jed lc4032ze\grp\gi13\glb0\pin_14.jed lc4032ze\grp\gi13\glb0\fb_A5.jed lc4032ze\grp\gi13\glb0\pin_9.jed
+    diff_options = --rows 26-27 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi13\glb1\fb_A10.jed: fit lc4032ze\grp\gi13\glb1\fb_A10.lci | lc4032ze\grp\gi13\glb1\fb_A10.tt4
+build lc4032ze\grp\gi13\glb1\pin_2.jed: fit lc4032ze\grp\gi13\glb1\pin_2.lci | lc4032ze\grp\gi13\glb1\pin_2.tt4
+build lc4032ze\grp\gi13\glb1\pin_39.jed: fit lc4032ze\grp\gi13\glb1\pin_39.lci | lc4032ze\grp\gi13\glb1\pin_39.tt4
+build lc4032ze\grp\gi13\glb1\pin_14.jed: fit lc4032ze\grp\gi13\glb1\pin_14.lci | lc4032ze\grp\gi13\glb1\pin_14.tt4
+build lc4032ze\grp\gi13\glb1\fb_A5.jed: fit lc4032ze\grp\gi13\glb1\fb_A5.lci | lc4032ze\grp\gi13\glb1\fb_A5.tt4
+build lc4032ze\grp\gi13\glb1\pin_9.jed: fit lc4032ze\grp\gi13\glb1\pin_9.lci | lc4032ze\grp\gi13\glb1\pin_9.tt4
+build lc4032ze\grp\gi13\glb1_fuses.csv: diff lc4032ze\grp\gi13\glb1\fb_A10.jed lc4032ze\grp\gi13\glb1\pin_2.jed lc4032ze\grp\gi13\glb1\pin_39.jed lc4032ze\grp\gi13\glb1\pin_14.jed lc4032ze\grp\gi13\glb1\fb_A5.jed lc4032ze\grp\gi13\glb1\pin_9.jed
+    diff_options = --rows 26-27 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi14\glb0\fb_A0.jed: fit lc4032ze\grp\gi14\glb0\fb_A0.lci | lc4032ze\grp\gi14\glb0\fb_A0.tt4
+build lc4032ze\grp\gi14\glb0\fb_B9.jed: fit lc4032ze\grp\gi14\glb0\fb_B9.lci | lc4032ze\grp\gi14\glb0\fb_B9.tt4
+build lc4032ze\grp\gi14\glb0\pin_10.jed: fit lc4032ze\grp\gi14\glb0\pin_10.lci | lc4032ze\grp\gi14\glb0\pin_10.tt4
+build lc4032ze\grp\gi14\glb0\fb_A8.jed: fit lc4032ze\grp\gi14\glb0\fb_A8.lci | lc4032ze\grp\gi14\glb0\fb_A8.tt4
+build lc4032ze\grp\gi14\glb0\pin_43.jed: fit lc4032ze\grp\gi14\glb0\pin_43.lci | lc4032ze\grp\gi14\glb0\pin_43.tt4
+build lc4032ze\grp\gi14\glb0\pin_8.jed: fit lc4032ze\grp\gi14\glb0\pin_8.lci | lc4032ze\grp\gi14\glb0\pin_8.tt4
+build lc4032ze\grp\gi14\glb0_fuses.csv: diff lc4032ze\grp\gi14\glb0\fb_A0.jed lc4032ze\grp\gi14\glb0\fb_B9.jed lc4032ze\grp\gi14\glb0\pin_10.jed lc4032ze\grp\gi14\glb0\fb_A8.jed lc4032ze\grp\gi14\glb0\pin_43.jed lc4032ze\grp\gi14\glb0\pin_8.jed
+    diff_options = --rows 28-29 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi14\glb1\fb_A0.jed: fit lc4032ze\grp\gi14\glb1\fb_A0.lci | lc4032ze\grp\gi14\glb1\fb_A0.tt4
+build lc4032ze\grp\gi14\glb1\fb_B9.jed: fit lc4032ze\grp\gi14\glb1\fb_B9.lci | lc4032ze\grp\gi14\glb1\fb_B9.tt4
+build lc4032ze\grp\gi14\glb1\pin_10.jed: fit lc4032ze\grp\gi14\glb1\pin_10.lci | lc4032ze\grp\gi14\glb1\pin_10.tt4
+build lc4032ze\grp\gi14\glb1\fb_A8.jed: fit lc4032ze\grp\gi14\glb1\fb_A8.lci | lc4032ze\grp\gi14\glb1\fb_A8.tt4
+build lc4032ze\grp\gi14\glb1\pin_43.jed: fit lc4032ze\grp\gi14\glb1\pin_43.lci | lc4032ze\grp\gi14\glb1\pin_43.tt4
+build lc4032ze\grp\gi14\glb1\pin_8.jed: fit lc4032ze\grp\gi14\glb1\pin_8.lci | lc4032ze\grp\gi14\glb1\pin_8.tt4
+build lc4032ze\grp\gi14\glb1_fuses.csv: diff lc4032ze\grp\gi14\glb1\fb_A0.jed lc4032ze\grp\gi14\glb1\fb_B9.jed lc4032ze\grp\gi14\glb1\pin_10.jed lc4032ze\grp\gi14\glb1\fb_A8.jed lc4032ze\grp\gi14\glb1\pin_43.jed lc4032ze\grp\gi14\glb1\pin_8.jed
+    diff_options = --rows 28-29 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi15\glb0\fb_B5.jed: fit lc4032ze\grp\gi15\glb0\fb_B5.lci | lc4032ze\grp\gi15\glb0\fb_B5.tt4
+build lc4032ze\grp\gi15\glb0\fb_B8.jed: fit lc4032ze\grp\gi15\glb0\fb_B8.lci | lc4032ze\grp\gi15\glb0\fb_B8.tt4
+build lc4032ze\grp\gi15\glb0\fb_B14.jed: fit lc4032ze\grp\gi15\glb0\fb_B14.lci | lc4032ze\grp\gi15\glb0\fb_B14.tt4
+build lc4032ze\grp\gi15\glb0\pin_19.jed: fit lc4032ze\grp\gi15\glb0\pin_19.lci | lc4032ze\grp\gi15\glb0\pin_19.tt4
+build lc4032ze\grp\gi15\glb0\pin_39.jed: fit lc4032ze\grp\gi15\glb0\pin_39.lci | lc4032ze\grp\gi15\glb0\pin_39.tt4
+build lc4032ze\grp\gi15\glb0\fb_B0.jed: fit lc4032ze\grp\gi15\glb0\fb_B0.lci | lc4032ze\grp\gi15\glb0\fb_B0.tt4
+build lc4032ze\grp\gi15\glb0_fuses.csv: diff lc4032ze\grp\gi15\glb0\fb_B5.jed lc4032ze\grp\gi15\glb0\fb_B8.jed lc4032ze\grp\gi15\glb0\fb_B14.jed lc4032ze\grp\gi15\glb0\pin_19.jed lc4032ze\grp\gi15\glb0\pin_39.jed lc4032ze\grp\gi15\glb0\fb_B0.jed
+    diff_options = --rows 30-31 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi15\glb1\fb_B5.jed: fit lc4032ze\grp\gi15\glb1\fb_B5.lci | lc4032ze\grp\gi15\glb1\fb_B5.tt4
+build lc4032ze\grp\gi15\glb1\fb_B8.jed: fit lc4032ze\grp\gi15\glb1\fb_B8.lci | lc4032ze\grp\gi15\glb1\fb_B8.tt4
+build lc4032ze\grp\gi15\glb1\fb_B14.jed: fit lc4032ze\grp\gi15\glb1\fb_B14.lci | lc4032ze\grp\gi15\glb1\fb_B14.tt4
+build lc4032ze\grp\gi15\glb1\pin_19.jed: fit lc4032ze\grp\gi15\glb1\pin_19.lci | lc4032ze\grp\gi15\glb1\pin_19.tt4
+build lc4032ze\grp\gi15\glb1\pin_39.jed: fit lc4032ze\grp\gi15\glb1\pin_39.lci | lc4032ze\grp\gi15\glb1\pin_39.tt4
+build lc4032ze\grp\gi15\glb1\fb_B0.jed: fit lc4032ze\grp\gi15\glb1\fb_B0.lci | lc4032ze\grp\gi15\glb1\fb_B0.tt4
+build lc4032ze\grp\gi15\glb1_fuses.csv: diff lc4032ze\grp\gi15\glb1\fb_B5.jed lc4032ze\grp\gi15\glb1\fb_B8.jed lc4032ze\grp\gi15\glb1\fb_B14.jed lc4032ze\grp\gi15\glb1\pin_19.jed lc4032ze\grp\gi15\glb1\pin_39.jed lc4032ze\grp\gi15\glb1\fb_B0.jed
+    diff_options = --rows 30-31 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi16\glb0\fb_B2.jed: fit lc4032ze\grp\gi16\glb0\fb_B2.lci | lc4032ze\grp\gi16\glb0\fb_B2.tt4
+build lc4032ze\grp\gi16\glb0\pin_34.jed: fit lc4032ze\grp\gi16\glb0\pin_34.lci | lc4032ze\grp\gi16\glb0\pin_34.tt4
+build lc4032ze\grp\gi16\glb0\pin_18.jed: fit lc4032ze\grp\gi16\glb0\pin_18.lci | lc4032ze\grp\gi16\glb0\pin_18.tt4
+build lc4032ze\grp\gi16\glb0\fb_B15.jed: fit lc4032ze\grp\gi16\glb0\fb_B15.lci | lc4032ze\grp\gi16\glb0\fb_B15.tt4
+build lc4032ze\grp\gi16\glb0\fb_A7.jed: fit lc4032ze\grp\gi16\glb0\fb_A7.lci | lc4032ze\grp\gi16\glb0\fb_A7.tt4
+build lc4032ze\grp\gi16\glb0\fb_A10.jed: fit lc4032ze\grp\gi16\glb0\fb_A10.lci | lc4032ze\grp\gi16\glb0\fb_A10.tt4
+build lc4032ze\grp\gi16\glb0_fuses.csv: diff lc4032ze\grp\gi16\glb0\fb_B2.jed lc4032ze\grp\gi16\glb0\pin_34.jed lc4032ze\grp\gi16\glb0\pin_18.jed lc4032ze\grp\gi16\glb0\fb_B15.jed lc4032ze\grp\gi16\glb0\fb_A7.jed lc4032ze\grp\gi16\glb0\fb_A10.jed
+    diff_options = --rows 32-33 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi16\glb1\fb_B2.jed: fit lc4032ze\grp\gi16\glb1\fb_B2.lci | lc4032ze\grp\gi16\glb1\fb_B2.tt4
+build lc4032ze\grp\gi16\glb1\pin_34.jed: fit lc4032ze\grp\gi16\glb1\pin_34.lci | lc4032ze\grp\gi16\glb1\pin_34.tt4
+build lc4032ze\grp\gi16\glb1\pin_18.jed: fit lc4032ze\grp\gi16\glb1\pin_18.lci | lc4032ze\grp\gi16\glb1\pin_18.tt4
+build lc4032ze\grp\gi16\glb1\fb_B15.jed: fit lc4032ze\grp\gi16\glb1\fb_B15.lci | lc4032ze\grp\gi16\glb1\fb_B15.tt4
+build lc4032ze\grp\gi16\glb1\fb_A7.jed: fit lc4032ze\grp\gi16\glb1\fb_A7.lci | lc4032ze\grp\gi16\glb1\fb_A7.tt4
+build lc4032ze\grp\gi16\glb1\fb_A10.jed: fit lc4032ze\grp\gi16\glb1\fb_A10.lci | lc4032ze\grp\gi16\glb1\fb_A10.tt4
+build lc4032ze\grp\gi16\glb1_fuses.csv: diff lc4032ze\grp\gi16\glb1\fb_B2.jed lc4032ze\grp\gi16\glb1\pin_34.jed lc4032ze\grp\gi16\glb1\pin_18.jed lc4032ze\grp\gi16\glb1\fb_B15.jed lc4032ze\grp\gi16\glb1\fb_A7.jed lc4032ze\grp\gi16\glb1\fb_A10.jed
+    diff_options = --rows 32-33 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi17\glb0\fb_A1.jed: fit lc4032ze\grp\gi17\glb0\fb_A1.lci | lc4032ze\grp\gi17\glb0\fb_A1.tt4
+build lc4032ze\grp\gi17\glb0\pin_15.jed: fit lc4032ze\grp\gi17\glb0\pin_15.lci | lc4032ze\grp\gi17\glb0\pin_15.tt4
+build lc4032ze\grp\gi17\glb0\pin_27.jed: fit lc4032ze\grp\gi17\glb0\pin_27.lci | lc4032ze\grp\gi17\glb0\pin_27.tt4
+build lc4032ze\grp\gi17\glb0\fb_A11.jed: fit lc4032ze\grp\gi17\glb0\fb_A11.lci | lc4032ze\grp\gi17\glb0\fb_A11.tt4
+build lc4032ze\grp\gi17\glb0\pin_40.jed: fit lc4032ze\grp\gi17\glb0\pin_40.lci | lc4032ze\grp\gi17\glb0\pin_40.tt4
+build lc4032ze\grp\gi17\glb0\fb_B9.jed: fit lc4032ze\grp\gi17\glb0\fb_B9.lci | lc4032ze\grp\gi17\glb0\fb_B9.tt4
+build lc4032ze\grp\gi17\glb0_fuses.csv: diff lc4032ze\grp\gi17\glb0\fb_A1.jed lc4032ze\grp\gi17\glb0\pin_15.jed lc4032ze\grp\gi17\glb0\pin_27.jed lc4032ze\grp\gi17\glb0\fb_A11.jed lc4032ze\grp\gi17\glb0\pin_40.jed lc4032ze\grp\gi17\glb0\fb_B9.jed
+    diff_options = --rows 34-35 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi17\glb1\fb_A1.jed: fit lc4032ze\grp\gi17\glb1\fb_A1.lci | lc4032ze\grp\gi17\glb1\fb_A1.tt4
+build lc4032ze\grp\gi17\glb1\pin_15.jed: fit lc4032ze\grp\gi17\glb1\pin_15.lci | lc4032ze\grp\gi17\glb1\pin_15.tt4
+build lc4032ze\grp\gi17\glb1\pin_27.jed: fit lc4032ze\grp\gi17\glb1\pin_27.lci | lc4032ze\grp\gi17\glb1\pin_27.tt4
+build lc4032ze\grp\gi17\glb1\fb_A11.jed: fit lc4032ze\grp\gi17\glb1\fb_A11.lci | lc4032ze\grp\gi17\glb1\fb_A11.tt4
+build lc4032ze\grp\gi17\glb1\pin_40.jed: fit lc4032ze\grp\gi17\glb1\pin_40.lci | lc4032ze\grp\gi17\glb1\pin_40.tt4
+build lc4032ze\grp\gi17\glb1\fb_B9.jed: fit lc4032ze\grp\gi17\glb1\fb_B9.lci | lc4032ze\grp\gi17\glb1\fb_B9.tt4
+build lc4032ze\grp\gi17\glb1_fuses.csv: diff lc4032ze\grp\gi17\glb1\fb_A1.jed lc4032ze\grp\gi17\glb1\pin_15.jed lc4032ze\grp\gi17\glb1\pin_27.jed lc4032ze\grp\gi17\glb1\fb_A11.jed lc4032ze\grp\gi17\glb1\pin_40.jed lc4032ze\grp\gi17\glb1\fb_B9.jed
+    diff_options = --rows 34-35 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi18\glb0\fb_A13.jed: fit lc4032ze\grp\gi18\glb0\fb_A13.lci | lc4032ze\grp\gi18\glb0\fb_A13.tt4
+build lc4032ze\grp\gi18\glb0\fb_A6.jed: fit lc4032ze\grp\gi18\glb0\fb_A6.lci | lc4032ze\grp\gi18\glb0\fb_A6.tt4
+build lc4032ze\grp\gi18\glb0\pin_17.jed: fit lc4032ze\grp\gi18\glb0\pin_17.lci | lc4032ze\grp\gi18\glb0\pin_17.tt4
+build lc4032ze\grp\gi18\glb0\fb_B5.jed: fit lc4032ze\grp\gi18\glb0\fb_B5.lci | lc4032ze\grp\gi18\glb0\fb_B5.tt4
+build lc4032ze\grp\gi18\glb0\pin_38.jed: fit lc4032ze\grp\gi18\glb0\pin_38.lci | lc4032ze\grp\gi18\glb0\pin_38.tt4
+build lc4032ze\grp\gi18\glb0\pin_3.jed: fit lc4032ze\grp\gi18\glb0\pin_3.lci | lc4032ze\grp\gi18\glb0\pin_3.tt4
+build lc4032ze\grp\gi18\glb0_fuses.csv: diff lc4032ze\grp\gi18\glb0\fb_A13.jed lc4032ze\grp\gi18\glb0\fb_A6.jed lc4032ze\grp\gi18\glb0\pin_17.jed lc4032ze\grp\gi18\glb0\fb_B5.jed lc4032ze\grp\gi18\glb0\pin_38.jed lc4032ze\grp\gi18\glb0\pin_3.jed
+    diff_options = --rows 36-37 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi18\glb1\fb_A13.jed: fit lc4032ze\grp\gi18\glb1\fb_A13.lci | lc4032ze\grp\gi18\glb1\fb_A13.tt4
+build lc4032ze\grp\gi18\glb1\fb_A6.jed: fit lc4032ze\grp\gi18\glb1\fb_A6.lci | lc4032ze\grp\gi18\glb1\fb_A6.tt4
+build lc4032ze\grp\gi18\glb1\pin_17.jed: fit lc4032ze\grp\gi18\glb1\pin_17.lci | lc4032ze\grp\gi18\glb1\pin_17.tt4
+build lc4032ze\grp\gi18\glb1\fb_B5.jed: fit lc4032ze\grp\gi18\glb1\fb_B5.lci | lc4032ze\grp\gi18\glb1\fb_B5.tt4
+build lc4032ze\grp\gi18\glb1\pin_38.jed: fit lc4032ze\grp\gi18\glb1\pin_38.lci | lc4032ze\grp\gi18\glb1\pin_38.tt4
+build lc4032ze\grp\gi18\glb1\pin_3.jed: fit lc4032ze\grp\gi18\glb1\pin_3.lci | lc4032ze\grp\gi18\glb1\pin_3.tt4
+build lc4032ze\grp\gi18\glb1_fuses.csv: diff lc4032ze\grp\gi18\glb1\fb_A13.jed lc4032ze\grp\gi18\glb1\fb_A6.jed lc4032ze\grp\gi18\glb1\pin_17.jed lc4032ze\grp\gi18\glb1\fb_B5.jed lc4032ze\grp\gi18\glb1\pin_38.jed lc4032ze\grp\gi18\glb1\pin_3.jed
+    diff_options = --rows 36-37 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi19\glb0\pin_7.jed: fit lc4032ze\grp\gi19\glb0\pin_7.lci | lc4032ze\grp\gi19\glb0\pin_7.tt4
+build lc4032ze\grp\gi19\glb0\pin_41.jed: fit lc4032ze\grp\gi19\glb0\pin_41.lci | lc4032ze\grp\gi19\glb0\pin_41.tt4
+build lc4032ze\grp\gi19\glb0\fb_A4.jed: fit lc4032ze\grp\gi19\glb0\fb_A4.lci | lc4032ze\grp\gi19\glb0\fb_A4.tt4
+build lc4032ze\grp\gi19\glb0\fb_A8.jed: fit lc4032ze\grp\gi19\glb0\fb_A8.lci | lc4032ze\grp\gi19\glb0\fb_A8.tt4
+build lc4032ze\grp\gi19\glb0\pin_19.jed: fit lc4032ze\grp\gi19\glb0\pin_19.lci | lc4032ze\grp\gi19\glb0\pin_19.tt4
+build lc4032ze\grp\gi19\glb0\pin_2.jed: fit lc4032ze\grp\gi19\glb0\pin_2.lci | lc4032ze\grp\gi19\glb0\pin_2.tt4
+build lc4032ze\grp\gi19\glb0_fuses.csv: diff lc4032ze\grp\gi19\glb0\pin_7.jed lc4032ze\grp\gi19\glb0\pin_41.jed lc4032ze\grp\gi19\glb0\fb_A4.jed lc4032ze\grp\gi19\glb0\fb_A8.jed lc4032ze\grp\gi19\glb0\pin_19.jed lc4032ze\grp\gi19\glb0\pin_2.jed
+    diff_options = --rows 38-39 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi19\glb1\pin_7.jed: fit lc4032ze\grp\gi19\glb1\pin_7.lci | lc4032ze\grp\gi19\glb1\pin_7.tt4
+build lc4032ze\grp\gi19\glb1\pin_41.jed: fit lc4032ze\grp\gi19\glb1\pin_41.lci | lc4032ze\grp\gi19\glb1\pin_41.tt4
+build lc4032ze\grp\gi19\glb1\fb_A4.jed: fit lc4032ze\grp\gi19\glb1\fb_A4.lci | lc4032ze\grp\gi19\glb1\fb_A4.tt4
+build lc4032ze\grp\gi19\glb1\fb_A8.jed: fit lc4032ze\grp\gi19\glb1\fb_A8.lci | lc4032ze\grp\gi19\glb1\fb_A8.tt4
+build lc4032ze\grp\gi19\glb1\pin_19.jed: fit lc4032ze\grp\gi19\glb1\pin_19.lci | lc4032ze\grp\gi19\glb1\pin_19.tt4
+build lc4032ze\grp\gi19\glb1\pin_2.jed: fit lc4032ze\grp\gi19\glb1\pin_2.lci | lc4032ze\grp\gi19\glb1\pin_2.tt4
+build lc4032ze\grp\gi19\glb1_fuses.csv: diff lc4032ze\grp\gi19\glb1\pin_7.jed lc4032ze\grp\gi19\glb1\pin_41.jed lc4032ze\grp\gi19\glb1\fb_A4.jed lc4032ze\grp\gi19\glb1\fb_A8.jed lc4032ze\grp\gi19\glb1\pin_19.jed lc4032ze\grp\gi19\glb1\pin_2.jed
+    diff_options = --rows 38-39 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi20\glb0\pin_46.jed: fit lc4032ze\grp\gi20\glb0\pin_46.lci | lc4032ze\grp\gi20\glb0\pin_46.tt4
+build lc4032ze\grp\gi20\glb0\pin_28.jed: fit lc4032ze\grp\gi20\glb0\pin_28.lci | lc4032ze\grp\gi20\glb0\pin_28.tt4
+build lc4032ze\grp\gi20\glb0\fb_A0.jed: fit lc4032ze\grp\gi20\glb0\fb_A0.lci | lc4032ze\grp\gi20\glb0\fb_A0.tt4
+build lc4032ze\grp\gi20\glb0\fb_B5.jed: fit lc4032ze\grp\gi20\glb0\fb_B5.lci | lc4032ze\grp\gi20\glb0\fb_B5.tt4
+build lc4032ze\grp\gi20\glb0\pin_18.jed: fit lc4032ze\grp\gi20\glb0\pin_18.lci | lc4032ze\grp\gi20\glb0\pin_18.tt4
+build lc4032ze\grp\gi20\glb0\fb_B10.jed: fit lc4032ze\grp\gi20\glb0\fb_B10.lci | lc4032ze\grp\gi20\glb0\fb_B10.tt4
+build lc4032ze\grp\gi20\glb0_fuses.csv: diff lc4032ze\grp\gi20\glb0\pin_46.jed lc4032ze\grp\gi20\glb0\pin_28.jed lc4032ze\grp\gi20\glb0\fb_A0.jed lc4032ze\grp\gi20\glb0\fb_B5.jed lc4032ze\grp\gi20\glb0\pin_18.jed lc4032ze\grp\gi20\glb0\fb_B10.jed
+    diff_options = --rows 40-41 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi20\glb1\pin_46.jed: fit lc4032ze\grp\gi20\glb1\pin_46.lci | lc4032ze\grp\gi20\glb1\pin_46.tt4
+build lc4032ze\grp\gi20\glb1\pin_28.jed: fit lc4032ze\grp\gi20\glb1\pin_28.lci | lc4032ze\grp\gi20\glb1\pin_28.tt4
+build lc4032ze\grp\gi20\glb1\fb_A0.jed: fit lc4032ze\grp\gi20\glb1\fb_A0.lci | lc4032ze\grp\gi20\glb1\fb_A0.tt4
+build lc4032ze\grp\gi20\glb1\fb_B5.jed: fit lc4032ze\grp\gi20\glb1\fb_B5.lci | lc4032ze\grp\gi20\glb1\fb_B5.tt4
+build lc4032ze\grp\gi20\glb1\pin_18.jed: fit lc4032ze\grp\gi20\glb1\pin_18.lci | lc4032ze\grp\gi20\glb1\pin_18.tt4
+build lc4032ze\grp\gi20\glb1\fb_B10.jed: fit lc4032ze\grp\gi20\glb1\fb_B10.lci | lc4032ze\grp\gi20\glb1\fb_B10.tt4
+build lc4032ze\grp\gi20\glb1_fuses.csv: diff lc4032ze\grp\gi20\glb1\pin_46.jed lc4032ze\grp\gi20\glb1\pin_28.jed lc4032ze\grp\gi20\glb1\fb_A0.jed lc4032ze\grp\gi20\glb1\fb_B5.jed lc4032ze\grp\gi20\glb1\pin_18.jed lc4032ze\grp\gi20\glb1\fb_B10.jed
+    diff_options = --rows 40-41 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi21\glb0\pin_42.jed: fit lc4032ze\grp\gi21\glb0\pin_42.lci | lc4032ze\grp\gi21\glb0\pin_42.tt4
+build lc4032ze\grp\gi21\glb0\pin_22.jed: fit lc4032ze\grp\gi21\glb0\pin_22.lci | lc4032ze\grp\gi21\glb0\pin_22.tt4
+build lc4032ze\grp\gi21\glb0\pin_7.jed: fit lc4032ze\grp\gi21\glb0\pin_7.lci | lc4032ze\grp\gi21\glb0\pin_7.tt4
+build lc4032ze\grp\gi21\glb0\fb_B14.jed: fit lc4032ze\grp\gi21\glb0\fb_B14.lci | lc4032ze\grp\gi21\glb0\fb_B14.tt4
+build lc4032ze\grp\gi21\glb0\fb_B3.jed: fit lc4032ze\grp\gi21\glb0\fb_B3.lci | lc4032ze\grp\gi21\glb0\fb_B3.tt4
+build lc4032ze\grp\gi21\glb0\fb_B9.jed: fit lc4032ze\grp\gi21\glb0\fb_B9.lci | lc4032ze\grp\gi21\glb0\fb_B9.tt4
+build lc4032ze\grp\gi21\glb0_fuses.csv: diff lc4032ze\grp\gi21\glb0\pin_42.jed lc4032ze\grp\gi21\glb0\pin_22.jed lc4032ze\grp\gi21\glb0\pin_7.jed lc4032ze\grp\gi21\glb0\fb_B14.jed lc4032ze\grp\gi21\glb0\fb_B3.jed lc4032ze\grp\gi21\glb0\fb_B9.jed
+    diff_options = --rows 42-43 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi21\glb1\pin_42.jed: fit lc4032ze\grp\gi21\glb1\pin_42.lci | lc4032ze\grp\gi21\glb1\pin_42.tt4
+build lc4032ze\grp\gi21\glb1\pin_22.jed: fit lc4032ze\grp\gi21\glb1\pin_22.lci | lc4032ze\grp\gi21\glb1\pin_22.tt4
+build lc4032ze\grp\gi21\glb1\pin_7.jed: fit lc4032ze\grp\gi21\glb1\pin_7.lci | lc4032ze\grp\gi21\glb1\pin_7.tt4
+build lc4032ze\grp\gi21\glb1\fb_B14.jed: fit lc4032ze\grp\gi21\glb1\fb_B14.lci | lc4032ze\grp\gi21\glb1\fb_B14.tt4
+build lc4032ze\grp\gi21\glb1\fb_B3.jed: fit lc4032ze\grp\gi21\glb1\fb_B3.lci | lc4032ze\grp\gi21\glb1\fb_B3.tt4
+build lc4032ze\grp\gi21\glb1\fb_B9.jed: fit lc4032ze\grp\gi21\glb1\fb_B9.lci | lc4032ze\grp\gi21\glb1\fb_B9.tt4
+build lc4032ze\grp\gi21\glb1_fuses.csv: diff lc4032ze\grp\gi21\glb1\pin_42.jed lc4032ze\grp\gi21\glb1\pin_22.jed lc4032ze\grp\gi21\glb1\pin_7.jed lc4032ze\grp\gi21\glb1\fb_B14.jed lc4032ze\grp\gi21\glb1\fb_B3.jed lc4032ze\grp\gi21\glb1\fb_B9.jed
+    diff_options = --rows 42-43 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi22\glb0\fb_A13.jed: fit lc4032ze\grp\gi22\glb0\fb_A13.lci | lc4032ze\grp\gi22\glb0\fb_A13.tt4
+build lc4032ze\grp\gi22\glb0\pin_32.jed: fit lc4032ze\grp\gi22\glb0\pin_32.lci | lc4032ze\grp\gi22\glb0\pin_32.tt4
+build lc4032ze\grp\gi22\glb0\pin_41.jed: fit lc4032ze\grp\gi22\glb0\pin_41.lci | lc4032ze\grp\gi22\glb0\pin_41.tt4
+build lc4032ze\grp\gi22\glb0\pin_10.jed: fit lc4032ze\grp\gi22\glb0\pin_10.lci | lc4032ze\grp\gi22\glb0\pin_10.tt4
+build lc4032ze\grp\gi22\glb0\fb_A12.jed: fit lc4032ze\grp\gi22\glb0\fb_A12.lci | lc4032ze\grp\gi22\glb0\fb_A12.tt4
+build lc4032ze\grp\gi22\glb0\fb_B8.jed: fit lc4032ze\grp\gi22\glb0\fb_B8.lci | lc4032ze\grp\gi22\glb0\fb_B8.tt4
+build lc4032ze\grp\gi22\glb0_fuses.csv: diff lc4032ze\grp\gi22\glb0\fb_A13.jed lc4032ze\grp\gi22\glb0\pin_32.jed lc4032ze\grp\gi22\glb0\pin_41.jed lc4032ze\grp\gi22\glb0\pin_10.jed lc4032ze\grp\gi22\glb0\fb_A12.jed lc4032ze\grp\gi22\glb0\fb_B8.jed
+    diff_options = --rows 44-45 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi22\glb1\fb_A13.jed: fit lc4032ze\grp\gi22\glb1\fb_A13.lci | lc4032ze\grp\gi22\glb1\fb_A13.tt4
+build lc4032ze\grp\gi22\glb1\pin_32.jed: fit lc4032ze\grp\gi22\glb1\pin_32.lci | lc4032ze\grp\gi22\glb1\pin_32.tt4
+build lc4032ze\grp\gi22\glb1\pin_41.jed: fit lc4032ze\grp\gi22\glb1\pin_41.lci | lc4032ze\grp\gi22\glb1\pin_41.tt4
+build lc4032ze\grp\gi22\glb1\pin_10.jed: fit lc4032ze\grp\gi22\glb1\pin_10.lci | lc4032ze\grp\gi22\glb1\pin_10.tt4
+build lc4032ze\grp\gi22\glb1\fb_A12.jed: fit lc4032ze\grp\gi22\glb1\fb_A12.lci | lc4032ze\grp\gi22\glb1\fb_A12.tt4
+build lc4032ze\grp\gi22\glb1\fb_B8.jed: fit lc4032ze\grp\gi22\glb1\fb_B8.lci | lc4032ze\grp\gi22\glb1\fb_B8.tt4
+build lc4032ze\grp\gi22\glb1_fuses.csv: diff lc4032ze\grp\gi22\glb1\fb_A13.jed lc4032ze\grp\gi22\glb1\pin_32.jed lc4032ze\grp\gi22\glb1\pin_41.jed lc4032ze\grp\gi22\glb1\pin_10.jed lc4032ze\grp\gi22\glb1\fb_A12.jed lc4032ze\grp\gi22\glb1\fb_B8.jed
+    diff_options = --rows 44-45 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi23\glb0\pin_48.jed: fit lc4032ze\grp\gi23\glb0\pin_48.lci | lc4032ze\grp\gi23\glb0\pin_48.tt4
+build lc4032ze\grp\gi23\glb0\fb_B11.jed: fit lc4032ze\grp\gi23\glb0\fb_B11.lci | lc4032ze\grp\gi23\glb0\fb_B11.tt4
+build lc4032ze\grp\gi23\glb0\pin_2.jed: fit lc4032ze\grp\gi23\glb0\pin_2.lci | lc4032ze\grp\gi23\glb0\pin_2.tt4
+build lc4032ze\grp\gi23\glb0\fb_B6.jed: fit lc4032ze\grp\gi23\glb0\fb_B6.lci | lc4032ze\grp\gi23\glb0\fb_B6.tt4
+build lc4032ze\grp\gi23\glb0\pin_16.jed: fit lc4032ze\grp\gi23\glb0\pin_16.lci | lc4032ze\grp\gi23\glb0\pin_16.tt4
+build lc4032ze\grp\gi23\glb0\fb_B0.jed: fit lc4032ze\grp\gi23\glb0\fb_B0.lci | lc4032ze\grp\gi23\glb0\fb_B0.tt4
+build lc4032ze\grp\gi23\glb0_fuses.csv: diff lc4032ze\grp\gi23\glb0\pin_48.jed lc4032ze\grp\gi23\glb0\fb_B11.jed lc4032ze\grp\gi23\glb0\pin_2.jed lc4032ze\grp\gi23\glb0\fb_B6.jed lc4032ze\grp\gi23\glb0\pin_16.jed lc4032ze\grp\gi23\glb0\fb_B0.jed
+    diff_options = --rows 46-47 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi23\glb1\pin_48.jed: fit lc4032ze\grp\gi23\glb1\pin_48.lci | lc4032ze\grp\gi23\glb1\pin_48.tt4
+build lc4032ze\grp\gi23\glb1\fb_B11.jed: fit lc4032ze\grp\gi23\glb1\fb_B11.lci | lc4032ze\grp\gi23\glb1\fb_B11.tt4
+build lc4032ze\grp\gi23\glb1\pin_2.jed: fit lc4032ze\grp\gi23\glb1\pin_2.lci | lc4032ze\grp\gi23\glb1\pin_2.tt4
+build lc4032ze\grp\gi23\glb1\fb_B6.jed: fit lc4032ze\grp\gi23\glb1\fb_B6.lci | lc4032ze\grp\gi23\glb1\fb_B6.tt4
+build lc4032ze\grp\gi23\glb1\pin_16.jed: fit lc4032ze\grp\gi23\glb1\pin_16.lci | lc4032ze\grp\gi23\glb1\pin_16.tt4
+build lc4032ze\grp\gi23\glb1\fb_B0.jed: fit lc4032ze\grp\gi23\glb1\fb_B0.lci | lc4032ze\grp\gi23\glb1\fb_B0.tt4
+build lc4032ze\grp\gi23\glb1_fuses.csv: diff lc4032ze\grp\gi23\glb1\pin_48.jed lc4032ze\grp\gi23\glb1\fb_B11.jed lc4032ze\grp\gi23\glb1\pin_2.jed lc4032ze\grp\gi23\glb1\fb_B6.jed lc4032ze\grp\gi23\glb1\pin_16.jed lc4032ze\grp\gi23\glb1\fb_B0.jed
+    diff_options = --rows 46-47 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi24\glb0\fb_B4.jed: fit lc4032ze\grp\gi24\glb0\fb_B4.lci | lc4032ze\grp\gi24\glb0\fb_B4.tt4
+build lc4032ze\grp\gi24\glb0\pin_40.jed: fit lc4032ze\grp\gi24\glb0\pin_40.lci | lc4032ze\grp\gi24\glb0\pin_40.tt4
+build lc4032ze\grp\gi24\glb0\fb_A4.jed: fit lc4032ze\grp\gi24\glb0\fb_A4.lci | lc4032ze\grp\gi24\glb0\fb_A4.tt4
+build lc4032ze\grp\gi24\glb0\pin_3.jed: fit lc4032ze\grp\gi24\glb0\pin_3.lci | lc4032ze\grp\gi24\glb0\pin_3.tt4
+build lc4032ze\grp\gi24\glb0\pin_24.jed: fit lc4032ze\grp\gi24\glb0\pin_24.lci | lc4032ze\grp\gi24\glb0\pin_24.tt4
+build lc4032ze\grp\gi24\glb0\fb_B2.jed: fit lc4032ze\grp\gi24\glb0\fb_B2.lci | lc4032ze\grp\gi24\glb0\fb_B2.tt4
+build lc4032ze\grp\gi24\glb0_fuses.csv: diff lc4032ze\grp\gi24\glb0\fb_B4.jed lc4032ze\grp\gi24\glb0\pin_40.jed lc4032ze\grp\gi24\glb0\fb_A4.jed lc4032ze\grp\gi24\glb0\pin_3.jed lc4032ze\grp\gi24\glb0\pin_24.jed lc4032ze\grp\gi24\glb0\fb_B2.jed
+    diff_options = --rows 48-49 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi24\glb1\fb_B4.jed: fit lc4032ze\grp\gi24\glb1\fb_B4.lci | lc4032ze\grp\gi24\glb1\fb_B4.tt4
+build lc4032ze\grp\gi24\glb1\pin_40.jed: fit lc4032ze\grp\gi24\glb1\pin_40.lci | lc4032ze\grp\gi24\glb1\pin_40.tt4
+build lc4032ze\grp\gi24\glb1\fb_A4.jed: fit lc4032ze\grp\gi24\glb1\fb_A4.lci | lc4032ze\grp\gi24\glb1\fb_A4.tt4
+build lc4032ze\grp\gi24\glb1\pin_3.jed: fit lc4032ze\grp\gi24\glb1\pin_3.lci | lc4032ze\grp\gi24\glb1\pin_3.tt4
+build lc4032ze\grp\gi24\glb1\pin_24.jed: fit lc4032ze\grp\gi24\glb1\pin_24.lci | lc4032ze\grp\gi24\glb1\pin_24.tt4
+build lc4032ze\grp\gi24\glb1\fb_B2.jed: fit lc4032ze\grp\gi24\glb1\fb_B2.lci | lc4032ze\grp\gi24\glb1\fb_B2.tt4
+build lc4032ze\grp\gi24\glb1_fuses.csv: diff lc4032ze\grp\gi24\glb1\fb_B4.jed lc4032ze\grp\gi24\glb1\pin_40.jed lc4032ze\grp\gi24\glb1\fb_A4.jed lc4032ze\grp\gi24\glb1\pin_3.jed lc4032ze\grp\gi24\glb1\pin_24.jed lc4032ze\grp\gi24\glb1\fb_B2.jed
+    diff_options = --rows 48-49 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi25\glb0\pin_21.jed: fit lc4032ze\grp\gi25\glb0\pin_21.lci | lc4032ze\grp\gi25\glb0\pin_21.tt4
+build lc4032ze\grp\gi25\glb0\fb_A6.jed: fit lc4032ze\grp\gi25\glb0\fb_A6.lci | lc4032ze\grp\gi25\glb0\fb_A6.tt4
+build lc4032ze\grp\gi25\glb0\fb_A1.jed: fit lc4032ze\grp\gi25\glb0\fb_A1.lci | lc4032ze\grp\gi25\glb0\fb_A1.tt4
+build lc4032ze\grp\gi25\glb0\pin_42.jed: fit lc4032ze\grp\gi25\glb0\pin_42.lci | lc4032ze\grp\gi25\glb0\pin_42.tt4
+build lc4032ze\grp\gi25\glb0\fb_B6.jed: fit lc4032ze\grp\gi25\glb0\fb_B6.lci | lc4032ze\grp\gi25\glb0\fb_B6.tt4
+build lc4032ze\grp\gi25\glb0\fb_B2.jed: fit lc4032ze\grp\gi25\glb0\fb_B2.lci | lc4032ze\grp\gi25\glb0\fb_B2.tt4
+build lc4032ze\grp\gi25\glb0_fuses.csv: diff lc4032ze\grp\gi25\glb0\pin_21.jed lc4032ze\grp\gi25\glb0\fb_A6.jed lc4032ze\grp\gi25\glb0\fb_A1.jed lc4032ze\grp\gi25\glb0\pin_42.jed lc4032ze\grp\gi25\glb0\fb_B6.jed lc4032ze\grp\gi25\glb0\fb_B2.jed
+    diff_options = --rows 50-51 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi25\glb1\pin_21.jed: fit lc4032ze\grp\gi25\glb1\pin_21.lci | lc4032ze\grp\gi25\glb1\pin_21.tt4
+build lc4032ze\grp\gi25\glb1\fb_A6.jed: fit lc4032ze\grp\gi25\glb1\fb_A6.lci | lc4032ze\grp\gi25\glb1\fb_A6.tt4
+build lc4032ze\grp\gi25\glb1\fb_A1.jed: fit lc4032ze\grp\gi25\glb1\fb_A1.lci | lc4032ze\grp\gi25\glb1\fb_A1.tt4
+build lc4032ze\grp\gi25\glb1\pin_42.jed: fit lc4032ze\grp\gi25\glb1\pin_42.lci | lc4032ze\grp\gi25\glb1\pin_42.tt4
+build lc4032ze\grp\gi25\glb1\fb_B6.jed: fit lc4032ze\grp\gi25\glb1\fb_B6.lci | lc4032ze\grp\gi25\glb1\fb_B6.tt4
+build lc4032ze\grp\gi25\glb1\fb_B2.jed: fit lc4032ze\grp\gi25\glb1\fb_B2.lci | lc4032ze\grp\gi25\glb1\fb_B2.tt4
+build lc4032ze\grp\gi25\glb1_fuses.csv: diff lc4032ze\grp\gi25\glb1\pin_21.jed lc4032ze\grp\gi25\glb1\fb_A6.jed lc4032ze\grp\gi25\glb1\fb_A1.jed lc4032ze\grp\gi25\glb1\pin_42.jed lc4032ze\grp\gi25\glb1\fb_B6.jed lc4032ze\grp\gi25\glb1\fb_B2.jed
+    diff_options = --rows 50-51 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi26\glb0\pin_26.jed: fit lc4032ze\grp\gi26\glb0\pin_26.lci | lc4032ze\grp\gi26\glb0\pin_26.tt4
+build lc4032ze\grp\gi26\glb0\pin_42.jed: fit lc4032ze\grp\gi26\glb0\pin_42.lci | lc4032ze\grp\gi26\glb0\pin_42.tt4
+build lc4032ze\grp\gi26\glb0\pin_17.jed: fit lc4032ze\grp\gi26\glb0\pin_17.lci | lc4032ze\grp\gi26\glb0\pin_17.tt4
+build lc4032ze\grp\gi26\glb0\fb_A7.jed: fit lc4032ze\grp\gi26\glb0\fb_A7.lci | lc4032ze\grp\gi26\glb0\fb_A7.tt4
+build lc4032ze\grp\gi26\glb0\fb_A12.jed: fit lc4032ze\grp\gi26\glb0\fb_A12.lci | lc4032ze\grp\gi26\glb0\fb_A12.tt4
+build lc4032ze\grp\gi26\glb0\fb_A0.jed: fit lc4032ze\grp\gi26\glb0\fb_A0.lci | lc4032ze\grp\gi26\glb0\fb_A0.tt4
+build lc4032ze\grp\gi26\glb0_fuses.csv: diff lc4032ze\grp\gi26\glb0\pin_26.jed lc4032ze\grp\gi26\glb0\pin_42.jed lc4032ze\grp\gi26\glb0\pin_17.jed lc4032ze\grp\gi26\glb0\fb_A7.jed lc4032ze\grp\gi26\glb0\fb_A12.jed lc4032ze\grp\gi26\glb0\fb_A0.jed
+    diff_options = --rows 52-53 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi26\glb1\pin_26.jed: fit lc4032ze\grp\gi26\glb1\pin_26.lci | lc4032ze\grp\gi26\glb1\pin_26.tt4
+build lc4032ze\grp\gi26\glb1\pin_42.jed: fit lc4032ze\grp\gi26\glb1\pin_42.lci | lc4032ze\grp\gi26\glb1\pin_42.tt4
+build lc4032ze\grp\gi26\glb1\pin_17.jed: fit lc4032ze\grp\gi26\glb1\pin_17.lci | lc4032ze\grp\gi26\glb1\pin_17.tt4
+build lc4032ze\grp\gi26\glb1\fb_A7.jed: fit lc4032ze\grp\gi26\glb1\fb_A7.lci | lc4032ze\grp\gi26\glb1\fb_A7.tt4
+build lc4032ze\grp\gi26\glb1\fb_A12.jed: fit lc4032ze\grp\gi26\glb1\fb_A12.lci | lc4032ze\grp\gi26\glb1\fb_A12.tt4
+build lc4032ze\grp\gi26\glb1\fb_A0.jed: fit lc4032ze\grp\gi26\glb1\fb_A0.lci | lc4032ze\grp\gi26\glb1\fb_A0.tt4
+build lc4032ze\grp\gi26\glb1_fuses.csv: diff lc4032ze\grp\gi26\glb1\pin_26.jed lc4032ze\grp\gi26\glb1\pin_42.jed lc4032ze\grp\gi26\glb1\pin_17.jed lc4032ze\grp\gi26\glb1\fb_A7.jed lc4032ze\grp\gi26\glb1\fb_A12.jed lc4032ze\grp\gi26\glb1\fb_A0.jed
+    diff_options = --rows 52-53 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi27\glb0\fb_B1.jed: fit lc4032ze\grp\gi27\glb0\fb_B1.lci | lc4032ze\grp\gi27\glb0\fb_B1.tt4
+build lc4032ze\grp\gi27\glb0\pin_31.jed: fit lc4032ze\grp\gi27\glb0\pin_31.lci | lc4032ze\grp\gi27\glb0\pin_31.tt4
+build lc4032ze\grp\gi27\glb0\pin_20.jed: fit lc4032ze\grp\gi27\glb0\pin_20.lci | lc4032ze\grp\gi27\glb0\pin_20.tt4
+build lc4032ze\grp\gi27\glb0\pin_38.jed: fit lc4032ze\grp\gi27\glb0\pin_38.lci | lc4032ze\grp\gi27\glb0\pin_38.tt4
+build lc4032ze\grp\gi27\glb0\fb_A10.jed: fit lc4032ze\grp\gi27\glb0\fb_A10.lci | lc4032ze\grp\gi27\glb0\fb_A10.tt4
+build lc4032ze\grp\gi27\glb0\fb_B11.jed: fit lc4032ze\grp\gi27\glb0\fb_B11.lci | lc4032ze\grp\gi27\glb0\fb_B11.tt4
+build lc4032ze\grp\gi27\glb0_fuses.csv: diff lc4032ze\grp\gi27\glb0\fb_B1.jed lc4032ze\grp\gi27\glb0\pin_31.jed lc4032ze\grp\gi27\glb0\pin_20.jed lc4032ze\grp\gi27\glb0\pin_38.jed lc4032ze\grp\gi27\glb0\fb_A10.jed lc4032ze\grp\gi27\glb0\fb_B11.jed
+    diff_options = --rows 54-55 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi27\glb1\fb_B1.jed: fit lc4032ze\grp\gi27\glb1\fb_B1.lci | lc4032ze\grp\gi27\glb1\fb_B1.tt4
+build lc4032ze\grp\gi27\glb1\pin_31.jed: fit lc4032ze\grp\gi27\glb1\pin_31.lci | lc4032ze\grp\gi27\glb1\pin_31.tt4
+build lc4032ze\grp\gi27\glb1\pin_20.jed: fit lc4032ze\grp\gi27\glb1\pin_20.lci | lc4032ze\grp\gi27\glb1\pin_20.tt4
+build lc4032ze\grp\gi27\glb1\pin_38.jed: fit lc4032ze\grp\gi27\glb1\pin_38.lci | lc4032ze\grp\gi27\glb1\pin_38.tt4
+build lc4032ze\grp\gi27\glb1\fb_A10.jed: fit lc4032ze\grp\gi27\glb1\fb_A10.lci | lc4032ze\grp\gi27\glb1\fb_A10.tt4
+build lc4032ze\grp\gi27\glb1\fb_B11.jed: fit lc4032ze\grp\gi27\glb1\fb_B11.lci | lc4032ze\grp\gi27\glb1\fb_B11.tt4
+build lc4032ze\grp\gi27\glb1_fuses.csv: diff lc4032ze\grp\gi27\glb1\fb_B1.jed lc4032ze\grp\gi27\glb1\pin_31.jed lc4032ze\grp\gi27\glb1\pin_20.jed lc4032ze\grp\gi27\glb1\pin_38.jed lc4032ze\grp\gi27\glb1\fb_A10.jed lc4032ze\grp\gi27\glb1\fb_B11.jed
+    diff_options = --rows 54-55 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi28\glb0\fb_A14.jed: fit lc4032ze\grp\gi28\glb0\fb_A14.lci | lc4032ze\grp\gi28\glb0\fb_A14.tt4
+build lc4032ze\grp\gi28\glb0\pin_33.jed: fit lc4032ze\grp\gi28\glb0\pin_33.lci | lc4032ze\grp\gi28\glb0\pin_33.tt4
+build lc4032ze\grp\gi28\glb0\pin_46.jed: fit lc4032ze\grp\gi28\glb0\pin_46.lci | lc4032ze\grp\gi28\glb0\pin_46.tt4
+build lc4032ze\grp\gi28\glb0\pin_23.jed: fit lc4032ze\grp\gi28\glb0\pin_23.lci | lc4032ze\grp\gi28\glb0\pin_23.tt4
+build lc4032ze\grp\gi28\glb0\fb_B12.jed: fit lc4032ze\grp\gi28\glb0\fb_B12.lci | lc4032ze\grp\gi28\glb0\fb_B12.tt4
+build lc4032ze\grp\gi28\glb0\fb_B7.jed: fit lc4032ze\grp\gi28\glb0\fb_B7.lci | lc4032ze\grp\gi28\glb0\fb_B7.tt4
+build lc4032ze\grp\gi28\glb0_fuses.csv: diff lc4032ze\grp\gi28\glb0\fb_A14.jed lc4032ze\grp\gi28\glb0\pin_33.jed lc4032ze\grp\gi28\glb0\pin_46.jed lc4032ze\grp\gi28\glb0\pin_23.jed lc4032ze\grp\gi28\glb0\fb_B12.jed lc4032ze\grp\gi28\glb0\fb_B7.jed
+    diff_options = --rows 56-57 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi28\glb1\fb_A14.jed: fit lc4032ze\grp\gi28\glb1\fb_A14.lci | lc4032ze\grp\gi28\glb1\fb_A14.tt4
+build lc4032ze\grp\gi28\glb1\pin_33.jed: fit lc4032ze\grp\gi28\glb1\pin_33.lci | lc4032ze\grp\gi28\glb1\pin_33.tt4
+build lc4032ze\grp\gi28\glb1\pin_46.jed: fit lc4032ze\grp\gi28\glb1\pin_46.lci | lc4032ze\grp\gi28\glb1\pin_46.tt4
+build lc4032ze\grp\gi28\glb1\pin_23.jed: fit lc4032ze\grp\gi28\glb1\pin_23.lci | lc4032ze\grp\gi28\glb1\pin_23.tt4
+build lc4032ze\grp\gi28\glb1\fb_B12.jed: fit lc4032ze\grp\gi28\glb1\fb_B12.lci | lc4032ze\grp\gi28\glb1\fb_B12.tt4
+build lc4032ze\grp\gi28\glb1\fb_B7.jed: fit lc4032ze\grp\gi28\glb1\fb_B7.lci | lc4032ze\grp\gi28\glb1\fb_B7.tt4
+build lc4032ze\grp\gi28\glb1_fuses.csv: diff lc4032ze\grp\gi28\glb1\fb_A14.jed lc4032ze\grp\gi28\glb1\pin_33.jed lc4032ze\grp\gi28\glb1\pin_46.jed lc4032ze\grp\gi28\glb1\pin_23.jed lc4032ze\grp\gi28\glb1\fb_B12.jed lc4032ze\grp\gi28\glb1\fb_B7.jed
+    diff_options = --rows 56-57 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi29\glb0\fb_B10.jed: fit lc4032ze\grp\gi29\glb0\fb_B10.lci | lc4032ze\grp\gi29\glb0\fb_B10.tt4
+build lc4032ze\grp\gi29\glb0\pin_48.jed: fit lc4032ze\grp\gi29\glb0\pin_48.lci | lc4032ze\grp\gi29\glb0\pin_48.tt4
+build lc4032ze\grp\gi29\glb0\fb_B4.jed: fit lc4032ze\grp\gi29\glb0\fb_B4.lci | lc4032ze\grp\gi29\glb0\fb_B4.tt4
+build lc4032ze\grp\gi29\glb0\pin_7.jed: fit lc4032ze\grp\gi29\glb0\pin_7.lci | lc4032ze\grp\gi29\glb0\pin_7.tt4
+build lc4032ze\grp\gi29\glb0\pin_23.jed: fit lc4032ze\grp\gi29\glb0\pin_23.lci | lc4032ze\grp\gi29\glb0\pin_23.tt4
+build lc4032ze\grp\gi29\glb0\fb_A1.jed: fit lc4032ze\grp\gi29\glb0\fb_A1.lci | lc4032ze\grp\gi29\glb0\fb_A1.tt4
+build lc4032ze\grp\gi29\glb0_fuses.csv: diff lc4032ze\grp\gi29\glb0\fb_B10.jed lc4032ze\grp\gi29\glb0\pin_48.jed lc4032ze\grp\gi29\glb0\fb_B4.jed lc4032ze\grp\gi29\glb0\pin_7.jed lc4032ze\grp\gi29\glb0\pin_23.jed lc4032ze\grp\gi29\glb0\fb_A1.jed
+    diff_options = --rows 58-59 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi29\glb1\fb_B10.jed: fit lc4032ze\grp\gi29\glb1\fb_B10.lci | lc4032ze\grp\gi29\glb1\fb_B10.tt4
+build lc4032ze\grp\gi29\glb1\pin_48.jed: fit lc4032ze\grp\gi29\glb1\pin_48.lci | lc4032ze\grp\gi29\glb1\pin_48.tt4
+build lc4032ze\grp\gi29\glb1\fb_B4.jed: fit lc4032ze\grp\gi29\glb1\fb_B4.lci | lc4032ze\grp\gi29\glb1\fb_B4.tt4
+build lc4032ze\grp\gi29\glb1\pin_7.jed: fit lc4032ze\grp\gi29\glb1\pin_7.lci | lc4032ze\grp\gi29\glb1\pin_7.tt4
+build lc4032ze\grp\gi29\glb1\pin_23.jed: fit lc4032ze\grp\gi29\glb1\pin_23.lci | lc4032ze\grp\gi29\glb1\pin_23.tt4
+build lc4032ze\grp\gi29\glb1\fb_A1.jed: fit lc4032ze\grp\gi29\glb1\fb_A1.lci | lc4032ze\grp\gi29\glb1\fb_A1.tt4
+build lc4032ze\grp\gi29\glb1_fuses.csv: diff lc4032ze\grp\gi29\glb1\fb_B10.jed lc4032ze\grp\gi29\glb1\pin_48.jed lc4032ze\grp\gi29\glb1\fb_B4.jed lc4032ze\grp\gi29\glb1\pin_7.jed lc4032ze\grp\gi29\glb1\pin_23.jed lc4032ze\grp\gi29\glb1\fb_A1.jed
+    diff_options = --rows 58-59 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi30\glb0\pin_9.jed: fit lc4032ze\grp\gi30\glb0\pin_9.lci | lc4032ze\grp\gi30\glb0\pin_9.tt4
+build lc4032ze\grp\gi30\glb0\fb_A4.jed: fit lc4032ze\grp\gi30\glb0\fb_A4.lci | lc4032ze\grp\gi30\glb0\fb_A4.tt4
+build lc4032ze\grp\gi30\glb0\pin_32.jed: fit lc4032ze\grp\gi30\glb0\pin_32.lci | lc4032ze\grp\gi30\glb0\pin_32.tt4
+build lc4032ze\grp\gi30\glb0\pin_22.jed: fit lc4032ze\grp\gi30\glb0\pin_22.lci | lc4032ze\grp\gi30\glb0\pin_22.tt4
+build lc4032ze\grp\gi30\glb0\fb_B5.jed: fit lc4032ze\grp\gi30\glb0\fb_B5.lci | lc4032ze\grp\gi30\glb0\fb_B5.tt4
+build lc4032ze\grp\gi30\glb0\pin_48.jed: fit lc4032ze\grp\gi30\glb0\pin_48.lci | lc4032ze\grp\gi30\glb0\pin_48.tt4
+build lc4032ze\grp\gi30\glb0_fuses.csv: diff lc4032ze\grp\gi30\glb0\pin_9.jed lc4032ze\grp\gi30\glb0\fb_A4.jed lc4032ze\grp\gi30\glb0\pin_32.jed lc4032ze\grp\gi30\glb0\pin_22.jed lc4032ze\grp\gi30\glb0\fb_B5.jed lc4032ze\grp\gi30\glb0\pin_48.jed
+    diff_options = --rows 60-61 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi30\glb1\pin_9.jed: fit lc4032ze\grp\gi30\glb1\pin_9.lci | lc4032ze\grp\gi30\glb1\pin_9.tt4
+build lc4032ze\grp\gi30\glb1\fb_A4.jed: fit lc4032ze\grp\gi30\glb1\fb_A4.lci | lc4032ze\grp\gi30\glb1\fb_A4.tt4
+build lc4032ze\grp\gi30\glb1\pin_32.jed: fit lc4032ze\grp\gi30\glb1\pin_32.lci | lc4032ze\grp\gi30\glb1\pin_32.tt4
+build lc4032ze\grp\gi30\glb1\pin_22.jed: fit lc4032ze\grp\gi30\glb1\pin_22.lci | lc4032ze\grp\gi30\glb1\pin_22.tt4
+build lc4032ze\grp\gi30\glb1\fb_B5.jed: fit lc4032ze\grp\gi30\glb1\fb_B5.lci | lc4032ze\grp\gi30\glb1\fb_B5.tt4
+build lc4032ze\grp\gi30\glb1\pin_48.jed: fit lc4032ze\grp\gi30\glb1\pin_48.lci | lc4032ze\grp\gi30\glb1\pin_48.tt4
+build lc4032ze\grp\gi30\glb1_fuses.csv: diff lc4032ze\grp\gi30\glb1\pin_9.jed lc4032ze\grp\gi30\glb1\fb_A4.jed lc4032ze\grp\gi30\glb1\pin_32.jed lc4032ze\grp\gi30\glb1\pin_22.jed lc4032ze\grp\gi30\glb1\fb_B5.jed lc4032ze\grp\gi30\glb1\pin_48.jed
+    diff_options = --rows 60-61 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi31\glb0\fb_A7.jed: fit lc4032ze\grp\gi31\glb0\fb_A7.lci | lc4032ze\grp\gi31\glb0\fb_A7.tt4
+build lc4032ze\grp\gi31\glb0\pin_15.jed: fit lc4032ze\grp\gi31\glb0\pin_15.lci | lc4032ze\grp\gi31\glb0\pin_15.tt4
+build lc4032ze\grp\gi31\glb0\fb_A2.jed: fit lc4032ze\grp\gi31\glb0\fb_A2.lci | lc4032ze\grp\gi31\glb0\fb_A2.tt4
+build lc4032ze\grp\gi31\glb0\pin_39.jed: fit lc4032ze\grp\gi31\glb0\pin_39.lci | lc4032ze\grp\gi31\glb0\pin_39.tt4
+build lc4032ze\grp\gi31\glb0\fb_B1.jed: fit lc4032ze\grp\gi31\glb0\fb_B1.lci | lc4032ze\grp\gi31\glb0\fb_B1.tt4
+build lc4032ze\grp\gi31\glb0\fb_B6.jed: fit lc4032ze\grp\gi31\glb0\fb_B6.lci | lc4032ze\grp\gi31\glb0\fb_B6.tt4
+build lc4032ze\grp\gi31\glb0_fuses.csv: diff lc4032ze\grp\gi31\glb0\fb_A7.jed lc4032ze\grp\gi31\glb0\pin_15.jed lc4032ze\grp\gi31\glb0\fb_A2.jed lc4032ze\grp\gi31\glb0\pin_39.jed lc4032ze\grp\gi31\glb0\fb_B1.jed lc4032ze\grp\gi31\glb0\fb_B6.jed
+    diff_options = --rows 62-63 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi31\glb1\fb_A7.jed: fit lc4032ze\grp\gi31\glb1\fb_A7.lci | lc4032ze\grp\gi31\glb1\fb_A7.tt4
+build lc4032ze\grp\gi31\glb1\pin_15.jed: fit lc4032ze\grp\gi31\glb1\pin_15.lci | lc4032ze\grp\gi31\glb1\pin_15.tt4
+build lc4032ze\grp\gi31\glb1\fb_A2.jed: fit lc4032ze\grp\gi31\glb1\fb_A2.lci | lc4032ze\grp\gi31\glb1\fb_A2.tt4
+build lc4032ze\grp\gi31\glb1\pin_39.jed: fit lc4032ze\grp\gi31\glb1\pin_39.lci | lc4032ze\grp\gi31\glb1\pin_39.tt4
+build lc4032ze\grp\gi31\glb1\fb_B1.jed: fit lc4032ze\grp\gi31\glb1\fb_B1.lci | lc4032ze\grp\gi31\glb1\fb_B1.tt4
+build lc4032ze\grp\gi31\glb1\fb_B6.jed: fit lc4032ze\grp\gi31\glb1\fb_B6.lci | lc4032ze\grp\gi31\glb1\fb_B6.tt4
+build lc4032ze\grp\gi31\glb1_fuses.csv: diff lc4032ze\grp\gi31\glb1\fb_A7.jed lc4032ze\grp\gi31\glb1\pin_15.jed lc4032ze\grp\gi31\glb1\fb_A2.jed lc4032ze\grp\gi31\glb1\pin_39.jed lc4032ze\grp\gi31\glb1\fb_B1.jed lc4032ze\grp\gi31\glb1\fb_B6.jed
+    diff_options = --rows 62-63 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi32\glb0\pin_34.jed: fit lc4032ze\grp\gi32\glb0\pin_34.lci | lc4032ze\grp\gi32\glb0\pin_34.tt4
+build lc4032ze\grp\gi32\glb0\pin_24.jed: fit lc4032ze\grp\gi32\glb0\pin_24.lci | lc4032ze\grp\gi32\glb0\pin_24.tt4
+build lc4032ze\grp\gi32\glb0\fb_B14.jed: fit lc4032ze\grp\gi32\glb0\fb_B14.lci | lc4032ze\grp\gi32\glb0\fb_B14.tt4
+build lc4032ze\grp\gi32\glb0\pin_26.jed: fit lc4032ze\grp\gi32\glb0\pin_26.lci | lc4032ze\grp\gi32\glb0\pin_26.tt4
+build lc4032ze\grp\gi32\glb0\fb_B12.jed: fit lc4032ze\grp\gi32\glb0\fb_B12.lci | lc4032ze\grp\gi32\glb0\fb_B12.tt4
+build lc4032ze\grp\gi32\glb0\fb_A8.jed: fit lc4032ze\grp\gi32\glb0\fb_A8.lci | lc4032ze\grp\gi32\glb0\fb_A8.tt4
+build lc4032ze\grp\gi32\glb0_fuses.csv: diff lc4032ze\grp\gi32\glb0\pin_34.jed lc4032ze\grp\gi32\glb0\pin_24.jed lc4032ze\grp\gi32\glb0\fb_B14.jed lc4032ze\grp\gi32\glb0\pin_26.jed lc4032ze\grp\gi32\glb0\fb_B12.jed lc4032ze\grp\gi32\glb0\fb_A8.jed
+    diff_options = --rows 64-65 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi32\glb1\pin_34.jed: fit lc4032ze\grp\gi32\glb1\pin_34.lci | lc4032ze\grp\gi32\glb1\pin_34.tt4
+build lc4032ze\grp\gi32\glb1\pin_24.jed: fit lc4032ze\grp\gi32\glb1\pin_24.lci | lc4032ze\grp\gi32\glb1\pin_24.tt4
+build lc4032ze\grp\gi32\glb1\fb_B14.jed: fit lc4032ze\grp\gi32\glb1\fb_B14.lci | lc4032ze\grp\gi32\glb1\fb_B14.tt4
+build lc4032ze\grp\gi32\glb1\pin_26.jed: fit lc4032ze\grp\gi32\glb1\pin_26.lci | lc4032ze\grp\gi32\glb1\pin_26.tt4
+build lc4032ze\grp\gi32\glb1\fb_B12.jed: fit lc4032ze\grp\gi32\glb1\fb_B12.lci | lc4032ze\grp\gi32\glb1\fb_B12.tt4
+build lc4032ze\grp\gi32\glb1\fb_A8.jed: fit lc4032ze\grp\gi32\glb1\fb_A8.lci | lc4032ze\grp\gi32\glb1\fb_A8.tt4
+build lc4032ze\grp\gi32\glb1_fuses.csv: diff lc4032ze\grp\gi32\glb1\pin_34.jed lc4032ze\grp\gi32\glb1\pin_24.jed lc4032ze\grp\gi32\glb1\fb_B14.jed lc4032ze\grp\gi32\glb1\pin_26.jed lc4032ze\grp\gi32\glb1\fb_B12.jed lc4032ze\grp\gi32\glb1\fb_A8.jed
+    diff_options = --rows 64-65 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi33\glb0\fb_B13.jed: fit lc4032ze\grp\gi33\glb0\fb_B13.lci | lc4032ze\grp\gi33\glb0\fb_B13.tt4
+build lc4032ze\grp\gi33\glb0\pin_21.jed: fit lc4032ze\grp\gi33\glb0\pin_21.lci | lc4032ze\grp\gi33\glb0\pin_21.tt4
+build lc4032ze\grp\gi33\glb0\fb_A10.jed: fit lc4032ze\grp\gi33\glb0\fb_A10.lci | lc4032ze\grp\gi33\glb0\fb_A10.tt4
+build lc4032ze\grp\gi33\glb0\pin_41.jed: fit lc4032ze\grp\gi33\glb0\pin_41.lci | lc4032ze\grp\gi33\glb0\pin_41.tt4
+build lc4032ze\grp\gi33\glb0\fb_B10.jed: fit lc4032ze\grp\gi33\glb0\fb_B10.lci | lc4032ze\grp\gi33\glb0\fb_B10.tt4
+build lc4032ze\grp\gi33\glb0\fb_A14.jed: fit lc4032ze\grp\gi33\glb0\fb_A14.lci | lc4032ze\grp\gi33\glb0\fb_A14.tt4
+build lc4032ze\grp\gi33\glb0_fuses.csv: diff lc4032ze\grp\gi33\glb0\fb_B13.jed lc4032ze\grp\gi33\glb0\pin_21.jed lc4032ze\grp\gi33\glb0\fb_A10.jed lc4032ze\grp\gi33\glb0\pin_41.jed lc4032ze\grp\gi33\glb0\fb_B10.jed lc4032ze\grp\gi33\glb0\fb_A14.jed
+    diff_options = --rows 66-67 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi33\glb1\fb_B13.jed: fit lc4032ze\grp\gi33\glb1\fb_B13.lci | lc4032ze\grp\gi33\glb1\fb_B13.tt4
+build lc4032ze\grp\gi33\glb1\pin_21.jed: fit lc4032ze\grp\gi33\glb1\pin_21.lci | lc4032ze\grp\gi33\glb1\pin_21.tt4
+build lc4032ze\grp\gi33\glb1\fb_A10.jed: fit lc4032ze\grp\gi33\glb1\fb_A10.lci | lc4032ze\grp\gi33\glb1\fb_A10.tt4
+build lc4032ze\grp\gi33\glb1\pin_41.jed: fit lc4032ze\grp\gi33\glb1\pin_41.lci | lc4032ze\grp\gi33\glb1\pin_41.tt4
+build lc4032ze\grp\gi33\glb1\fb_B10.jed: fit lc4032ze\grp\gi33\glb1\fb_B10.lci | lc4032ze\grp\gi33\glb1\fb_B10.tt4
+build lc4032ze\grp\gi33\glb1\fb_A14.jed: fit lc4032ze\grp\gi33\glb1\fb_A14.lci | lc4032ze\grp\gi33\glb1\fb_A14.tt4
+build lc4032ze\grp\gi33\glb1_fuses.csv: diff lc4032ze\grp\gi33\glb1\fb_B13.jed lc4032ze\grp\gi33\glb1\pin_21.jed lc4032ze\grp\gi33\glb1\fb_A10.jed lc4032ze\grp\gi33\glb1\pin_41.jed lc4032ze\grp\gi33\glb1\fb_B10.jed lc4032ze\grp\gi33\glb1\fb_A14.jed
+    diff_options = --rows 66-67 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi34\glb0\fb_A9.jed: fit lc4032ze\grp\gi34\glb0\fb_A9.lci | lc4032ze\grp\gi34\glb0\fb_A9.tt4
+build lc4032ze\grp\gi34\glb0\fb_A3.jed: fit lc4032ze\grp\gi34\glb0\fb_A3.lci | lc4032ze\grp\gi34\glb0\fb_A3.tt4
+build lc4032ze\grp\gi34\glb0\pin_46.jed: fit lc4032ze\grp\gi34\glb0\pin_46.lci | lc4032ze\grp\gi34\glb0\pin_46.tt4
+build lc4032ze\grp\gi34\glb0\pin_8.jed: fit lc4032ze\grp\gi34\glb0\pin_8.lci | lc4032ze\grp\gi34\glb0\pin_8.tt4
+build lc4032ze\grp\gi34\glb0\pin_15.jed: fit lc4032ze\grp\gi34\glb0\pin_15.lci | lc4032ze\grp\gi34\glb0\pin_15.tt4
+build lc4032ze\grp\gi34\glb0\fb_B13.jed: fit lc4032ze\grp\gi34\glb0\fb_B13.lci | lc4032ze\grp\gi34\glb0\fb_B13.tt4
+build lc4032ze\grp\gi34\glb0_fuses.csv: diff lc4032ze\grp\gi34\glb0\fb_A9.jed lc4032ze\grp\gi34\glb0\fb_A3.jed lc4032ze\grp\gi34\glb0\pin_46.jed lc4032ze\grp\gi34\glb0\pin_8.jed lc4032ze\grp\gi34\glb0\pin_15.jed lc4032ze\grp\gi34\glb0\fb_B13.jed
+    diff_options = --rows 68-69 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi34\glb1\fb_A9.jed: fit lc4032ze\grp\gi34\glb1\fb_A9.lci | lc4032ze\grp\gi34\glb1\fb_A9.tt4
+build lc4032ze\grp\gi34\glb1\fb_A3.jed: fit lc4032ze\grp\gi34\glb1\fb_A3.lci | lc4032ze\grp\gi34\glb1\fb_A3.tt4
+build lc4032ze\grp\gi34\glb1\pin_46.jed: fit lc4032ze\grp\gi34\glb1\pin_46.lci | lc4032ze\grp\gi34\glb1\pin_46.tt4
+build lc4032ze\grp\gi34\glb1\pin_8.jed: fit lc4032ze\grp\gi34\glb1\pin_8.lci | lc4032ze\grp\gi34\glb1\pin_8.tt4
+build lc4032ze\grp\gi34\glb1\pin_15.jed: fit lc4032ze\grp\gi34\glb1\pin_15.lci | lc4032ze\grp\gi34\glb1\pin_15.tt4
+build lc4032ze\grp\gi34\glb1\fb_B13.jed: fit lc4032ze\grp\gi34\glb1\fb_B13.lci | lc4032ze\grp\gi34\glb1\fb_B13.tt4
+build lc4032ze\grp\gi34\glb1_fuses.csv: diff lc4032ze\grp\gi34\glb1\fb_A9.jed lc4032ze\grp\gi34\glb1\fb_A3.jed lc4032ze\grp\gi34\glb1\pin_46.jed lc4032ze\grp\gi34\glb1\pin_8.jed lc4032ze\grp\gi34\glb1\pin_15.jed lc4032ze\grp\gi34\glb1\fb_B13.jed
+    diff_options = --rows 68-69 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi35\glb0\pin_43.jed: fit lc4032ze\grp\gi35\glb0\pin_43.lci | lc4032ze\grp\gi35\glb0\pin_43.tt4
+build lc4032ze\grp\gi35\glb0\fb_B8.jed: fit lc4032ze\grp\gi35\glb0\fb_B8.lci | lc4032ze\grp\gi35\glb0\fb_B8.tt4
+build lc4032ze\grp\gi35\glb0\pin_33.jed: fit lc4032ze\grp\gi35\glb0\pin_33.lci | lc4032ze\grp\gi35\glb0\pin_33.tt4
+build lc4032ze\grp\gi35\glb0\fb_A15.jed: fit lc4032ze\grp\gi35\glb0\fb_A15.lci | lc4032ze\grp\gi35\glb0\fb_A15.tt4
+build lc4032ze\grp\gi35\glb0\fb_A9.jed: fit lc4032ze\grp\gi35\glb0\fb_A9.lci | lc4032ze\grp\gi35\glb0\fb_A9.tt4
+build lc4032ze\grp\gi35\glb0\pin_16.jed: fit lc4032ze\grp\gi35\glb0\pin_16.lci | lc4032ze\grp\gi35\glb0\pin_16.tt4
+build lc4032ze\grp\gi35\glb0_fuses.csv: diff lc4032ze\grp\gi35\glb0\pin_43.jed lc4032ze\grp\gi35\glb0\fb_B8.jed lc4032ze\grp\gi35\glb0\pin_33.jed lc4032ze\grp\gi35\glb0\fb_A15.jed lc4032ze\grp\gi35\glb0\fb_A9.jed lc4032ze\grp\gi35\glb0\pin_16.jed
+    diff_options = --rows 70-71 --exclude 0:3-71:85 --exclude 0:89-71:171
+
+build lc4032ze\grp\gi35\glb1\pin_43.jed: fit lc4032ze\grp\gi35\glb1\pin_43.lci | lc4032ze\grp\gi35\glb1\pin_43.tt4
+build lc4032ze\grp\gi35\glb1\fb_B8.jed: fit lc4032ze\grp\gi35\glb1\fb_B8.lci | lc4032ze\grp\gi35\glb1\fb_B8.tt4
+build lc4032ze\grp\gi35\glb1\pin_33.jed: fit lc4032ze\grp\gi35\glb1\pin_33.lci | lc4032ze\grp\gi35\glb1\pin_33.tt4
+build lc4032ze\grp\gi35\glb1\fb_A15.jed: fit lc4032ze\grp\gi35\glb1\fb_A15.lci | lc4032ze\grp\gi35\glb1\fb_A15.tt4
+build lc4032ze\grp\gi35\glb1\fb_A9.jed: fit lc4032ze\grp\gi35\glb1\fb_A9.lci | lc4032ze\grp\gi35\glb1\fb_A9.tt4
+build lc4032ze\grp\gi35\glb1\pin_16.jed: fit lc4032ze\grp\gi35\glb1\pin_16.lci | lc4032ze\grp\gi35\glb1\pin_16.tt4
+build lc4032ze\grp\gi35\glb1_fuses.csv: diff lc4032ze\grp\gi35\glb1\pin_43.jed lc4032ze\grp\gi35\glb1\fb_B8.jed lc4032ze\grp\gi35\glb1\pin_33.jed lc4032ze\grp\gi35\glb1\fb_A15.jed lc4032ze\grp\gi35\glb1\fb_A9.jed lc4032ze\grp\gi35\glb1\pin_16.jed
+    diff_options = --rows 70-71 --exclude 0:3-71:85 --exclude 0:89-71:171
+
 build bclk01: phony lc4032ze\bclk01\glb0_fuses.csv lc4032ze\bclk01\glb1_fuses.csv
 build bclk23: phony lc4032ze\bclk23\glb0_fuses.csv lc4032ze\bclk23\glb1_fuses.csv
 build ce_mux: phony lc4032ze\ce_mux\glb0\mc0_fuses.csv lc4032ze\ce_mux\glb0\mc10_fuses.csv lc4032ze\ce_mux\glb0\mc11_fuses.csv lc4032ze\ce_mux\glb0\mc12_fuses.csv lc4032ze\ce_mux\glb0\mc13_fuses.csv lc4032ze\ce_mux\glb0\mc14_fuses.csv lc4032ze\ce_mux\glb0\mc15_fuses.csv lc4032ze\ce_mux\glb0\mc1_fuses.csv lc4032ze\ce_mux\glb0\mc2_fuses.csv lc4032ze\ce_mux\glb0\mc3_fuses.csv lc4032ze\ce_mux\glb0\mc4_fuses.csv lc4032ze\ce_mux\glb0\mc5_fuses.csv lc4032ze\ce_mux\glb0\mc6_fuses.csv lc4032ze\ce_mux\glb0\mc7_fuses.csv lc4032ze\ce_mux\glb0\mc8_fuses.csv lc4032ze\ce_mux\glb0\mc9_fuses.csv lc4032ze\ce_mux\glb1\mc0_fuses.csv lc4032ze\ce_mux\glb1\mc10_fuses.csv lc4032ze\ce_mux\glb1\mc11_fuses.csv lc4032ze\ce_mux\glb1\mc12_fuses.csv lc4032ze\ce_mux\glb1\mc13_fuses.csv lc4032ze\ce_mux\glb1\mc14_fuses.csv lc4032ze\ce_mux\glb1\mc15_fuses.csv lc4032ze\ce_mux\glb1\mc1_fuses.csv lc4032ze\ce_mux\glb1\mc2_fuses.csv lc4032ze\ce_mux\glb1\mc3_fuses.csv lc4032ze\ce_mux\glb1\mc4_fuses.csv lc4032ze\ce_mux\glb1\mc5_fuses.csv lc4032ze\ce_mux\glb1\mc6_fuses.csv lc4032ze\ce_mux\glb1\mc7_fuses.csv lc4032ze\ce_mux\glb1\mc8_fuses.csv lc4032ze\ce_mux\glb1\mc9_fuses.csv
 build goe0_polarity: phony lc4032ze\goe0_polarity\fuses.csv
 build goe1_polarity: phony lc4032ze\goe1_polarity\fuses.csv
+build grp: phony grp\gi0 grp\gi1 grp\gi10 grp\gi11 grp\gi12 grp\gi13 grp\gi14 grp\gi15 grp\gi16 grp\gi17 grp\gi18 grp\gi19 grp\gi2 grp\gi20 grp\gi21 grp\gi22 grp\gi23 grp\gi24 grp\gi25 grp\gi26 grp\gi27 grp\gi28 grp\gi29 grp\gi3 grp\gi30 grp\gi31 grp\gi32 grp\gi33 grp\gi34 grp\gi35 grp\gi4 grp\gi5 grp\gi6 grp\gi7 grp\gi8 grp\gi9
+build grp\gi0: phony lc4032ze\grp\gi0\glb0_fuses.csv lc4032ze\grp\gi0\glb1_fuses.csv
+build grp\gi1: phony lc4032ze\grp\gi1\glb0_fuses.csv lc4032ze\grp\gi1\glb1_fuses.csv
+build grp\gi10: phony lc4032ze\grp\gi10\glb0_fuses.csv lc4032ze\grp\gi10\glb1_fuses.csv
+build grp\gi11: phony lc4032ze\grp\gi11\glb0_fuses.csv lc4032ze\grp\gi11\glb1_fuses.csv
+build grp\gi12: phony lc4032ze\grp\gi12\glb0_fuses.csv lc4032ze\grp\gi12\glb1_fuses.csv
+build grp\gi13: phony lc4032ze\grp\gi13\glb0_fuses.csv lc4032ze\grp\gi13\glb1_fuses.csv
+build grp\gi14: phony lc4032ze\grp\gi14\glb0_fuses.csv lc4032ze\grp\gi14\glb1_fuses.csv
+build grp\gi15: phony lc4032ze\grp\gi15\glb0_fuses.csv lc4032ze\grp\gi15\glb1_fuses.csv
+build grp\gi16: phony lc4032ze\grp\gi16\glb0_fuses.csv lc4032ze\grp\gi16\glb1_fuses.csv
+build grp\gi17: phony lc4032ze\grp\gi17\glb0_fuses.csv lc4032ze\grp\gi17\glb1_fuses.csv
+build grp\gi18: phony lc4032ze\grp\gi18\glb0_fuses.csv lc4032ze\grp\gi18\glb1_fuses.csv
+build grp\gi19: phony lc4032ze\grp\gi19\glb0_fuses.csv lc4032ze\grp\gi19\glb1_fuses.csv
+build grp\gi2: phony lc4032ze\grp\gi2\glb0_fuses.csv lc4032ze\grp\gi2\glb1_fuses.csv
+build grp\gi20: phony lc4032ze\grp\gi20\glb0_fuses.csv lc4032ze\grp\gi20\glb1_fuses.csv
+build grp\gi21: phony lc4032ze\grp\gi21\glb0_fuses.csv lc4032ze\grp\gi21\glb1_fuses.csv
+build grp\gi22: phony lc4032ze\grp\gi22\glb0_fuses.csv lc4032ze\grp\gi22\glb1_fuses.csv
+build grp\gi23: phony lc4032ze\grp\gi23\glb0_fuses.csv lc4032ze\grp\gi23\glb1_fuses.csv
+build grp\gi24: phony lc4032ze\grp\gi24\glb0_fuses.csv lc4032ze\grp\gi24\glb1_fuses.csv
+build grp\gi25: phony lc4032ze\grp\gi25\glb0_fuses.csv lc4032ze\grp\gi25\glb1_fuses.csv
+build grp\gi26: phony lc4032ze\grp\gi26\glb0_fuses.csv lc4032ze\grp\gi26\glb1_fuses.csv
+build grp\gi27: phony lc4032ze\grp\gi27\glb0_fuses.csv lc4032ze\grp\gi27\glb1_fuses.csv
+build grp\gi28: phony lc4032ze\grp\gi28\glb0_fuses.csv lc4032ze\grp\gi28\glb1_fuses.csv
+build grp\gi29: phony lc4032ze\grp\gi29\glb0_fuses.csv lc4032ze\grp\gi29\glb1_fuses.csv
+build grp\gi3: phony lc4032ze\grp\gi3\glb0_fuses.csv lc4032ze\grp\gi3\glb1_fuses.csv
+build grp\gi30: phony lc4032ze\grp\gi30\glb0_fuses.csv lc4032ze\grp\gi30\glb1_fuses.csv
+build grp\gi31: phony lc4032ze\grp\gi31\glb0_fuses.csv lc4032ze\grp\gi31\glb1_fuses.csv
+build grp\gi32: phony lc4032ze\grp\gi32\glb0_fuses.csv lc4032ze\grp\gi32\glb1_fuses.csv
+build grp\gi33: phony lc4032ze\grp\gi33\glb0_fuses.csv lc4032ze\grp\gi33\glb1_fuses.csv
+build grp\gi34: phony lc4032ze\grp\gi34\glb0_fuses.csv lc4032ze\grp\gi34\glb1_fuses.csv
+build grp\gi35: phony lc4032ze\grp\gi35\glb0_fuses.csv lc4032ze\grp\gi35\glb1_fuses.csv
+build grp\gi4: phony lc4032ze\grp\gi4\glb0_fuses.csv lc4032ze\grp\gi4\glb1_fuses.csv
+build grp\gi5: phony lc4032ze\grp\gi5\glb0_fuses.csv lc4032ze\grp\gi5\glb1_fuses.csv
+build grp\gi6: phony lc4032ze\grp\gi6\glb0_fuses.csv lc4032ze\grp\gi6\glb1_fuses.csv
+build grp\gi7: phony lc4032ze\grp\gi7\glb0_fuses.csv lc4032ze\grp\gi7\glb1_fuses.csv
+build grp\gi8: phony lc4032ze\grp\gi8\glb0_fuses.csv lc4032ze\grp\gi8\glb1_fuses.csv
+build grp\gi9: phony lc4032ze\grp\gi9\glb0_fuses.csv lc4032ze\grp\gi9\glb1_fuses.csv
 build input_threshold: phony lc4032ze\input_threshold\glb0\mc0_fuses.csv lc4032ze\input_threshold\glb0\mc10_fuses.csv lc4032ze\input_threshold\glb0\mc11_fuses.csv lc4032ze\input_threshold\glb0\mc12_fuses.csv lc4032ze\input_threshold\glb0\mc13_fuses.csv lc4032ze\input_threshold\glb0\mc14_fuses.csv lc4032ze\input_threshold\glb0\mc15_fuses.csv lc4032ze\input_threshold\glb0\mc1_fuses.csv lc4032ze\input_threshold\glb0\mc2_fuses.csv lc4032ze\input_threshold\glb0\mc3_fuses.csv lc4032ze\input_threshold\glb0\mc4_fuses.csv lc4032ze\input_threshold\glb0\mc5_fuses.csv lc4032ze\input_threshold\glb0\mc6_fuses.csv lc4032ze\input_threshold\glb0\mc7_fuses.csv lc4032ze\input_threshold\glb0\mc8_fuses.csv lc4032ze\input_threshold\glb0\mc9_fuses.csv lc4032ze\input_threshold\glb1\mc0_fuses.csv lc4032ze\input_threshold\glb1\mc10_fuses.csv lc4032ze\input_threshold\glb1\mc11_fuses.csv lc4032ze\input_threshold\glb1\mc12_fuses.csv lc4032ze\input_threshold\glb1\mc13_fuses.csv lc4032ze\input_threshold\glb1\mc14_fuses.csv lc4032ze\input_threshold\glb1\mc15_fuses.csv lc4032ze\input_threshold\glb1\mc1_fuses.csv lc4032ze\input_threshold\glb1\mc2_fuses.csv lc4032ze\input_threshold\glb1\mc3_fuses.csv lc4032ze\input_threshold\glb1\mc4_fuses.csv lc4032ze\input_threshold\glb1\mc5_fuses.csv lc4032ze\input_threshold\glb1\mc6_fuses.csv lc4032ze\input_threshold\glb1\mc7_fuses.csv lc4032ze\input_threshold\glb1\mc8_fuses.csv lc4032ze\input_threshold\glb1\mc9_fuses.csv lc4032ze\input_threshold\input\CLK0_fuses.csv lc4032ze\input_threshold\input\CLK1_fuses.csv lc4032ze\input_threshold\input\CLK2_fuses.csv lc4032ze\input_threshold\input\CLK3_fuses.csv
 build od: phony lc4032ze\od\glb0\mc0_fuses.csv lc4032ze\od\glb0\mc10_fuses.csv lc4032ze\od\glb0\mc11_fuses.csv lc4032ze\od\glb0\mc12_fuses.csv lc4032ze\od\glb0\mc13_fuses.csv lc4032ze\od\glb0\mc14_fuses.csv lc4032ze\od\glb0\mc15_fuses.csv lc4032ze\od\glb0\mc1_fuses.csv lc4032ze\od\glb0\mc2_fuses.csv lc4032ze\od\glb0\mc3_fuses.csv lc4032ze\od\glb0\mc4_fuses.csv lc4032ze\od\glb0\mc5_fuses.csv lc4032ze\od\glb0\mc6_fuses.csv lc4032ze\od\glb0\mc7_fuses.csv lc4032ze\od\glb0\mc8_fuses.csv lc4032ze\od\glb0\mc9_fuses.csv lc4032ze\od\glb1\mc0_fuses.csv lc4032ze\od\glb1\mc10_fuses.csv lc4032ze\od\glb1\mc11_fuses.csv lc4032ze\od\glb1\mc12_fuses.csv lc4032ze\od\glb1\mc13_fuses.csv lc4032ze\od\glb1\mc14_fuses.csv lc4032ze\od\glb1\mc15_fuses.csv lc4032ze\od\glb1\mc1_fuses.csv lc4032ze\od\glb1\mc2_fuses.csv lc4032ze\od\glb1\mc3_fuses.csv lc4032ze\od\glb1\mc4_fuses.csv lc4032ze\od\glb1\mc5_fuses.csv lc4032ze\od\glb1\mc6_fuses.csv lc4032ze\od\glb1\mc7_fuses.csv lc4032ze\od\glb1\mc8_fuses.csv lc4032ze\od\glb1\mc9_fuses.csv
 build oe_mux: phony lc4032ze\oe_mux\glb0\mc0_fuses.csv lc4032ze\oe_mux\glb0\mc10_fuses.csv lc4032ze\oe_mux\glb0\mc11_fuses.csv lc4032ze\oe_mux\glb0\mc12_fuses.csv lc4032ze\oe_mux\glb0\mc13_fuses.csv lc4032ze\oe_mux\glb0\mc14_fuses.csv lc4032ze\oe_mux\glb0\mc15_fuses.csv lc4032ze\oe_mux\glb0\mc1_fuses.csv lc4032ze\oe_mux\glb0\mc2_fuses.csv lc4032ze\oe_mux\glb0\mc3_fuses.csv lc4032ze\oe_mux\glb0\mc4_fuses.csv lc4032ze\oe_mux\glb0\mc5_fuses.csv lc4032ze\oe_mux\glb0\mc6_fuses.csv lc4032ze\oe_mux\glb0\mc7_fuses.csv lc4032ze\oe_mux\glb0\mc8_fuses.csv lc4032ze\oe_mux\glb0\mc9_fuses.csv lc4032ze\oe_mux\glb1\mc0_fuses.csv lc4032ze\oe_mux\glb1\mc10_fuses.csv lc4032ze\oe_mux\glb1\mc11_fuses.csv lc4032ze\oe_mux\glb1\mc12_fuses.csv lc4032ze\oe_mux\glb1\mc13_fuses.csv lc4032ze\oe_mux\glb1\mc14_fuses.csv lc4032ze\oe_mux\glb1\mc15_fuses.csv lc4032ze\oe_mux\glb1\mc1_fuses.csv lc4032ze\oe_mux\glb1\mc2_fuses.csv lc4032ze\oe_mux\glb1\mc3_fuses.csv lc4032ze\oe_mux\glb1\mc4_fuses.csv lc4032ze\oe_mux\glb1\mc5_fuses.csv lc4032ze\oe_mux\glb1\mc6_fuses.csv lc4032ze\oe_mux\glb1\mc7_fuses.csv lc4032ze\oe_mux\glb1\mc8_fuses.csv lc4032ze\oe_mux\glb1\mc9_fuses.csv
@@ -3567,6 +4252,6 @@ build pull: phony lc4032ze\pull\glb0\mc0_fuses.csv lc4032ze\pull\glb0\mc10_fuses
 build reset_init: phony lc4032ze\reset_init\glb0\mc0_fuses.csv lc4032ze\reset_init\glb0\mc10_fuses.csv lc4032ze\reset_init\glb0\mc11_fuses.csv lc4032ze\reset_init\glb0\mc12_fuses.csv lc4032ze\reset_init\glb0\mc13_fuses.csv lc4032ze\reset_init\glb0\mc14_fuses.csv lc4032ze\reset_init\glb0\mc15_fuses.csv lc4032ze\reset_init\glb0\mc1_fuses.csv lc4032ze\reset_init\glb0\mc2_fuses.csv lc4032ze\reset_init\glb0\mc3_fuses.csv lc4032ze\reset_init\glb0\mc4_fuses.csv lc4032ze\reset_init\glb0\mc5_fuses.csv lc4032ze\reset_init\glb0\mc6_fuses.csv lc4032ze\reset_init\glb0\mc7_fuses.csv lc4032ze\reset_init\glb0\mc8_fuses.csv lc4032ze\reset_init\glb0\mc9_fuses.csv lc4032ze\reset_init\glb1\mc0_fuses.csv lc4032ze\reset_init\glb1\mc10_fuses.csv lc4032ze\reset_init\glb1\mc11_fuses.csv lc4032ze\reset_init\glb1\mc12_fuses.csv lc4032ze\reset_init\glb1\mc13_fuses.csv lc4032ze\reset_init\glb1\mc14_fuses.csv lc4032ze\reset_init\glb1\mc15_fuses.csv lc4032ze\reset_init\glb1\mc1_fuses.csv lc4032ze\reset_init\glb1\mc2_fuses.csv lc4032ze\reset_init\glb1\mc3_fuses.csv lc4032ze\reset_init\glb1\mc4_fuses.csv lc4032ze\reset_init\glb1\mc5_fuses.csv lc4032ze\reset_init\glb1\mc6_fuses.csv lc4032ze\reset_init\glb1\mc7_fuses.csv lc4032ze\reset_init\glb1\mc8_fuses.csv lc4032ze\reset_init\glb1\mc9_fuses.csv
 build slew: phony lc4032ze\slew\glb0\mc0_fuses.csv lc4032ze\slew\glb0\mc10_fuses.csv lc4032ze\slew\glb0\mc11_fuses.csv lc4032ze\slew\glb0\mc12_fuses.csv lc4032ze\slew\glb0\mc13_fuses.csv lc4032ze\slew\glb0\mc14_fuses.csv lc4032ze\slew\glb0\mc15_fuses.csv lc4032ze\slew\glb0\mc1_fuses.csv lc4032ze\slew\glb0\mc2_fuses.csv lc4032ze\slew\glb0\mc3_fuses.csv lc4032ze\slew\glb0\mc4_fuses.csv lc4032ze\slew\glb0\mc5_fuses.csv lc4032ze\slew\glb0\mc6_fuses.csv lc4032ze\slew\glb0\mc7_fuses.csv lc4032ze\slew\glb0\mc8_fuses.csv lc4032ze\slew\glb0\mc9_fuses.csv lc4032ze\slew\glb1\mc0_fuses.csv lc4032ze\slew\glb1\mc10_fuses.csv lc4032ze\slew\glb1\mc11_fuses.csv lc4032ze\slew\glb1\mc12_fuses.csv lc4032ze\slew\glb1\mc13_fuses.csv lc4032ze\slew\glb1\mc14_fuses.csv lc4032ze\slew\glb1\mc15_fuses.csv lc4032ze\slew\glb1\mc1_fuses.csv lc4032ze\slew\glb1\mc2_fuses.csv lc4032ze\slew\glb1\mc3_fuses.csv lc4032ze\slew\glb1\mc4_fuses.csv lc4032ze\slew\glb1\mc5_fuses.csv lc4032ze\slew\glb1\mc6_fuses.csv lc4032ze\slew\glb1\mc7_fuses.csv lc4032ze\slew\glb1\mc8_fuses.csv lc4032ze\slew\glb1\mc9_fuses.csv
 build zerohold: phony lc4032ze\zerohold\fuses.csv
-default bclk01 bclk23 ce_mux goe0_polarity goe1_polarity input_threshold od oe_mux orm pgdf pt0 pt1 pt2 pt3 pull reset_init slew zerohold
+default bclk01 bclk23 ce_mux goe0_polarity goe1_polarity grp input_threshold od oe_mux orm pgdf pt0 pt1 pt2 pt3 pull reset_init slew zerohold
 
 ## ######################### END OF GENERATED CODE ######################### ##
