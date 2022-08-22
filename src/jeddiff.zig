@@ -13,6 +13,75 @@ fn readJedec(filename: []const u8) !jedec.JedecData(172, 100) {
     return try DeviceJed.init(raw);
 }
 
+const Range = struct {
+    min_row: u32,
+    max_row: u32,
+    min_col: u32,
+    max_col: u32,
+
+    pub fn parse(str: []const u8) !Range {
+        var range_it = std.mem.split(u8, str, "-");
+        var first = range_it.next() orelse return error.InvalidRange;
+
+        var first_iter = std.mem.split(u8, first, ":");
+        var min_row = try std.fmt.parseUnsigned(u32, first_iter.next() orelse return error.InvalidFuse, 10);
+        var min_col: u32 = undefined;
+        if (first_iter.next()) |col| {
+            min_col = try std.fmt.parseUnsigned(u32, col, 10);
+        } else {
+            min_col = DeviceJed.getColumn(min_row);
+            min_row = DeviceJed.getRow(min_row);
+        }
+
+        var second = range_it.next() orelse return error.InvalidRange;
+        var second_iter = std.mem.split(u8, second, ":");
+        var max_row = try std.fmt.parseUnsigned(u32, second_iter.next() orelse return error.InvalidFuse, 10);
+        var max_col: u32 = undefined;
+        if (second_iter.next()) |col| {
+            max_col = try std.fmt.parseUnsigned(u32, col, 10);
+        } else {
+            max_col = DeviceJed.getColumn(max_row);
+            max_row = DeviceJed.getRow(max_row);
+        }
+
+        return Range {
+            .min_row = min_row,
+            .max_row = max_row,
+            .min_col = min_col,
+            .max_col = max_col,
+        };
+    }
+
+    pub fn parseRows(str: []const u8, min_col: u32, max_col: u32) !Range {
+        var range_it = std.mem.split(u8, str, "-");
+        var min_row = try std.fmt.parseUnsigned(u32, range_it.next() orelse return error.InvalidRange, 10);
+        var max_row = try std.fmt.parseUnsigned(u32, range_it.next() orelse return error.InvalidRange, 10);
+
+        return Range {
+            .min_row = min_row,
+            .max_row = max_row,
+            .min_col = min_col,
+            .max_col = max_col,
+        };
+    }
+    pub fn parseColumns(str: []const u8, min_row: u32, max_row: u32) !Range {
+        var range_it = std.mem.split(u8, str, "-");
+        var min_col = try std.fmt.parseUnsigned(u32, range_it.next() orelse return error.InvalidRange, 10);
+        var max_col = try std.fmt.parseUnsigned(u32, range_it.next() orelse return error.InvalidRange, 10);
+
+        return Range {
+            .min_row = min_row,
+            .max_row = max_row,
+            .min_col = min_col,
+            .max_col = max_col,
+        };
+    }
+    pub fn contains(self: Range, row: u32, col: u32) bool {
+        return row >= self.min_row and row <= self.max_row
+            and col >= self.min_row and col <= self.max_row;
+    }
+};
+
 pub fn main() !void {
     var args = try std.process.ArgIterator.initWithAllocator(temp_alloc.allocator());
     _ = args.next() orelse std.os.exit(255);
@@ -22,21 +91,23 @@ pub fn main() !void {
 
     var args_copy = args;
 
-    var min_row: u32 = 0;
-    var max_row: u32 = DeviceJed.rows-1;
-    var min_col: u32 = 0;
-    var max_col: u32 = DeviceJed.width-1;
+    var range = Range {
+        .min_row = 0,
+        .max_row = DeviceJed.rows-1,
+        .min_col = 0,
+        .max_col = DeviceJed.width-1,
+    };
+
+    var exclusions = std.ArrayList(Range).init(temp_alloc.allocator());
 
     while (args.next()) |path| {
         if (path[0] == '-') {
             if (std.mem.eql(u8, path, "--rows")) {
-                var range_it = std.mem.split(u8, args.next() orelse return error.ExpectedRange, "-");
-                min_row = try std.fmt.parseUnsigned(u32, range_it.next() orelse return error.InvalidRange, 10);
-                max_row = try std.fmt.parseUnsigned(u32, range_it.next() orelse return error.InvalidRange, 10);
+                range = try Range.parseRows(args.next() orelse return error.ExpectedRange, range.min_col, range.max_col);
             } else if (std.mem.eql(u8, path, "--cols")) {
-                var range_it = std.mem.split(u8, args.next() orelse return error.ExpectedRange, "-");
-                min_col = try std.fmt.parseUnsigned(u32, range_it.next() orelse return error.InvalidRange, 10);
-                max_col = try std.fmt.parseUnsigned(u32, range_it.next() orelse return error.InvalidRange, 10);
+                range = try Range.parseColumns(args.next() orelse return error.ExpectedRange, range.min_row, range.max_row);
+            } else if (std.mem.eql(u8, path, "--exclude")) {
+                try exclusions.append(try Range.parse(args.next() orelse return error.ExpectedRange));
             } else {
                 try std.io.getStdErr().writer().print("Unrecognized option: {s}\n", .{ path });
                 std.os.exit(2);
@@ -57,15 +128,25 @@ pub fn main() !void {
         }
     }
 
+    for (exclusions.items) |r| {
+        var row: u32 = r.min_row;
+        while (row <= r.max_row) : (row += 1) {
+            var col: u32 = r.min_col;
+            while (col <= r.max_col) : (col += 1) {
+                combined_diff.set(row, col, 0);
+            }
+        }
+    }
+
     {
         var row: u32 = 0;
-        while (row < min_row) : (row += 1) {
+        while (row < range.min_row) : (row += 1) {
             var col: u32 = 0;
             while (col < DeviceJed.width) : (col += 1) {
                 combined_diff.set(row, col, 0);
             }
         }
-        row = max_row + 1;
+        row = range.max_row + 1;
         while (row < DeviceJed.rows) : (row += 1) {
             var col: u32 = 0;
             while (col < DeviceJed.width) : (col += 1) {
@@ -76,16 +157,16 @@ pub fn main() !void {
 
     {
         var col: u32 = 0;
-        while (col < min_col) : (col += 1) {
-            var row: u32 = min_row;
-            while (row < max_row) : (row += 1) {
+        while (col < range.min_col) : (col += 1) {
+            var row: u32 = range.min_row;
+            while (row < range.max_row) : (row += 1) {
                 combined_diff.set(row, col, 0);
             }
         }
-        col = max_col + 1;
+        col = range.max_col + 1;
         while (col < DeviceJed.width) : (col += 1) {
-            var row: u32 = min_row;
-            while (row < max_row) : (row += 1) {
+            var row: u32 = range.min_row;
+            while (row < range.max_row) : (row += 1) {
                 combined_diff.set(row, col, 0);
             }
         }
@@ -102,6 +183,8 @@ pub fn main() !void {
                 _ = args_copy.next();
             } else if (std.mem.eql(u8, path, "--cols")) {
                 _ = args_copy.next();
+            } else if (std.mem.eql(u8, path, "--exclude")) {
+                _ = args_copy.next();
             }
         } else {
             try writer.print(",{s}", .{ path });
@@ -112,7 +195,7 @@ pub fn main() !void {
 
     var diff_iter = combined_diff.raw.iterator(.{});
     while (diff_iter.next()) |fuse| {
-        try writer.print("{}:{}",.{ DeviceJed.getRow(fuse), DeviceJed.getColumn(fuse) });
+        try writer.print("{}:{}",.{ DeviceJed.getRow(@intCast(u32, fuse)), DeviceJed.getColumn(@intCast(u32, fuse)) });
 
         for (data.items) |d| {
             const v: u32 = if (d.raw.isSet(fuse)) 1 else 0;

@@ -36,22 +36,22 @@ pub fn JedecData(comptime w: u32, comptime h: u32) type {
             return self;
         }
 
-        pub fn getRow(fuse: usize) usize {
-            return fuse / Self.width;
+        pub fn getRow(fuse: u32) u32 {
+            return @intCast(u32, fuse / Self.width);
         }
 
-        pub fn getColumn(fuse: usize) usize {
-            return fuse - getRow(fuse) * Self.width;
+        pub fn getColumn(fuse: u32) u32 {
+            return @intCast(u32, fuse - getRow(fuse) * Self.width);
         }
 
-        pub fn get(self: Self, row: usize, col: usize) u1 {
+        pub fn get(self: Self, row: u32, col: u32) u1 {
             return switch (self.raw.isSet(row * Self.width + col)) {
                 true => 1,
                 false => 0,
             };
         }
 
-        pub fn set(self: *Self, row: usize, col: usize, val: u1) void {
+        pub fn set(self: *Self, row: u32, col: u32, val: u1) void {
             self.raw.setValue(row * Self.width + col, val == 1);
         }
 
@@ -62,9 +62,9 @@ pub fn JedecData(comptime w: u32, comptime h: u32) type {
         }
 
         pub fn writeHex(self: *Self, writer: anytype) !void {
-            var r: usize = 0;
+            var r: u32 = 0;
             while (r < Self.rows) : (r += 1) {
-                var c: usize = 0;
+                var c: u32 = 0;
                 while (c < Self.width - 3) : (c += 4) {
                     const v: u4 = self.get(r, Self.width - c - 1)
                             + self.get(r, Self.width - c - 2) * @as(u4, 2)
