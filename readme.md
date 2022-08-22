@@ -12,7 +12,6 @@
 * MC output selection (reg/comb)
 * MC clock configuration
 * MC AR/AS configuration
-* MC FF/latch type
 * MC inreg/xor configuration
 * shared PT fuses
 * PT cluster routing

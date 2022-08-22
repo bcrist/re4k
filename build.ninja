@@ -3,7 +3,7 @@ rule fit
 rule diff
     command = zig-out/bin/jeddiff.exe $out $diff_options $in
 
-##!! include 'build_ninja' !! 4252 ##
+##!! include 'build_ninja' !! 4477 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 build lc4032ze\pull\glb0\mc0\OFF.jed: fit lc4032ze\pull\glb0\mc0\OFF.lci | lc4032ze\pull\glb0\mc0\OFF.tt4
 build lc4032ze\pull\glb0\mc0\UP.jed: fit lc4032ze\pull\glb0\mc0\UP.lci | lc4032ze\pull\glb0\mc0\UP.tt4
@@ -1538,224 +1538,224 @@ build lc4032ze\ce_mux\glb0\mc0\npt.jed: fit lc4032ze\ce_mux\glb0\mc0\npt.lci | l
 build lc4032ze\ce_mux\glb0\mc0\pt.jed: fit lc4032ze\ce_mux\glb0\mc0\pt.lci | lc4032ze\ce_mux\glb0\mc0\pt.tt4
 build lc4032ze\ce_mux\glb0\mc0\shared.jed: fit lc4032ze\ce_mux\glb0\mc0\shared.lci | lc4032ze\ce_mux\glb0\mc0\shared.tt4
 build lc4032ze\ce_mux\glb0\mc0_fuses.csv: diff lc4032ze\ce_mux\glb0\mc0\always.jed lc4032ze\ce_mux\glb0\mc0\npt.jed lc4032ze\ce_mux\glb0\mc0\pt.jed lc4032ze\ce_mux\glb0\mc0\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb0\mc1\always.jed: fit lc4032ze\ce_mux\glb0\mc1\always.lci | lc4032ze\ce_mux\glb0\mc1\always.tt4
 build lc4032ze\ce_mux\glb0\mc1\npt.jed: fit lc4032ze\ce_mux\glb0\mc1\npt.lci | lc4032ze\ce_mux\glb0\mc1\npt.tt4
 build lc4032ze\ce_mux\glb0\mc1\pt.jed: fit lc4032ze\ce_mux\glb0\mc1\pt.lci | lc4032ze\ce_mux\glb0\mc1\pt.tt4
 build lc4032ze\ce_mux\glb0\mc1\shared.jed: fit lc4032ze\ce_mux\glb0\mc1\shared.lci | lc4032ze\ce_mux\glb0\mc1\shared.tt4
 build lc4032ze\ce_mux\glb0\mc1_fuses.csv: diff lc4032ze\ce_mux\glb0\mc1\always.jed lc4032ze\ce_mux\glb0\mc1\npt.jed lc4032ze\ce_mux\glb0\mc1\pt.jed lc4032ze\ce_mux\glb0\mc1\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb0\mc2\always.jed: fit lc4032ze\ce_mux\glb0\mc2\always.lci | lc4032ze\ce_mux\glb0\mc2\always.tt4
 build lc4032ze\ce_mux\glb0\mc2\npt.jed: fit lc4032ze\ce_mux\glb0\mc2\npt.lci | lc4032ze\ce_mux\glb0\mc2\npt.tt4
 build lc4032ze\ce_mux\glb0\mc2\pt.jed: fit lc4032ze\ce_mux\glb0\mc2\pt.lci | lc4032ze\ce_mux\glb0\mc2\pt.tt4
 build lc4032ze\ce_mux\glb0\mc2\shared.jed: fit lc4032ze\ce_mux\glb0\mc2\shared.lci | lc4032ze\ce_mux\glb0\mc2\shared.tt4
 build lc4032ze\ce_mux\glb0\mc2_fuses.csv: diff lc4032ze\ce_mux\glb0\mc2\always.jed lc4032ze\ce_mux\glb0\mc2\npt.jed lc4032ze\ce_mux\glb0\mc2\pt.jed lc4032ze\ce_mux\glb0\mc2\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb0\mc3\always.jed: fit lc4032ze\ce_mux\glb0\mc3\always.lci | lc4032ze\ce_mux\glb0\mc3\always.tt4
 build lc4032ze\ce_mux\glb0\mc3\npt.jed: fit lc4032ze\ce_mux\glb0\mc3\npt.lci | lc4032ze\ce_mux\glb0\mc3\npt.tt4
 build lc4032ze\ce_mux\glb0\mc3\pt.jed: fit lc4032ze\ce_mux\glb0\mc3\pt.lci | lc4032ze\ce_mux\glb0\mc3\pt.tt4
 build lc4032ze\ce_mux\glb0\mc3\shared.jed: fit lc4032ze\ce_mux\glb0\mc3\shared.lci | lc4032ze\ce_mux\glb0\mc3\shared.tt4
 build lc4032ze\ce_mux\glb0\mc3_fuses.csv: diff lc4032ze\ce_mux\glb0\mc3\always.jed lc4032ze\ce_mux\glb0\mc3\npt.jed lc4032ze\ce_mux\glb0\mc3\pt.jed lc4032ze\ce_mux\glb0\mc3\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb0\mc4\always.jed: fit lc4032ze\ce_mux\glb0\mc4\always.lci | lc4032ze\ce_mux\glb0\mc4\always.tt4
 build lc4032ze\ce_mux\glb0\mc4\npt.jed: fit lc4032ze\ce_mux\glb0\mc4\npt.lci | lc4032ze\ce_mux\glb0\mc4\npt.tt4
 build lc4032ze\ce_mux\glb0\mc4\pt.jed: fit lc4032ze\ce_mux\glb0\mc4\pt.lci | lc4032ze\ce_mux\glb0\mc4\pt.tt4
 build lc4032ze\ce_mux\glb0\mc4\shared.jed: fit lc4032ze\ce_mux\glb0\mc4\shared.lci | lc4032ze\ce_mux\glb0\mc4\shared.tt4
 build lc4032ze\ce_mux\glb0\mc4_fuses.csv: diff lc4032ze\ce_mux\glb0\mc4\always.jed lc4032ze\ce_mux\glb0\mc4\npt.jed lc4032ze\ce_mux\glb0\mc4\pt.jed lc4032ze\ce_mux\glb0\mc4\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb0\mc5\always.jed: fit lc4032ze\ce_mux\glb0\mc5\always.lci | lc4032ze\ce_mux\glb0\mc5\always.tt4
 build lc4032ze\ce_mux\glb0\mc5\npt.jed: fit lc4032ze\ce_mux\glb0\mc5\npt.lci | lc4032ze\ce_mux\glb0\mc5\npt.tt4
 build lc4032ze\ce_mux\glb0\mc5\pt.jed: fit lc4032ze\ce_mux\glb0\mc5\pt.lci | lc4032ze\ce_mux\glb0\mc5\pt.tt4
 build lc4032ze\ce_mux\glb0\mc5\shared.jed: fit lc4032ze\ce_mux\glb0\mc5\shared.lci | lc4032ze\ce_mux\glb0\mc5\shared.tt4
 build lc4032ze\ce_mux\glb0\mc5_fuses.csv: diff lc4032ze\ce_mux\glb0\mc5\always.jed lc4032ze\ce_mux\glb0\mc5\npt.jed lc4032ze\ce_mux\glb0\mc5\pt.jed lc4032ze\ce_mux\glb0\mc5\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb0\mc6\always.jed: fit lc4032ze\ce_mux\glb0\mc6\always.lci | lc4032ze\ce_mux\glb0\mc6\always.tt4
 build lc4032ze\ce_mux\glb0\mc6\npt.jed: fit lc4032ze\ce_mux\glb0\mc6\npt.lci | lc4032ze\ce_mux\glb0\mc6\npt.tt4
 build lc4032ze\ce_mux\glb0\mc6\pt.jed: fit lc4032ze\ce_mux\glb0\mc6\pt.lci | lc4032ze\ce_mux\glb0\mc6\pt.tt4
 build lc4032ze\ce_mux\glb0\mc6\shared.jed: fit lc4032ze\ce_mux\glb0\mc6\shared.lci | lc4032ze\ce_mux\glb0\mc6\shared.tt4
 build lc4032ze\ce_mux\glb0\mc6_fuses.csv: diff lc4032ze\ce_mux\glb0\mc6\always.jed lc4032ze\ce_mux\glb0\mc6\npt.jed lc4032ze\ce_mux\glb0\mc6\pt.jed lc4032ze\ce_mux\glb0\mc6\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb0\mc7\always.jed: fit lc4032ze\ce_mux\glb0\mc7\always.lci | lc4032ze\ce_mux\glb0\mc7\always.tt4
 build lc4032ze\ce_mux\glb0\mc7\npt.jed: fit lc4032ze\ce_mux\glb0\mc7\npt.lci | lc4032ze\ce_mux\glb0\mc7\npt.tt4
 build lc4032ze\ce_mux\glb0\mc7\pt.jed: fit lc4032ze\ce_mux\glb0\mc7\pt.lci | lc4032ze\ce_mux\glb0\mc7\pt.tt4
 build lc4032ze\ce_mux\glb0\mc7\shared.jed: fit lc4032ze\ce_mux\glb0\mc7\shared.lci | lc4032ze\ce_mux\glb0\mc7\shared.tt4
 build lc4032ze\ce_mux\glb0\mc7_fuses.csv: diff lc4032ze\ce_mux\glb0\mc7\always.jed lc4032ze\ce_mux\glb0\mc7\npt.jed lc4032ze\ce_mux\glb0\mc7\pt.jed lc4032ze\ce_mux\glb0\mc7\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb0\mc8\always.jed: fit lc4032ze\ce_mux\glb0\mc8\always.lci | lc4032ze\ce_mux\glb0\mc8\always.tt4
 build lc4032ze\ce_mux\glb0\mc8\npt.jed: fit lc4032ze\ce_mux\glb0\mc8\npt.lci | lc4032ze\ce_mux\glb0\mc8\npt.tt4
 build lc4032ze\ce_mux\glb0\mc8\pt.jed: fit lc4032ze\ce_mux\glb0\mc8\pt.lci | lc4032ze\ce_mux\glb0\mc8\pt.tt4
 build lc4032ze\ce_mux\glb0\mc8\shared.jed: fit lc4032ze\ce_mux\glb0\mc8\shared.lci | lc4032ze\ce_mux\glb0\mc8\shared.tt4
 build lc4032ze\ce_mux\glb0\mc8_fuses.csv: diff lc4032ze\ce_mux\glb0\mc8\always.jed lc4032ze\ce_mux\glb0\mc8\npt.jed lc4032ze\ce_mux\glb0\mc8\pt.jed lc4032ze\ce_mux\glb0\mc8\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb0\mc9\always.jed: fit lc4032ze\ce_mux\glb0\mc9\always.lci | lc4032ze\ce_mux\glb0\mc9\always.tt4
 build lc4032ze\ce_mux\glb0\mc9\npt.jed: fit lc4032ze\ce_mux\glb0\mc9\npt.lci | lc4032ze\ce_mux\glb0\mc9\npt.tt4
 build lc4032ze\ce_mux\glb0\mc9\pt.jed: fit lc4032ze\ce_mux\glb0\mc9\pt.lci | lc4032ze\ce_mux\glb0\mc9\pt.tt4
 build lc4032ze\ce_mux\glb0\mc9\shared.jed: fit lc4032ze\ce_mux\glb0\mc9\shared.lci | lc4032ze\ce_mux\glb0\mc9\shared.tt4
 build lc4032ze\ce_mux\glb0\mc9_fuses.csv: diff lc4032ze\ce_mux\glb0\mc9\always.jed lc4032ze\ce_mux\glb0\mc9\npt.jed lc4032ze\ce_mux\glb0\mc9\pt.jed lc4032ze\ce_mux\glb0\mc9\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb0\mc10\always.jed: fit lc4032ze\ce_mux\glb0\mc10\always.lci | lc4032ze\ce_mux\glb0\mc10\always.tt4
 build lc4032ze\ce_mux\glb0\mc10\npt.jed: fit lc4032ze\ce_mux\glb0\mc10\npt.lci | lc4032ze\ce_mux\glb0\mc10\npt.tt4
 build lc4032ze\ce_mux\glb0\mc10\pt.jed: fit lc4032ze\ce_mux\glb0\mc10\pt.lci | lc4032ze\ce_mux\glb0\mc10\pt.tt4
 build lc4032ze\ce_mux\glb0\mc10\shared.jed: fit lc4032ze\ce_mux\glb0\mc10\shared.lci | lc4032ze\ce_mux\glb0\mc10\shared.tt4
 build lc4032ze\ce_mux\glb0\mc10_fuses.csv: diff lc4032ze\ce_mux\glb0\mc10\always.jed lc4032ze\ce_mux\glb0\mc10\npt.jed lc4032ze\ce_mux\glb0\mc10\pt.jed lc4032ze\ce_mux\glb0\mc10\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb0\mc11\always.jed: fit lc4032ze\ce_mux\glb0\mc11\always.lci | lc4032ze\ce_mux\glb0\mc11\always.tt4
 build lc4032ze\ce_mux\glb0\mc11\npt.jed: fit lc4032ze\ce_mux\glb0\mc11\npt.lci | lc4032ze\ce_mux\glb0\mc11\npt.tt4
 build lc4032ze\ce_mux\glb0\mc11\pt.jed: fit lc4032ze\ce_mux\glb0\mc11\pt.lci | lc4032ze\ce_mux\glb0\mc11\pt.tt4
 build lc4032ze\ce_mux\glb0\mc11\shared.jed: fit lc4032ze\ce_mux\glb0\mc11\shared.lci | lc4032ze\ce_mux\glb0\mc11\shared.tt4
 build lc4032ze\ce_mux\glb0\mc11_fuses.csv: diff lc4032ze\ce_mux\glb0\mc11\always.jed lc4032ze\ce_mux\glb0\mc11\npt.jed lc4032ze\ce_mux\glb0\mc11\pt.jed lc4032ze\ce_mux\glb0\mc11\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb0\mc12\always.jed: fit lc4032ze\ce_mux\glb0\mc12\always.lci | lc4032ze\ce_mux\glb0\mc12\always.tt4
 build lc4032ze\ce_mux\glb0\mc12\npt.jed: fit lc4032ze\ce_mux\glb0\mc12\npt.lci | lc4032ze\ce_mux\glb0\mc12\npt.tt4
 build lc4032ze\ce_mux\glb0\mc12\pt.jed: fit lc4032ze\ce_mux\glb0\mc12\pt.lci | lc4032ze\ce_mux\glb0\mc12\pt.tt4
 build lc4032ze\ce_mux\glb0\mc12\shared.jed: fit lc4032ze\ce_mux\glb0\mc12\shared.lci | lc4032ze\ce_mux\glb0\mc12\shared.tt4
 build lc4032ze\ce_mux\glb0\mc12_fuses.csv: diff lc4032ze\ce_mux\glb0\mc12\always.jed lc4032ze\ce_mux\glb0\mc12\npt.jed lc4032ze\ce_mux\glb0\mc12\pt.jed lc4032ze\ce_mux\glb0\mc12\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb0\mc13\always.jed: fit lc4032ze\ce_mux\glb0\mc13\always.lci | lc4032ze\ce_mux\glb0\mc13\always.tt4
 build lc4032ze\ce_mux\glb0\mc13\npt.jed: fit lc4032ze\ce_mux\glb0\mc13\npt.lci | lc4032ze\ce_mux\glb0\mc13\npt.tt4
 build lc4032ze\ce_mux\glb0\mc13\pt.jed: fit lc4032ze\ce_mux\glb0\mc13\pt.lci | lc4032ze\ce_mux\glb0\mc13\pt.tt4
 build lc4032ze\ce_mux\glb0\mc13\shared.jed: fit lc4032ze\ce_mux\glb0\mc13\shared.lci | lc4032ze\ce_mux\glb0\mc13\shared.tt4
 build lc4032ze\ce_mux\glb0\mc13_fuses.csv: diff lc4032ze\ce_mux\glb0\mc13\always.jed lc4032ze\ce_mux\glb0\mc13\npt.jed lc4032ze\ce_mux\glb0\mc13\pt.jed lc4032ze\ce_mux\glb0\mc13\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb0\mc14\always.jed: fit lc4032ze\ce_mux\glb0\mc14\always.lci | lc4032ze\ce_mux\glb0\mc14\always.tt4
 build lc4032ze\ce_mux\glb0\mc14\npt.jed: fit lc4032ze\ce_mux\glb0\mc14\npt.lci | lc4032ze\ce_mux\glb0\mc14\npt.tt4
 build lc4032ze\ce_mux\glb0\mc14\pt.jed: fit lc4032ze\ce_mux\glb0\mc14\pt.lci | lc4032ze\ce_mux\glb0\mc14\pt.tt4
 build lc4032ze\ce_mux\glb0\mc14\shared.jed: fit lc4032ze\ce_mux\glb0\mc14\shared.lci | lc4032ze\ce_mux\glb0\mc14\shared.tt4
 build lc4032ze\ce_mux\glb0\mc14_fuses.csv: diff lc4032ze\ce_mux\glb0\mc14\always.jed lc4032ze\ce_mux\glb0\mc14\npt.jed lc4032ze\ce_mux\glb0\mc14\pt.jed lc4032ze\ce_mux\glb0\mc14\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb0\mc15\always.jed: fit lc4032ze\ce_mux\glb0\mc15\always.lci | lc4032ze\ce_mux\glb0\mc15\always.tt4
 build lc4032ze\ce_mux\glb0\mc15\npt.jed: fit lc4032ze\ce_mux\glb0\mc15\npt.lci | lc4032ze\ce_mux\glb0\mc15\npt.tt4
 build lc4032ze\ce_mux\glb0\mc15\pt.jed: fit lc4032ze\ce_mux\glb0\mc15\pt.lci | lc4032ze\ce_mux\glb0\mc15\pt.tt4
 build lc4032ze\ce_mux\glb0\mc15\shared.jed: fit lc4032ze\ce_mux\glb0\mc15\shared.lci | lc4032ze\ce_mux\glb0\mc15\shared.tt4
 build lc4032ze\ce_mux\glb0\mc15_fuses.csv: diff lc4032ze\ce_mux\glb0\mc15\always.jed lc4032ze\ce_mux\glb0\mc15\npt.jed lc4032ze\ce_mux\glb0\mc15\pt.jed lc4032ze\ce_mux\glb0\mc15\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb1\mc0\always.jed: fit lc4032ze\ce_mux\glb1\mc0\always.lci | lc4032ze\ce_mux\glb1\mc0\always.tt4
 build lc4032ze\ce_mux\glb1\mc0\npt.jed: fit lc4032ze\ce_mux\glb1\mc0\npt.lci | lc4032ze\ce_mux\glb1\mc0\npt.tt4
 build lc4032ze\ce_mux\glb1\mc0\pt.jed: fit lc4032ze\ce_mux\glb1\mc0\pt.lci | lc4032ze\ce_mux\glb1\mc0\pt.tt4
 build lc4032ze\ce_mux\glb1\mc0\shared.jed: fit lc4032ze\ce_mux\glb1\mc0\shared.lci | lc4032ze\ce_mux\glb1\mc0\shared.tt4
 build lc4032ze\ce_mux\glb1\mc0_fuses.csv: diff lc4032ze\ce_mux\glb1\mc0\always.jed lc4032ze\ce_mux\glb1\mc0\npt.jed lc4032ze\ce_mux\glb1\mc0\pt.jed lc4032ze\ce_mux\glb1\mc0\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb1\mc1\always.jed: fit lc4032ze\ce_mux\glb1\mc1\always.lci | lc4032ze\ce_mux\glb1\mc1\always.tt4
 build lc4032ze\ce_mux\glb1\mc1\npt.jed: fit lc4032ze\ce_mux\glb1\mc1\npt.lci | lc4032ze\ce_mux\glb1\mc1\npt.tt4
 build lc4032ze\ce_mux\glb1\mc1\pt.jed: fit lc4032ze\ce_mux\glb1\mc1\pt.lci | lc4032ze\ce_mux\glb1\mc1\pt.tt4
 build lc4032ze\ce_mux\glb1\mc1\shared.jed: fit lc4032ze\ce_mux\glb1\mc1\shared.lci | lc4032ze\ce_mux\glb1\mc1\shared.tt4
 build lc4032ze\ce_mux\glb1\mc1_fuses.csv: diff lc4032ze\ce_mux\glb1\mc1\always.jed lc4032ze\ce_mux\glb1\mc1\npt.jed lc4032ze\ce_mux\glb1\mc1\pt.jed lc4032ze\ce_mux\glb1\mc1\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb1\mc2\always.jed: fit lc4032ze\ce_mux\glb1\mc2\always.lci | lc4032ze\ce_mux\glb1\mc2\always.tt4
 build lc4032ze\ce_mux\glb1\mc2\npt.jed: fit lc4032ze\ce_mux\glb1\mc2\npt.lci | lc4032ze\ce_mux\glb1\mc2\npt.tt4
 build lc4032ze\ce_mux\glb1\mc2\pt.jed: fit lc4032ze\ce_mux\glb1\mc2\pt.lci | lc4032ze\ce_mux\glb1\mc2\pt.tt4
 build lc4032ze\ce_mux\glb1\mc2\shared.jed: fit lc4032ze\ce_mux\glb1\mc2\shared.lci | lc4032ze\ce_mux\glb1\mc2\shared.tt4
 build lc4032ze\ce_mux\glb1\mc2_fuses.csv: diff lc4032ze\ce_mux\glb1\mc2\always.jed lc4032ze\ce_mux\glb1\mc2\npt.jed lc4032ze\ce_mux\glb1\mc2\pt.jed lc4032ze\ce_mux\glb1\mc2\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb1\mc3\always.jed: fit lc4032ze\ce_mux\glb1\mc3\always.lci | lc4032ze\ce_mux\glb1\mc3\always.tt4
 build lc4032ze\ce_mux\glb1\mc3\npt.jed: fit lc4032ze\ce_mux\glb1\mc3\npt.lci | lc4032ze\ce_mux\glb1\mc3\npt.tt4
 build lc4032ze\ce_mux\glb1\mc3\pt.jed: fit lc4032ze\ce_mux\glb1\mc3\pt.lci | lc4032ze\ce_mux\glb1\mc3\pt.tt4
 build lc4032ze\ce_mux\glb1\mc3\shared.jed: fit lc4032ze\ce_mux\glb1\mc3\shared.lci | lc4032ze\ce_mux\glb1\mc3\shared.tt4
 build lc4032ze\ce_mux\glb1\mc3_fuses.csv: diff lc4032ze\ce_mux\glb1\mc3\always.jed lc4032ze\ce_mux\glb1\mc3\npt.jed lc4032ze\ce_mux\glb1\mc3\pt.jed lc4032ze\ce_mux\glb1\mc3\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb1\mc4\always.jed: fit lc4032ze\ce_mux\glb1\mc4\always.lci | lc4032ze\ce_mux\glb1\mc4\always.tt4
 build lc4032ze\ce_mux\glb1\mc4\npt.jed: fit lc4032ze\ce_mux\glb1\mc4\npt.lci | lc4032ze\ce_mux\glb1\mc4\npt.tt4
 build lc4032ze\ce_mux\glb1\mc4\pt.jed: fit lc4032ze\ce_mux\glb1\mc4\pt.lci | lc4032ze\ce_mux\glb1\mc4\pt.tt4
 build lc4032ze\ce_mux\glb1\mc4\shared.jed: fit lc4032ze\ce_mux\glb1\mc4\shared.lci | lc4032ze\ce_mux\glb1\mc4\shared.tt4
 build lc4032ze\ce_mux\glb1\mc4_fuses.csv: diff lc4032ze\ce_mux\glb1\mc4\always.jed lc4032ze\ce_mux\glb1\mc4\npt.jed lc4032ze\ce_mux\glb1\mc4\pt.jed lc4032ze\ce_mux\glb1\mc4\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb1\mc5\always.jed: fit lc4032ze\ce_mux\glb1\mc5\always.lci | lc4032ze\ce_mux\glb1\mc5\always.tt4
 build lc4032ze\ce_mux\glb1\mc5\npt.jed: fit lc4032ze\ce_mux\glb1\mc5\npt.lci | lc4032ze\ce_mux\glb1\mc5\npt.tt4
 build lc4032ze\ce_mux\glb1\mc5\pt.jed: fit lc4032ze\ce_mux\glb1\mc5\pt.lci | lc4032ze\ce_mux\glb1\mc5\pt.tt4
 build lc4032ze\ce_mux\glb1\mc5\shared.jed: fit lc4032ze\ce_mux\glb1\mc5\shared.lci | lc4032ze\ce_mux\glb1\mc5\shared.tt4
 build lc4032ze\ce_mux\glb1\mc5_fuses.csv: diff lc4032ze\ce_mux\glb1\mc5\always.jed lc4032ze\ce_mux\glb1\mc5\npt.jed lc4032ze\ce_mux\glb1\mc5\pt.jed lc4032ze\ce_mux\glb1\mc5\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb1\mc6\always.jed: fit lc4032ze\ce_mux\glb1\mc6\always.lci | lc4032ze\ce_mux\glb1\mc6\always.tt4
 build lc4032ze\ce_mux\glb1\mc6\npt.jed: fit lc4032ze\ce_mux\glb1\mc6\npt.lci | lc4032ze\ce_mux\glb1\mc6\npt.tt4
 build lc4032ze\ce_mux\glb1\mc6\pt.jed: fit lc4032ze\ce_mux\glb1\mc6\pt.lci | lc4032ze\ce_mux\glb1\mc6\pt.tt4
 build lc4032ze\ce_mux\glb1\mc6\shared.jed: fit lc4032ze\ce_mux\glb1\mc6\shared.lci | lc4032ze\ce_mux\glb1\mc6\shared.tt4
 build lc4032ze\ce_mux\glb1\mc6_fuses.csv: diff lc4032ze\ce_mux\glb1\mc6\always.jed lc4032ze\ce_mux\glb1\mc6\npt.jed lc4032ze\ce_mux\glb1\mc6\pt.jed lc4032ze\ce_mux\glb1\mc6\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb1\mc7\always.jed: fit lc4032ze\ce_mux\glb1\mc7\always.lci | lc4032ze\ce_mux\glb1\mc7\always.tt4
 build lc4032ze\ce_mux\glb1\mc7\npt.jed: fit lc4032ze\ce_mux\glb1\mc7\npt.lci | lc4032ze\ce_mux\glb1\mc7\npt.tt4
 build lc4032ze\ce_mux\glb1\mc7\pt.jed: fit lc4032ze\ce_mux\glb1\mc7\pt.lci | lc4032ze\ce_mux\glb1\mc7\pt.tt4
 build lc4032ze\ce_mux\glb1\mc7\shared.jed: fit lc4032ze\ce_mux\glb1\mc7\shared.lci | lc4032ze\ce_mux\glb1\mc7\shared.tt4
 build lc4032ze\ce_mux\glb1\mc7_fuses.csv: diff lc4032ze\ce_mux\glb1\mc7\always.jed lc4032ze\ce_mux\glb1\mc7\npt.jed lc4032ze\ce_mux\glb1\mc7\pt.jed lc4032ze\ce_mux\glb1\mc7\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb1\mc8\always.jed: fit lc4032ze\ce_mux\glb1\mc8\always.lci | lc4032ze\ce_mux\glb1\mc8\always.tt4
 build lc4032ze\ce_mux\glb1\mc8\npt.jed: fit lc4032ze\ce_mux\glb1\mc8\npt.lci | lc4032ze\ce_mux\glb1\mc8\npt.tt4
 build lc4032ze\ce_mux\glb1\mc8\pt.jed: fit lc4032ze\ce_mux\glb1\mc8\pt.lci | lc4032ze\ce_mux\glb1\mc8\pt.tt4
 build lc4032ze\ce_mux\glb1\mc8\shared.jed: fit lc4032ze\ce_mux\glb1\mc8\shared.lci | lc4032ze\ce_mux\glb1\mc8\shared.tt4
 build lc4032ze\ce_mux\glb1\mc8_fuses.csv: diff lc4032ze\ce_mux\glb1\mc8\always.jed lc4032ze\ce_mux\glb1\mc8\npt.jed lc4032ze\ce_mux\glb1\mc8\pt.jed lc4032ze\ce_mux\glb1\mc8\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb1\mc9\always.jed: fit lc4032ze\ce_mux\glb1\mc9\always.lci | lc4032ze\ce_mux\glb1\mc9\always.tt4
 build lc4032ze\ce_mux\glb1\mc9\npt.jed: fit lc4032ze\ce_mux\glb1\mc9\npt.lci | lc4032ze\ce_mux\glb1\mc9\npt.tt4
 build lc4032ze\ce_mux\glb1\mc9\pt.jed: fit lc4032ze\ce_mux\glb1\mc9\pt.lci | lc4032ze\ce_mux\glb1\mc9\pt.tt4
 build lc4032ze\ce_mux\glb1\mc9\shared.jed: fit lc4032ze\ce_mux\glb1\mc9\shared.lci | lc4032ze\ce_mux\glb1\mc9\shared.tt4
 build lc4032ze\ce_mux\glb1\mc9_fuses.csv: diff lc4032ze\ce_mux\glb1\mc9\always.jed lc4032ze\ce_mux\glb1\mc9\npt.jed lc4032ze\ce_mux\glb1\mc9\pt.jed lc4032ze\ce_mux\glb1\mc9\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb1\mc10\always.jed: fit lc4032ze\ce_mux\glb1\mc10\always.lci | lc4032ze\ce_mux\glb1\mc10\always.tt4
 build lc4032ze\ce_mux\glb1\mc10\npt.jed: fit lc4032ze\ce_mux\glb1\mc10\npt.lci | lc4032ze\ce_mux\glb1\mc10\npt.tt4
 build lc4032ze\ce_mux\glb1\mc10\pt.jed: fit lc4032ze\ce_mux\glb1\mc10\pt.lci | lc4032ze\ce_mux\glb1\mc10\pt.tt4
 build lc4032ze\ce_mux\glb1\mc10\shared.jed: fit lc4032ze\ce_mux\glb1\mc10\shared.lci | lc4032ze\ce_mux\glb1\mc10\shared.tt4
 build lc4032ze\ce_mux\glb1\mc10_fuses.csv: diff lc4032ze\ce_mux\glb1\mc10\always.jed lc4032ze\ce_mux\glb1\mc10\npt.jed lc4032ze\ce_mux\glb1\mc10\pt.jed lc4032ze\ce_mux\glb1\mc10\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb1\mc11\always.jed: fit lc4032ze\ce_mux\glb1\mc11\always.lci | lc4032ze\ce_mux\glb1\mc11\always.tt4
 build lc4032ze\ce_mux\glb1\mc11\npt.jed: fit lc4032ze\ce_mux\glb1\mc11\npt.lci | lc4032ze\ce_mux\glb1\mc11\npt.tt4
 build lc4032ze\ce_mux\glb1\mc11\pt.jed: fit lc4032ze\ce_mux\glb1\mc11\pt.lci | lc4032ze\ce_mux\glb1\mc11\pt.tt4
 build lc4032ze\ce_mux\glb1\mc11\shared.jed: fit lc4032ze\ce_mux\glb1\mc11\shared.lci | lc4032ze\ce_mux\glb1\mc11\shared.tt4
 build lc4032ze\ce_mux\glb1\mc11_fuses.csv: diff lc4032ze\ce_mux\glb1\mc11\always.jed lc4032ze\ce_mux\glb1\mc11\npt.jed lc4032ze\ce_mux\glb1\mc11\pt.jed lc4032ze\ce_mux\glb1\mc11\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb1\mc12\always.jed: fit lc4032ze\ce_mux\glb1\mc12\always.lci | lc4032ze\ce_mux\glb1\mc12\always.tt4
 build lc4032ze\ce_mux\glb1\mc12\npt.jed: fit lc4032ze\ce_mux\glb1\mc12\npt.lci | lc4032ze\ce_mux\glb1\mc12\npt.tt4
 build lc4032ze\ce_mux\glb1\mc12\pt.jed: fit lc4032ze\ce_mux\glb1\mc12\pt.lci | lc4032ze\ce_mux\glb1\mc12\pt.tt4
 build lc4032ze\ce_mux\glb1\mc12\shared.jed: fit lc4032ze\ce_mux\glb1\mc12\shared.lci | lc4032ze\ce_mux\glb1\mc12\shared.tt4
 build lc4032ze\ce_mux\glb1\mc12_fuses.csv: diff lc4032ze\ce_mux\glb1\mc12\always.jed lc4032ze\ce_mux\glb1\mc12\npt.jed lc4032ze\ce_mux\glb1\mc12\pt.jed lc4032ze\ce_mux\glb1\mc12\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb1\mc13\always.jed: fit lc4032ze\ce_mux\glb1\mc13\always.lci | lc4032ze\ce_mux\glb1\mc13\always.tt4
 build lc4032ze\ce_mux\glb1\mc13\npt.jed: fit lc4032ze\ce_mux\glb1\mc13\npt.lci | lc4032ze\ce_mux\glb1\mc13\npt.tt4
 build lc4032ze\ce_mux\glb1\mc13\pt.jed: fit lc4032ze\ce_mux\glb1\mc13\pt.lci | lc4032ze\ce_mux\glb1\mc13\pt.tt4
 build lc4032ze\ce_mux\glb1\mc13\shared.jed: fit lc4032ze\ce_mux\glb1\mc13\shared.lci | lc4032ze\ce_mux\glb1\mc13\shared.tt4
 build lc4032ze\ce_mux\glb1\mc13_fuses.csv: diff lc4032ze\ce_mux\glb1\mc13\always.jed lc4032ze\ce_mux\glb1\mc13\npt.jed lc4032ze\ce_mux\glb1\mc13\pt.jed lc4032ze\ce_mux\glb1\mc13\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb1\mc14\always.jed: fit lc4032ze\ce_mux\glb1\mc14\always.lci | lc4032ze\ce_mux\glb1\mc14\always.tt4
 build lc4032ze\ce_mux\glb1\mc14\npt.jed: fit lc4032ze\ce_mux\glb1\mc14\npt.lci | lc4032ze\ce_mux\glb1\mc14\npt.tt4
 build lc4032ze\ce_mux\glb1\mc14\pt.jed: fit lc4032ze\ce_mux\glb1\mc14\pt.lci | lc4032ze\ce_mux\glb1\mc14\pt.tt4
 build lc4032ze\ce_mux\glb1\mc14\shared.jed: fit lc4032ze\ce_mux\glb1\mc14\shared.lci | lc4032ze\ce_mux\glb1\mc14\shared.tt4
 build lc4032ze\ce_mux\glb1\mc14_fuses.csv: diff lc4032ze\ce_mux\glb1\mc14\always.jed lc4032ze\ce_mux\glb1\mc14\npt.jed lc4032ze\ce_mux\glb1\mc14\pt.jed lc4032ze\ce_mux\glb1\mc14\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\ce_mux\glb1\mc15\always.jed: fit lc4032ze\ce_mux\glb1\mc15\always.lci | lc4032ze\ce_mux\glb1\mc15\always.tt4
 build lc4032ze\ce_mux\glb1\mc15\npt.jed: fit lc4032ze\ce_mux\glb1\mc15\npt.lci | lc4032ze\ce_mux\glb1\mc15\npt.tt4
 build lc4032ze\ce_mux\glb1\mc15\pt.jed: fit lc4032ze\ce_mux\glb1\mc15\pt.lci | lc4032ze\ce_mux\glb1\mc15\pt.tt4
 build lc4032ze\ce_mux\glb1\mc15\shared.jed: fit lc4032ze\ce_mux\glb1\mc15\shared.lci | lc4032ze\ce_mux\glb1\mc15\shared.tt4
 build lc4032ze\ce_mux\glb1\mc15_fuses.csv: diff lc4032ze\ce_mux\glb1\mc15\always.jed lc4032ze\ce_mux\glb1\mc15\npt.jed lc4032ze\ce_mux\glb1\mc15\pt.jed lc4032ze\ce_mux\glb1\mc15\shared.jed
-    diff_options = --rows 86-87
+    diff_options = --rows 72-99
 
 build lc4032ze\pt0\glb0\mc0\gi0\p.jed: fit lc4032ze\pt0\glb0\mc0\gi0\p.lci | lc4032ze\pt0\glb0\mc0\gi0\p.tt4
 build lc4032ze\pt0\glb0\mc0\gi0\n.jed: fit lc4032ze\pt0\glb0\mc0\gi0\n.lci | lc4032ze\pt0\glb0\mc0\gi0\n.tt4
@@ -4197,9 +4197,234 @@ build lc4032ze\grp\gi35\glb1\pin_16.jed: fit lc4032ze\grp\gi35\glb1\pin_16.lci |
 build lc4032ze\grp\gi35\glb1_fuses.csv: diff lc4032ze\grp\gi35\glb1\pin_43.jed lc4032ze\grp\gi35\glb1\fb_B8.jed lc4032ze\grp\gi35\glb1\pin_33.jed lc4032ze\grp\gi35\glb1\fb_A15.jed lc4032ze\grp\gi35\glb1\fb_A9.jed lc4032ze\grp\gi35\glb1\pin_16.jed
     diff_options = --rows 70-71 --exclude 0:3-71:85 --exclude 0:89-71:171
 
+build lc4032ze\ff_type\glb0\mc0\D.jed: fit lc4032ze\ff_type\glb0\mc0\D.lci | lc4032ze\ff_type\glb0\mc0\D.tt4
+build lc4032ze\ff_type\glb0\mc0\T.jed: fit lc4032ze\ff_type\glb0\mc0\T.lci | lc4032ze\ff_type\glb0\mc0\T.tt4
+build lc4032ze\ff_type\glb0\mc0\latch.jed: fit lc4032ze\ff_type\glb0\mc0\latch.lci | lc4032ze\ff_type\glb0\mc0\latch.tt4
+build lc4032ze\ff_type\glb0\mc0\none.jed: fit lc4032ze\ff_type\glb0\mc0\none.lci | lc4032ze\ff_type\glb0\mc0\none.tt4
+build lc4032ze\ff_type\glb0\mc0_fuses.csv: diff lc4032ze\ff_type\glb0\mc0\D.jed lc4032ze\ff_type\glb0\mc0\T.jed lc4032ze\ff_type\glb0\mc0\latch.jed lc4032ze\ff_type\glb0\mc0\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb0\mc1\D.jed: fit lc4032ze\ff_type\glb0\mc1\D.lci | lc4032ze\ff_type\glb0\mc1\D.tt4
+build lc4032ze\ff_type\glb0\mc1\T.jed: fit lc4032ze\ff_type\glb0\mc1\T.lci | lc4032ze\ff_type\glb0\mc1\T.tt4
+build lc4032ze\ff_type\glb0\mc1\latch.jed: fit lc4032ze\ff_type\glb0\mc1\latch.lci | lc4032ze\ff_type\glb0\mc1\latch.tt4
+build lc4032ze\ff_type\glb0\mc1\none.jed: fit lc4032ze\ff_type\glb0\mc1\none.lci | lc4032ze\ff_type\glb0\mc1\none.tt4
+build lc4032ze\ff_type\glb0\mc1_fuses.csv: diff lc4032ze\ff_type\glb0\mc1\D.jed lc4032ze\ff_type\glb0\mc1\T.jed lc4032ze\ff_type\glb0\mc1\latch.jed lc4032ze\ff_type\glb0\mc1\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb0\mc2\D.jed: fit lc4032ze\ff_type\glb0\mc2\D.lci | lc4032ze\ff_type\glb0\mc2\D.tt4
+build lc4032ze\ff_type\glb0\mc2\T.jed: fit lc4032ze\ff_type\glb0\mc2\T.lci | lc4032ze\ff_type\glb0\mc2\T.tt4
+build lc4032ze\ff_type\glb0\mc2\latch.jed: fit lc4032ze\ff_type\glb0\mc2\latch.lci | lc4032ze\ff_type\glb0\mc2\latch.tt4
+build lc4032ze\ff_type\glb0\mc2\none.jed: fit lc4032ze\ff_type\glb0\mc2\none.lci | lc4032ze\ff_type\glb0\mc2\none.tt4
+build lc4032ze\ff_type\glb0\mc2_fuses.csv: diff lc4032ze\ff_type\glb0\mc2\D.jed lc4032ze\ff_type\glb0\mc2\T.jed lc4032ze\ff_type\glb0\mc2\latch.jed lc4032ze\ff_type\glb0\mc2\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb0\mc3\D.jed: fit lc4032ze\ff_type\glb0\mc3\D.lci | lc4032ze\ff_type\glb0\mc3\D.tt4
+build lc4032ze\ff_type\glb0\mc3\T.jed: fit lc4032ze\ff_type\glb0\mc3\T.lci | lc4032ze\ff_type\glb0\mc3\T.tt4
+build lc4032ze\ff_type\glb0\mc3\latch.jed: fit lc4032ze\ff_type\glb0\mc3\latch.lci | lc4032ze\ff_type\glb0\mc3\latch.tt4
+build lc4032ze\ff_type\glb0\mc3\none.jed: fit lc4032ze\ff_type\glb0\mc3\none.lci | lc4032ze\ff_type\glb0\mc3\none.tt4
+build lc4032ze\ff_type\glb0\mc3_fuses.csv: diff lc4032ze\ff_type\glb0\mc3\D.jed lc4032ze\ff_type\glb0\mc3\T.jed lc4032ze\ff_type\glb0\mc3\latch.jed lc4032ze\ff_type\glb0\mc3\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb0\mc4\D.jed: fit lc4032ze\ff_type\glb0\mc4\D.lci | lc4032ze\ff_type\glb0\mc4\D.tt4
+build lc4032ze\ff_type\glb0\mc4\T.jed: fit lc4032ze\ff_type\glb0\mc4\T.lci | lc4032ze\ff_type\glb0\mc4\T.tt4
+build lc4032ze\ff_type\glb0\mc4\latch.jed: fit lc4032ze\ff_type\glb0\mc4\latch.lci | lc4032ze\ff_type\glb0\mc4\latch.tt4
+build lc4032ze\ff_type\glb0\mc4\none.jed: fit lc4032ze\ff_type\glb0\mc4\none.lci | lc4032ze\ff_type\glb0\mc4\none.tt4
+build lc4032ze\ff_type\glb0\mc4_fuses.csv: diff lc4032ze\ff_type\glb0\mc4\D.jed lc4032ze\ff_type\glb0\mc4\T.jed lc4032ze\ff_type\glb0\mc4\latch.jed lc4032ze\ff_type\glb0\mc4\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb0\mc5\D.jed: fit lc4032ze\ff_type\glb0\mc5\D.lci | lc4032ze\ff_type\glb0\mc5\D.tt4
+build lc4032ze\ff_type\glb0\mc5\T.jed: fit lc4032ze\ff_type\glb0\mc5\T.lci | lc4032ze\ff_type\glb0\mc5\T.tt4
+build lc4032ze\ff_type\glb0\mc5\latch.jed: fit lc4032ze\ff_type\glb0\mc5\latch.lci | lc4032ze\ff_type\glb0\mc5\latch.tt4
+build lc4032ze\ff_type\glb0\mc5\none.jed: fit lc4032ze\ff_type\glb0\mc5\none.lci | lc4032ze\ff_type\glb0\mc5\none.tt4
+build lc4032ze\ff_type\glb0\mc5_fuses.csv: diff lc4032ze\ff_type\glb0\mc5\D.jed lc4032ze\ff_type\glb0\mc5\T.jed lc4032ze\ff_type\glb0\mc5\latch.jed lc4032ze\ff_type\glb0\mc5\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb0\mc6\D.jed: fit lc4032ze\ff_type\glb0\mc6\D.lci | lc4032ze\ff_type\glb0\mc6\D.tt4
+build lc4032ze\ff_type\glb0\mc6\T.jed: fit lc4032ze\ff_type\glb0\mc6\T.lci | lc4032ze\ff_type\glb0\mc6\T.tt4
+build lc4032ze\ff_type\glb0\mc6\latch.jed: fit lc4032ze\ff_type\glb0\mc6\latch.lci | lc4032ze\ff_type\glb0\mc6\latch.tt4
+build lc4032ze\ff_type\glb0\mc6\none.jed: fit lc4032ze\ff_type\glb0\mc6\none.lci | lc4032ze\ff_type\glb0\mc6\none.tt4
+build lc4032ze\ff_type\glb0\mc6_fuses.csv: diff lc4032ze\ff_type\glb0\mc6\D.jed lc4032ze\ff_type\glb0\mc6\T.jed lc4032ze\ff_type\glb0\mc6\latch.jed lc4032ze\ff_type\glb0\mc6\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb0\mc7\D.jed: fit lc4032ze\ff_type\glb0\mc7\D.lci | lc4032ze\ff_type\glb0\mc7\D.tt4
+build lc4032ze\ff_type\glb0\mc7\T.jed: fit lc4032ze\ff_type\glb0\mc7\T.lci | lc4032ze\ff_type\glb0\mc7\T.tt4
+build lc4032ze\ff_type\glb0\mc7\latch.jed: fit lc4032ze\ff_type\glb0\mc7\latch.lci | lc4032ze\ff_type\glb0\mc7\latch.tt4
+build lc4032ze\ff_type\glb0\mc7\none.jed: fit lc4032ze\ff_type\glb0\mc7\none.lci | lc4032ze\ff_type\glb0\mc7\none.tt4
+build lc4032ze\ff_type\glb0\mc7_fuses.csv: diff lc4032ze\ff_type\glb0\mc7\D.jed lc4032ze\ff_type\glb0\mc7\T.jed lc4032ze\ff_type\glb0\mc7\latch.jed lc4032ze\ff_type\glb0\mc7\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb0\mc8\D.jed: fit lc4032ze\ff_type\glb0\mc8\D.lci | lc4032ze\ff_type\glb0\mc8\D.tt4
+build lc4032ze\ff_type\glb0\mc8\T.jed: fit lc4032ze\ff_type\glb0\mc8\T.lci | lc4032ze\ff_type\glb0\mc8\T.tt4
+build lc4032ze\ff_type\glb0\mc8\latch.jed: fit lc4032ze\ff_type\glb0\mc8\latch.lci | lc4032ze\ff_type\glb0\mc8\latch.tt4
+build lc4032ze\ff_type\glb0\mc8\none.jed: fit lc4032ze\ff_type\glb0\mc8\none.lci | lc4032ze\ff_type\glb0\mc8\none.tt4
+build lc4032ze\ff_type\glb0\mc8_fuses.csv: diff lc4032ze\ff_type\glb0\mc8\D.jed lc4032ze\ff_type\glb0\mc8\T.jed lc4032ze\ff_type\glb0\mc8\latch.jed lc4032ze\ff_type\glb0\mc8\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb0\mc9\D.jed: fit lc4032ze\ff_type\glb0\mc9\D.lci | lc4032ze\ff_type\glb0\mc9\D.tt4
+build lc4032ze\ff_type\glb0\mc9\T.jed: fit lc4032ze\ff_type\glb0\mc9\T.lci | lc4032ze\ff_type\glb0\mc9\T.tt4
+build lc4032ze\ff_type\glb0\mc9\latch.jed: fit lc4032ze\ff_type\glb0\mc9\latch.lci | lc4032ze\ff_type\glb0\mc9\latch.tt4
+build lc4032ze\ff_type\glb0\mc9\none.jed: fit lc4032ze\ff_type\glb0\mc9\none.lci | lc4032ze\ff_type\glb0\mc9\none.tt4
+build lc4032ze\ff_type\glb0\mc9_fuses.csv: diff lc4032ze\ff_type\glb0\mc9\D.jed lc4032ze\ff_type\glb0\mc9\T.jed lc4032ze\ff_type\glb0\mc9\latch.jed lc4032ze\ff_type\glb0\mc9\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb0\mc10\D.jed: fit lc4032ze\ff_type\glb0\mc10\D.lci | lc4032ze\ff_type\glb0\mc10\D.tt4
+build lc4032ze\ff_type\glb0\mc10\T.jed: fit lc4032ze\ff_type\glb0\mc10\T.lci | lc4032ze\ff_type\glb0\mc10\T.tt4
+build lc4032ze\ff_type\glb0\mc10\latch.jed: fit lc4032ze\ff_type\glb0\mc10\latch.lci | lc4032ze\ff_type\glb0\mc10\latch.tt4
+build lc4032ze\ff_type\glb0\mc10\none.jed: fit lc4032ze\ff_type\glb0\mc10\none.lci | lc4032ze\ff_type\glb0\mc10\none.tt4
+build lc4032ze\ff_type\glb0\mc10_fuses.csv: diff lc4032ze\ff_type\glb0\mc10\D.jed lc4032ze\ff_type\glb0\mc10\T.jed lc4032ze\ff_type\glb0\mc10\latch.jed lc4032ze\ff_type\glb0\mc10\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb0\mc11\D.jed: fit lc4032ze\ff_type\glb0\mc11\D.lci | lc4032ze\ff_type\glb0\mc11\D.tt4
+build lc4032ze\ff_type\glb0\mc11\T.jed: fit lc4032ze\ff_type\glb0\mc11\T.lci | lc4032ze\ff_type\glb0\mc11\T.tt4
+build lc4032ze\ff_type\glb0\mc11\latch.jed: fit lc4032ze\ff_type\glb0\mc11\latch.lci | lc4032ze\ff_type\glb0\mc11\latch.tt4
+build lc4032ze\ff_type\glb0\mc11\none.jed: fit lc4032ze\ff_type\glb0\mc11\none.lci | lc4032ze\ff_type\glb0\mc11\none.tt4
+build lc4032ze\ff_type\glb0\mc11_fuses.csv: diff lc4032ze\ff_type\glb0\mc11\D.jed lc4032ze\ff_type\glb0\mc11\T.jed lc4032ze\ff_type\glb0\mc11\latch.jed lc4032ze\ff_type\glb0\mc11\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb0\mc12\D.jed: fit lc4032ze\ff_type\glb0\mc12\D.lci | lc4032ze\ff_type\glb0\mc12\D.tt4
+build lc4032ze\ff_type\glb0\mc12\T.jed: fit lc4032ze\ff_type\glb0\mc12\T.lci | lc4032ze\ff_type\glb0\mc12\T.tt4
+build lc4032ze\ff_type\glb0\mc12\latch.jed: fit lc4032ze\ff_type\glb0\mc12\latch.lci | lc4032ze\ff_type\glb0\mc12\latch.tt4
+build lc4032ze\ff_type\glb0\mc12\none.jed: fit lc4032ze\ff_type\glb0\mc12\none.lci | lc4032ze\ff_type\glb0\mc12\none.tt4
+build lc4032ze\ff_type\glb0\mc12_fuses.csv: diff lc4032ze\ff_type\glb0\mc12\D.jed lc4032ze\ff_type\glb0\mc12\T.jed lc4032ze\ff_type\glb0\mc12\latch.jed lc4032ze\ff_type\glb0\mc12\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb0\mc13\D.jed: fit lc4032ze\ff_type\glb0\mc13\D.lci | lc4032ze\ff_type\glb0\mc13\D.tt4
+build lc4032ze\ff_type\glb0\mc13\T.jed: fit lc4032ze\ff_type\glb0\mc13\T.lci | lc4032ze\ff_type\glb0\mc13\T.tt4
+build lc4032ze\ff_type\glb0\mc13\latch.jed: fit lc4032ze\ff_type\glb0\mc13\latch.lci | lc4032ze\ff_type\glb0\mc13\latch.tt4
+build lc4032ze\ff_type\glb0\mc13\none.jed: fit lc4032ze\ff_type\glb0\mc13\none.lci | lc4032ze\ff_type\glb0\mc13\none.tt4
+build lc4032ze\ff_type\glb0\mc13_fuses.csv: diff lc4032ze\ff_type\glb0\mc13\D.jed lc4032ze\ff_type\glb0\mc13\T.jed lc4032ze\ff_type\glb0\mc13\latch.jed lc4032ze\ff_type\glb0\mc13\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb0\mc14\D.jed: fit lc4032ze\ff_type\glb0\mc14\D.lci | lc4032ze\ff_type\glb0\mc14\D.tt4
+build lc4032ze\ff_type\glb0\mc14\T.jed: fit lc4032ze\ff_type\glb0\mc14\T.lci | lc4032ze\ff_type\glb0\mc14\T.tt4
+build lc4032ze\ff_type\glb0\mc14\latch.jed: fit lc4032ze\ff_type\glb0\mc14\latch.lci | lc4032ze\ff_type\glb0\mc14\latch.tt4
+build lc4032ze\ff_type\glb0\mc14\none.jed: fit lc4032ze\ff_type\glb0\mc14\none.lci | lc4032ze\ff_type\glb0\mc14\none.tt4
+build lc4032ze\ff_type\glb0\mc14_fuses.csv: diff lc4032ze\ff_type\glb0\mc14\D.jed lc4032ze\ff_type\glb0\mc14\T.jed lc4032ze\ff_type\glb0\mc14\latch.jed lc4032ze\ff_type\glb0\mc14\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb0\mc15\D.jed: fit lc4032ze\ff_type\glb0\mc15\D.lci | lc4032ze\ff_type\glb0\mc15\D.tt4
+build lc4032ze\ff_type\glb0\mc15\T.jed: fit lc4032ze\ff_type\glb0\mc15\T.lci | lc4032ze\ff_type\glb0\mc15\T.tt4
+build lc4032ze\ff_type\glb0\mc15\latch.jed: fit lc4032ze\ff_type\glb0\mc15\latch.lci | lc4032ze\ff_type\glb0\mc15\latch.tt4
+build lc4032ze\ff_type\glb0\mc15\none.jed: fit lc4032ze\ff_type\glb0\mc15\none.lci | lc4032ze\ff_type\glb0\mc15\none.tt4
+build lc4032ze\ff_type\glb0\mc15_fuses.csv: diff lc4032ze\ff_type\glb0\mc15\D.jed lc4032ze\ff_type\glb0\mc15\T.jed lc4032ze\ff_type\glb0\mc15\latch.jed lc4032ze\ff_type\glb0\mc15\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb1\mc0\D.jed: fit lc4032ze\ff_type\glb1\mc0\D.lci | lc4032ze\ff_type\glb1\mc0\D.tt4
+build lc4032ze\ff_type\glb1\mc0\T.jed: fit lc4032ze\ff_type\glb1\mc0\T.lci | lc4032ze\ff_type\glb1\mc0\T.tt4
+build lc4032ze\ff_type\glb1\mc0\latch.jed: fit lc4032ze\ff_type\glb1\mc0\latch.lci | lc4032ze\ff_type\glb1\mc0\latch.tt4
+build lc4032ze\ff_type\glb1\mc0\none.jed: fit lc4032ze\ff_type\glb1\mc0\none.lci | lc4032ze\ff_type\glb1\mc0\none.tt4
+build lc4032ze\ff_type\glb1\mc0_fuses.csv: diff lc4032ze\ff_type\glb1\mc0\D.jed lc4032ze\ff_type\glb1\mc0\T.jed lc4032ze\ff_type\glb1\mc0\latch.jed lc4032ze\ff_type\glb1\mc0\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb1\mc1\D.jed: fit lc4032ze\ff_type\glb1\mc1\D.lci | lc4032ze\ff_type\glb1\mc1\D.tt4
+build lc4032ze\ff_type\glb1\mc1\T.jed: fit lc4032ze\ff_type\glb1\mc1\T.lci | lc4032ze\ff_type\glb1\mc1\T.tt4
+build lc4032ze\ff_type\glb1\mc1\latch.jed: fit lc4032ze\ff_type\glb1\mc1\latch.lci | lc4032ze\ff_type\glb1\mc1\latch.tt4
+build lc4032ze\ff_type\glb1\mc1\none.jed: fit lc4032ze\ff_type\glb1\mc1\none.lci | lc4032ze\ff_type\glb1\mc1\none.tt4
+build lc4032ze\ff_type\glb1\mc1_fuses.csv: diff lc4032ze\ff_type\glb1\mc1\D.jed lc4032ze\ff_type\glb1\mc1\T.jed lc4032ze\ff_type\glb1\mc1\latch.jed lc4032ze\ff_type\glb1\mc1\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb1\mc2\D.jed: fit lc4032ze\ff_type\glb1\mc2\D.lci | lc4032ze\ff_type\glb1\mc2\D.tt4
+build lc4032ze\ff_type\glb1\mc2\T.jed: fit lc4032ze\ff_type\glb1\mc2\T.lci | lc4032ze\ff_type\glb1\mc2\T.tt4
+build lc4032ze\ff_type\glb1\mc2\latch.jed: fit lc4032ze\ff_type\glb1\mc2\latch.lci | lc4032ze\ff_type\glb1\mc2\latch.tt4
+build lc4032ze\ff_type\glb1\mc2\none.jed: fit lc4032ze\ff_type\glb1\mc2\none.lci | lc4032ze\ff_type\glb1\mc2\none.tt4
+build lc4032ze\ff_type\glb1\mc2_fuses.csv: diff lc4032ze\ff_type\glb1\mc2\D.jed lc4032ze\ff_type\glb1\mc2\T.jed lc4032ze\ff_type\glb1\mc2\latch.jed lc4032ze\ff_type\glb1\mc2\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb1\mc3\D.jed: fit lc4032ze\ff_type\glb1\mc3\D.lci | lc4032ze\ff_type\glb1\mc3\D.tt4
+build lc4032ze\ff_type\glb1\mc3\T.jed: fit lc4032ze\ff_type\glb1\mc3\T.lci | lc4032ze\ff_type\glb1\mc3\T.tt4
+build lc4032ze\ff_type\glb1\mc3\latch.jed: fit lc4032ze\ff_type\glb1\mc3\latch.lci | lc4032ze\ff_type\glb1\mc3\latch.tt4
+build lc4032ze\ff_type\glb1\mc3\none.jed: fit lc4032ze\ff_type\glb1\mc3\none.lci | lc4032ze\ff_type\glb1\mc3\none.tt4
+build lc4032ze\ff_type\glb1\mc3_fuses.csv: diff lc4032ze\ff_type\glb1\mc3\D.jed lc4032ze\ff_type\glb1\mc3\T.jed lc4032ze\ff_type\glb1\mc3\latch.jed lc4032ze\ff_type\glb1\mc3\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb1\mc4\D.jed: fit lc4032ze\ff_type\glb1\mc4\D.lci | lc4032ze\ff_type\glb1\mc4\D.tt4
+build lc4032ze\ff_type\glb1\mc4\T.jed: fit lc4032ze\ff_type\glb1\mc4\T.lci | lc4032ze\ff_type\glb1\mc4\T.tt4
+build lc4032ze\ff_type\glb1\mc4\latch.jed: fit lc4032ze\ff_type\glb1\mc4\latch.lci | lc4032ze\ff_type\glb1\mc4\latch.tt4
+build lc4032ze\ff_type\glb1\mc4\none.jed: fit lc4032ze\ff_type\glb1\mc4\none.lci | lc4032ze\ff_type\glb1\mc4\none.tt4
+build lc4032ze\ff_type\glb1\mc4_fuses.csv: diff lc4032ze\ff_type\glb1\mc4\D.jed lc4032ze\ff_type\glb1\mc4\T.jed lc4032ze\ff_type\glb1\mc4\latch.jed lc4032ze\ff_type\glb1\mc4\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb1\mc5\D.jed: fit lc4032ze\ff_type\glb1\mc5\D.lci | lc4032ze\ff_type\glb1\mc5\D.tt4
+build lc4032ze\ff_type\glb1\mc5\T.jed: fit lc4032ze\ff_type\glb1\mc5\T.lci | lc4032ze\ff_type\glb1\mc5\T.tt4
+build lc4032ze\ff_type\glb1\mc5\latch.jed: fit lc4032ze\ff_type\glb1\mc5\latch.lci | lc4032ze\ff_type\glb1\mc5\latch.tt4
+build lc4032ze\ff_type\glb1\mc5\none.jed: fit lc4032ze\ff_type\glb1\mc5\none.lci | lc4032ze\ff_type\glb1\mc5\none.tt4
+build lc4032ze\ff_type\glb1\mc5_fuses.csv: diff lc4032ze\ff_type\glb1\mc5\D.jed lc4032ze\ff_type\glb1\mc5\T.jed lc4032ze\ff_type\glb1\mc5\latch.jed lc4032ze\ff_type\glb1\mc5\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb1\mc6\D.jed: fit lc4032ze\ff_type\glb1\mc6\D.lci | lc4032ze\ff_type\glb1\mc6\D.tt4
+build lc4032ze\ff_type\glb1\mc6\T.jed: fit lc4032ze\ff_type\glb1\mc6\T.lci | lc4032ze\ff_type\glb1\mc6\T.tt4
+build lc4032ze\ff_type\glb1\mc6\latch.jed: fit lc4032ze\ff_type\glb1\mc6\latch.lci | lc4032ze\ff_type\glb1\mc6\latch.tt4
+build lc4032ze\ff_type\glb1\mc6\none.jed: fit lc4032ze\ff_type\glb1\mc6\none.lci | lc4032ze\ff_type\glb1\mc6\none.tt4
+build lc4032ze\ff_type\glb1\mc6_fuses.csv: diff lc4032ze\ff_type\glb1\mc6\D.jed lc4032ze\ff_type\glb1\mc6\T.jed lc4032ze\ff_type\glb1\mc6\latch.jed lc4032ze\ff_type\glb1\mc6\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb1\mc7\D.jed: fit lc4032ze\ff_type\glb1\mc7\D.lci | lc4032ze\ff_type\glb1\mc7\D.tt4
+build lc4032ze\ff_type\glb1\mc7\T.jed: fit lc4032ze\ff_type\glb1\mc7\T.lci | lc4032ze\ff_type\glb1\mc7\T.tt4
+build lc4032ze\ff_type\glb1\mc7\latch.jed: fit lc4032ze\ff_type\glb1\mc7\latch.lci | lc4032ze\ff_type\glb1\mc7\latch.tt4
+build lc4032ze\ff_type\glb1\mc7\none.jed: fit lc4032ze\ff_type\glb1\mc7\none.lci | lc4032ze\ff_type\glb1\mc7\none.tt4
+build lc4032ze\ff_type\glb1\mc7_fuses.csv: diff lc4032ze\ff_type\glb1\mc7\D.jed lc4032ze\ff_type\glb1\mc7\T.jed lc4032ze\ff_type\glb1\mc7\latch.jed lc4032ze\ff_type\glb1\mc7\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb1\mc8\D.jed: fit lc4032ze\ff_type\glb1\mc8\D.lci | lc4032ze\ff_type\glb1\mc8\D.tt4
+build lc4032ze\ff_type\glb1\mc8\T.jed: fit lc4032ze\ff_type\glb1\mc8\T.lci | lc4032ze\ff_type\glb1\mc8\T.tt4
+build lc4032ze\ff_type\glb1\mc8\latch.jed: fit lc4032ze\ff_type\glb1\mc8\latch.lci | lc4032ze\ff_type\glb1\mc8\latch.tt4
+build lc4032ze\ff_type\glb1\mc8\none.jed: fit lc4032ze\ff_type\glb1\mc8\none.lci | lc4032ze\ff_type\glb1\mc8\none.tt4
+build lc4032ze\ff_type\glb1\mc8_fuses.csv: diff lc4032ze\ff_type\glb1\mc8\D.jed lc4032ze\ff_type\glb1\mc8\T.jed lc4032ze\ff_type\glb1\mc8\latch.jed lc4032ze\ff_type\glb1\mc8\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb1\mc9\D.jed: fit lc4032ze\ff_type\glb1\mc9\D.lci | lc4032ze\ff_type\glb1\mc9\D.tt4
+build lc4032ze\ff_type\glb1\mc9\T.jed: fit lc4032ze\ff_type\glb1\mc9\T.lci | lc4032ze\ff_type\glb1\mc9\T.tt4
+build lc4032ze\ff_type\glb1\mc9\latch.jed: fit lc4032ze\ff_type\glb1\mc9\latch.lci | lc4032ze\ff_type\glb1\mc9\latch.tt4
+build lc4032ze\ff_type\glb1\mc9\none.jed: fit lc4032ze\ff_type\glb1\mc9\none.lci | lc4032ze\ff_type\glb1\mc9\none.tt4
+build lc4032ze\ff_type\glb1\mc9_fuses.csv: diff lc4032ze\ff_type\glb1\mc9\D.jed lc4032ze\ff_type\glb1\mc9\T.jed lc4032ze\ff_type\glb1\mc9\latch.jed lc4032ze\ff_type\glb1\mc9\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb1\mc10\D.jed: fit lc4032ze\ff_type\glb1\mc10\D.lci | lc4032ze\ff_type\glb1\mc10\D.tt4
+build lc4032ze\ff_type\glb1\mc10\T.jed: fit lc4032ze\ff_type\glb1\mc10\T.lci | lc4032ze\ff_type\glb1\mc10\T.tt4
+build lc4032ze\ff_type\glb1\mc10\latch.jed: fit lc4032ze\ff_type\glb1\mc10\latch.lci | lc4032ze\ff_type\glb1\mc10\latch.tt4
+build lc4032ze\ff_type\glb1\mc10\none.jed: fit lc4032ze\ff_type\glb1\mc10\none.lci | lc4032ze\ff_type\glb1\mc10\none.tt4
+build lc4032ze\ff_type\glb1\mc10_fuses.csv: diff lc4032ze\ff_type\glb1\mc10\D.jed lc4032ze\ff_type\glb1\mc10\T.jed lc4032ze\ff_type\glb1\mc10\latch.jed lc4032ze\ff_type\glb1\mc10\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb1\mc11\D.jed: fit lc4032ze\ff_type\glb1\mc11\D.lci | lc4032ze\ff_type\glb1\mc11\D.tt4
+build lc4032ze\ff_type\glb1\mc11\T.jed: fit lc4032ze\ff_type\glb1\mc11\T.lci | lc4032ze\ff_type\glb1\mc11\T.tt4
+build lc4032ze\ff_type\glb1\mc11\latch.jed: fit lc4032ze\ff_type\glb1\mc11\latch.lci | lc4032ze\ff_type\glb1\mc11\latch.tt4
+build lc4032ze\ff_type\glb1\mc11\none.jed: fit lc4032ze\ff_type\glb1\mc11\none.lci | lc4032ze\ff_type\glb1\mc11\none.tt4
+build lc4032ze\ff_type\glb1\mc11_fuses.csv: diff lc4032ze\ff_type\glb1\mc11\D.jed lc4032ze\ff_type\glb1\mc11\T.jed lc4032ze\ff_type\glb1\mc11\latch.jed lc4032ze\ff_type\glb1\mc11\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb1\mc12\D.jed: fit lc4032ze\ff_type\glb1\mc12\D.lci | lc4032ze\ff_type\glb1\mc12\D.tt4
+build lc4032ze\ff_type\glb1\mc12\T.jed: fit lc4032ze\ff_type\glb1\mc12\T.lci | lc4032ze\ff_type\glb1\mc12\T.tt4
+build lc4032ze\ff_type\glb1\mc12\latch.jed: fit lc4032ze\ff_type\glb1\mc12\latch.lci | lc4032ze\ff_type\glb1\mc12\latch.tt4
+build lc4032ze\ff_type\glb1\mc12\none.jed: fit lc4032ze\ff_type\glb1\mc12\none.lci | lc4032ze\ff_type\glb1\mc12\none.tt4
+build lc4032ze\ff_type\glb1\mc12_fuses.csv: diff lc4032ze\ff_type\glb1\mc12\D.jed lc4032ze\ff_type\glb1\mc12\T.jed lc4032ze\ff_type\glb1\mc12\latch.jed lc4032ze\ff_type\glb1\mc12\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb1\mc13\D.jed: fit lc4032ze\ff_type\glb1\mc13\D.lci | lc4032ze\ff_type\glb1\mc13\D.tt4
+build lc4032ze\ff_type\glb1\mc13\T.jed: fit lc4032ze\ff_type\glb1\mc13\T.lci | lc4032ze\ff_type\glb1\mc13\T.tt4
+build lc4032ze\ff_type\glb1\mc13\latch.jed: fit lc4032ze\ff_type\glb1\mc13\latch.lci | lc4032ze\ff_type\glb1\mc13\latch.tt4
+build lc4032ze\ff_type\glb1\mc13\none.jed: fit lc4032ze\ff_type\glb1\mc13\none.lci | lc4032ze\ff_type\glb1\mc13\none.tt4
+build lc4032ze\ff_type\glb1\mc13_fuses.csv: diff lc4032ze\ff_type\glb1\mc13\D.jed lc4032ze\ff_type\glb1\mc13\T.jed lc4032ze\ff_type\glb1\mc13\latch.jed lc4032ze\ff_type\glb1\mc13\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb1\mc14\D.jed: fit lc4032ze\ff_type\glb1\mc14\D.lci | lc4032ze\ff_type\glb1\mc14\D.tt4
+build lc4032ze\ff_type\glb1\mc14\T.jed: fit lc4032ze\ff_type\glb1\mc14\T.lci | lc4032ze\ff_type\glb1\mc14\T.tt4
+build lc4032ze\ff_type\glb1\mc14\latch.jed: fit lc4032ze\ff_type\glb1\mc14\latch.lci | lc4032ze\ff_type\glb1\mc14\latch.tt4
+build lc4032ze\ff_type\glb1\mc14\none.jed: fit lc4032ze\ff_type\glb1\mc14\none.lci | lc4032ze\ff_type\glb1\mc14\none.tt4
+build lc4032ze\ff_type\glb1\mc14_fuses.csv: diff lc4032ze\ff_type\glb1\mc14\D.jed lc4032ze\ff_type\glb1\mc14\T.jed lc4032ze\ff_type\glb1\mc14\latch.jed lc4032ze\ff_type\glb1\mc14\none.jed
+    diff_options = --rows 79-80
+
+build lc4032ze\ff_type\glb1\mc15\D.jed: fit lc4032ze\ff_type\glb1\mc15\D.lci | lc4032ze\ff_type\glb1\mc15\D.tt4
+build lc4032ze\ff_type\glb1\mc15\T.jed: fit lc4032ze\ff_type\glb1\mc15\T.lci | lc4032ze\ff_type\glb1\mc15\T.tt4
+build lc4032ze\ff_type\glb1\mc15\latch.jed: fit lc4032ze\ff_type\glb1\mc15\latch.lci | lc4032ze\ff_type\glb1\mc15\latch.tt4
+build lc4032ze\ff_type\glb1\mc15\none.jed: fit lc4032ze\ff_type\glb1\mc15\none.lci | lc4032ze\ff_type\glb1\mc15\none.tt4
+build lc4032ze\ff_type\glb1\mc15_fuses.csv: diff lc4032ze\ff_type\glb1\mc15\D.jed lc4032ze\ff_type\glb1\mc15\T.jed lc4032ze\ff_type\glb1\mc15\latch.jed lc4032ze\ff_type\glb1\mc15\none.jed
+    diff_options = --rows 79-80
+
 build bclk01: phony lc4032ze\bclk01\glb0_fuses.csv lc4032ze\bclk01\glb1_fuses.csv
 build bclk23: phony lc4032ze\bclk23\glb0_fuses.csv lc4032ze\bclk23\glb1_fuses.csv
 build ce_mux: phony lc4032ze\ce_mux\glb0\mc0_fuses.csv lc4032ze\ce_mux\glb0\mc10_fuses.csv lc4032ze\ce_mux\glb0\mc11_fuses.csv lc4032ze\ce_mux\glb0\mc12_fuses.csv lc4032ze\ce_mux\glb0\mc13_fuses.csv lc4032ze\ce_mux\glb0\mc14_fuses.csv lc4032ze\ce_mux\glb0\mc15_fuses.csv lc4032ze\ce_mux\glb0\mc1_fuses.csv lc4032ze\ce_mux\glb0\mc2_fuses.csv lc4032ze\ce_mux\glb0\mc3_fuses.csv lc4032ze\ce_mux\glb0\mc4_fuses.csv lc4032ze\ce_mux\glb0\mc5_fuses.csv lc4032ze\ce_mux\glb0\mc6_fuses.csv lc4032ze\ce_mux\glb0\mc7_fuses.csv lc4032ze\ce_mux\glb0\mc8_fuses.csv lc4032ze\ce_mux\glb0\mc9_fuses.csv lc4032ze\ce_mux\glb1\mc0_fuses.csv lc4032ze\ce_mux\glb1\mc10_fuses.csv lc4032ze\ce_mux\glb1\mc11_fuses.csv lc4032ze\ce_mux\glb1\mc12_fuses.csv lc4032ze\ce_mux\glb1\mc13_fuses.csv lc4032ze\ce_mux\glb1\mc14_fuses.csv lc4032ze\ce_mux\glb1\mc15_fuses.csv lc4032ze\ce_mux\glb1\mc1_fuses.csv lc4032ze\ce_mux\glb1\mc2_fuses.csv lc4032ze\ce_mux\glb1\mc3_fuses.csv lc4032ze\ce_mux\glb1\mc4_fuses.csv lc4032ze\ce_mux\glb1\mc5_fuses.csv lc4032ze\ce_mux\glb1\mc6_fuses.csv lc4032ze\ce_mux\glb1\mc7_fuses.csv lc4032ze\ce_mux\glb1\mc8_fuses.csv lc4032ze\ce_mux\glb1\mc9_fuses.csv
+build ff_type: phony lc4032ze\ff_type\glb0\mc0_fuses.csv lc4032ze\ff_type\glb0\mc10_fuses.csv lc4032ze\ff_type\glb0\mc11_fuses.csv lc4032ze\ff_type\glb0\mc12_fuses.csv lc4032ze\ff_type\glb0\mc13_fuses.csv lc4032ze\ff_type\glb0\mc14_fuses.csv lc4032ze\ff_type\glb0\mc15_fuses.csv lc4032ze\ff_type\glb0\mc1_fuses.csv lc4032ze\ff_type\glb0\mc2_fuses.csv lc4032ze\ff_type\glb0\mc3_fuses.csv lc4032ze\ff_type\glb0\mc4_fuses.csv lc4032ze\ff_type\glb0\mc5_fuses.csv lc4032ze\ff_type\glb0\mc6_fuses.csv lc4032ze\ff_type\glb0\mc7_fuses.csv lc4032ze\ff_type\glb0\mc8_fuses.csv lc4032ze\ff_type\glb0\mc9_fuses.csv lc4032ze\ff_type\glb1\mc0_fuses.csv lc4032ze\ff_type\glb1\mc10_fuses.csv lc4032ze\ff_type\glb1\mc11_fuses.csv lc4032ze\ff_type\glb1\mc12_fuses.csv lc4032ze\ff_type\glb1\mc13_fuses.csv lc4032ze\ff_type\glb1\mc14_fuses.csv lc4032ze\ff_type\glb1\mc15_fuses.csv lc4032ze\ff_type\glb1\mc1_fuses.csv lc4032ze\ff_type\glb1\mc2_fuses.csv lc4032ze\ff_type\glb1\mc3_fuses.csv lc4032ze\ff_type\glb1\mc4_fuses.csv lc4032ze\ff_type\glb1\mc5_fuses.csv lc4032ze\ff_type\glb1\mc6_fuses.csv lc4032ze\ff_type\glb1\mc7_fuses.csv lc4032ze\ff_type\glb1\mc8_fuses.csv lc4032ze\ff_type\glb1\mc9_fuses.csv
 build goe0_polarity: phony lc4032ze\goe0_polarity\fuses.csv
 build goe1_polarity: phony lc4032ze\goe1_polarity\fuses.csv
 build grp: phony grp\gi0 grp\gi1 grp\gi10 grp\gi11 grp\gi12 grp\gi13 grp\gi14 grp\gi15 grp\gi16 grp\gi17 grp\gi18 grp\gi19 grp\gi2 grp\gi20 grp\gi21 grp\gi22 grp\gi23 grp\gi24 grp\gi25 grp\gi26 grp\gi27 grp\gi28 grp\gi29 grp\gi3 grp\gi30 grp\gi31 grp\gi32 grp\gi33 grp\gi34 grp\gi35 grp\gi4 grp\gi5 grp\gi6 grp\gi7 grp\gi8 grp\gi9
@@ -4252,6 +4477,6 @@ build pull: phony lc4032ze\pull\glb0\mc0_fuses.csv lc4032ze\pull\glb0\mc10_fuses
 build reset_init: phony lc4032ze\reset_init\glb0\mc0_fuses.csv lc4032ze\reset_init\glb0\mc10_fuses.csv lc4032ze\reset_init\glb0\mc11_fuses.csv lc4032ze\reset_init\glb0\mc12_fuses.csv lc4032ze\reset_init\glb0\mc13_fuses.csv lc4032ze\reset_init\glb0\mc14_fuses.csv lc4032ze\reset_init\glb0\mc15_fuses.csv lc4032ze\reset_init\glb0\mc1_fuses.csv lc4032ze\reset_init\glb0\mc2_fuses.csv lc4032ze\reset_init\glb0\mc3_fuses.csv lc4032ze\reset_init\glb0\mc4_fuses.csv lc4032ze\reset_init\glb0\mc5_fuses.csv lc4032ze\reset_init\glb0\mc6_fuses.csv lc4032ze\reset_init\glb0\mc7_fuses.csv lc4032ze\reset_init\glb0\mc8_fuses.csv lc4032ze\reset_init\glb0\mc9_fuses.csv lc4032ze\reset_init\glb1\mc0_fuses.csv lc4032ze\reset_init\glb1\mc10_fuses.csv lc4032ze\reset_init\glb1\mc11_fuses.csv lc4032ze\reset_init\glb1\mc12_fuses.csv lc4032ze\reset_init\glb1\mc13_fuses.csv lc4032ze\reset_init\glb1\mc14_fuses.csv lc4032ze\reset_init\glb1\mc15_fuses.csv lc4032ze\reset_init\glb1\mc1_fuses.csv lc4032ze\reset_init\glb1\mc2_fuses.csv lc4032ze\reset_init\glb1\mc3_fuses.csv lc4032ze\reset_init\glb1\mc4_fuses.csv lc4032ze\reset_init\glb1\mc5_fuses.csv lc4032ze\reset_init\glb1\mc6_fuses.csv lc4032ze\reset_init\glb1\mc7_fuses.csv lc4032ze\reset_init\glb1\mc8_fuses.csv lc4032ze\reset_init\glb1\mc9_fuses.csv
 build slew: phony lc4032ze\slew\glb0\mc0_fuses.csv lc4032ze\slew\glb0\mc10_fuses.csv lc4032ze\slew\glb0\mc11_fuses.csv lc4032ze\slew\glb0\mc12_fuses.csv lc4032ze\slew\glb0\mc13_fuses.csv lc4032ze\slew\glb0\mc14_fuses.csv lc4032ze\slew\glb0\mc15_fuses.csv lc4032ze\slew\glb0\mc1_fuses.csv lc4032ze\slew\glb0\mc2_fuses.csv lc4032ze\slew\glb0\mc3_fuses.csv lc4032ze\slew\glb0\mc4_fuses.csv lc4032ze\slew\glb0\mc5_fuses.csv lc4032ze\slew\glb0\mc6_fuses.csv lc4032ze\slew\glb0\mc7_fuses.csv lc4032ze\slew\glb0\mc8_fuses.csv lc4032ze\slew\glb0\mc9_fuses.csv lc4032ze\slew\glb1\mc0_fuses.csv lc4032ze\slew\glb1\mc10_fuses.csv lc4032ze\slew\glb1\mc11_fuses.csv lc4032ze\slew\glb1\mc12_fuses.csv lc4032ze\slew\glb1\mc13_fuses.csv lc4032ze\slew\glb1\mc14_fuses.csv lc4032ze\slew\glb1\mc15_fuses.csv lc4032ze\slew\glb1\mc1_fuses.csv lc4032ze\slew\glb1\mc2_fuses.csv lc4032ze\slew\glb1\mc3_fuses.csv lc4032ze\slew\glb1\mc4_fuses.csv lc4032ze\slew\glb1\mc5_fuses.csv lc4032ze\slew\glb1\mc6_fuses.csv lc4032ze\slew\glb1\mc7_fuses.csv lc4032ze\slew\glb1\mc8_fuses.csv lc4032ze\slew\glb1\mc9_fuses.csv
 build zerohold: phony lc4032ze\zerohold\fuses.csv
-default bclk01 bclk23 ce_mux goe0_polarity goe1_polarity grp input_threshold od oe_mux orm pgdf pt0 pt1 pt2 pt3 pull reset_init slew zerohold
+default bclk01 bclk23 ce_mux ff_type goe0_polarity goe1_polarity grp input_threshold od oe_mux orm pgdf pt0 pt1 pt2 pt3 pull reset_init slew zerohold
 
 ## ######################### END OF GENERATED CODE ######################### ##

@@ -274,7 +274,7 @@ perOutputTest(dev, 'orm', { 'self', 'o1', 'o2', 'o3', 'o4', 'o5', 'o6', 'o7' })
 
 perMacrocellTest(dev, 'reset_init', { 'SET', 'RESET' })
 
-perMacrocellTest(dev, 'ce_mux', { 'always', 'npt', 'pt', 'shared' }, { diff_options = '--rows 86-87'})
+perMacrocellTest(dev, 'ce_mux', { 'always', 'npt', 'pt', 'shared' }, { diff_options = '--rows 72-99'}) --86-87'})
 
 
 local gi_list = { 0, 1, 34, 35 }
@@ -369,6 +369,8 @@ perGlbTest(dev, 'grp\\gi32', { 'pin 34', 'pin 24', 'fb B14', 'pin 26', 'fb B12',
 perGlbTest(dev, 'grp\\gi33', { 'fb B13', 'pin 21', 'fb A10', 'pin 41', 'fb B10', 'fb A14' }, { diff_options = '--rows 66-67 --exclude 0:3-71:85 --exclude 0:89-71:171' })
 perGlbTest(dev, 'grp\\gi34', { 'fb A9',  'fb A3',  'pin 46', 'pin 8',  'pin 15', 'fb B13' }, { diff_options = '--rows 68-69 --exclude 0:3-71:85 --exclude 0:89-71:171' })
 perGlbTest(dev, 'grp\\gi35', { 'pin 43', 'fb B8',  'pin 33', 'fb A15', 'fb A9',  'pin 16' }, { diff_options = '--rows 70-71 --exclude 0:3-71:85 --exclude 0:89-71:171' })
+
+perMacrocellTest(dev, 'ff_type', { 'D', 'T', 'latch', 'none' }, { diff_options = '--rows 79-80' })
 
 
 for group, targets in spairs(group_targets) do

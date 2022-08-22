@@ -447,6 +447,7 @@ function write_lci_ce_mux (device, special_glb, special_mc, variant)
 
     writeln '\n[Location Assignments]'
     assign_node_location('out', device.glb(special_glb).mc(special_mc))
+    assign_node_location('ceo', device.glb(special_glb))
     assign_node_location('out2', device.glb(special_glb).mc(scratch_base))
     assign_node_location('out3', device.glb(special_glb).mc(scratch_base+1))
     assign_node_location('out4', device.glb(special_glb).mc(scratch_base+2))
@@ -925,3 +926,26 @@ write_lci_grp_gi32 = function(...) write_lci_grp(32, ...) end
 write_lci_grp_gi33 = function(...) write_lci_grp(33, ...) end
 write_lci_grp_gi34 = function(...) write_lci_grp(34, ...) end
 write_lci_grp_gi35 = function(...) write_lci_grp(35, ...) end
+
+function write_lci_ff_type (device, glb, mc, variant)
+    local pla = make_pla()
+    write_lci_common { device = device }
+    writeln '\n[Location Assignments]'
+
+    pla:node('out')
+    if variant == 'D' then
+        pla:pt('in', 'out.D')
+        pla:pt('clk', 'out.C')
+    elseif variant == 'T' then
+        pla:pt('in', 'out.T')
+        pla:pt('clk', 'out.C')
+    elseif variant == 'latch' then
+        pla:pt('in', 'out.D')
+        pla:pt('clk', 'out.LH')
+    else
+        pla:pt('in', 'out')
+    end
+    assign_node_location('out', device.glb(glb).mc(mc))
+
+    pla:write(variant..'.tt4')
+end

@@ -1,4 +1,4 @@
-//[[!! include "lci"; write_lci_ce_mux(device.lc4032ze, 1, 10, "always") !! 31 ]]
+//[[!! include "lci"; write_lci_ce_mux(device.lc4032ze, 1, 10, "always") !! 32 ]]
 //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
 [Revision]
 Parent = lc4k32e.lci;
@@ -24,6 +24,7 @@ Spread_Placement=No;
 
 [Location Assignments]
 out=node,-,-,B,10;
+ceo=node,-,-,B,-;
 out2=node,-,-,B,1;
 out3=node,-,-,B,2;
 out4=node,-,-,B,3;
