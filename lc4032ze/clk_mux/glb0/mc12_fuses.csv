@@ -1,0 +1,4 @@
+fuse,lc4032ze\clk_mux\glb0\mc12\bclk0.jed,lc4032ze\clk_mux\glb0\mc12\bclk1.jed,lc4032ze\clk_mux\glb0\mc12\bclk2.jed,lc4032ze\clk_mux\glb0\mc12\bclk3.jed,lc4032ze\clk_mux\glb0\mc12\pt.jed,lc4032ze\clk_mux\glb0\mc12\npt.jed,lc4032ze\clk_mux\glb0\mc12\shared_pt.jed,lc4032ze\clk_mux\glb0\mc12\gnd.jed
+76:153,0,1,0,1,0,1,0,1
+77:153,0,0,1,1,0,0,1,1
+81:153,0,0,0,0,1,1,1,1

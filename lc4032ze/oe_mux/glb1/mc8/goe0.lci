@@ -1,4 +1,4 @@
-//[[!! include "lci"; write_lci_oe_mux(device.lc4032ze, 1, 8, "goe0") !! 40 ]]
+//[[!! include "lci"; write_lci_oe_mux(device.lc4032ze, 1, 8, "goe0") !! 29 ]]
 //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
 [Revision]
 Parent = lc4k32e.lci;
@@ -23,18 +23,7 @@ Default_Device_Io_Types=LVCMOS33,-;
 Spread_Placement=No;
 
 [Location Assignments]
-goe0=pin,44,-,-,-;
-goe1=pin,41,-,-,-;
-goe2=pin,45,-,-,-;
-goe3=pin,46,-,-,-;
-in0=pin,47,-,-,-;
-in1=pin,48,-,-,-;
-in2=pin,2,-,-,-;
-in3=pin,3,-,-,-;
-out_goe0=pin,21,-,B,1;
-out_goe1=pin,22,-,B,2;
-out_goe2=pin,23,-,B,3;
-out_goe3=pin,24,-,B,4;
 out=pin,31,-,B,8;
+goe0=pin,44,-,-,-;
 
 //[[ ######################### END OF GENERATED CODE ######################### ]]

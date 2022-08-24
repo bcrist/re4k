@@ -292,49 +292,8 @@ end
 function write_lci_oe_mux (device, special_glb, special_mc, variant)
     local pla = make_pla()
 
-    pla:pin('out_goe0', 'out_goe1', 'out_goe2', 'out_goe3', 'out')
-
-    pla:pt({}, { 'out_goe0', 'out_goe1', 'out_goe2', 'out_goe3' })
-    pla:pt('goe0', 'out_goe0.OE')
-    pla:pt('goe1', 'out_goe1.OE')
-    pla:pt('goe2', 'out_goe2.OE')
-    pla:pt('goe3', 'out_goe3.OE')
-
-    pla:pt('in0', 'out')
-    pla:pt('in1', 'out')
-    pla:pt('in2', 'out')
-    pla:pt('in3', 'out')
-
-    if variant == 'goe0' then
-        pla:pt('goe0', 'out.OE')
-
-    elseif variant == 'goe1' then
-        pla:pt('goe1', 'out.OE')
-
-    elseif variant == 'goe2' then
-        pla:pt('goe2', 'out.OE')
-
-    elseif variant == 'goe3' then
-        pla:pt('goe3', 'out.OE')
-
-    elseif variant == 'pt' then
-        pla:pt({'in0', 'in1'}, 'out.OE')
-
-    elseif variant == 'npt' then
-        pla:pt({'in0', 'in1'}, 'out.OE-')
-
-    elseif variant == 'on' then
-        pla:pt({}, 'out.OE')
-
-    elseif variant == 'off' then
-        pla:output('out.OE')
-    
-    end
-
-    pla:write(variant..'.tt4')
-
-
     write_lci_common { device = device }
+    writeln '\n[Location Assignments]'
 
     local glb = device.glb(special_glb)
     local scratch_glb = device.glb((special_glb + 1) % device.num_glbs)
@@ -346,28 +305,67 @@ function write_lci_oe_mux (device, special_glb, special_mc, variant)
         scratch_base = 1
     end
 
-    writeln '\n[Location Assignments]'
-
-    if glb.mc(special_mc).pin.type ~= 'IO' then
-        assign_pin_location('goe0', scratch_glb.mc(8).pin)
-        assign_pin_location('goe1', scratch_glb.mc(9).pin)
-    else
-        assign_pin_location('goe0', device.goe(0))
-        assign_pin_location('goe1', device.goe(1))
-    end
-    assign_pin_location('goe2', scratch_glb.mc(1).pin)
-    assign_pin_location('goe3', scratch_glb.mc(2).pin)
-    assign_pin_location('in0', scratch_glb.mc(3).pin)
-    assign_pin_location('in1', scratch_glb.mc(4).pin)
-    assign_pin_location('in2', scratch_glb.mc(5).pin)
-    assign_pin_location('in3', scratch_glb.mc(6).pin)
-
-    assign_pin_location('out_goe0', glb.mc(scratch_base))
-    assign_pin_location('out_goe1', glb.mc(scratch_base+1))
-    assign_pin_location('out_goe2', glb.mc(scratch_base+2))
-    assign_pin_location('out_goe3', glb.mc(scratch_base+3))
-
+    pla:pin('out')
+    pla:pt('in', 'out')
     assign_pin_location('out', glb.mc(special_mc))
+
+    if variant == 'goe0' then
+        pla:pt('goe0', 'out.OE')
+        assign_pin_location('goe0', device.goe(0))
+        
+    elseif variant == 'goe1' then
+        pla:pt('goe1', 'out.OE')
+        assign_pin_location('goe1', device.goe(1))
+
+    elseif variant == 'goe2' then
+        pla:pt('goe2', 'out.OE')
+        assign_pin_location('goe2', scratch_glb.mc(1).pin)
+        assign_pin_location('goe3', scratch_glb.mc(2).pin)
+
+    elseif variant == 'goe3' then
+        pla:pt('goe3', 'out.OE')
+
+        pla:pin('dum1')
+        pla:pt({}, {'dum1','dum2'})
+        pla:pt('goe2', 'dum1.OE')
+        pla:pt('goe2', 'dum2.OE')
+        assign_pin_location('dum1', glb.mc(scratch_base + 1).pin)
+        assign_pin_location('dum2', glb.mc(scratch_base + 2).pin)
+        assign_pin_location('goe2', scratch_glb.mc(1).pin)
+        assign_pin_location('goe3', scratch_glb.mc(2).pin)
+
+    elseif variant == 'pt' or variant == 'npt' then
+        if variant == 'npt' then
+            pla:pt({'in0', 'in1'}, 'out.OE-')
+        else
+            pla:pt({'in0', 'in1'}, 'out.OE')
+        end
+
+        for mc, mci in glb.mcs() do
+            if mc ~= special_mc then
+                local sig = 'dum'..mc
+                pla:pin(sig)
+                pla:pt({}, sig)
+                if mc < 8 then
+                    pla:pt('goe2', sig..'.OE')
+                else
+                    pla:pt('goe3', sig..'.OE')
+                end
+                assign_pin_location(sig, mci)
+            end
+        end
+        assign_pin_location('goe2', scratch_glb.mc(1).pin)
+        assign_pin_location('goe3', scratch_glb.mc(2).pin)
+
+    elseif variant == 'on' then
+        -- nothing
+
+    elseif variant == 'off' then
+        pla:output('out.OE')
+    
+    end
+
+    pla:write(variant..'.tt4')
 end
 
 function write_lci_orm (device, special_glb, special_mc, variant)
@@ -946,6 +944,138 @@ function write_lci_ff_type (device, glb, mc, variant)
         pla:pt('in', 'out')
     end
     assign_node_location('out', device.glb(glb).mc(mc))
+
+    pla:write(variant..'.tt4')
+end
+
+function write_lci_pt2_reset (device, glb, mc, variant)
+    local pla = make_pla()
+    write_lci_common { device = device }
+    writeln '\n[Location Assignments]'
+
+    pla:pt('in', 'out.D')
+    if variant == 'pt' then
+        pla:pt('as', 'out.AP')
+    end
+    assign_node_location('out', device.glb(glb).mc(mc))
+
+    pla:write(variant..'.tt4')
+
+    writeln '\n[Register Powerup]'
+    writeln('Default = RESET;')
+end
+
+function write_lci_pt3_reset (device, glb, mc, variant)
+    local pla = make_pla()
+    write_lci_common { device = device }
+    writeln '\n[Location Assignments]'
+
+    pla:pt('in', 'b.D')
+    pla:pt('gas', 'b.AR')
+    assign_node_location('b', device.glb(glb).mc((mc+15) % 16))
+
+    pla:pt('in', 'a.D')
+    if variant == 'pt' then
+        pla:pt('xas', 'a.AR')
+    elseif variant == 'shared' then
+        pla:pt('gas', 'a.AR')
+    end
+    assign_node_location('a', device.glb(glb).mc(mc))
+
+
+    pla:write(variant..'.tt4')
+
+    writeln '\n[Register Powerup]'
+    writeln('Default = RESET;')
+end
+
+function write_lci_clk_mux (device, glb, mc, variant)
+    local pla = make_pla()
+    write_lci_common { device = device }
+    writeln '\n[Location Assignments]'
+
+    assign_pin_location('clk0', device.clk(0))
+    assign_pin_location('clk1', device.clk(1))
+    assign_pin_location('clk2', device.clk(2))
+    assign_pin_location('clk3', device.clk(3))
+    assign_node_location('out', device.glb(glb).mc(mc))
+
+    pla:pt('in', 'out.D')
+
+    local other_glb = 0
+    if glb == 0 then other_glb = 1 end
+    assign_pin_location('sck', device.glb(other_glb).mc(3))
+
+    pla:pt({}, {'dummy1.D','dummy2.D'})
+    pla:pt('sck', 'dummy1.C')
+    pla:pt('sck', 'dummy2.C')
+    assign_pin_location('dummy1', device.glb(glb))
+    assign_pin_location('dummy2', device.glb(glb))
+
+    if variant == 'pt' then
+        pla:pt({'a','b'}, 'out.C')
+        assign_pin_location('a', device.glb(other_glb).mc(4))
+        assign_pin_location('b', device.glb(other_glb).mc(5))
+    elseif variant == 'npt' then
+        pla:pt({'a','b'}, 'out.C-')
+        local other_glb = 0
+        if glb == 0 then other_glb = 1 end
+        assign_pin_location('a', device.glb(other_glb).mc(4))
+        assign_pin_location('b', device.glb(other_glb).mc(5))
+    elseif variant == 'shared_pt' then
+        pla:pt('sck', 'out.C')
+    elseif variant == 'bclk0' then
+        pla:pt('clk0', 'out.C')
+    elseif variant == 'bclk1' then
+        pla:pt('clk1', 'out.C')
+    elseif variant == 'bclk2' then
+        pla:pt('clk2', 'out.C')
+    elseif variant == 'bclk3' then
+        pla:pt('clk3', 'out.C')
+    end
+
+    pla:write(variant..'.tt4')
+end
+
+
+function write_lci_shared_ptclk_polarity (device, glb, variant)
+    local pla = make_pla()
+    write_lci_common { device = device }
+    writeln '\n[Location Assignments]'
+
+    assign_node_location('out', device.glb(glb).mc(3))
+
+    pla:pt('in', 'out.D')
+
+    local other_glb = 0
+    if glb == 0 then other_glb = 1 end
+    assign_pin_location('sck1', device.glb(other_glb).mc(3))
+    assign_pin_location('sck2', device.glb(other_glb).mc(4))
+
+    if variant == 'invert' then
+        pla:pt({'sck1','sck2'}, 'out.C-')
+    else
+        pla:pt({'sck1','sck2'}, 'out.C')
+    end
+
+    pla:write(variant..'.tt4')
+end
+
+function write_lci_shared_ptinit_polarity (device, glb, variant)
+    local pla = make_pla()
+    write_lci_common { device = device }
+    writeln '\n[Location Assignments]'
+
+    pla:pt('in', 'out.D')
+    if variant == 'invert' then
+        pla:pt('as', 'out.AR-')
+    else
+        pla:pt('as', 'out.AR')
+    end
+    assign_node_location('out', device.glb(glb).mc(4))
+
+    writeln '\n[Register Powerup]'
+    writeln('Default = RESET;')
 
     pla:write(variant..'.tt4')
 end

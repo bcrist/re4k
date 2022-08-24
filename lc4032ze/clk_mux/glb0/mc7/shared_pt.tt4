@@ -1,0 +1,14 @@
+#$ MODULE x
+#$ PINS 2 in sck
+#$ NODES 3 dummy1 dummy2 out
+.type f
+.i 2
+.o 6
+.ilb in sck
+.ob dummy1.C dummy1.D dummy2.C dummy2.D out.C out.D
+.phase 111111
+.p 3
+-- -1-1--
+1- -----1
+-1 1-1-1-
+.end

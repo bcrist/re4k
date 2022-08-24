@@ -9,6 +9,17 @@ pub fn JedecData(comptime w: u32, comptime h: u32) type {
 
         raw: std.StaticBitSet(len),
 
+        pub fn initEmpty() Self {
+            return .{
+                .raw = std.StaticBitSet(len).initEmpty(),
+            };
+        }
+        pub fn initFull() Self {
+            return .{
+                .raw = std.StaticBitSet(len).initFull(),
+            };
+        }
+
         pub fn init(str: []u8) !Self {
             var self = .{
                 .raw = std.StaticBitSet(len).initEmpty(),

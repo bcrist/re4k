@@ -1,21 +1,16 @@
 #$ MODULE x
-#$ PINS 13 goe0 goe1 goe2 goe3 in0 in1 in2 in3 out out_goe0 out_goe1 out_goe2 out_goe3
+#$ PINS 21 dum1 dum10 dum11 dum12 dum13 dum14 dum15 dum2 dum3 dum4 dum5 dum6 dum7 dum8 dum9 goe2 goe3 in in0 in1 out
 #$ NODES 0
 .type f
-.i 8
-.o 10
-.ilb goe0 goe1 goe2 goe3 in0 in1 in2 in3
-.ob out out.OE- out_goe0 out_goe0.OE out_goe1 out_goe1.OE out_goe2 out_goe2.OE out_goe3 out_goe3.OE
-.phase 1111111111
-.p 10
--------- --1-1-1-1-
-1------- ---1------
--1------ -----1----
---1----- -------1--
----1---- ---------1
-----1--- 1---------
-----11-- -1--------
------1-- 1---------
-------1- 1---------
--------1 1---------
+.i 5
+.o 32
+.ilb goe2 goe3 in in0 in1
+.ob dum1 dum1.OE dum10 dum10.OE dum11 dum11.OE dum12 dum12.OE dum13 dum13.OE dum14 dum14.OE dum15 dum15.OE dum2 dum2.OE dum3 dum3.OE dum4 dum4.OE dum5 dum5.OE dum6 dum6.OE dum7 dum7.OE dum8 dum8.OE dum9 dum9.OE out out.OE-
+.phase 11111111111111111111111111111111
+.p 5
+----- 1-1-1-1-1-1-1-1-1-1-1-1-1-1-1---
+1---- -1-------------1-1-1-1-1-1------
+-1--- ---1-1-1-1-1-1-------------1-1--
+--1-- ------------------------------1-
+---11 -------------------------------1
 .end
