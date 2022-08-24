@@ -3,7 +3,7 @@ rule fit
 rule diff
     command = zig-out/bin/jeddiff.exe $out $diff_options $in
 
-##!! include 'build_ninja' !! 5257 ##
+##!! include 'build_ninja' !! 5336 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 build lc4032ze\pull\glb0\mc0\OFF.jed: fit lc4032ze\pull\glb0\mc0\OFF.lci | lc4032ze\pull\glb0\mc0\OFF.tt4
 build lc4032ze\pull\glb0\mc0\UP.jed: fit lc4032ze\pull\glb0\mc0\UP.lci | lc4032ze\pull\glb0\mc0\UP.tt4
@@ -5197,10 +5197,89 @@ build lc4032ze\shared_ptclk_polarity\glb1\normal.jed: fit lc4032ze\shared_ptclk_
 build lc4032ze\shared_ptclk_polarity\glb1\invert.jed: fit lc4032ze\shared_ptclk_polarity\glb1\invert.lci | lc4032ze\shared_ptclk_polarity\glb1\invert.tt4
 build lc4032ze\shared_ptclk_polarity\glb1_fuses.csv: diff lc4032ze\shared_ptclk_polarity\glb1\normal.jed lc4032ze\shared_ptclk_polarity\glb1\invert.jed
 
+build lc4032ze\clusters\1.jed: fit lc4032ze\clusters\1.lci | lc4032ze\clusters\1.tt4
+build lc4032ze\clusters\2.jed: fit lc4032ze\clusters\2.lci | lc4032ze\clusters\2.tt4
+build lc4032ze\clusters\3.jed: fit lc4032ze\clusters\3.lci | lc4032ze\clusters\3.tt4
+build lc4032ze\clusters\4.jed: fit lc4032ze\clusters\4.lci | lc4032ze\clusters\4.tt4
+build lc4032ze\clusters\5.jed: fit lc4032ze\clusters\5.lci | lc4032ze\clusters\5.tt4
+build lc4032ze\clusters\6.jed: fit lc4032ze\clusters\6.lci | lc4032ze\clusters\6.tt4
+build lc4032ze\clusters\7.jed: fit lc4032ze\clusters\7.lci | lc4032ze\clusters\7.tt4
+build lc4032ze\clusters\8.jed: fit lc4032ze\clusters\8.lci | lc4032ze\clusters\8.tt4
+build lc4032ze\clusters\9.jed: fit lc4032ze\clusters\9.lci | lc4032ze\clusters\9.tt4
+build lc4032ze\clusters\10.jed: fit lc4032ze\clusters\10.lci | lc4032ze\clusters\10.tt4
+build lc4032ze\clusters\11.jed: fit lc4032ze\clusters\11.lci | lc4032ze\clusters\11.tt4
+build lc4032ze\clusters\12.jed: fit lc4032ze\clusters\12.lci | lc4032ze\clusters\12.tt4
+build lc4032ze\clusters\13.jed: fit lc4032ze\clusters\13.lci | lc4032ze\clusters\13.tt4
+build lc4032ze\clusters\14.jed: fit lc4032ze\clusters\14.lci | lc4032ze\clusters\14.tt4
+build lc4032ze\clusters\15.jed: fit lc4032ze\clusters\15.lci | lc4032ze\clusters\15.tt4
+build lc4032ze\clusters\16.jed: fit lc4032ze\clusters\16.lci | lc4032ze\clusters\16.tt4
+build lc4032ze\clusters\17.jed: fit lc4032ze\clusters\17.lci | lc4032ze\clusters\17.tt4
+build lc4032ze\clusters\18.jed: fit lc4032ze\clusters\18.lci | lc4032ze\clusters\18.tt4
+build lc4032ze\clusters\19.jed: fit lc4032ze\clusters\19.lci | lc4032ze\clusters\19.tt4
+build lc4032ze\clusters\20.jed: fit lc4032ze\clusters\20.lci | lc4032ze\clusters\20.tt4
+build lc4032ze\clusters\21.jed: fit lc4032ze\clusters\21.lci | lc4032ze\clusters\21.tt4
+build lc4032ze\clusters\22.jed: fit lc4032ze\clusters\22.lci | lc4032ze\clusters\22.tt4
+build lc4032ze\clusters\23.jed: fit lc4032ze\clusters\23.lci | lc4032ze\clusters\23.tt4
+build lc4032ze\clusters\24.jed: fit lc4032ze\clusters\24.lci | lc4032ze\clusters\24.tt4
+build lc4032ze\clusters\25.jed: fit lc4032ze\clusters\25.lci | lc4032ze\clusters\25.tt4
+build lc4032ze\clusters\26.jed: fit lc4032ze\clusters\26.lci | lc4032ze\clusters\26.tt4
+build lc4032ze\clusters\27.jed: fit lc4032ze\clusters\27.lci | lc4032ze\clusters\27.tt4
+build lc4032ze\clusters\28.jed: fit lc4032ze\clusters\28.lci | lc4032ze\clusters\28.tt4
+build lc4032ze\clusters\29.jed: fit lc4032ze\clusters\29.lci | lc4032ze\clusters\29.tt4
+build lc4032ze\clusters\30.jed: fit lc4032ze\clusters\30.lci | lc4032ze\clusters\30.tt4
+build lc4032ze\clusters\31.jed: fit lc4032ze\clusters\31.lci | lc4032ze\clusters\31.tt4
+build lc4032ze\clusters\32.jed: fit lc4032ze\clusters\32.lci | lc4032ze\clusters\32.tt4
+build lc4032ze\clusters\33.jed: fit lc4032ze\clusters\33.lci | lc4032ze\clusters\33.tt4
+build lc4032ze\clusters\34.jed: fit lc4032ze\clusters\34.lci | lc4032ze\clusters\34.tt4
+build lc4032ze\clusters\35.jed: fit lc4032ze\clusters\35.lci | lc4032ze\clusters\35.tt4
+build lc4032ze\clusters\36.jed: fit lc4032ze\clusters\36.lci | lc4032ze\clusters\36.tt4
+build lc4032ze\clusters\37.jed: fit lc4032ze\clusters\37.lci | lc4032ze\clusters\37.tt4
+build lc4032ze\clusters\38.jed: fit lc4032ze\clusters\38.lci | lc4032ze\clusters\38.tt4
+build lc4032ze\clusters\39.jed: fit lc4032ze\clusters\39.lci | lc4032ze\clusters\39.tt4
+build lc4032ze\clusters\40.jed: fit lc4032ze\clusters\40.lci | lc4032ze\clusters\40.tt4
+build lc4032ze\clusters\41.jed: fit lc4032ze\clusters\41.lci | lc4032ze\clusters\41.tt4
+build lc4032ze\clusters\42.jed: fit lc4032ze\clusters\42.lci | lc4032ze\clusters\42.tt4
+build lc4032ze\clusters\43.jed: fit lc4032ze\clusters\43.lci | lc4032ze\clusters\43.tt4
+build lc4032ze\clusters\44.jed: fit lc4032ze\clusters\44.lci | lc4032ze\clusters\44.tt4
+build lc4032ze\clusters\45.jed: fit lc4032ze\clusters\45.lci | lc4032ze\clusters\45.tt4
+build lc4032ze\clusters\46.jed: fit lc4032ze\clusters\46.lci | lc4032ze\clusters\46.tt4
+build lc4032ze\clusters\47.jed: fit lc4032ze\clusters\47.lci | lc4032ze\clusters\47.tt4
+build lc4032ze\clusters\48.jed: fit lc4032ze\clusters\48.lci | lc4032ze\clusters\48.tt4
+build lc4032ze\clusters\49.jed: fit lc4032ze\clusters\49.lci | lc4032ze\clusters\49.tt4
+build lc4032ze\clusters\50.jed: fit lc4032ze\clusters\50.lci | lc4032ze\clusters\50.tt4
+build lc4032ze\clusters\51.jed: fit lc4032ze\clusters\51.lci | lc4032ze\clusters\51.tt4
+build lc4032ze\clusters\52.jed: fit lc4032ze\clusters\52.lci | lc4032ze\clusters\52.tt4
+build lc4032ze\clusters\53.jed: fit lc4032ze\clusters\53.lci | lc4032ze\clusters\53.tt4
+build lc4032ze\clusters\54.jed: fit lc4032ze\clusters\54.lci | lc4032ze\clusters\54.tt4
+build lc4032ze\clusters\55.jed: fit lc4032ze\clusters\55.lci | lc4032ze\clusters\55.tt4
+build lc4032ze\clusters\56.jed: fit lc4032ze\clusters\56.lci | lc4032ze\clusters\56.tt4
+build lc4032ze\clusters\57.jed: fit lc4032ze\clusters\57.lci | lc4032ze\clusters\57.tt4
+build lc4032ze\clusters\58.jed: fit lc4032ze\clusters\58.lci | lc4032ze\clusters\58.tt4
+build lc4032ze\clusters\59.jed: fit lc4032ze\clusters\59.lci | lc4032ze\clusters\59.tt4
+build lc4032ze\clusters\60.jed: fit lc4032ze\clusters\60.lci | lc4032ze\clusters\60.tt4
+build lc4032ze\clusters\61.jed: fit lc4032ze\clusters\61.lci | lc4032ze\clusters\61.tt4
+build lc4032ze\clusters\62.jed: fit lc4032ze\clusters\62.lci | lc4032ze\clusters\62.tt4
+build lc4032ze\clusters\63.jed: fit lc4032ze\clusters\63.lci | lc4032ze\clusters\63.tt4
+build lc4032ze\clusters\64.jed: fit lc4032ze\clusters\64.lci | lc4032ze\clusters\64.tt4
+build lc4032ze\clusters\65.jed: fit lc4032ze\clusters\65.lci | lc4032ze\clusters\65.tt4
+build lc4032ze\clusters\66.jed: fit lc4032ze\clusters\66.lci | lc4032ze\clusters\66.tt4
+build lc4032ze\clusters\67.jed: fit lc4032ze\clusters\67.lci | lc4032ze\clusters\67.tt4
+build lc4032ze\clusters\68.jed: fit lc4032ze\clusters\68.lci | lc4032ze\clusters\68.tt4
+build lc4032ze\clusters\69.jed: fit lc4032ze\clusters\69.lci | lc4032ze\clusters\69.tt4
+build lc4032ze\clusters\70.jed: fit lc4032ze\clusters\70.lci | lc4032ze\clusters\70.tt4
+build lc4032ze\clusters\71.jed: fit lc4032ze\clusters\71.lci | lc4032ze\clusters\71.tt4
+build lc4032ze\clusters\72.jed: fit lc4032ze\clusters\72.lci | lc4032ze\clusters\72.tt4
+build lc4032ze\clusters\73.jed: fit lc4032ze\clusters\73.lci | lc4032ze\clusters\73.tt4
+build lc4032ze\clusters\74.jed: fit lc4032ze\clusters\74.lci | lc4032ze\clusters\74.tt4
+build lc4032ze\clusters\75.jed: fit lc4032ze\clusters\75.lci | lc4032ze\clusters\75.tt4
+build lc4032ze\clusters\fuses.csv: diff lc4032ze\clusters\1.jed lc4032ze\clusters\2.jed lc4032ze\clusters\3.jed lc4032ze\clusters\4.jed lc4032ze\clusters\5.jed lc4032ze\clusters\6.jed lc4032ze\clusters\7.jed lc4032ze\clusters\8.jed lc4032ze\clusters\9.jed lc4032ze\clusters\10.jed lc4032ze\clusters\11.jed lc4032ze\clusters\12.jed lc4032ze\clusters\13.jed lc4032ze\clusters\14.jed lc4032ze\clusters\15.jed lc4032ze\clusters\16.jed lc4032ze\clusters\17.jed lc4032ze\clusters\18.jed lc4032ze\clusters\19.jed lc4032ze\clusters\20.jed lc4032ze\clusters\21.jed lc4032ze\clusters\22.jed lc4032ze\clusters\23.jed lc4032ze\clusters\24.jed lc4032ze\clusters\25.jed lc4032ze\clusters\26.jed lc4032ze\clusters\27.jed lc4032ze\clusters\28.jed lc4032ze\clusters\29.jed lc4032ze\clusters\30.jed lc4032ze\clusters\31.jed lc4032ze\clusters\32.jed lc4032ze\clusters\33.jed lc4032ze\clusters\34.jed lc4032ze\clusters\35.jed lc4032ze\clusters\36.jed lc4032ze\clusters\37.jed lc4032ze\clusters\38.jed lc4032ze\clusters\39.jed lc4032ze\clusters\40.jed lc4032ze\clusters\41.jed lc4032ze\clusters\42.jed lc4032ze\clusters\43.jed lc4032ze\clusters\44.jed lc4032ze\clusters\45.jed lc4032ze\clusters\46.jed lc4032ze\clusters\47.jed lc4032ze\clusters\48.jed lc4032ze\clusters\49.jed lc4032ze\clusters\50.jed lc4032ze\clusters\51.jed lc4032ze\clusters\52.jed lc4032ze\clusters\53.jed lc4032ze\clusters\54.jed lc4032ze\clusters\55.jed lc4032ze\clusters\56.jed lc4032ze\clusters\57.jed lc4032ze\clusters\58.jed lc4032ze\clusters\59.jed lc4032ze\clusters\60.jed lc4032ze\clusters\61.jed lc4032ze\clusters\62.jed lc4032ze\clusters\63.jed lc4032ze\clusters\64.jed lc4032ze\clusters\65.jed lc4032ze\clusters\66.jed lc4032ze\clusters\67.jed lc4032ze\clusters\68.jed lc4032ze\clusters\69.jed lc4032ze\clusters\70.jed lc4032ze\clusters\71.jed lc4032ze\clusters\72.jed lc4032ze\clusters\73.jed lc4032ze\clusters\74.jed lc4032ze\clusters\75.jed
+    diff_options = --include 72:0-99:171
+
 build bclk01: phony lc4032ze\bclk01\glb0_fuses.csv lc4032ze\bclk01\glb1_fuses.csv
 build bclk23: phony lc4032ze\bclk23\glb0_fuses.csv lc4032ze\bclk23\glb1_fuses.csv
 build ce_mux: phony lc4032ze\ce_mux\glb0\mc0_fuses.csv lc4032ze\ce_mux\glb0\mc10_fuses.csv lc4032ze\ce_mux\glb0\mc11_fuses.csv lc4032ze\ce_mux\glb0\mc12_fuses.csv lc4032ze\ce_mux\glb0\mc13_fuses.csv lc4032ze\ce_mux\glb0\mc14_fuses.csv lc4032ze\ce_mux\glb0\mc15_fuses.csv lc4032ze\ce_mux\glb0\mc1_fuses.csv lc4032ze\ce_mux\glb0\mc2_fuses.csv lc4032ze\ce_mux\glb0\mc3_fuses.csv lc4032ze\ce_mux\glb0\mc4_fuses.csv lc4032ze\ce_mux\glb0\mc5_fuses.csv lc4032ze\ce_mux\glb0\mc6_fuses.csv lc4032ze\ce_mux\glb0\mc7_fuses.csv lc4032ze\ce_mux\glb0\mc8_fuses.csv lc4032ze\ce_mux\glb0\mc9_fuses.csv lc4032ze\ce_mux\glb1\mc0_fuses.csv lc4032ze\ce_mux\glb1\mc10_fuses.csv lc4032ze\ce_mux\glb1\mc11_fuses.csv lc4032ze\ce_mux\glb1\mc12_fuses.csv lc4032ze\ce_mux\glb1\mc13_fuses.csv lc4032ze\ce_mux\glb1\mc14_fuses.csv lc4032ze\ce_mux\glb1\mc15_fuses.csv lc4032ze\ce_mux\glb1\mc1_fuses.csv lc4032ze\ce_mux\glb1\mc2_fuses.csv lc4032ze\ce_mux\glb1\mc3_fuses.csv lc4032ze\ce_mux\glb1\mc4_fuses.csv lc4032ze\ce_mux\glb1\mc5_fuses.csv lc4032ze\ce_mux\glb1\mc6_fuses.csv lc4032ze\ce_mux\glb1\mc7_fuses.csv lc4032ze\ce_mux\glb1\mc8_fuses.csv lc4032ze\ce_mux\glb1\mc9_fuses.csv
 build clk_mux: phony lc4032ze\clk_mux\glb0\mc0_fuses.csv lc4032ze\clk_mux\glb0\mc10_fuses.csv lc4032ze\clk_mux\glb0\mc11_fuses.csv lc4032ze\clk_mux\glb0\mc12_fuses.csv lc4032ze\clk_mux\glb0\mc13_fuses.csv lc4032ze\clk_mux\glb0\mc14_fuses.csv lc4032ze\clk_mux\glb0\mc15_fuses.csv lc4032ze\clk_mux\glb0\mc1_fuses.csv lc4032ze\clk_mux\glb0\mc2_fuses.csv lc4032ze\clk_mux\glb0\mc3_fuses.csv lc4032ze\clk_mux\glb0\mc4_fuses.csv lc4032ze\clk_mux\glb0\mc5_fuses.csv lc4032ze\clk_mux\glb0\mc6_fuses.csv lc4032ze\clk_mux\glb0\mc7_fuses.csv lc4032ze\clk_mux\glb0\mc8_fuses.csv lc4032ze\clk_mux\glb0\mc9_fuses.csv lc4032ze\clk_mux\glb1\mc0_fuses.csv lc4032ze\clk_mux\glb1\mc10_fuses.csv lc4032ze\clk_mux\glb1\mc11_fuses.csv lc4032ze\clk_mux\glb1\mc12_fuses.csv lc4032ze\clk_mux\glb1\mc13_fuses.csv lc4032ze\clk_mux\glb1\mc14_fuses.csv lc4032ze\clk_mux\glb1\mc15_fuses.csv lc4032ze\clk_mux\glb1\mc1_fuses.csv lc4032ze\clk_mux\glb1\mc2_fuses.csv lc4032ze\clk_mux\glb1\mc3_fuses.csv lc4032ze\clk_mux\glb1\mc4_fuses.csv lc4032ze\clk_mux\glb1\mc5_fuses.csv lc4032ze\clk_mux\glb1\mc6_fuses.csv lc4032ze\clk_mux\glb1\mc7_fuses.csv lc4032ze\clk_mux\glb1\mc8_fuses.csv lc4032ze\clk_mux\glb1\mc9_fuses.csv
+build clusters: phony lc4032ze\clusters\fuses.csv
 build ff_type: phony lc4032ze\ff_type\glb0\mc0_fuses.csv lc4032ze\ff_type\glb0\mc10_fuses.csv lc4032ze\ff_type\glb0\mc11_fuses.csv lc4032ze\ff_type\glb0\mc12_fuses.csv lc4032ze\ff_type\glb0\mc13_fuses.csv lc4032ze\ff_type\glb0\mc14_fuses.csv lc4032ze\ff_type\glb0\mc15_fuses.csv lc4032ze\ff_type\glb0\mc1_fuses.csv lc4032ze\ff_type\glb0\mc2_fuses.csv lc4032ze\ff_type\glb0\mc3_fuses.csv lc4032ze\ff_type\glb0\mc4_fuses.csv lc4032ze\ff_type\glb0\mc5_fuses.csv lc4032ze\ff_type\glb0\mc6_fuses.csv lc4032ze\ff_type\glb0\mc7_fuses.csv lc4032ze\ff_type\glb0\mc8_fuses.csv lc4032ze\ff_type\glb0\mc9_fuses.csv lc4032ze\ff_type\glb1\mc0_fuses.csv lc4032ze\ff_type\glb1\mc10_fuses.csv lc4032ze\ff_type\glb1\mc11_fuses.csv lc4032ze\ff_type\glb1\mc12_fuses.csv lc4032ze\ff_type\glb1\mc13_fuses.csv lc4032ze\ff_type\glb1\mc14_fuses.csv lc4032ze\ff_type\glb1\mc15_fuses.csv lc4032ze\ff_type\glb1\mc1_fuses.csv lc4032ze\ff_type\glb1\mc2_fuses.csv lc4032ze\ff_type\glb1\mc3_fuses.csv lc4032ze\ff_type\glb1\mc4_fuses.csv lc4032ze\ff_type\glb1\mc5_fuses.csv lc4032ze\ff_type\glb1\mc6_fuses.csv lc4032ze\ff_type\glb1\mc7_fuses.csv lc4032ze\ff_type\glb1\mc8_fuses.csv lc4032ze\ff_type\glb1\mc9_fuses.csv
 build goe0_polarity: phony lc4032ze\goe0_polarity\fuses.csv
 build goe1_polarity: phony lc4032ze\goe1_polarity\fuses.csv
@@ -5257,6 +5336,6 @@ build reset_init: phony lc4032ze\reset_init\glb0\mc0_fuses.csv lc4032ze\reset_in
 build shared_ptclk_polarity: phony lc4032ze\shared_ptclk_polarity\glb0_fuses.csv lc4032ze\shared_ptclk_polarity\glb1_fuses.csv
 build slew: phony lc4032ze\slew\glb0\mc0_fuses.csv lc4032ze\slew\glb0\mc10_fuses.csv lc4032ze\slew\glb0\mc11_fuses.csv lc4032ze\slew\glb0\mc12_fuses.csv lc4032ze\slew\glb0\mc13_fuses.csv lc4032ze\slew\glb0\mc14_fuses.csv lc4032ze\slew\glb0\mc15_fuses.csv lc4032ze\slew\glb0\mc1_fuses.csv lc4032ze\slew\glb0\mc2_fuses.csv lc4032ze\slew\glb0\mc3_fuses.csv lc4032ze\slew\glb0\mc4_fuses.csv lc4032ze\slew\glb0\mc5_fuses.csv lc4032ze\slew\glb0\mc6_fuses.csv lc4032ze\slew\glb0\mc7_fuses.csv lc4032ze\slew\glb0\mc8_fuses.csv lc4032ze\slew\glb0\mc9_fuses.csv lc4032ze\slew\glb1\mc0_fuses.csv lc4032ze\slew\glb1\mc10_fuses.csv lc4032ze\slew\glb1\mc11_fuses.csv lc4032ze\slew\glb1\mc12_fuses.csv lc4032ze\slew\glb1\mc13_fuses.csv lc4032ze\slew\glb1\mc14_fuses.csv lc4032ze\slew\glb1\mc15_fuses.csv lc4032ze\slew\glb1\mc1_fuses.csv lc4032ze\slew\glb1\mc2_fuses.csv lc4032ze\slew\glb1\mc3_fuses.csv lc4032ze\slew\glb1\mc4_fuses.csv lc4032ze\slew\glb1\mc5_fuses.csv lc4032ze\slew\glb1\mc6_fuses.csv lc4032ze\slew\glb1\mc7_fuses.csv lc4032ze\slew\glb1\mc8_fuses.csv lc4032ze\slew\glb1\mc9_fuses.csv
 build zerohold: phony lc4032ze\zerohold\fuses.csv
-default bclk01 bclk23 ce_mux clk_mux ff_type goe0_polarity goe1_polarity grp input_threshold od oe_mux orm pgdf pt0 pt1 pt2 pt2_reset pt3 pt3_reset pull reset_init shared_ptclk_polarity slew zerohold
+default bclk01 bclk23 ce_mux clk_mux clusters ff_type goe0_polarity goe1_polarity grp input_threshold od oe_mux orm pgdf pt0 pt1 pt2 pt2_reset pt3 pt3_reset pull reset_init shared_ptclk_polarity slew zerohold
 
 ## ######################### END OF GENERATED CODE ######################### ##

@@ -1,0 +1,12 @@
+#$ MODULE x
+#$ PINS 7 i0 i1 i2 i3 i4 i5 i6
+#$ NODES 1 out
+.type f
+.i 7
+.o 1
+.ilb i0 i1 i2 i3 i4 i5 i6
+.ob out
+.phase 1
+.p 1
+1000000 1
+.end

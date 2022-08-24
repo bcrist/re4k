@@ -150,7 +150,7 @@ end
 function globalTest (device, test_name, variants, extra)
     writeReadme(device, test_name, extra)
     if type(variants) == 'function' then
-        variants = variants(mc)
+        variants = variants()
     end
     if variants ~= nil then
         local csv = writeVariants(device, test_name, variants, nil, nil, nil, extra)
@@ -388,6 +388,25 @@ perMacrocellTest(dev, 'clk_mux', { 'bclk0', 'bclk1', 'bclk2', 'bclk3', 'pt', 'np
 
 perGlbTest(dev, 'shared_ptclk_polarity', { 'normal', 'invert' })
 
+globalTest(dev, 'clusters', function()
+    local variants = {}
+    for i = 1, 75 do
+        variants[#variants+1] = '' .. i
+    end
+    return variants
+end, { diff_options = '--include 72:0-99:171',
+readme = [[
+    row 88: SuperWIDE steering
+        1 : Route this cluster allocator's output to this MC
+        0 : Route this cluster allocator's output to the cluster allocator for MC+4, wrapping around if above 15
+
+    rows 74, 75: Cluster allocator steering
+         0   0 : Route this cluster to the allocator for MC-2
+         0   1 : Route this cluster to the allocator for MC+1
+         1   0 : Route this cluster to this allocator
+         1   1 : Route this cluster to the allocator for MC-1
+
+]]})
 
 for group, targets in spairs(group_targets) do
     write("build ", group, ": phony")
