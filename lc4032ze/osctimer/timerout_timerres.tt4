@@ -1,0 +1,15 @@
+#$ MODULE x
+#$ PINS 2 in osc_reset
+#$ NODES 2 dummy osc_tout
+#$ PROPERTY LATTICE OSCTIMER osc= -, osc_reset, -, osc_tout, 128;
+#$ EXTERNAL OSCTIMER 4 DYNOSCDIS'i' TIMERRES'i' OSCOUT'o' TIMEROUT'o'
+#$ INSTANCE osc OSCTIMER 4 osc>dis osc_reset osc>out osc_tout
+.type f
+.i 1
+.o 1
+.ilb in
+.ob dummy
+.phase 1
+.p 1
+1 1
+.end

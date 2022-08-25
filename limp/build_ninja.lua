@@ -2,6 +2,7 @@ include 'lc4032ze'
 
 local default_targets = {}
 local group_targets = {}
+local jed_jobs = {}
 
 local write_build = template [[
 build `file`.jed: fit `file`.lci | `file`.tt4
@@ -71,6 +72,15 @@ local function writeVariants (device, test_name, variants, extra_path, extra_par
 
         write_build { file = file }
     end
+
+    local checkname = fs.compose_path(base_path, "check")
+    jed_jobs[#jed_jobs+1] = checkname
+    write("build ", checkname, ": check")
+    for _, variant in ipairs(variants) do
+        variant = variant:gsub(' ', '_')
+        write(" ", fs.compose_path(base_path, variant..".jed"))
+    end
+    nl()
 
     local csv
     if targets == nil then
@@ -245,10 +255,6 @@ Registers whose data comes from product term logic are not affected by this fuse
 This fuse affects the entire chip.
 ]])
 
--- globalTest(dev, 'security', { 'on', 'off' }, 'buf_1in_1out', [[
--- Prevents reading flash?
--- ]])
-
 perGlbTest(dev, 'bclk01', { 'passthru', 'invert_both', 'clk0_comp', 'clk1_comp' })
 perGlbTest(dev, 'bclk23', { 'passthru', 'invert_both', 'clk2_comp', 'clk3_comp' })
 
@@ -257,15 +263,16 @@ perInputTest(dev, 'pgdf', { 'pg', 'pg_disabled' })
 globalTest(dev, 'goe0_polarity', { 'active_high', 'active_low' })
 globalTest(dev, 'goe1_polarity', { 'active_high', 'active_low' })
 
---I'm having trouble coming up with a way to force the fitter into inverting the shared PTOE polarity.  I tried setting up 2 terms in the PLA, where either of 2
---input signals being 0 will enable an output.  That way it can't satisfy it using a single PT alone, but it didn't seem to figure out that it was possible
---to fit using the PTOE inverter, and just failed the fit instead.
---
---One thing I haven't tried yet is setting up an active-high shared PTOE that's used for one thing, and then another one that's the same signal but active low.
---Maybe it will realize it can use the inverter instead of allocating the second global PTOE?  Or maybe I can occupy the second PTOE slot with a PG/BIE.
---
---Alternatively since there's only a few fuses, maybe I can identify them by elimination at the end and manually test with hardware until it does what I want.
--- globalTest(dev, 'goe23_polarity', { 'LL', 'LH', 'HL', 'HH' }, { 'shared_goe_ll', 'shared_goe_ll', 'shared_goe_hh', 'shared_goe_hh' })
+globalTest(dev, 'goe23_polarity', { 'goe2low_goe3low', 'goe2low_goe3high', 'goe2high_goe3low', 'goe2high goe3high' }, [[
+
+|      |Column 85                                   |Column 171                                  |
+|Row 73|When cleared, route GLB 1's PTOE/BIE to GOE2|When cleared, route GLB 0's PTOE/BIE to GOE2|
+|Row 74|When cleared, route GLB 1's PTOE/BIE to GOE3|When cleared, route GLB 0's PTOE/BIE to GOE3|
+
+|      |Column 171                      |
+|Row 88|When cleared, GOE2 is active low|
+|Row 89|When cleared, GOE3 is active low|
+]])
 
 
 perOutputTest(dev, 'oe_mux', function (mc)
@@ -278,6 +285,21 @@ perOutputTest(dev, 'oe_mux', function (mc)
     variants[#variants+1] = 'goe3'
     return variants
 end, { diff_options = '--exclude 0:0-91:171', mc_range = true })
+
+globalTest(dev, 'ptoe_orm', { 'test', 'control' }, { diff_options = '--include 84:0-84:171 --include 92:0-94:171', readme = [[
+Row 84 indicates that pt4 is used as a PTOE and should be redirected from the cluster sum.
+
+At first that may seem redundant, since rows 92-94 (OE mux) normally also encode that, and
+for other PT routing (PTCE, PTCLK, etc.) the PT is automatically removed from the logic sum
+when the mux is set to a value that requires it.  But one must remember that the OE mux is
+actually associated with the I/O cell, not the macrocell, and the PTOE input to the OE mux
+goes through the ORM and may be from a different MC/logic allocator.  So if row 84 didn't
+exist, there would have to be a third, "reverse" channel in the ORM to propagate knowledge
+of whether PTOE is used back to the original logic allocator.
+
+This is just a quick test to validate that rows 92-94 associate to an I/O cell, while 84
+stays with the MC/logic alloc, evem when the ORM is in use.
+]]})
 
 perOutputTest(dev, 'orm', { 'self', 'o1', 'o2', 'o3', 'o4', 'o5', 'o6', 'o7' })
 
@@ -408,6 +430,14 @@ readme = [[
 
 ]]})
 
+perOutputTest(dev, 'inreg', { 'normal', 'inreg' }, { diff_options = '--include 85:0-85:171'})
+
+perMacrocellTest(dev, 'xor', { 'normal', 'invert', 'xor_pt0', 'xor_npt0' }, { diff_options = '--include 72:0-99:171'})
+
+globalTest(dev, 'osctimer', { 'none', 'oscout', 'timerout', 'timerout_timerres', 'oscout_dynoscdis' }, { diff_options = '--include 75:165-99:171 --exclude 85:0-86:171 --exclude 95:0-95:171 --exclude 87:168-90:168 --exclude 87:171-91:171'})
+
+globalTest(dev, 'osctimer_div', { '128', '1024', '1048576' }, { diff_options = '--include 75:165-99:171 --exclude 85:0-86:171 --exclude 95:0-95:171 --exclude 87:168-90:168 --exclude 87:171-91:171'})
+
 for group, targets in spairs(group_targets) do
     write("build ", group, ": phony")
     for target in spairs(targets) do
@@ -415,6 +445,14 @@ for group, targets in spairs(group_targets) do
     end
     nl()
 end
+nl()
+
+write("build check: phony")
+for _, jed in ipairs(jed_jobs) do
+    write(" ", jed)
+end
+nl()
+nl()
 
 write("default")
 for target in spairs(default_targets) do

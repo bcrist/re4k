@@ -259,6 +259,86 @@ function write_lci_pgdf_clk (device, special_clk, variant)
     assign_pin_location('out', device.glb(clk.glb.index or 0).mc(2))
 end
 
+function write_lci_osctimer (device, variant)
+    local pla = make_pla()
+    write_lci_common { device = device }
+
+    pla:pt('in', 'dummy')
+
+    if variant ~= 'none' then
+        local prop = "#$ PROPERTY LATTICE OSCTIMER osc= "
+        local inst = "#$ INSTANCE osc OSCTIMER 4 "
+        writeln '\n[OSCTIMER Assignments]'
+        writeln 'layer = OFF;'
+        write 'OSCTIMER = '
+        if variant:match('dynoscdis') then
+            write 'osc_dis, '
+            pla:pin('osc_dis')
+            prop = prop..'osc_dis, '
+            inst = inst..'osc_dis '
+        else
+            write '-, '
+            prop = prop..'-, '
+            inst = inst..'osc>dis '
+        end
+        if variant:match('timerres') then
+            write 'osc_reset, '
+            pla:pin('osc_reset')
+            prop = prop..'osc_reset, '
+            inst = inst..'osc_reset '
+        else
+            write '-, '
+            prop = prop..'-, '
+            inst = inst..'osc>reset '
+        end
+        if variant:match('oscout') then
+            write 'osc_out, '
+            pla:node('osc_out')
+            prop = prop..'osc_out, '
+            inst = inst..'osc_out '
+        else
+            write '-, '
+            prop = prop..'-, '
+            inst = inst..'osc>out '
+        end
+        if variant:match('timerout') then
+            write 'osc_tout'
+            pla:node('osc_tout')
+            prop = prop..'osc_tout'
+            inst = inst..'osc_tout'
+        else
+            write '-'
+            prop = prop..'-'
+            inst = inst..'osc>tout'
+        end
+        write ', 128;'
+
+        pla:ext(prop.. ', 128;')
+        pla:ext("#$ EXTERNAL OSCTIMER 4 DYNOSCDIS'i' TIMERRES'i' OSCOUT'o' TIMEROUT'o'")
+        pla:ext(inst)
+    end
+
+    pla:write(variant..'.tt4')
+end
+
+function write_lci_osctimer_div (device, variant)
+    local pla = make_pla()
+    write_lci_common { device = device }
+
+    pla:pt('in', 'dummy')
+
+    writeln '\n[OSCTIMER Assignments]'
+    writeln 'layer = OFF;'
+    writeln('OSCTIMER = osc_dis, osc_reset, osc_out, osc_tout, ',variant,';')
+
+    pla:pin('osc_dis', 'osc_reset', 'osc_out', 'osc_tout')
+    pla:ext("#$ PROPERTY LATTICE OSCTIMER osc= osc_dis, osc_reset, osc_out, osc_tout, "..variant..";")
+    pla:ext("#$ EXTERNAL OSCTIMER 4 DYNOSCDIS'i' TIMERRES'i' OSCOUT'o' TIMEROUT'o'")
+    pla:ext("#$ INSTANCE osc OSCTIMER 4 osc_dis osc_reset osc_out osc_tout")
+
+    pla:write(variant..'.tt4')
+end
+
 function write_tt4_goe01_polarity (variant)
     local pla = make_pla()
     pla:pin('out')
@@ -287,6 +367,33 @@ function write_lci_goe1_polarity (device, variant)
     assign_pin_location('oe', device.goe(1))
     assign_pin_location('in', device.glb(0).mc(4))
     assign_pin_location('out', device.glb(0).mc(5))
+end
+
+function write_lci_goe23_polarity (device, variant)
+    local pla = make_pla()
+
+    write_lci_common { device = device }
+    writeln '\n[Location Assignments]'
+
+    local glb = device.glb(0)
+
+    pla:pin('o2', 'o3')
+    pla:pt('i', {'o2', 'o3'})
+    assign_pin_location('o2', glb.mc(2))
+    assign_pin_location('o3', glb.mc(3))
+
+    if variant == 'goe2low_goe3low' or variant == 'goe2low_goe3high' then
+        pla:pt({'g2a', 'g2b'}, 'o2.OE-')
+    else
+        pla:pt({'g2a', 'g2b'}, 'o2.OE')
+    end
+    if variant == 'goe2low_goe3low' or variant == 'goe2high_goe3low' then
+        pla:pt({'g3a', 'g3b'}, 'o3.OE-')
+    else
+        pla:pt({'g3a', 'g3b'}, 'o3.OE')
+    end
+
+    pla:write(variant..'.tt4')
 end
 
 function write_lci_oe_mux (device, special_glb, special_mc, variant)
@@ -364,6 +471,47 @@ function write_lci_oe_mux (device, special_glb, special_mc, variant)
         pla:output('out.OE')
     
     end
+
+    pla:write(variant..'.tt4')
+end
+
+function write_lci_ptoe_orm (device, variant)
+    local pla = make_pla()
+
+    write_lci_common { device = device }
+    writeln '\n[Location Assignments]'
+
+    for mc, mci in device.glb(0).mcs() do
+        if mc > 0 and mc < 13 then
+            local sig = 'dum'..mc
+            pla:pin(sig)
+            pla:pt({}, sig)
+            if mc < 8 then
+                pla:pt('goe2', sig..'.OE')
+            else
+                pla:pt('goe3', sig..'.OE')
+            end
+            assign_pin_location(sig, mci)
+        end
+    end
+    assign_pin_location('goe2', device.glb(1).mc(1).pin)
+    assign_pin_location('goe3', device.glb(1).mc(2).pin)
+
+    if variant == 'test' then
+        pla:pin('out')
+        pla:pt('in', 'out')
+        pla:pt({'in0', 'in1'}, 'out.OE')
+        assign_pin_location('out', device.glb(0).mc(13))
+    else
+        --pla:pin('out')
+        pla:pt('in', 'out')
+        --pla:pt({'in0', 'in1'}, 'out.OE')
+        --assign_pin_location('out', device.glb(0).mc(0))
+        assign_node_location('out', device.glb(0).mc(0))
+    end
+    
+    pla:pt({}, 'block')
+    assign_node_location('block', device.glb(0).mc(13))
 
     pla:write(variant..'.tt4')
 end
@@ -1109,6 +1257,58 @@ function write_lci_clusters (device, variant)
     end
 
     assign_node_location('out', device.glb(0).mc(1))
+
+    pla:write(variant..'.tt4')
+end
+
+function write_lci_inreg (device, glb, mc, variant)
+    local pla = make_pla()
+
+    write_lci_common { device = device }
+    writeln '\n[Location Assignments]'
+    assign_pin_location('in', device.glb(glb).mc(mc))
+    assign_node_location('out', device.glb(glb).mc(mc))
+    pla:pt('clk', 'out.C')
+    pla:pt('in', 'out.D')
+
+    if variant == 'inreg' then
+        writeln '\n[Input Registers]'
+        writeln 'Default=INREG;'
+    end
+
+    pla:write(variant..'.tt4')
+end
+
+function write_lci_xor (device, glb, mc, variant)
+    local pla = make_pla()
+
+    write_lci_common { device = device }
+    writeln '\n[Location Assignments]'
+
+    for i = 0, mc - 1 do
+        local sig = 'd'..i
+        assign_node_location(sig, device.glb(glb).mc(i))
+        pla:pt('x0', sig)
+        pla:pt('x1', sig)
+        pla:pt('x2', sig)
+        pla:pt('x3', sig)
+        pla:pt('x4', sig)
+    end
+
+    assign_node_location('out', device.glb(glb).mc(mc))
+    pla:pt('in1', 'out.C')
+
+    if variant == 'normal' then
+        pla:pt('in1', 'out.D')
+        pla:pt('in2', 'out.D')
+    elseif variant == 'invert' then
+        pla:pt('in1', 'out.D-')
+        pla:pt('in2', 'out.D-')
+    elseif variant == 'xor_pt0' then
+        pla:pt({'in1','in2'}, 'out.D')
+    elseif variant == 'xor_npt0' then
+        pla:pt({'in1','in2'}, 'out.D-')
+    end
 
     pla:write(variant..'.tt4')
 end

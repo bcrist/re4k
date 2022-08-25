@@ -1,0 +1,14 @@
+#$ MODULE x
+#$ PINS 7 g2a g2b g3a g3b i o2 o3
+#$ NODES 0
+.type f
+.i 5
+.o 4
+.ilb g2a g2b g3a g3b i
+.ob o2 o2.OE o3 o3.OE-
+.phase 1111
+.p 3
+11--- -1--
+--11- ---1
+----1 1-1-
+.end

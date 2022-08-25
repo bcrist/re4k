@@ -1,4 +1,4 @@
-//[[!! include 'build_zig' !! 31 ]]
+//[[!! include 'build_zig' !! 38 ]]
 //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
 const std = @import("std");
 const Pkg = std.build.Pkg;
@@ -18,6 +18,13 @@ pub fn build(b: *std.build.Builder) void {
     fit.setBuildMode(mode);
     fit.install();
     _ = makeRunStep(b, fit, "fit", "run fit");
+
+    const jedcheck = b.addExecutable("jedcheck", "src/jedcheck.zig");
+    jedcheck.linkLibC();
+    jedcheck.setTarget(target);
+    jedcheck.setBuildMode(mode);
+    jedcheck.install();
+    _ = makeRunStep(b, jedcheck, "jedcheck", "run jedcheck");
 
     const jeddiff = b.addExecutable("jeddiff", "src/jeddiff.zig");
     jeddiff.linkLibC();

@@ -1,0 +1,18 @@
+#$ MODULE x
+#$ PINS 7 in1 in2 x0 x1 x2 x3 x4
+#$ NODES 2 d0 out
+.type f
+.i 7
+.o 3
+.ilb in1 in2 x0 x1 x2 x3 x4
+.ob d0 out.C out.D
+.phase 111
+.p 7
+1------ -11
+-1----- --1
+--1---- 1--
+---1--- 1--
+----1-- 1--
+-----1- 1--
+------1 1--
+.end
