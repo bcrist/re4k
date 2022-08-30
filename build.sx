@@ -6,4 +6,5 @@
     (exe fit)
     (exe jeddiff)
     (exe jedcheck)
+    (exe sniffgrp)
 )

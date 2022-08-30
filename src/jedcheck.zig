@@ -4,13 +4,13 @@ const jedec = @import("jedec.zig");
 var temp_alloc = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 
 // TODO handle other device layouts
-const DeviceJed = jedec.JedecData(172, 100);
+const DeviceJed = jedec.JedecData;
 
-fn readJedec(filename: []const u8) !jedec.JedecData(172, 100) {
+fn readJedec(filename: []const u8) !DeviceJed {
     var f = try std.fs.cwd().openFile(filename, .{});
     defer f.close();
     var raw = try f.readToEndAlloc(temp_alloc.allocator(), 0x100000000);
-    return try DeviceJed.init(raw);
+    return try DeviceJed.parse(temp_alloc.allocator(), 172, null, filename, raw);
 }
 
 pub fn main() !void {
@@ -125,8 +125,8 @@ fn check(jed: DeviceJed, filename: []const u8) !void {
         .kind = .unset
     });
     while (iter.next()) |fuse| {
-        var row = DeviceJed.getRow(@intCast(u32, fuse));
-        var col = DeviceJed.getColumn(@intCast(u32, fuse));
+        var row = jed.getRow(@intCast(u32, fuse));
+        var col = jed.getColumn(@intCast(u32, fuse));
         if (!isKnownFuse(row, col)) {
             if (getMacrocellForColumn(col)) |mc| {
                 try std.io.getStdOut().writer().print("{s}: Unknown fuse set at {}:{}\t{}\n", .{ filename, row, col, mc });

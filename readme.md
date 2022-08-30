@@ -1,12 +1,10 @@
 # Fusemaps for Lattice ispMach4000 CPLDs
 
 # TODO
-* LC4032ZE reverse engineering
-* General documentation
+* General documentation of LC4k architecture
+* Convert LCI/TT4 generation from lua/limp to zig
 * Bitstream configuration through zig
 * Bitstream decompilation
-* Save as JED
-* Save as SVF
 
 # TODO: LC4032ZE
 * GLB inputs from GRP (WIP)

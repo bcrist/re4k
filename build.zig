@@ -1,4 +1,4 @@
-//[[!! include 'build_zig' !! 38 ]]
+//[[!! include 'build_zig' !! 45 ]]
 //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
 const std = @import("std");
 const Pkg = std.build.Pkg;
@@ -33,7 +33,14 @@ pub fn build(b: *std.build.Builder) void {
     jeddiff.install();
     _ = makeRunStep(b, jeddiff, "jeddiff", "run jeddiff");
 
-    _ = temp_allocator;
+    const sniffgrp = b.addExecutable("sniffgrp", "src/sniffgrp.zig");
+    sniffgrp.addPackage(temp_allocator);
+    sniffgrp.linkLibC();
+    sniffgrp.setTarget(target);
+    sniffgrp.setBuildMode(mode);
+    sniffgrp.install();
+    _ = makeRunStep(b, sniffgrp, "sniffgrp", "run sniffgrp");
+
 }
 //[[ ######################### END OF GENERATED CODE ######################### ]]
 

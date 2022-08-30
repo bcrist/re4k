@@ -4,13 +4,13 @@ const jedec = @import("jedec.zig");
 var temp_alloc = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 
 // TODO handle other device layouts
-const DeviceJed = jedec.JedecData(172, 100);
+const DeviceJed = jedec.JedecData;
 
-fn readJedec(filename: []const u8) !jedec.JedecData(172, 100) {
+fn readJedec(filename: []const u8) !jedec.JedecData {
     var f = try std.fs.cwd().openFile(filename, .{});
     defer f.close();
     var raw = try f.readToEndAlloc(temp_alloc.allocator(), 0x100000000);
-    return try DeviceJed.init(raw);
+    return try DeviceJed.parse(temp_alloc.allocator(), 172, null, filename, raw);
 }
 
 fn parseAndAddRange(jed: *DeviceJed, str: []const u8) !void {
@@ -23,8 +23,8 @@ fn parseAndAddRange(jed: *DeviceJed, str: []const u8) !void {
     if (first_iter.next()) |col| {
         min_col = try std.fmt.parseUnsigned(u32, col, 10);
     } else {
-        min_col = DeviceJed.getColumn(min_row);
-        min_row = DeviceJed.getRow(min_row);
+        min_col = jed.getColumn(min_row);
+        min_row = jed.getRow(min_row);
     }
 
     var second = range_it.next() orelse return error.InvalidRange;
@@ -34,8 +34,8 @@ fn parseAndAddRange(jed: *DeviceJed, str: []const u8) !void {
     if (second_iter.next()) |col| {
         max_col = try std.fmt.parseUnsigned(u32, col, 10);
     } else {
-        max_col = DeviceJed.getColumn(max_row);
-        max_row = DeviceJed.getRow(max_row);
+        max_col = jed.getColumn(max_row);
+        max_row = jed.getRow(max_row);
     }
 
     var row: u32 = min_row;
@@ -57,8 +57,8 @@ pub fn main() !void {
 
     var has_include = false;
 
-    var included = DeviceJed.initFull();
-    var excluded = DeviceJed.initEmpty();
+    var included = try DeviceJed.initFull(temp_alloc.allocator(), 172, 100);
+    var excluded = try DeviceJed.initEmpty(temp_alloc.allocator(), 172, 100);
 
     while (args.next()) |path| {
         if (path[0] == '-') {
@@ -80,14 +80,12 @@ pub fn main() !void {
         }
     }
 
-    var combined_diff = DeviceJed {
-        .raw = std.StaticBitSet(DeviceJed.len).initEmpty(),
-    };
+    var combined_diff = try DeviceJed.initEmpty(temp_alloc.allocator(), 172, 100);
 
     if (data.items.len > 1) {
         var first = data.items[0];
         for (data.items[1..]) |d| {
-            combined_diff.raw.setUnion(first.diff(d).raw);
+            combined_diff.raw.setUnion((try first.xor(d)).raw);
         }
     } else if (data.items.len == 1) {
         // just print bits that are cleared
@@ -110,20 +108,20 @@ pub fn main() !void {
 }
 
 fn write(writer: anytype, headers: std.ArrayList([]const u8), combined_diff: DeviceJed, data: std.ArrayList(DeviceJed)) !void {
-    _ = try writer.write("fuse");
+    try writer.writeAll("fuse");
     for (headers.items) |h| {
         try writer.print(",{s}", .{ h });
     }
-    _ = try writer.write("\n");
+    try writer.writeAll("\n");
 
     var diff_iter = combined_diff.raw.iterator(.{});
     while (diff_iter.next()) |fuse| {
-        try writer.print("{}:{}",.{ DeviceJed.getRow(@intCast(u32, fuse)), DeviceJed.getColumn(@intCast(u32, fuse)) });
+        try writer.print("{}:{}",.{ combined_diff.getRow(@intCast(u32, fuse)), combined_diff.getColumn(@intCast(u32, fuse)) });
 
         for (data.items) |d| {
             const v: u32 = if (d.raw.isSet(fuse)) 1 else 0;
             try writer.print(",{}", .{ v });
         }
-        _ = try writer.write("\n");
+        try writer.writeAll("\n");
     }
 }
