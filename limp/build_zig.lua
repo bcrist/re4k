@@ -73,7 +73,7 @@ for i = 1, #dirs do
         for import_name in contents:gmatch('@import%("([^"]+)"%)') do
             if fs.path_extension(import_name) == '.zig' then
                 deps[#deps + 1] = fs.compose_path_slash(dir, import_name)
-            elseif import_name ~= 'std' and import_name ~= 'builtin' then
+            elseif import_name ~= 'std' and import_name ~= 'builtin' and import_name ~= 'root' then
                 deps[#deps + 1] = import_name
             end
         end

@@ -1,0 +1,8 @@
+
+(LC4032ZE_TQFP48
+   (zero_hold_time
+      (fuse 87 171)
+      (value 1 disabled)
+      (value 0 enabled)
+   )
+)

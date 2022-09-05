@@ -1,5 +1,38 @@
 const std = @import("std");
 
+const DeviceType = @import("device.zig").DeviceType;
+
+pub const MacrocellRef = struct {
+    glb: u8,
+    mc: u8,
+};
+
+pub const MacrocellIterator = struct {
+    device: DeviceType,
+    _last: ?MacrocellRef = null,
+    pub fn next(self: *MacrocellIterator) ?MacrocellRef {
+        if (self._last) |*ref| {
+            if (ref.mc < self.device.getMcsPerGlb()) {
+                ref.mc += 1;
+                return ref.*;
+            } else if (ref.glb < self.device.getNumGlbs()) {
+                ref.glb += 1;
+                ref.mc = 0;
+                return ref.*;
+            } else {
+                return null;
+            }
+        } else {
+            const ref = MacrocellRef {
+                .glb = 0,
+                .mc = 0,
+            };
+            self._last = ref;
+            return ref;
+        }
+    }
+};
+
 pub const SignalType = enum {
     buried,
     input,
@@ -41,14 +74,6 @@ pub const GlbInputSignal = union {
     },
     pin: u16,
 };
-
-
-
-pub const DeviceInfo = struct {
-    jedec_width: u16,
-    jedec_height: u16,
-};
-
 
 pub const FuseFileFormat = enum {
     jed,

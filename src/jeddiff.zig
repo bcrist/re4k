@@ -85,7 +85,9 @@ pub fn main() !void {
     if (data.items.len > 1) {
         var first = data.items[0];
         for (data.items[1..]) |d| {
-            combined_diff.raw.setUnion((try first.xor(d)).raw);
+            var diff = try first.clone(temp_alloc.allocator());
+            try diff.xor(d);
+            combined_diff.raw.setUnion(diff.raw);
         }
     } else if (data.items.len == 1) {
         // just print bits that are cleared

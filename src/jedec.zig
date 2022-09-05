@@ -73,7 +73,7 @@ pub const JedecData = struct {
         return JedecData {
             .width = width,
             .height = height,
-            .raw = try std.DynamicBitSet.initEmpty(allocator, width * height),
+            .raw = try std.DynamicBitSet.initEmpty(allocator, @as(u32, width) * height),
         };
     }
 
@@ -81,7 +81,7 @@ pub const JedecData = struct {
         return JedecData {
             .width = width,
             .height = height,
-            .raw = try std.DynamicBitSet.initFull(allocator, width * height),
+            .raw = try std.DynamicBitSet.initFull(allocator, @as(u32, width) * height),
         };
     }
 
@@ -89,6 +89,17 @@ pub const JedecData = struct {
         self.raw.deinit();
         self.width = 0;
         self.height = 0;
+    }
+
+    pub fn clone(self: JedecData, allocator: std.mem.Allocator) error{OutOfMemory}!JedecData {
+        return JedecData {
+            .width = self.width,
+            .height = self.height,
+            .raw = try self.raw.clone(allocator),
+            .usercode = self.usercode,
+            .security = self.security,
+            .pin_count = self.pin_count,
+        };
     }
 
     pub fn parse(allocator: std.mem.Allocator, width: u16, height: ?u16, name: []const u8, data: []const u8) !JedecData {
@@ -113,7 +124,7 @@ pub const JedecData = struct {
                 .qty_fuses => {
                     const qf = std.fmt.parseUnsigned(u32, field.extra, 10) catch return error.MalformedJedecFile;
                     if (actual_height) |h| {
-                        const expected = h * width;
+                        const expected = @as(u32, h) * width;
                         if (qf != expected) {
                             try std.io.getStdErr().writer().print("{s}: Expected fuse count to be exactly {}, but found {}\n", .{ name, expected, qf });
                             return error.IncorrectFuseCount;
@@ -405,32 +416,24 @@ pub const JedecData = struct {
         self.raw.setValue(row * self.width + col, val == 1);
     }
 
-    pub fn xor(self: JedecData, other: JedecData) !JedecData {
+    pub fn xor(self: *JedecData, other: JedecData) !void {
         if (self.length() != other.length()) {
             return error.IncompatibleJedecData;
         }
 
-        var result = self;
+        self.raw.toggleSet(other.raw);
 
-        result.raw.toggleSet(other.raw);
-
-        if (self.usercode == null and other.usercode == null) {
-            result.usercode = null;
-        } else {
+        if (self.usercode != null or other.usercode != null) {
             const s: u32 = self.usercode orelse 0;
             const o: u32 = other.usercode orelse 0;
-            result.usercode = s ^ o;
+            self.usercode = s ^ o;
         }
 
-        if (self.security == null and other.security == null) {
-            result.security = null;
-        } else {
+        if (self.security != null or other.security != null) {
             const s: u1 = self.security orelse 0;
             const o: u1 = other.security orelse 0;
-            result.security = s ^ o;
+            self.security = s ^ o;
         }
-
-        return result;
     }
 
     // pub fn writeHex(self: JedecData, writer: anytype) !void {

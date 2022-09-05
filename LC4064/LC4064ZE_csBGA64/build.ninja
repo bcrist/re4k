@@ -1,0 +1,16 @@
+##!! include('build_ninja_2','LC4064ZE_csBGA64') !! 16 ##
+## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
+dev = LC4064\LC4064ZE_csBGA64
+
+rule zerohold
+    command = zig-out/bin/zerohold.exe $out
+
+rule slew
+    command = zig-out/bin/slew.exe $out
+
+build $dev/zerohold.sx: zerohold
+build $dev/slew.sx: slew
+
+build build-LC4064ZE_csBGA64: phony $dev/zerohold.sx $dev/slew.sx
+
+## ######################### END OF GENERATED CODE ######################### ##

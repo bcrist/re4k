@@ -1,4 +1,4 @@
-//[[!! include 'build_zig' !! 45 ]]
+//[[!! include 'build_zig' !! 32 ]]
 //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
 const std = @import("std");
 const Pkg = std.build.Pkg;
@@ -12,34 +12,21 @@ pub fn build(b: *std.build.Builder) void {
         .source = .{ .path = "pkg/tempallocator/temp_allocator.zig" },
     };
 
-    const fit = b.addExecutable("fit", "src/fit.zig");
-    fit.linkLibC();
-    fit.setTarget(target);
-    fit.setBuildMode(mode);
-    fit.install();
-    _ = makeRunStep(b, fit, "fit", "run fit");
+    const slew = b.addExecutable("slew", "src/slew.zig");
+    slew.addPackage(temp_allocator);
+    slew.linkLibC();
+    slew.setTarget(target);
+    slew.setBuildMode(mode);
+    slew.install();
+    _ = makeRunStep(b, slew, "slew", "run slew");
 
-    const jedcheck = b.addExecutable("jedcheck", "src/jedcheck.zig");
-    jedcheck.linkLibC();
-    jedcheck.setTarget(target);
-    jedcheck.setBuildMode(mode);
-    jedcheck.install();
-    _ = makeRunStep(b, jedcheck, "jedcheck", "run jedcheck");
-
-    const jeddiff = b.addExecutable("jeddiff", "src/jeddiff.zig");
-    jeddiff.linkLibC();
-    jeddiff.setTarget(target);
-    jeddiff.setBuildMode(mode);
-    jeddiff.install();
-    _ = makeRunStep(b, jeddiff, "jeddiff", "run jeddiff");
-
-    const sniffgrp = b.addExecutable("sniffgrp", "src/sniffgrp.zig");
-    sniffgrp.addPackage(temp_allocator);
-    sniffgrp.linkLibC();
-    sniffgrp.setTarget(target);
-    sniffgrp.setBuildMode(mode);
-    sniffgrp.install();
-    _ = makeRunStep(b, sniffgrp, "sniffgrp", "run sniffgrp");
+    const zerohold = b.addExecutable("zerohold", "src/zerohold.zig");
+    zerohold.addPackage(temp_allocator);
+    zerohold.linkLibC();
+    zerohold.setTarget(target);
+    zerohold.setBuildMode(mode);
+    zerohold.install();
+    _ = makeRunStep(b, zerohold, "zerohold", "run zerohold");
 
 }
 //[[ ######################### END OF GENERATED CODE ######################### ]]

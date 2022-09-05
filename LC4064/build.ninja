@@ -1,0 +1,14 @@
+subninja LC4064/LC4064x_TQFP44/build.ninja
+subninja LC4064/LC4064x_TQFP48/build.ninja
+subninja LC4064/LC4064x_TQFP100/build.ninja
+subninja LC4064/LC4064ZC_TQFP48/build.ninja
+subninja LC4064/LC4064ZC_csBGA56/build.ninja
+subninja LC4064/LC4064ZC_TQFP100/build.ninja
+subninja LC4064/LC4064ZC_csBGA132/build.ninja
+subninja LC4064/LC4064ZE_TQFP48/build.ninja
+subninja LC4064/LC4064ZE_csBGA64/build.ninja
+subninja LC4064/LC4064ZE_ucBGA64/build.ninja
+subninja LC4064/LC4064ZE_TQFP100/build.ninja
+subninja LC4064/LC4064ZE_csBGA144/build.ninja
+
+build build-LC4064: phony build-LC4064x_TQFP44 build-LC4064x_TQFP48 build-LC4064x_TQFP100 build-LC4064ZC_TQFP48 build-LC4064ZC_csBGA56 build-LC4064ZC_TQFP100 build-LC4064ZC_csBGA132 build-LC4064ZE_TQFP48 build-LC4064ZE_csBGA64 build-LC4064ZE_ucBGA64 build-LC4064ZE_TQFP100 build-LC4064ZE_csBGA144

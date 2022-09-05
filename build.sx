@@ -3,8 +3,6 @@
     (pkg temp_allocator)
 )
 (dir src
-    (exe fit)
-    (exe jeddiff)
-    (exe jedcheck)
-    (exe sniffgrp)
+    (exe zerohold)
+    (exe slew)
 )

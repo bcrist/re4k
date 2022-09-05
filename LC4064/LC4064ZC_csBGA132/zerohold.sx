@@ -1,0 +1,8 @@
+
+(LC4064ZC_csBGA132
+   (zero_hold_time
+      (fuse 87 355)
+      (value 1 disabled)
+      (value 0 enabled)
+   )
+)

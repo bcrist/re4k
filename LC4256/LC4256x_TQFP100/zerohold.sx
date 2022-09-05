@@ -1,0 +1,8 @@
+
+(LC4256x_TQFP100
+   (zero_hold_time
+      (fuse 87 115)
+      (value 1 disabled)
+      (value 0 enabled)
+   )
+)
