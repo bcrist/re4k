@@ -62,7 +62,6 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             try writer.expression("fuse");
             try writer.printRaw("{}", .{ row });
             try writer.printRaw("{}", .{ col });
-            try writer.close();
 
             const slow_value = results_slow.jedec.get(row, col);
             if (default_slow) |def| {
@@ -85,6 +84,8 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             } else {
                 default_fast = fast_value;
             }
+
+            try writer.close();
 
         } else {
             try std.io.getStdErr().writer().print("Expected one slew fuse for device {} pin {s} but found none!\n", .{ dev, pin_number });

@@ -1,0 +1,11 @@
+
+(LC4128V_TQFP144
+   (bus_maintenance
+      (fuse 85 101 (value 1))
+      (fuse 86 101 (value 2))
+      (value 3 pullup)
+      (value 2 keeper)
+      (value 1 float)
+      (value 0 pulldown)
+   )
+)

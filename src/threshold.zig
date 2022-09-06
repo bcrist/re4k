@@ -97,7 +97,6 @@ fn writeFuse(fuse: usize, results_high: JedecData, results_low: JedecData, diff:
     try writer.expression("fuse");
     try writer.printRaw("{}", .{ row });
     try writer.printRaw("{}", .{ col });
-    try writer.close();
 
     const high_value = results_high.get(row, col);
     if (default_high) |def| {
@@ -120,4 +119,6 @@ fn writeFuse(fuse: usize, results_high: JedecData, results_low: JedecData, diff:
     } else {
         default_low = low_value;
     }
+    
+    try writer.close();
 }

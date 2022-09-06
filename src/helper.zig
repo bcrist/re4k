@@ -1,6 +1,7 @@
 const root = @import("root");
 const std = @import("std");
 const sx = @import("sx.zig");
+const jedec = @import("jedec.zig");
 const toolchain = @import("toolchain.zig");
 const TempAllocator = @import("temp_allocator");
 const DeviceType = @import("device.zig").DeviceType;
@@ -65,4 +66,10 @@ fn run() !void {
 pub fn logReport(name: []const u8, results: toolchain.FitResults) !void {
     const stderr = std.io.getStdErr().writer();
     try stderr.print("{s} Report:\n{s}", .{ name, results.report });
+}
+
+pub fn diff(alloc: std.mem.Allocator, a: jedec.JedecData, b: jedec.JedecData) !jedec.JedecData {
+    var result = try a.clone(alloc);
+    try result.xor(b);
+    return result;
 }

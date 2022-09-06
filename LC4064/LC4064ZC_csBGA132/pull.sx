@@ -1,0 +1,11 @@
+
+(LC4064ZC_csBGA132
+   (bus_maintenance
+      (fuse 85 355 (value 1))
+      (fuse 86 355 (value 2))
+      (value 3 pullup)
+      (value 2 keeper)
+      (value 1 float)
+      (value 0 pulldown)
+   )
+)

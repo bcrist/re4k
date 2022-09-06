@@ -1,0 +1,11 @@
+
+(LC4064x_TQFP48
+   (bus_maintenance
+      (fuse 85 351 (value 1))
+      (fuse 86 351 (value 2))
+      (value 3 pullup)
+      (value 2 keeper)
+      (value 1 float)
+      (value 0 pulldown)
+   )
+)

@@ -6,4 +6,5 @@
     (exe zerohold)
     (exe slew)
     (exe threshold)
+    (exe pull)
 )

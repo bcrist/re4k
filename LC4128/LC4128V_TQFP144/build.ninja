@@ -1,4 +1,4 @@
-##!! include('build_ninja_2','LC4128V_TQFP144') !! 19 ##
+##!! include('build_ninja_2','LC4128V_TQFP144') !! 23 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 dev = LC4128\LC4128V_TQFP144
 
@@ -14,6 +14,10 @@ rule threshold
     command = zig-out/bin/threshold.exe $out
 build $dev/threshold.sx: threshold
 
-build build-LC4128V_TQFP144: phony $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx
+rule pull
+    command = zig-out/bin/pull.exe $out
+build $dev/pull.sx: pull
+
+build build-LC4128V_TQFP144: phony $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx $dev/pull.sx
 
 ## ######################### END OF GENERATED CODE ######################### ##

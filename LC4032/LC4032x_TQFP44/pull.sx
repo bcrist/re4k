@@ -1,0 +1,13 @@
+
+(LC4032x_TQFP44
+   (bus_maintenance
+      (fuse 85 171 (value 1))
+      (fuse 86 171 (value 2))
+      (fuse 92 58 (value 4))
+      (fuse 92 144 (value 8))
+      (value 15 pullup)
+      (value 14 keeper)
+      (value 1 float)
+      (value 12 pulldown)
+   )
+)

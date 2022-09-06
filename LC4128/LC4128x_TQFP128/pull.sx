@@ -1,0 +1,15 @@
+
+(LC4128x_TQFP128
+   (bus_maintenance
+      (fuse 85 101 (value 1))
+      (fuse 86 101 (value 2))
+      (fuse 92 107 (value 4))
+      (fuse 92 269 (value 8))
+      (fuse 92 477 (value 16))
+      (fuse 92 639 (value 32))
+      (value 63 pullup)
+      (value 62 keeper)
+      (value 1 float)
+      (value 60 pulldown)
+   )
+)

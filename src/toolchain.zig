@@ -49,7 +49,7 @@ pub const PinAssignment = struct {
     pin_index: ?u16 = null,
     //input_register: ?bool = null,
     iostd: ?core.LogicLevels = null,
-    //bus_maintenance: ?core.BusMaintenanceType = null,
+    bus_maintenance: ?core.BusMaintenanceType = null,
     slew_rate: ?core.SlewRate = null,
     //power_guard_signal: ?[]const u8 = null,
 };
@@ -135,6 +135,7 @@ pub const Design = struct {
     outputs: std.ArrayListUnmanaged([]const u8),
     pts: std.ArrayListUnmanaged(ProductTerm),
     zero_hold_time: bool,
+    ignore_fitter_warnings: bool,
 
     pub fn init(alloc: std.mem.Allocator, device: DeviceType) Design {
         return .{
@@ -146,6 +147,7 @@ pub const Design = struct {
             .outputs = .{},
             .pts = .{},
             .zero_hold_time = false,
+            .ignore_fitter_warnings = false,
         };
     }
 
@@ -155,7 +157,7 @@ pub const Design = struct {
                 if (pa.pin_index) |pin_index| existing.pin_index = pin_index;
                 // if (pa.input_register) |inreg| existing.input_register = inreg;
                 if (pa.iostd) |iostd| existing.iostd = iostd;
-                // if (pa.bus_maintenance) |pull| existing.bus_maintenance = pull;
+                if (pa.bus_maintenance) |pull| existing.bus_maintenance = pull;
                 if (pa.slew_rate) |slew| existing.slew_rate = slew;
                 // if (pa.power_guard_signal) |pg| {
                     // existing.power_guard_signal = pg;
@@ -207,7 +209,7 @@ pub const Design = struct {
 
         for (self.pins.items) |existing| {
             if (std.mem.eql(u8, na.signal, existing.signal)) {
-                std.io.getStdOut().writer().print("Signal `{s}` already exists as a pin; can't be redefined as a node!\n", .{ na.signal });
+                try std.io.getStdOut().writer().print("Signal `{s}` already exists as a pin; can't be redefined as a node!\n", .{ na.signal });
                 return;
             }
         }
@@ -372,14 +374,77 @@ pub const Design = struct {
             }
         }
 
-        for (self.nodes.items) |node| {
-            _ = node;
+        for (self.nodes.items) |node_assignment| {
+            if (node_assignment.glb) |glb| {
+                const glb_name = device.getGlbName(glb);
+                if (node_assignment.mc) |mc| {
+                    try writer.print("{s}=node,-,-,{s},{};\n", .{ node_assignment.signal, glb_name, mc });
+                } else {
+                    try writer.print("{s}=node,-,-,{s},-;\n", .{ node_assignment.signal, glb_name });
+                }
+            } else if (node_assignment.mc) |_| {
+                return error.InvalidNodeAssignment;
+            }
         }
 
         try writer.writeAll("\n[IO Types]\n");
         for (self.pins.items) |pin_assignment| {
             if (pin_assignment.iostd) |iostd| {
                 try writer.print("{s}={s},pin,-,-;\n", .{ pin_assignment.signal, @tagName(iostd) });
+            }
+        }
+
+        try writer.writeAll("\n[Pullup]\n");
+
+        if (device.getFamily() == .zero_power_enhanced) {
+            try writer.writeAll("Default=down;\n");
+            for ([_]core.BusMaintenanceType { .float, .pulldown, .pullup, .keeper }) |pull| {
+                const tag = switch (pull) {
+                    .float => "OFF",
+                    .pulldown => "DOWN",
+                    .pullup => "UP",
+                    .keeper => "HOLD",
+                };
+                try writer.print("{s}=", .{ tag });
+                var first = true;
+                for (self.pins.items) |pin_assignment| {
+                    if (pin_assignment.bus_maintenance) |pin_pull| {
+                        if (pull == pin_pull) {
+                            if (first) {
+                                first = false;
+                            } else {
+                                try writer.writeByte(',');
+                            }
+                            try writer.writeAll(pin_assignment.signal);
+                        }
+                    }
+                }
+                try writer.writeAll(";\n");
+            }
+        } else {
+            var default: ?core.BusMaintenanceType = null;
+            for (self.pins.items) |pin_assignment| {
+                if (pin_assignment.bus_maintenance) |pin_pull| {
+                    if (default) |default_pull| {
+                        if (pin_pull != default_pull) {
+                            return error.MultipleBusMaintenanceTypes;
+                        }
+                    } else {
+                        default = pin_pull;
+                    }
+                }
+            }
+
+            if (default) |pull| {
+                const tag = switch (pull) {
+                    .float => "OFF",
+                    .pulldown => "DOWN",
+                    .pullup => "UP",
+                    .keeper => "HOLD",
+                };
+                try writer.print("Default={s};\n", .{ tag });
+            } else {
+                try writer.writeAll("Default=down;\n");
             }
         }
 
@@ -602,13 +667,19 @@ pub const Toolchain = struct {
 
         var log = try self.readFile("test.log");
 
-        if (!std.mem.startsWith(u8, log, "Project 'test' was Fitted Successfully!")) {
+        if (!std.mem.eql(u8, log, "Project 'test' was Fitted Successfully!\r\n")) {
             const stderr = std.io.getStdErr().writer();
-            try stderr.writeAll("Fitter failed:\n");
-            try stderr.print("Log:\n{s}\n", .{ log });
-            try stderr.print("1>\n{s}\n", .{ proc_results.stdout });
-            try stderr.print("2>\n{s}\n", .{ proc_results.stderr });
-            return error.FitFailed;
+
+            if (!std.mem.endsWith(u8, log, "Project 'test' was Fitted Successfully!\r\n")) {
+                try stderr.writeAll("Fitter failed!n");
+                try stderr.print("Log:\n{s}\n", .{ log });
+                try stderr.print("1>\n{s}\n", .{ proc_results.stdout });
+                try stderr.print("2>\n{s}\n", .{ proc_results.stderr });
+                return error.FitFailed;
+            } else if (!design.ignore_fitter_warnings) {
+                try stderr.writeAll("Fitter had warnings!\n");
+                try stderr.print("Log:\n{s}\n", .{ log });
+            }
         }
 
         var results = FitResults {
