@@ -2556,6 +2556,24 @@ pub const PinInfo = union(enum) {
         pin_number: []const u8,
         misc_type: MiscPinType,
     },
+
+    pub fn pin_index(self: PinInfo) u16 {
+        return switch (self) {
+            .input => |info| info.pin_index,
+            .clock_input => |info| info.pin_index,
+            .input_output => |info| info.pin_index,
+            .misc => |info| info.pin_index,
+        };
+    }
+
+    pub fn pin_number(self: PinInfo) []const u8 {
+        return switch (self) {
+            .input => |info| info.pin_number,
+            .clock_input => |info| info.pin_number,
+            .input_output => |info| info.pin_number,
+            .misc => |info| info.pin_number,
+        };
+    }
 };
 
 fn _pin_number(comptime pin_index: u16, pin_number: ?[]const u8) []const u8 {

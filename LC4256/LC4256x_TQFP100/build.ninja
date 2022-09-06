@@ -1,16 +1,19 @@
-##!! include('build_ninja_2','LC4256x_TQFP100') !! 16 ##
+##!! include('build_ninja_2','LC4256x_TQFP100') !! 19 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 dev = LC4256\LC4256x_TQFP100
 
 rule zerohold
     command = zig-out/bin/zerohold.exe $out
+build $dev/zerohold.sx: zerohold
 
 rule slew
     command = zig-out/bin/slew.exe $out
-
-build $dev/zerohold.sx: zerohold
 build $dev/slew.sx: slew
 
-build build-LC4256x_TQFP100: phony $dev/zerohold.sx $dev/slew.sx
+rule threshold
+    command = zig-out/bin/threshold.exe $out
+build $dev/threshold.sx: threshold
+
+build build-LC4256x_TQFP100: phony $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx
 
 ## ######################### END OF GENERATED CODE ######################### ##

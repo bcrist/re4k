@@ -5,4 +5,5 @@
 (dir src
     (exe zerohold)
     (exe slew)
+    (exe threshold)
 )

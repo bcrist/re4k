@@ -26,7 +26,6 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
 }
 
 pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
-
     try writer.expressionExpanded(@tagName(dev));
     try writer.expressionExpanded("slew_rate");
 
@@ -36,23 +35,12 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     var pin_index: u16 = 0;
     while (pin_index < dev.getNumPins()) : (pin_index += 1) {
         const pin_info = dev.getPinInfo(pin_index);
+        std.debug.assert(pin_index == pin_info.pin_index());
         switch (pin_info) {
-            .input_output => |info| {
-                std.debug.assert(pin_index == info.pin_index);
-            },
-            .input => |info| {
-                std.debug.assert(pin_index == info.pin_index);
-                continue;
-            },
-            .clock_input => |info| {
-                std.debug.assert(pin_index == info.pin_index);
-                continue;
-            },
-            .misc => |info| {
-                std.debug.assert(pin_index == info.pin_index);
-                continue;
-            },
+            .input_output => {},
+            else => continue,
         }
+        const pin_number = pin_info.pin_number();
 
         try tc.cleanTempDir();
         helper.resetTemp();
@@ -64,7 +52,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         try diff.xor(results_fast.jedec);
 
         try writer.expression("pin");
-        try writer.printRaw("{s}", .{ pin_info.input_output.pin_number });
+        try writer.printRaw("{s}", .{ pin_number });
 
         var diff_iter = diff.raw.iterator(.{});
         if (diff_iter.next()) |fuse| {
@@ -99,12 +87,12 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             }
 
         } else {
-            try std.io.getStdErr().writer().print("Expected one slew fuse for device {} pin {s} but found none!\n", .{ dev, pin_info.input_output.pin_number });
+            try std.io.getStdErr().writer().print("Expected one slew fuse for device {} pin {s} but found none!\n", .{ dev, pin_number });
             return error.Think;
         }
 
         if (diff_iter.next()) |_| {
-            try std.io.getStdErr().writer().print("Expected one slew fuse for device {} pin {s}  but found multiple!\n", .{ dev, pin_info.input_output.pin_number });
+            try std.io.getStdErr().writer().print("Expected one slew fuse for device {} pin {s} but found multiple!\n", .{ dev, pin_number });
             return error.Think;
         }
 

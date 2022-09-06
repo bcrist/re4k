@@ -61,3 +61,8 @@ fn run() !void {
 
     try root.run(ta, pa, &tc, device, &sx_writer);
 }
+
+pub fn logReport(name: []const u8, results: toolchain.FitResults) !void {
+    const stderr = std.io.getStdErr().writer();
+    try stderr.print("{s} Report:\n{s}", .{ name, results.report });
+}

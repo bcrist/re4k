@@ -1,17 +1,21 @@
 local device = ...
+local jobs = {
+    'zerohold',
+    'slew',
+    'threshold',
+}
 
-writeln('dev = ', fs.compose_path(device:sub(1, 6), device))
-write [[
+writeln('dev = ', fs.compose_path(device:sub(1, 6), device), nl)
 
-rule zerohold
-    command = zig-out/bin/zerohold.exe $out
+for _, job in ipairs(jobs) do
+    writeln('rule ', job)
+    writeln('    command = zig-out/bin/', job, '.exe $out')
+    writeln('build $dev/', job, '.sx: ', job)
+    nl()
+end
 
-rule slew
-    command = zig-out/bin/slew.exe $out
-
-build $dev/zerohold.sx: zerohold
-build $dev/slew.sx: slew
-
-]]
-
-writeln('build build-', device, ': phony $dev/zerohold.sx $dev/slew.sx')
+write('build build-', device, ': phony')
+for _, job in ipairs(jobs) do
+    write(' $dev/', job, '.sx')
+end
+nl()

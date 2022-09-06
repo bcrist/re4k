@@ -1,4 +1,4 @@
-//[[!! include 'build_zig' !! 32 ]]
+//[[!! include 'build_zig' !! 40 ]]
 //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
 const std = @import("std");
 const Pkg = std.build.Pkg;
@@ -19,6 +19,14 @@ pub fn build(b: *std.build.Builder) void {
     slew.setBuildMode(mode);
     slew.install();
     _ = makeRunStep(b, slew, "slew", "run slew");
+
+    const threshold = b.addExecutable("threshold", "src/threshold.zig");
+    threshold.addPackage(temp_allocator);
+    threshold.linkLibC();
+    threshold.setTarget(target);
+    threshold.setBuildMode(mode);
+    threshold.install();
+    _ = makeRunStep(b, threshold, "threshold", "run threshold");
 
     const zerohold = b.addExecutable("zerohold", "src/zerohold.zig");
     zerohold.addPackage(temp_allocator);

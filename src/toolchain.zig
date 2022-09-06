@@ -48,7 +48,7 @@ pub const PinAssignment = struct {
     signal: []const u8,
     pin_index: ?u16 = null,
     //input_register: ?bool = null,
-    //iostd: ?core.LogicLevels = null,
+    iostd: ?core.LogicLevels = null,
     //bus_maintenance: ?core.BusMaintenanceType = null,
     slew_rate: ?core.SlewRate = null,
     //power_guard_signal: ?[]const u8 = null,
@@ -154,7 +154,7 @@ pub const Design = struct {
             if (std.mem.eql(u8, pa.signal, existing.signal)) {
                 if (pa.pin_index) |pin_index| existing.pin_index = pin_index;
                 // if (pa.input_register) |inreg| existing.input_register = inreg;
-                // if (pa.iostd) |iostd| existing.iostd = iostd;
+                if (pa.iostd) |iostd| existing.iostd = iostd;
                 // if (pa.bus_maintenance) |pull| existing.bus_maintenance = pull;
                 if (pa.slew_rate) |slew| existing.slew_rate = slew;
                 // if (pa.power_guard_signal) |pg| {
@@ -374,6 +374,13 @@ pub const Design = struct {
 
         for (self.nodes.items) |node| {
             _ = node;
+        }
+
+        try writer.writeAll("\n[IO Types]\n");
+        for (self.pins.items) |pin_assignment| {
+            if (pin_assignment.iostd) |iostd| {
+                try writer.print("{s}={s},pin,-,-;\n", .{ pin_assignment.signal, @tagName(iostd) });
+            }
         }
 
         try writer.writeAll("\n[Slewrate]\n");
