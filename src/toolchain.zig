@@ -49,6 +49,7 @@ pub const PinAssignment = struct {
     pin_index: ?u16 = null,
     //input_register: ?bool = null,
     iostd: ?core.LogicLevels = null,
+    drive: ?core.DriveType = null,
     bus_maintenance: ?core.BusMaintenanceType = null,
     slew_rate: ?core.SlewRate = null,
     //power_guard_signal: ?[]const u8 = null,
@@ -157,6 +158,7 @@ pub const Design = struct {
                 if (pa.pin_index) |pin_index| existing.pin_index = pin_index;
                 // if (pa.input_register) |inreg| existing.input_register = inreg;
                 if (pa.iostd) |iostd| existing.iostd = iostd;
+                if (pa.drive) |drive| existing.drive = drive;
                 if (pa.bus_maintenance) |pull| existing.bus_maintenance = pull;
                 if (pa.slew_rate) |slew| existing.slew_rate = slew;
                 // if (pa.power_guard_signal) |pg| {
@@ -390,7 +392,31 @@ pub const Design = struct {
         try writer.writeAll("\n[IO Types]\n");
         for (self.pins.items) |pin_assignment| {
             if (pin_assignment.iostd) |iostd| {
-                try writer.print("{s}={s},pin,-,-;\n", .{ pin_assignment.signal, @tagName(iostd) });
+                const tag = switch (pin_assignment.drive orelse .push_pull) {
+                    .push_pull => switch (iostd) {
+                        .PCI => "PCI",
+                        .LVTTL => "LVTTL",
+                        .LVCMOS15 => "LVCMOS15",
+                        .LVCMOS18 => "LVCMOS18",
+                        .LVCMOS25 => "LVCMOS25",
+                        .LVCMOS33 => "LVCMOS33",
+                    },
+                    .open_drain => switch (iostd) {
+                        .PCI => "PCI_OD",
+                        .LVTTL => "LVTTL_OD",
+                        .LVCMOS15 => "LVCMOS15_OD",
+                        .LVCMOS18 => "LVCMOS18_OD",
+                        .LVCMOS25 => "LVCMOS25_OD",
+                        .LVCMOS33 => "LVCMOS33_OD",
+                    },
+                };
+                try writer.print("{s}={s},pin,-,-;\n", .{ pin_assignment.signal, tag });
+            } else if (pin_assignment.drive) |drive| {
+                const tag = switch (drive) {
+                    .push_pull => "LVCMOS33",
+                    .open_drain => "LVCMOS33_OD",
+                };
+                try writer.print("{s}={s},pin,-,-;\n", .{ pin_assignment.signal, tag });
             }
         }
 

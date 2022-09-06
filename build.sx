@@ -7,4 +7,5 @@
     (exe slew)
     (exe threshold)
     (exe pull)
+    (exe drive)
 )

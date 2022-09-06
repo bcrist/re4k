@@ -1,4 +1,4 @@
-##!! include('build_ninja_2','LC4256ZC_csBGA132') !! 23 ##
+##!! include('build_ninja_2','LC4256ZC_csBGA132') !! 27 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 dev = LC4256\LC4256ZC_csBGA132
 
@@ -18,6 +18,10 @@ rule pull
     command = zig-out/bin/pull.exe $out
 build $dev/pull.sx: pull
 
-build build-LC4256ZC_csBGA132: phony $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx $dev/pull.sx
+rule drive
+    command = zig-out/bin/drive.exe $out
+build $dev/drive.sx: drive
+
+build build-LC4256ZC_csBGA132: phony $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx $dev/pull.sx $dev/drive.sx
 
 ## ######################### END OF GENERATED CODE ######################### ##

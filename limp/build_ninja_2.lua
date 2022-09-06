@@ -4,6 +4,7 @@ local jobs = {
     'slew',
     'threshold',
     'pull',
+    'drive',
 }
 
 writeln('dev = ', fs.compose_path(device:sub(1, 6), device), nl)

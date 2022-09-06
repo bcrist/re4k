@@ -1,4 +1,4 @@
-//[[!! include 'build_zig' !! 48 ]]
+//[[!! include 'build_zig' !! 56 ]]
 //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
 const std = @import("std");
 const Pkg = std.build.Pkg;
@@ -11,6 +11,14 @@ pub fn build(b: *std.build.Builder) void {
         .name = "temp_allocator",
         .source = .{ .path = "pkg/tempallocator/temp_allocator.zig" },
     };
+
+    const drive = b.addExecutable("drive", "src/drive.zig");
+    drive.addPackage(temp_allocator);
+    drive.linkLibC();
+    drive.setTarget(target);
+    drive.setBuildMode(mode);
+    drive.install();
+    _ = makeRunStep(b, drive, "drive", "run drive");
 
     const pull = b.addExecutable("pull", "src/pull.zig");
     pull.addPackage(temp_allocator);

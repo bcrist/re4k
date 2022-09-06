@@ -49,6 +49,11 @@ pub const LogicLevels = enum {
     LVCMOS33,
 };
 
+pub const DriveType = enum {
+    push_pull,
+    open_drain,
+};
+
 pub const BusMaintenanceType = enum {
     float,
     pulldown,
