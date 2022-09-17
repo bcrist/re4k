@@ -1,6 +1,7 @@
 # Zig
 **/zig-cache/
 **/zig-out/
+temp/
 
 #VS
 **/.vscode/

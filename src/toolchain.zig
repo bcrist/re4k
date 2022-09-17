@@ -676,60 +676,36 @@ pub const Toolchain = struct {
 
     alloc: std.mem.Allocator,
     dir: std.fs.IterableDir,
-    dir_name: [8]u8,
 
     pub fn init(allocator: std.mem.Allocator) !Toolchain {
+        var parent_dir = try std.fs.cwd().makeOpenPath("temp", .{});
+        try std.os.chdir("temp");
+
         var random_bytes: [6]u8 = undefined;
         std.crypto.random.bytes(&random_bytes);
         var sub_path: [8]u8 = undefined;
         _ = std.fs.base64_encoder.encode(&sub_path, &random_bytes);
 
-        var dir = try std.fs.cwd().makeOpenPathIterable(&sub_path, .{});
+        var dir = try parent_dir.makeOpenPathIterable(&sub_path, .{});
         try std.os.chdir(&sub_path);
 
         return Toolchain {
             .alloc = allocator,
             .dir = dir,
-            .dir_name = sub_path,
         };
-    }
-
-    fn moveToParentPath(self: *Toolchain) !void {
-        const parent_path = try self.dir.dir.realpathAlloc(self.alloc, "..");
-        try std.os.chdir(parent_path);
     }
 
     pub fn deinit(self: *Toolchain, keep_files: bool) void {
-        self.moveToParentPath() catch |err| {
-            std.debug.print("Failed to clean up toolchain temporary directory: {}\n", .{ err });
-            if (@errorReturnTrace()) |trace| {
-                std.debug.dumpStackTrace(trace.*);
-            }
-            std.debug.dumpCurrentStackTrace(null);
-        };
-        self.dir.close();
         if (!keep_files) {
-            var n: u8 = 0;
-            const max: u8 = 32;
-            while (n <= max) : (n += 1) {
-                std.fs.cwd().deleteTree(&self.dir_name) catch |err| switch (err) {
-                    error.FileBusy => {
-                        if (n < max) {
-                            std.time.sleep(10000000);
-                            continue;
-                        } else {
-                            std.debug.print("Failed to clean up toolchain temporary directory: {}\n", .{ err });
-                            if (@errorReturnTrace()) |trace| {
-                                std.debug.dumpStackTrace(trace.*);
-                            }
-                            std.debug.dumpCurrentStackTrace(null);
-                        }
-                    },
-                    else => {},
-                };
-                break;
-            }
+            self.cleanTempDir() catch |err| {
+                std.debug.print("Failed to clean up toolchain temporary directory: {}\n", .{ err });
+                if (@errorReturnTrace()) |trace| {
+                    std.debug.dumpStackTrace(trace.*);
+                }
+                std.debug.dumpCurrentStackTrace(null);
+            };
         }
+        self.dir.close();
     }
 
     pub fn runToolchain(self: *Toolchain, design: Design) !FitResults {
