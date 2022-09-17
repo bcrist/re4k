@@ -7,6 +7,7 @@ local jobs = {
     'drive',
     'oe_mux',
     'orm',
+    'powerup_state',
 }
 
 writeln('dev = ', fs.compose_path(device:sub(1, 6), device), nl)

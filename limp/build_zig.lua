@@ -20,6 +20,10 @@ function root_visitor.dir ()
     parser:require_close()
 end
 
+function dir_visitor._ ()
+    -- Comment
+    parser:ignore_remaining_expression()
+end
 
 function dir_visitor.pkg (_, _, dir_path)
     local name = parser:require_string()

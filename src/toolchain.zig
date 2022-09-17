@@ -54,12 +54,15 @@ pub const PinAssignment = struct {
     bus_maintenance: ?core.BusMaintenanceType = null,
     slew_rate: ?core.SlewRate = null,
     //power_guard_signal: ?[]const u8 = null,
+
+    powerup_state: ?u1 = null,
 };
 
 pub const NodeAssignment = struct {
     signal: []const u8,
     glb: ?u8 = null,
     mc: ?u8 = null,
+    powerup_state: ?u1 = null,
 };
 
 pub const ProductTerm = struct {
@@ -162,6 +165,7 @@ pub const Design = struct {
                 if (pa.drive) |drive| existing.drive = drive;
                 if (pa.bus_maintenance) |pull| existing.bus_maintenance = pull;
                 if (pa.slew_rate) |slew| existing.slew_rate = slew;
+                if (pa.powerup_state) |powerup| existing.powerup_state = powerup;
                 // if (pa.power_guard_signal) |pg| {
                     // existing.power_guard_signal = pg;
                     // try self.addPinIfNotNode(pg);
@@ -206,6 +210,7 @@ pub const Design = struct {
             if (std.mem.eql(u8, na.signal, existing.signal)) {
                 if (na.glb) |glb| existing.glb = glb;
                 if (na.mc) |mc| existing.mc = mc;
+                if (na.powerup_state) |powerup| existing.powerup_state = powerup;
                 return;
             }
         }
@@ -500,6 +505,41 @@ pub const Design = struct {
             }
             try writer.writeAll(";\n");
         }
+
+        try writer.writeAll("\n[Register Powerup]\n");
+        for ([_]u1 { 0, 1 }) |state| {
+            const name = switch (state) {
+                0 => "RESET",
+                1 => "SET",
+            };
+            try writer.print("{s}=", .{ name });
+            var first = true;
+            for (self.pins.items) |pin_assignment| {
+                if (pin_assignment.powerup_state) |mc_state| {
+                    if (state == mc_state) {
+                        if (first) {
+                            first = false;
+                        } else {
+                            try writer.writeByte(',');
+                        }
+                        try writer.writeAll(pin_assignment.signal);
+                    }
+                }
+            }
+            for (self.nodes.items) |node_assignment| {
+                if (node_assignment.powerup_state) |mc_state| {
+                    if (state == mc_state) {
+                        if (first) {
+                            first = false;
+                        } else {
+                            try writer.writeByte(',');
+                        }
+                        try writer.writeAll(node_assignment.signal);
+                    }
+                }
+            }
+            try writer.writeAll(";\n");
+        }
     }
 
     pub fn writePla(self: Design, writer: anytype) !void {
@@ -665,6 +705,7 @@ pub const Toolchain = struct {
             if (@errorReturnTrace()) |trace| {
                 std.debug.dumpStackTrace(trace.*);
             }
+            std.debug.dumpCurrentStackTrace(null);
         };
         self.dir.close();
         if (!keep_files) {
@@ -674,13 +715,14 @@ pub const Toolchain = struct {
                 std.fs.cwd().deleteTree(&self.dir_name) catch |err| switch (err) {
                     error.FileBusy => {
                         if (n < max) {
-                            std.time.sleep(1000000);
+                            std.time.sleep(10000000);
                             continue;
                         } else {
                             std.debug.print("Failed to clean up toolchain temporary directory: {}\n", .{ err });
                             if (@errorReturnTrace()) |trace| {
                                 std.debug.dumpStackTrace(trace.*);
                             }
+                            std.debug.dumpCurrentStackTrace(null);
                         }
                     },
                     else => {},
@@ -722,7 +764,7 @@ pub const Toolchain = struct {
             const stderr = std.io.getStdErr().writer();
 
             if (!std.mem.endsWith(u8, log, "Project 'test' was Fitted Successfully!\r\n")) {
-                try stderr.writeAll("Fitter failed!n");
+                try stderr.writeAll("Fitter failed!\n");
                 try stderr.print("Log:\n{s}\n", .{ log });
                 try stderr.print("1>\n{s}\n", .{ proc_results.stdout });
                 try stderr.print("2>\n{s}\n", .{ proc_results.stderr });

@@ -5,6 +5,7 @@
 * Convert LCI/TT4 generation from lua/limp to zig
 * Bitstream configuration through zig
 * Bitstream decompilation
+* ORM bypass for non-ZE families
 
 # TODO: LC4032ZE
 * GLB inputs from GRP (WIP)

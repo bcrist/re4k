@@ -11,12 +11,13 @@ pub const MacrocellRef = struct {
 pub const MacrocellIterator = struct {
     device: DeviceType,
     _last: ?MacrocellRef = null,
+
     pub fn next(self: *MacrocellIterator) ?MacrocellRef {
         if (self._last) |*ref| {
-            if (ref.mc < self.device.getMcsPerGlb()) {
+            if (ref.mc + 1 < self.device.getNumMcsPerGlb()) {
                 ref.mc += 1;
                 return ref.*;
-            } else if (ref.glb < self.device.getNumGlbs()) {
+            } else if (ref.glb + 1 < self.device.getNumGlbs()) {
                 ref.glb += 1;
                 ref.mc = 0;
                 return ref.*;
