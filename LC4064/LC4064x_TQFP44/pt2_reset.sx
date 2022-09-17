@@ -74,6 +74,6 @@
          (mc 15 (fuse 82 80))
       )
       (value 1 disabled)
-      (value 0 enabled)
+      (value 0 pt2)
    )
 )

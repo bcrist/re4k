@@ -14,7 +14,7 @@ pub fn main() void {
     helper.main();
 }
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: core.MacrocellRef, pt_as: bool) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: core.MacrocellRef, pt2_as: bool) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
     try design.nodeAssignment(.{
@@ -25,7 +25,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
     });
     try design.addPT("in", "out.D");
 
-    if (pt_as) {
+    if (pt2_as) {
         try design.addPT("as", "out.AP");
     }
 
@@ -41,7 +41,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
     try design.addPT("as", "dum.AP");
 
     var results = try tc.runToolchain(design);
-    try helper.logReport("pt2_reset_glb{}_mc{}_{}", .{ mcref.glb, mcref.mc, pt_as }, results);
+    try helper.logReport("pt2_reset_glb{}_mc{}_{}", .{ mcref.glb, mcref.mc, pt2_as }, results);
     try results.checkTerm();
     return results;
 }
@@ -127,7 +127,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         if (default_on) |def| {
             if (value_on != def) {
                 try writer.expression("value");
-                try writer.printRaw("{} enabled", .{ value_on });
+                try writer.printRaw("{} pt2", .{ value_on });
                 try writer.close();
             }
         } else {
@@ -149,7 +149,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
     if (default_on) |def| {
         try writer.expression("value");
-        try writer.printRaw("{} enabled", .{ def });
+        try writer.printRaw("{} pt2", .{ def });
         try writer.close();
     }
 

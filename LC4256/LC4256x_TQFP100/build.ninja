@@ -1,4 +1,4 @@
-##!! include('build_ninja_2','LC4256x_TQFP100') !! 51 ##
+##!! include('build_ninja_2','LC4256x_TQFP100') !! 55 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 dev = LC4256\LC4256x_TQFP100
 
@@ -46,6 +46,10 @@ rule pt2_reset
     command = zig-out/bin/pt2_reset.exe $out
 build $dev/pt2_reset.sx: pt2_reset
 
-build build-LC4256x_TQFP100: phony $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx $dev/pull.sx $dev/drive.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/ce_mux.sx $dev/reg_type.sx $dev/pt2_reset.sx
+rule pt3_reset
+    command = zig-out/bin/pt3_reset.exe $out
+build $dev/pt3_reset.sx: pt3_reset
+
+build build-LC4256x_TQFP100: phony $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx $dev/pull.sx $dev/drive.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/ce_mux.sx $dev/reg_type.sx $dev/pt2_reset.sx $dev/pt3_reset.sx
 
 ## ######################### END OF GENERATED CODE ######################### ##

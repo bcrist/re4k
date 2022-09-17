@@ -11,6 +11,7 @@ local jobs = {
     'ce_mux',
     'reg_type',
     'pt2_reset',
+    'pt3_reset',
 }
 
 writeln('dev = ', fs.compose_path(device:sub(1, 6), device), nl)
