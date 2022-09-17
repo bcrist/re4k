@@ -1,4 +1,4 @@
-//[[!! include 'build_zig' !! 56 ]]
+//[[!! include 'build_zig' !! 72 ]]
 //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
 const std = @import("std");
 const Pkg = std.build.Pkg;
@@ -19,6 +19,22 @@ pub fn build(b: *std.build.Builder) void {
     drive.setBuildMode(mode);
     drive.install();
     _ = makeRunStep(b, drive, "drive", "run drive");
+
+    const oe_mux = b.addExecutable("oe_mux", "src/oe_mux.zig");
+    oe_mux.addPackage(temp_allocator);
+    oe_mux.linkLibC();
+    oe_mux.setTarget(target);
+    oe_mux.setBuildMode(mode);
+    oe_mux.install();
+    _ = makeRunStep(b, oe_mux, "oe_mux", "run oe_mux");
+
+    const orm = b.addExecutable("orm", "src/orm.zig");
+    orm.addPackage(temp_allocator);
+    orm.linkLibC();
+    orm.setTarget(target);
+    orm.setBuildMode(mode);
+    orm.install();
+    _ = makeRunStep(b, orm, "orm", "run orm");
 
     const pull = b.addExecutable("pull", "src/pull.zig");
     pull.addPackage(temp_allocator);

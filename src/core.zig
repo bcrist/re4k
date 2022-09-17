@@ -1,6 +1,7 @@
 const std = @import("std");
 
-const DeviceType = @import("device.zig").DeviceType;
+const devices = @import("devices/devices.zig");
+const DeviceType = devices.DeviceType;
 
 pub const MacrocellRef = struct {
     glb: u8,
@@ -70,6 +71,17 @@ pub const MacrocellType = enum {
     combinational,
     d_ff,
     t_ff,
+};
+
+pub const OutputEnableMode = enum {
+    input_only,
+    output_only,
+    from_orp_active_low,
+    from_orp_active_high,
+    goe0,
+    goe1,
+    goe2,
+    goe3,
 };
 
 pub const GlbInputSignal = union {

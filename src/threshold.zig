@@ -3,8 +3,10 @@ const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx.zig");
 const core = @import("core.zig");
-const JedecData = @import("jedec.zig").JedecData;
-const DeviceType = @import("device.zig").DeviceType;
+const jedec = @import("jedec.zig");
+const devices = @import("devices/devices.zig");
+const JedecData = jedec.JedecData;
+const DeviceType = devices.DeviceType;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 
@@ -35,7 +37,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
     var pin_index: u16 = 0;
     while (pin_index < dev.getNumPins()) : (pin_index += 1) {
-        const pin_info = dev.getPinInfo(pin_index);
+        const pin_info = dev.getPins()[pin_index];
         switch (pin_info) {
             .input_output, .input, .clock_input => {},
             .misc => continue,

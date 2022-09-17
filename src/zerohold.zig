@@ -2,7 +2,8 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx.zig");
-const DeviceType = @import("device.zig").DeviceType;
+const devices = @import("devices/devices.zig");
+const DeviceType = devices.DeviceType;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 

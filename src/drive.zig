@@ -3,7 +3,7 @@ const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx.zig");
 const core = @import("core.zig");
-const DeviceType = @import("device.zig").DeviceType;
+const DeviceType = @import("devices/devices.zig").DeviceType;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 
@@ -34,7 +34,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
     var pin_index: u16 = 0;
     while (pin_index < dev.getNumPins()) : (pin_index += 1) {
-        const pin_info = dev.getPinInfo(pin_index);
+        const pin_info = dev.getPins()[pin_index];
         std.debug.assert(pin_index == pin_info.pin_index());
         switch (pin_info) {
             .input_output => {},

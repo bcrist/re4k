@@ -2,7 +2,8 @@ const std = @import("std");
 const core = @import("core.zig");
 const jedec = @import("jedec.zig");
 
-const DeviceType = @import("device.zig").DeviceType;
+const devices = @import("devices/devices.zig");
+const DeviceType = devices.DeviceType;
 const JedecData = jedec.JedecData;
 
 fn getDeviceFitterName(device: DeviceType) []const u8 {
@@ -237,7 +238,7 @@ pub const Design = struct {
         });
     }
 
-    fn addInput(self: *Design, signal: []const u8) !void {
+    pub fn addInput(self: *Design, signal: []const u8) !void {
         var sig = if (signal[0] == '~') signal[1..] else signal;
 
         for (self.inputs.items) |input| {
@@ -250,7 +251,7 @@ pub const Design = struct {
         try self.addPinIfNotNode(stripSignalSuffix(signal));
     }
 
-    fn addOutput(self: *Design, signal: []const u8) !void {
+    pub fn addOutput(self: *Design, signal: []const u8) !void {
         for (self.outputs.items) |output| {
             if (std.mem.eql(u8, output, signal)) {
                 return;
@@ -267,13 +268,18 @@ pub const Design = struct {
         const inputs_type_info = @typeInfo(@TypeOf(inputs));
         switch (inputs_type_info) {
             .Struct => {
-                for (inputs) |input| {
+            //.Struct => |info| {
+                // inline for (info.fields) |field| {
+                //     try pt_inputs.append(@field(inputs, field.name));
+                // }
+                inline for (inputs) |input| {
                     try pt_inputs.append(input);
                 }
             },
             .Pointer => {
                 try pt_inputs.append(inputs);
             },
+            .Null => {}, // no inputs
             else => {
                 @compileError("Expected inputs to be a string or tuple of strings!");
             },
@@ -304,7 +310,7 @@ pub const Design = struct {
         const outputs_type_info = @typeInfo(@TypeOf(outputs));
         switch (outputs_type_info) {
             .Struct => {
-                for (outputs) |output| {
+                inline for (outputs) |output| {
                     if(try pt.addOutput(self.alloc, output)) {
                         try self.addOutput(output);
                     }
@@ -360,9 +366,9 @@ pub const Design = struct {
         try writer.writeAll("\n[Location Assignments]\n");
         for (self.pins.items) |pin_assignment| {
             if (pin_assignment.pin_index) |pin_index| {
-                switch (device.getPinInfo(pin_index)) {
+                switch (device.getPins()[pin_index]) {
                     .input_output => |info| {
-                        const glb_name = device.getGlbName(info.glb);
+                        const glb_name = devices.getGlbName(info.glb);
                         try writer.print("{s}=pin,{s},-,{s},{};\n", .{ pin_assignment.signal, info.pin_number, glb_name, info.mc });
                     },
                     .input => |info| {
@@ -378,7 +384,7 @@ pub const Design = struct {
 
         for (self.nodes.items) |node_assignment| {
             if (node_assignment.glb) |glb| {
-                const glb_name = device.getGlbName(glb);
+                const glb_name = devices.getGlbName(glb);
                 if (node_assignment.mc) |mc| {
                     try writer.print("{s}=node,-,-,{s},{};\n", .{ node_assignment.signal, glb_name, mc });
                 } else {
@@ -655,13 +661,32 @@ pub const Toolchain = struct {
 
     pub fn deinit(self: *Toolchain, keep_files: bool) void {
         self.moveToParentPath() catch |err| {
-            std.debug.print("Failed to clean up toolchain temporary directory: {}", .{ err });
+            std.debug.print("Failed to clean up toolchain temporary directory: {}\n", .{ err });
+            if (@errorReturnTrace()) |trace| {
+                std.debug.dumpStackTrace(trace.*);
+            }
         };
         self.dir.close();
         if (!keep_files) {
-            std.fs.cwd().deleteTree(&self.dir_name) catch |err| {
-                std.debug.print("Failed to clean up toolchain temporary directory: {}", .{ err });
-            };
+            var n: u8 = 0;
+            const max: u8 = 32;
+            while (n <= max) : (n += 1) {
+                std.fs.cwd().deleteTree(&self.dir_name) catch |err| switch (err) {
+                    error.FileBusy => {
+                        if (n < max) {
+                            std.time.sleep(1000000);
+                            continue;
+                        } else {
+                            std.debug.print("Failed to clean up toolchain temporary directory: {}\n", .{ err });
+                            if (@errorReturnTrace()) |trace| {
+                                std.debug.dumpStackTrace(trace.*);
+                            }
+                        }
+                    },
+                    else => {},
+                };
+                break;
+            }
         }
     }
 
@@ -734,9 +759,29 @@ pub const Toolchain = struct {
     }
 
     pub fn cleanTempDir(self: *Toolchain) !void {
-        var iter = self.dir.iterate();
-        while (try iter.next()) |entry| {
-            try self.dir.dir.deleteFile(entry.name);
+        var n: u8 = 0;
+        const max: u8 = 10;
+        while (n <= max) : (n += 1) {
+            var retry = false;
+            var iter = self.dir.iterate();
+            while (try iter.next()) |entry| {
+                self.dir.dir.deleteFile(entry.name) catch |err| switch (err) {
+                    error.FileBusy => {
+                        if (n < max) {
+                            retry = true;
+                        } else {
+                            return err;
+                        }
+                    },
+                    else => return err,
+                };
+            }
+
+            if (retry) {
+                std.time.sleep(1000000);
+            } else {
+                break;
+            }
         }
     }
 

@@ -4,7 +4,7 @@ const sx = @import("sx.zig");
 const jedec = @import("jedec.zig");
 const toolchain = @import("toolchain.zig");
 const TempAllocator = @import("temp_allocator");
-const DeviceType = @import("device.zig").DeviceType;
+const DeviceType = @import("devices/devices.zig").DeviceType;
 const Toolchain = toolchain.Toolchain;
 
 var temp_alloc = TempAllocator {};
@@ -17,13 +17,11 @@ pub fn main() void {
 }
 
 pub fn resetTemp() void {
-    //std.debug.print("Temp usage: {}\n", .{ temp_alloc.highWaterUsage() });
     temp_alloc.reset();
 }
 
 fn run() !void {
     temp_alloc = try TempAllocator.init(0x100_00000);
-    defer temp_alloc.reset();
     defer temp_alloc.deinit();
 
     var perm_alloc = std.heap.ArenaAllocator.init(std.heap.page_allocator);
@@ -41,15 +39,17 @@ fn run() !void {
     const device_str = std.fs.path.basename(out_dir_path);
     const device = DeviceType.parse(device_str) orelse return error.InvalidDevice;
 
+    var out_dir = try std.fs.cwd().makeOpenPath(out_dir_path, .{});
+    defer out_dir.close();
+
     var keep = false;
     if (args.next()) |arg| {
         if (std.mem.eql(u8, arg, "--keep")) {
             keep = true;
+        } else if (std.mem.eql(u8, arg, "--reports")) {
+            report_dir = &out_dir;
         }
     }
-
-    var out_dir = try std.fs.cwd().makeOpenPath(out_dir_path, .{});
-    defer out_dir.close();
 
     var f = try out_dir.createFile(out_filename, .{});
     defer f.close();
@@ -63,9 +63,16 @@ fn run() !void {
     try root.run(ta, pa, &tc, device, &sx_writer);
 }
 
-pub fn logReport(name: []const u8, results: toolchain.FitResults) !void {
-    const stderr = std.io.getStdErr().writer();
-    try stderr.print("{s} Report:\n{s}", .{ name, results.report });
+var report_dir: ?*std.fs.Dir = null;
+
+pub fn logReport(comptime name_fmt: []const u8, name_args: anytype, results: toolchain.FitResults) !void {
+    if (report_dir) |dir| {
+        const filename = try std.fmt.allocPrint(temp_alloc.allocator(), name_fmt ++ ".rpt", name_args);
+        var f = try dir.createFile(filename, .{});
+        defer f.close();
+
+        try f.writer().writeAll(results.report);
+    }
 }
 
 pub fn diff(alloc: std.mem.Allocator, a: jedec.JedecData, b: jedec.JedecData) !jedec.JedecData {

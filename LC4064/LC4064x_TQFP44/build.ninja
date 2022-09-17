@@ -1,4 +1,4 @@
-##!! include('build_ninja_2','LC4064x_TQFP44') !! 27 ##
+##!! include('build_ninja_2','LC4064x_TQFP44') !! 35 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 dev = LC4064\LC4064x_TQFP44
 
@@ -22,6 +22,14 @@ rule drive
     command = zig-out/bin/drive.exe $out
 build $dev/drive.sx: drive
 
-build build-LC4064x_TQFP44: phony $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx $dev/pull.sx $dev/drive.sx
+rule oe_mux
+    command = zig-out/bin/oe_mux.exe $out
+build $dev/oe_mux.sx: oe_mux
+
+rule orm
+    command = zig-out/bin/orm.exe $out
+build $dev/orm.sx: orm
+
+build build-LC4064x_TQFP44: phony $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx $dev/pull.sx $dev/drive.sx $dev/oe_mux.sx $dev/orm.sx
 
 ## ######################### END OF GENERATED CODE ######################### ##
