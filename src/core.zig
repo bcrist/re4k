@@ -70,8 +70,9 @@ pub const SlewRate = enum {
 
 pub const MacrocellType = enum {
     combinational,
-    d_ff,
+    latch,
     t_ff,
+    d_ff,
 };
 
 pub const OutputEnableMode = enum {

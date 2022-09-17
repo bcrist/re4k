@@ -11,5 +11,6 @@
     (_ exe zerohold)
     (_ exe orm)
     (_ exe powerup_state)
-    (exe ce_mux)
+    (_ exe ce_mux)
+    (exe reg_type)
 )

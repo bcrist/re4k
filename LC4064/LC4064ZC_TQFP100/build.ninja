@@ -1,4 +1,4 @@
-##!! include('build_ninja_2','LC4064ZC_TQFP100') !! 43 ##
+##!! include('build_ninja_2','LC4064ZC_TQFP100') !! 47 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 dev = LC4064\LC4064ZC_TQFP100
 
@@ -38,6 +38,10 @@ rule ce_mux
     command = zig-out/bin/ce_mux.exe $out
 build $dev/ce_mux.sx: ce_mux
 
-build build-LC4064ZC_TQFP100: phony $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx $dev/pull.sx $dev/drive.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/ce_mux.sx
+rule reg_type
+    command = zig-out/bin/reg_type.exe $out
+build $dev/reg_type.sx: reg_type
+
+build build-LC4064ZC_TQFP100: phony $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx $dev/pull.sx $dev/drive.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/ce_mux.sx $dev/reg_type.sx
 
 ## ######################### END OF GENERATED CODE ######################### ##
