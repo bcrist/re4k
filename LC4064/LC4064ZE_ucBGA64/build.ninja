@@ -1,4 +1,4 @@
-##!! include('build_ninja_2','LC4064ZE_ucBGA64') !! 47 ##
+##!! include('build_ninja_2','LC4064ZE_ucBGA64') !! 51 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 dev = LC4064\LC4064ZE_ucBGA64
 
@@ -42,6 +42,10 @@ rule reg_type
     command = zig-out/bin/reg_type.exe $out
 build $dev/reg_type.sx: reg_type
 
-build build-LC4064ZE_ucBGA64: phony $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx $dev/pull.sx $dev/drive.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/ce_mux.sx $dev/reg_type.sx
+rule pt2_reset
+    command = zig-out/bin/pt2_reset.exe $out
+build $dev/pt2_reset.sx: pt2_reset
+
+build build-LC4064ZE_ucBGA64: phony $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx $dev/pull.sx $dev/drive.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/ce_mux.sx $dev/reg_type.sx $dev/pt2_reset.sx
 
 ## ######################### END OF GENERATED CODE ######################### ##

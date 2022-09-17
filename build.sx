@@ -12,5 +12,6 @@
     (_ exe orm)
     (_ exe powerup_state)
     (_ exe ce_mux)
-    (exe reg_type)
+    (_ exe reg_type)
+    (exe pt2_reset)
 )

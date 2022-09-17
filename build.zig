@@ -12,13 +12,13 @@ pub fn build(b: *std.build.Builder) void {
         .source = .{ .path = "pkg/tempallocator/temp_allocator.zig" },
     };
 
-    const reg_type = b.addExecutable("reg_type", "src/reg_type.zig");
-    reg_type.addPackage(temp_allocator);
-    reg_type.linkLibC();
-    reg_type.setTarget(target);
-    reg_type.setBuildMode(mode);
-    reg_type.install();
-    _ = makeRunStep(b, reg_type, "reg_type", "run reg_type");
+    const pt2_reset = b.addExecutable("pt2_reset", "src/pt2_reset.zig");
+    pt2_reset.addPackage(temp_allocator);
+    pt2_reset.linkLibC();
+    pt2_reset.setTarget(target);
+    pt2_reset.setBuildMode(mode);
+    pt2_reset.install();
+    _ = makeRunStep(b, pt2_reset, "pt2_reset", "run pt2_reset");
 
 }
 //[[ ######################### END OF GENERATED CODE ######################### ]]
