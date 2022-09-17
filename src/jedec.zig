@@ -416,6 +416,16 @@ pub const JedecData = struct {
         self.raw.setValue(row * self.width + col, val == 1);
     }
 
+    pub fn setRange(self: *JedecData, row0: u32, col0: u32, row1: u32, col1: u32, val: u1) void {
+        const bool_val = val != 0;
+        var r = row0;
+        while (r <= row1) : (r += 1) {
+            var first = r * self.width + col0;
+            var last = r * self.width + col1;
+            self.raw.setRangeValue(.{ .start = first, .end = last + 1 }, bool_val);
+        }
+    }
+
     pub fn xor(self: *JedecData, other: JedecData) !void {
         if (self.length() != other.length()) {
             return error.IncompatibleJedecData;

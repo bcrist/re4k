@@ -1,4 +1,4 @@
-//[[!! include 'build_zig' !! 80 ]]
+//[[!! include 'build_zig' !! 24 ]]
 //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
 const std = @import("std");
 const Pkg = std.build.Pkg;
@@ -12,69 +12,13 @@ pub fn build(b: *std.build.Builder) void {
         .source = .{ .path = "pkg/tempallocator/temp_allocator.zig" },
     };
 
-    const drive = b.addExecutable("drive", "src/drive.zig");
-    drive.addPackage(temp_allocator);
-    drive.linkLibC();
-    drive.setTarget(target);
-    drive.setBuildMode(mode);
-    drive.install();
-    _ = makeRunStep(b, drive, "drive", "run drive");
-
-    const oe_mux = b.addExecutable("oe_mux", "src/oe_mux.zig");
-    oe_mux.addPackage(temp_allocator);
-    oe_mux.linkLibC();
-    oe_mux.setTarget(target);
-    oe_mux.setBuildMode(mode);
-    oe_mux.install();
-    _ = makeRunStep(b, oe_mux, "oe_mux", "run oe_mux");
-
-    const orm = b.addExecutable("orm", "src/orm.zig");
-    orm.addPackage(temp_allocator);
-    orm.linkLibC();
-    orm.setTarget(target);
-    orm.setBuildMode(mode);
-    orm.install();
-    _ = makeRunStep(b, orm, "orm", "run orm");
-
-    const powerup_state = b.addExecutable("powerup_state", "src/powerup_state.zig");
-    powerup_state.addPackage(temp_allocator);
-    powerup_state.linkLibC();
-    powerup_state.setTarget(target);
-    powerup_state.setBuildMode(mode);
-    powerup_state.install();
-    _ = makeRunStep(b, powerup_state, "powerup_state", "run powerup_state");
-
-    const pull = b.addExecutable("pull", "src/pull.zig");
-    pull.addPackage(temp_allocator);
-    pull.linkLibC();
-    pull.setTarget(target);
-    pull.setBuildMode(mode);
-    pull.install();
-    _ = makeRunStep(b, pull, "pull", "run pull");
-
-    const slew = b.addExecutable("slew", "src/slew.zig");
-    slew.addPackage(temp_allocator);
-    slew.linkLibC();
-    slew.setTarget(target);
-    slew.setBuildMode(mode);
-    slew.install();
-    _ = makeRunStep(b, slew, "slew", "run slew");
-
-    const threshold = b.addExecutable("threshold", "src/threshold.zig");
-    threshold.addPackage(temp_allocator);
-    threshold.linkLibC();
-    threshold.setTarget(target);
-    threshold.setBuildMode(mode);
-    threshold.install();
-    _ = makeRunStep(b, threshold, "threshold", "run threshold");
-
-    const zerohold = b.addExecutable("zerohold", "src/zerohold.zig");
-    zerohold.addPackage(temp_allocator);
-    zerohold.linkLibC();
-    zerohold.setTarget(target);
-    zerohold.setBuildMode(mode);
-    zerohold.install();
-    _ = makeRunStep(b, zerohold, "zerohold", "run zerohold");
+    const ce_mux = b.addExecutable("ce_mux", "src/ce_mux.zig");
+    ce_mux.addPackage(temp_allocator);
+    ce_mux.linkLibC();
+    ce_mux.setTarget(target);
+    ce_mux.setBuildMode(mode);
+    ce_mux.install();
+    _ = makeRunStep(b, ce_mux, "ce_mux", "run ce_mux");
 
 }
 //[[ ######################### END OF GENERATED CODE ######################### ]]

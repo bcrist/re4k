@@ -1,4 +1,4 @@
-##!! include('build_ninja_2','LC4032ZE_TQFP48') !! 39 ##
+##!! include('build_ninja_2','LC4032ZE_TQFP48') !! 43 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 dev = LC4032\LC4032ZE_TQFP48
 
@@ -34,6 +34,10 @@ rule powerup_state
     command = zig-out/bin/powerup_state.exe $out
 build $dev/powerup_state.sx: powerup_state
 
-build build-LC4032ZE_TQFP48: phony $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx $dev/pull.sx $dev/drive.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx
+rule ce_mux
+    command = zig-out/bin/ce_mux.exe $out
+build $dev/ce_mux.sx: ce_mux
+
+build build-LC4032ZE_TQFP48: phony $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx $dev/pull.sx $dev/drive.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/ce_mux.sx
 
 ## ######################### END OF GENERATED CODE ######################### ##

@@ -380,6 +380,11 @@ pub const DeviceType = enum {
         return self.getNumGlbs() * @as(u16, self.getNumMcsPerGlb());
     }
 
+    pub fn getNumGlbInputs(self: DeviceType) u8 {
+        _ = self;
+        return 36;
+    }
+
     pub fn getJedecWidth(self: DeviceType) u16 {
         return switch (self) {
             .LC4032x_TQFP44,
