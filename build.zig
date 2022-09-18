@@ -1,4 +1,4 @@
-//[[!! include 'build_zig' !! 32 ]]
+//[[!! include 'build_zig' !! 24 ]]
 //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
 const std = @import("std");
 const Pkg = std.build.Pkg;
@@ -12,21 +12,13 @@ pub fn build(b: *std.build.Builder) void {
         .source = .{ .path = "pkg/tempallocator/temp_allocator.zig" },
     };
 
-    const pt2_reset = b.addExecutable("pt2_reset", "src/pt2_reset.zig");
-    pt2_reset.addPackage(temp_allocator);
-    pt2_reset.linkLibC();
-    pt2_reset.setTarget(target);
-    pt2_reset.setBuildMode(mode);
-    pt2_reset.install();
-    _ = makeRunStep(b, pt2_reset, "pt2_reset", "run pt2_reset");
-
-    const pt3_reset = b.addExecutable("pt3_reset", "src/pt3_reset.zig");
-    pt3_reset.addPackage(temp_allocator);
-    pt3_reset.linkLibC();
-    pt3_reset.setTarget(target);
-    pt3_reset.setBuildMode(mode);
-    pt3_reset.install();
-    _ = makeRunStep(b, pt3_reset, "pt3_reset", "run pt3_reset");
+    const clk_mux = b.addExecutable("clk_mux", "src/clk_mux.zig");
+    clk_mux.addPackage(temp_allocator);
+    clk_mux.linkLibC();
+    clk_mux.setTarget(target);
+    clk_mux.setBuildMode(mode);
+    clk_mux.install();
+    _ = makeRunStep(b, clk_mux, "clk_mux", "run clk_mux");
 
 }
 //[[ ######################### END OF GENERATED CODE ######################### ]]

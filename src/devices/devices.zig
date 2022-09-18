@@ -541,14 +541,14 @@ pub const DeviceType = enum {
         unreachable;
     }
 
-    pub fn getClockPin(self: DeviceType, clock_index: u8) device_pins.ClockInputPinInfo {
+    pub fn getClockPin(self: DeviceType, clock_index: u8) ?device_pins.ClockInputPinInfo {
         var iter = device_pins.ClockIterator {
             .pins = self.getPins(),
         };
         while (iter.next()) |clk| {
             if (clk.clock_index == clock_index) return clk;
         }
-        unreachable;
+        return null;
     }
 };
 

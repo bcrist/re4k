@@ -1,4 +1,4 @@
-##!! include('build_ninja_2','LC4064ZC_TQFP48') !! 55 ##
+##!! include('build_ninja_2','LC4064ZC_TQFP48') !! 59 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 dev = LC4064\LC4064ZC_TQFP48
 
@@ -50,6 +50,10 @@ rule pt3_reset
     command = zig-out/bin/pt3_reset.exe $out
 build $dev/pt3_reset.sx: pt3_reset
 
-build build-LC4064ZC_TQFP48: phony $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx $dev/pull.sx $dev/drive.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/ce_mux.sx $dev/reg_type.sx $dev/pt2_reset.sx $dev/pt3_reset.sx
+rule clk_mux
+    command = zig-out/bin/clk_mux.exe $out
+build $dev/clk_mux.sx: clk_mux
+
+build build-LC4064ZC_TQFP48: phony $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx $dev/pull.sx $dev/drive.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/ce_mux.sx $dev/reg_type.sx $dev/pt2_reset.sx $dev/pt3_reset.sx $dev/clk_mux.sx
 
 ## ######################### END OF GENERATED CODE ######################### ##
