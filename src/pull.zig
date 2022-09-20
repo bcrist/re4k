@@ -4,7 +4,7 @@ const toolchain = @import("toolchain.zig");
 const sx = @import("sx.zig");
 const core = @import("core.zig");
 const jedec = @import("jedec.zig");
-const devices = @import("devices/devices.zig");
+const devices = @import("devices.zig");
 const JedecData = jedec.JedecData;
 const DeviceType = devices.DeviceType;
 const Toolchain = toolchain.Toolchain;
@@ -28,10 +28,9 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
     });
     try design.addPT("in", "out");
 
-    design.ignore_fitter_warnings = true;
     var results = try tc.runToolchain(design);
     try helper.logReport("pull_pin{s}_{s}", .{ dev.getPins()[pin_index].pin_number(), @tagName(pull) }, results);
-    try results.checkTerm();
+    try results.checkTerm(true);
     return results;
 }
 
@@ -48,7 +47,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
     var max_pin = if (has_per_pin_config) dev.getNumPins() else 1;
 
-    var float_diff = try JedecData.initEmpty(pa, dev.getJedecWidth(), dev.getJedecHeight());
+    var float_diff = try dev.initJedecZeroes(pa);
 
     var pin_index: u16 = 0;
     while (pin_index < max_pin) : (pin_index += 1) {
@@ -70,31 +69,27 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         const results_pullup = try runToolchain(ta, tc, dev, pin_index, .pullup);
         const results_keeper = try runToolchain(ta, tc, dev, pin_index, .keeper);
 
-        var diff = try helper.diff(ta, results_pullup.jedec, results_pulldown.jedec);
-        diff.raw.setUnion((try helper.diff(ta, results_keeper.jedec, results_pulldown.jedec)).raw);
+        var diff = try JedecData.initDiff(ta, results_pullup.jedec, results_pulldown.jedec);
+        diff.unionAll(try JedecData.initDiff(ta, results_keeper.jedec, results_pulldown.jedec));
 
         if (has_per_pin_config) {
             try writer.expression("pin");
             try writer.printRaw("{s}", .{ pin_number });
 
-            diff.raw.setUnion((try helper.diff(ta, results_float.jedec, results_pulldown.jedec)).raw);
+            diff.unionAll(try JedecData.initDiff(ta, results_float.jedec, results_pulldown.jedec));
         } else {
-            var temp_diff = try helper.diff(ta, results_float.jedec, results_pulldown.jedec);
-            var diff_iter = temp_diff.raw.iterator(.{});
+            var temp_diff = try JedecData.initDiff(ta, results_float.jedec, results_pulldown.jedec);
+            var diff_iter = temp_diff.iterator(.{});
             while (diff_iter.next()) |fuse| {
-                if (!diff.raw.isSet(fuse)) {
-                    if (results_float.jedec.raw.isSet(fuse)) {
-                        const row = diff.getRow(@intCast(u32, fuse));
-                        const col = diff.getColumn(@intCast(u32, fuse));
-                        try std.io.getStdErr().writer().print("Expected additional float fuse differences to be 0-valued fuses: device {s} {}:{}\n", .{ @tagName(dev), row, col });
+                if (!diff.isSet(fuse)) {
+                    if (results_float.jedec.isSet(fuse)) {
+                        try helper.err("Expected additional float fuse differences to be 0-valued fuses: {}:{}\n", .{ fuse.row, fuse.col }, dev, .{ .pin_index = pin_index });
                     } else {
-                        float_diff.raw.set(fuse);
+                        float_diff.put(fuse, 1);
                     }
                 }
             }
         }
-
-        var n_fuses: usize = 0;
 
         var val_float: usize = 0;
         var val_pulldown: usize = 0;
@@ -102,27 +97,19 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         var val_keeper: usize = 0;
 
         var bit_value: usize = 1;
-        var diff_iter = diff.raw.iterator(.{});
+        var diff_iter = diff.iterator(.{});
         while (diff_iter.next()) |fuse| {
-            const row = diff.getRow(@intCast(u32, fuse));
-            const col = diff.getColumn(@intCast(u32, fuse));
+            if (results_float.jedec.isSet(fuse)) val_float |= bit_value;
+            if (results_pulldown.jedec.isSet(fuse)) val_pulldown |= bit_value;
+            if (results_pullup.jedec.isSet(fuse)) val_pullup |= bit_value;
+            if (results_keeper.jedec.isSet(fuse)) val_keeper |= bit_value;
 
-            if (results_float.jedec.raw.isSet(fuse)) val_float |= bit_value;
-            if (results_pulldown.jedec.raw.isSet(fuse)) val_pulldown |= bit_value;
-            if (results_pullup.jedec.raw.isSet(fuse)) val_pullup |= bit_value;
-            if (results_keeper.jedec.raw.isSet(fuse)) val_keeper |= bit_value;
-
-            try writer.expression("fuse");
-            try writer.printRaw("{}", .{ row });
-            try writer.printRaw("{}", .{ col });
             if (bit_value != 1 or !has_per_pin_config) {
-                try writer.expression("value");
-                try writer.printRaw("{}", .{ bit_value });
-                try writer.close();
+                try helper.writeFuseValue(writer, fuse, bit_value);
+            } else {
+                try helper.writeFuse(writer, fuse);
             }
-            try writer.close();
 
-            n_fuses += 1;
             bit_value *= 2;
         }
 
@@ -130,34 +117,34 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             try writer.close();
         }
 
-        if (n_fuses != 2) {
-            try std.io.getStdErr().writer().print("Expected 2 fuses to define bus maintenance options for device {} pin {s}, but found {}!\n", .{ dev, pin_number, n_fuses });
+        if (diff.countSet() != 2) {
+            try helper.err("Expected 2 fuses to define bus maintenance options, but found {}!\n", .{ diff.countSet() }, dev, .{ .pin_index = pin_index });
         }
 
         if (default_val_float) |val| {
             if (val != val_float) {
-                try std.io.getStdErr().writer().print("Expected same fuse patterns for all pins in device {}!\n", .{ dev });
+                try helper.err("Expected same fuse patterns for all pins!", .{}, dev, .{ .pin_index = pin_index });
             }
         } else {
             default_val_float = val_float;
         }
         if (default_val_pulldown) |val| {
             if (val != val_pulldown) {
-                try std.io.getStdErr().writer().print("Expected same fuse patterns for all pins in device {}!\n", .{ dev });
+                try helper.err("Expected same fuse patterns for all pins!", .{}, dev, .{ .pin_index = pin_index });
             }
         } else {
             default_val_pulldown = val_pulldown;
         }
         if (default_val_pullup) |val| {
             if (val != val_pullup) {
-                try std.io.getStdErr().writer().print("Expected same fuse patterns for all pins in device {}!\n", .{ dev });
+                try helper.err("Expected same fuse patterns for all pins!", .{}, dev, .{ .pin_index = pin_index });
             }
         } else {
             default_val_pullup = val_pullup;
         }
         if (default_val_keeper) |val| {
             if (val != val_keeper) {
-                try std.io.getStdErr().writer().print("Expected same fuse patterns for all pins in device {}!\n", .{ dev });
+                try helper.err("Expected same fuse patterns for all pins!", .{}, dev, .{ .pin_index = pin_index });
             }
         } else {
             default_val_keeper = val_keeper;
@@ -190,21 +177,15 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
     try writer.close();
 
-    if (float_diff.raw.count() > 0) {
+    if (float_diff.countSet() > 0) {
         // Some devices have buried I/O cells that aren't connected to any package pin.
         // If the device doesn't have per-pin bus maintenance, and the maintenance is set to float,
         // those extra I/O cells should be configured as outputs to avoid excessive power usage.
         // The remaining fuses in float_diff should do that.
         try writer.expressionExpanded("bus_maintenance_extra");
-        var diff_iter = float_diff.raw.iterator(.{});
+        var diff_iter = float_diff.iterator(.{});
         while (diff_iter.next()) |fuse| {
-            const row = float_diff.getRow(@intCast(u32, fuse));
-            const col = float_diff.getColumn(@intCast(u32, fuse));
-
-            try writer.expression("fuse");
-            try writer.printRaw("{}", .{ row });
-            try writer.printRaw("{}", .{ col });
-            try writer.close();
+            try helper.writeFuse(writer, fuse);
         }
 
         try writer.expression("value");

@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const devices = @import("devices/devices.zig");
+const devices = @import("devices.zig");
 const DeviceType = devices.DeviceType;
 
 pub const MacrocellRef = struct {

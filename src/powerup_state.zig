@@ -4,7 +4,9 @@ const toolchain = @import("toolchain.zig");
 const sx = @import("sx.zig");
 const core = @import("core.zig");
 const jedec = @import("jedec.zig");
-const devices = @import("devices/devices.zig");
+const devices = @import("devices.zig");
+
+const Fuse = jedec.Fuse;
 const JedecData = jedec.JedecData;
 const DeviceType = devices.DeviceType;
 const Toolchain = toolchain.Toolchain;
@@ -26,7 +28,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
 
     var results = try tc.runToolchain(design);
     try helper.logReport("powerup_state_glb{}_mc{}_{}", .{ mcref.glb, mcref.mc, powerup_state }, results);
-    try results.checkTerm();
+    try results.checkTerm(false);
     return results;
 }
 
@@ -45,8 +47,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         const results_reset = try runToolchain(ta, tc, dev, mcref, 0);
         const results_set = try runToolchain(ta, tc, dev, mcref, 1);
 
-        var diff = try results_reset.jedec.clone(ta);
-        try diff.xor(results_set.jedec);
+        const diff = try JedecData.initDiff(ta, results_reset.jedec, results_set.jedec);
 
         if (mcref.mc == 0) {
             try writer.expression("glb");
@@ -61,19 +62,19 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         try writer.expression("mc");
         try writer.printRaw("{}", .{ mcref.mc });
 
-        var diff_iter = diff.raw.iterator(.{});
+        var diff_iter = diff.iterator(.{});
         if (diff_iter.next()) |fuse| {
-            try writeFuse(fuse, results_reset.jedec, results_set.jedec, diff, writer);
+            try writeFuse(fuse, results_reset.jedec, results_set.jedec, writer);
         } else {
-            try std.io.getStdErr().writer().print("Expected one powerup state fuse for device {} glb {} mc {} but found none!\n", .{ dev, mcref.glb, mcref.mc });
+            try helper.err("Expected one powerup state fuse but found none!", .{}, dev, .{ .mcref = mcref });
         }
 
         if (diff_iter.next()) |fuse| {
-            try std.io.getStdErr().writer().print("Expected one powerup state fuse for device {} glb {} mc {} but found multiple!\n", .{ dev, mcref.glb, mcref.mc });
-            try writeFuse(fuse, results_reset.jedec, results_set.jedec, diff, writer);
+            try helper.err("Expected one powerup state fuse but found multiple!", .{}, dev, .{ .mcref = mcref });
+            try writeFuse(fuse, results_reset.jedec, results_set.jedec, writer);
 
             while (diff_iter.next()) |f| {
-                try writeFuse(f, results_reset.jedec, results_set.jedec, diff, writer);
+                try writeFuse(f, results_reset.jedec, results_set.jedec, writer);
             }
         }
 
@@ -101,15 +102,10 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     _ = pa;
 }
 
-fn writeFuse(fuse: usize, results_reset: JedecData, results_set: JedecData, diff: JedecData, writer: anytype) !void {
-    const row = diff.getRow(@intCast(u32, fuse));
-    const col = diff.getColumn(@intCast(u32, fuse));
+fn writeFuse(fuse: Fuse, results_reset: JedecData, results_set: JedecData, writer: anytype) !void {
+    try helper.writeFuse(writer, fuse);
 
-    try writer.expression("fuse");
-    try writer.printRaw("{}", .{ row });
-    try writer.printRaw("{}", .{ col });
-
-    const value_reset = results_reset.get(row, col);
+    const value_reset = results_reset.get(fuse);
     if (default_reset) |def| {
         if (value_reset != def) {
             try writer.expression("value");
@@ -120,7 +116,7 @@ fn writeFuse(fuse: usize, results_reset: JedecData, results_set: JedecData, diff
         default_reset = value_reset;
     }
 
-    const value_set = results_set.get(row, col);
+    const value_set = results_set.get(fuse);
     if (default_set) |def| {
         if (value_set != def) {
             try writer.expression("value");
@@ -130,6 +126,4 @@ fn writeFuse(fuse: usize, results_reset: JedecData, results_set: JedecData, diff
     } else {
         default_set = value_set;
     }
-
-    try writer.close();
 }

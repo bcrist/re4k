@@ -1,5 +1,10 @@
 const std = @import("std");
-const device_pins = @import("device_pins.zig");
+const jedec = @import("jedec.zig");
+pub const pins = @import("devices/device_pins.zig");
+
+const JedecData = jedec.JedecData;
+const FuseRange = jedec.FuseRange;
+const Fuse = jedec.Fuse;
 
 // Most data in this file (and the files imported here) comes from:
 // "ispMACH 4000V/B/C/Z Family Data Sheet"
@@ -43,44 +48,44 @@ const device_pins = @import("device_pins.zig");
 // }
 //
 // for _, device in ipairs(devices) do
-//     writeln('const ', device, ' = @import("', device, '.zig");')
+//     writeln('const ', device, ' = @import("devices/', device, '.zig");')
 // end
 // !! 38 ]]
 //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
-const LC4032x_TQFP44 = @import("LC4032x_TQFP44.zig");
-const LC4032x_TQFP48 = @import("LC4032x_TQFP48.zig");
-const LC4032ZC_TQFP48 = @import("LC4032ZC_TQFP48.zig");
-const LC4032ZC_csBGA56 = @import("LC4032ZC_csBGA56.zig");
-const LC4032ZE_TQFP48 = @import("LC4032ZE_TQFP48.zig");
-const LC4032ZE_csBGA64 = @import("LC4032ZE_csBGA64.zig");
-const LC4064x_TQFP44 = @import("LC4064x_TQFP44.zig");
-const LC4064x_TQFP48 = @import("LC4064x_TQFP48.zig");
-const LC4064x_TQFP100 = @import("LC4064x_TQFP100.zig");
-const LC4064ZC_TQFP48 = @import("LC4064ZC_TQFP48.zig");
-const LC4064ZC_csBGA56 = @import("LC4064ZC_csBGA56.zig");
-const LC4064ZC_TQFP100 = @import("LC4064ZC_TQFP100.zig");
-const LC4064ZC_csBGA132 = @import("LC4064ZC_csBGA132.zig");
-const LC4064ZE_TQFP48 = @import("LC4064ZE_TQFP48.zig");
-const LC4064ZE_csBGA64 = @import("LC4064ZE_csBGA64.zig");
-const LC4064ZE_ucBGA64 = @import("LC4064ZE_ucBGA64.zig");
-const LC4064ZE_TQFP100 = @import("LC4064ZE_TQFP100.zig");
-const LC4064ZE_csBGA144 = @import("LC4064ZE_csBGA144.zig");
-const LC4128x_TQFP100 = @import("LC4128x_TQFP100.zig");
-const LC4128x_TQFP128 = @import("LC4128x_TQFP128.zig");
-const LC4128V_TQFP144 = @import("LC4128V_TQFP144.zig");
-const LC4128ZC_TQFP100 = @import("LC4128ZC_TQFP100.zig");
-const LC4128ZC_csBGA132 = @import("LC4128ZC_csBGA132.zig");
-const LC4128ZE_TQFP100 = @import("LC4128ZE_TQFP100.zig");
-const LC4128ZE_TQFP144 = @import("LC4128ZE_TQFP144.zig");
-const LC4128ZE_ucBGA144 = @import("LC4128ZE_ucBGA144.zig");
-const LC4128ZE_csBGA144 = @import("LC4128ZE_csBGA144.zig");
-const LC4256x_TQFP100 = @import("LC4256x_TQFP100.zig");
-const LC4256V_TQFP144 = @import("LC4256V_TQFP144.zig");
-const LC4256ZC_TQFP100 = @import("LC4256ZC_TQFP100.zig");
-const LC4256ZC_csBGA132 = @import("LC4256ZC_csBGA132.zig");
-const LC4256ZE_TQFP100 = @import("LC4256ZE_TQFP100.zig");
-const LC4256ZE_TQFP144 = @import("LC4256ZE_TQFP144.zig");
-const LC4256ZE_csBGA144 = @import("LC4256ZE_csBGA144.zig");
+const LC4032x_TQFP44 = @import("devices/LC4032x_TQFP44.zig");
+const LC4032x_TQFP48 = @import("devices/LC4032x_TQFP48.zig");
+const LC4032ZC_TQFP48 = @import("devices/LC4032ZC_TQFP48.zig");
+const LC4032ZC_csBGA56 = @import("devices/LC4032ZC_csBGA56.zig");
+const LC4032ZE_TQFP48 = @import("devices/LC4032ZE_TQFP48.zig");
+const LC4032ZE_csBGA64 = @import("devices/LC4032ZE_csBGA64.zig");
+const LC4064x_TQFP44 = @import("devices/LC4064x_TQFP44.zig");
+const LC4064x_TQFP48 = @import("devices/LC4064x_TQFP48.zig");
+const LC4064x_TQFP100 = @import("devices/LC4064x_TQFP100.zig");
+const LC4064ZC_TQFP48 = @import("devices/LC4064ZC_TQFP48.zig");
+const LC4064ZC_csBGA56 = @import("devices/LC4064ZC_csBGA56.zig");
+const LC4064ZC_TQFP100 = @import("devices/LC4064ZC_TQFP100.zig");
+const LC4064ZC_csBGA132 = @import("devices/LC4064ZC_csBGA132.zig");
+const LC4064ZE_TQFP48 = @import("devices/LC4064ZE_TQFP48.zig");
+const LC4064ZE_csBGA64 = @import("devices/LC4064ZE_csBGA64.zig");
+const LC4064ZE_ucBGA64 = @import("devices/LC4064ZE_ucBGA64.zig");
+const LC4064ZE_TQFP100 = @import("devices/LC4064ZE_TQFP100.zig");
+const LC4064ZE_csBGA144 = @import("devices/LC4064ZE_csBGA144.zig");
+const LC4128x_TQFP100 = @import("devices/LC4128x_TQFP100.zig");
+const LC4128x_TQFP128 = @import("devices/LC4128x_TQFP128.zig");
+const LC4128V_TQFP144 = @import("devices/LC4128V_TQFP144.zig");
+const LC4128ZC_TQFP100 = @import("devices/LC4128ZC_TQFP100.zig");
+const LC4128ZC_csBGA132 = @import("devices/LC4128ZC_csBGA132.zig");
+const LC4128ZE_TQFP100 = @import("devices/LC4128ZE_TQFP100.zig");
+const LC4128ZE_TQFP144 = @import("devices/LC4128ZE_TQFP144.zig");
+const LC4128ZE_ucBGA144 = @import("devices/LC4128ZE_ucBGA144.zig");
+const LC4128ZE_csBGA144 = @import("devices/LC4128ZE_csBGA144.zig");
+const LC4256x_TQFP100 = @import("devices/LC4256x_TQFP100.zig");
+const LC4256V_TQFP144 = @import("devices/LC4256V_TQFP144.zig");
+const LC4256ZC_TQFP100 = @import("devices/LC4256ZC_TQFP100.zig");
+const LC4256ZC_csBGA132 = @import("devices/LC4256ZC_csBGA132.zig");
+const LC4256ZE_TQFP100 = @import("devices/LC4256ZE_TQFP100.zig");
+const LC4256ZE_TQFP144 = @import("devices/LC4256ZE_TQFP144.zig");
+const LC4256ZE_csBGA144 = @import("devices/LC4256ZE_csBGA144.zig");
 
 //[[ ######################### END OF GENERATED CODE ######################### ]]
 
@@ -385,6 +390,24 @@ pub const DeviceType = enum {
         return 36;
     }
 
+    // The range at the beginning of the fusemap containing PT and GLB input mux fuses; row 0-71
+    pub fn getRoutingRange(self: DeviceType) FuseRange {
+        return FuseRange.between(Fuse.init(0, 0), Fuse.init(self.getNumGlbInputs() * 2 - 1, self.getJedecWidth() - 1));
+    }
+
+    // The range at the end of the fusemap containing MC, I/O cell, and misc option fuses; row 72+
+    pub fn getOptionsRange(self: DeviceType) FuseRange {
+        return FuseRange.between(Fuse.init(self.getNumGlbInputs() * 2, 0), Fuse.init(self.getJedecHeight() - 1, self.getJedecWidth() - 1));
+    }
+
+    pub fn initJedecZeroes(self: DeviceType, allocator: std.mem.Allocator) !JedecData {
+        return JedecData.initEmpty(allocator, self.getJedecWidth(), self.getJedecHeight());
+    }
+
+    pub fn initJedecBlank(self: DeviceType, allocator: std.mem.Allocator) !JedecData {
+        return JedecData.initFull(allocator, self.getJedecWidth(), self.getJedecHeight());
+    }
+
     pub fn getJedecWidth(self: DeviceType) u16 {
         return switch (self) {
             .LC4032x_TQFP44,
@@ -488,7 +511,7 @@ pub const DeviceType = enum {
         try writer.writeAll(temp);
     }
 
-    pub fn getPins(self: DeviceType) []const device_pins.PinInfo {
+    pub fn getPins(self: DeviceType) []const pins.PinInfo {
         return switch (self) {
             //[[!! for _, device in ipairs(devices) do write('.', device, ' => &', device, '.pins,', nl) end !! 38 ]]
             //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
@@ -531,8 +554,8 @@ pub const DeviceType = enum {
         };
     }
 
-    pub fn getGOEPin(self: DeviceType, goe_index: u1) device_pins.InputOutputPinInfo {
-        var iter = device_pins.GoeIterator {
+    pub fn getGOEPin(self: DeviceType, goe_index: u1) pins.InputOutputPinInfo {
+        var iter = pins.GoeIterator {
             .pins = self.getPins(),
         };
         while (iter.next()) |goe| {
@@ -541,8 +564,8 @@ pub const DeviceType = enum {
         unreachable;
     }
 
-    pub fn getClockPin(self: DeviceType, clock_index: u8) ?device_pins.ClockInputPinInfo {
-        var iter = device_pins.ClockIterator {
+    pub fn getClockPin(self: DeviceType, clock_index: u8) ?pins.ClockInputPinInfo {
+        var iter = pins.ClockIterator {
             .pins = self.getPins(),
         };
         while (iter.next()) |clk| {

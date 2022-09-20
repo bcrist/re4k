@@ -3,11 +3,12 @@ const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx.zig");
 const core = @import("core.zig");
-const device_pins = @import("devices/device_pins.zig");
 const jedec = @import("jedec.zig");
-const DeviceType = @import("devices/devices.zig").DeviceType;
+const devices = @import("devices.zig");
+const DeviceType = devices.DeviceType;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
+const JedecData = jedec.JedecData;
 
 pub fn main() void {
     helper.main();
@@ -18,7 +19,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
 
     try design.pinAssignment(.{
         .signal = "in",
-        .pin_index = dev.getClockPin(0).pin_index,
+        .pin_index = dev.getClockPin(0).?.pin_index,
     });
     try design.pinAssignment(.{
         .signal = "out",
@@ -48,7 +49,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
 
     var results = try tc.runToolchain(design);
     try helper.logReport("orm_{s}_plus{}", .{ out_info.pin_number, offset }, results);
-    try results.checkTerm();
+    try results.checkTerm(false);
     return results;
 }
 
@@ -56,7 +57,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     try writer.expressionExpanded(@tagName(dev));
     try writer.expressionExpanded("output_routing_mux");
 
-    var pin_iter = device_pins.OutputIterator {
+    var pin_iter = devices.pins.OutputIterator {
         .pins = dev.getPins(),
     };
 
@@ -69,54 +70,38 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         const results_2 = try runToolchain(ta, tc, dev, io.pin_index, 2);
         const results_4 = try runToolchain(ta, tc, dev, io.pin_index, 4);
 
-        var diff = try helper.diff(ta, results_1.jedec, results_2.jedec);
-        diff.raw.setUnion((try helper.diff(ta, results_1.jedec, results_4.jedec)).raw);
+        var diff = try JedecData.initDiff(ta, results_1.jedec, results_2.jedec);
+        diff.unionAll(try JedecData.initDiff(ta, results_1.jedec, results_4.jedec));
 
         try writer.expression("pin");
         try writer.printRaw("{s}", .{ io.pin_number });
 
-        var n_fuses: u32 = 0;
-
-        var diff_iter = diff.raw.iterator(.{});
+        var diff_iter = diff.iterator(.{});
         while (diff_iter.next()) |fuse| {
-            const row = diff.getRow(@intCast(u32, fuse));
-            const col = diff.getColumn(@intCast(u32, fuse));
-
-            try writer.expression("fuse");
-            try writer.printRaw("{}", .{ row });
-            try writer.printRaw("{}", .{ col });
-
             var value: u32 = 0;
-            if (results_1.jedec.raw.isSet(fuse)) {
+            if (results_1.jedec.isSet(fuse)) {
                 value += 1;
             }
-            if (results_2.jedec.raw.isSet(fuse)) {
+            if (results_2.jedec.isSet(fuse)) {
                 value += 2;
             }
-            if (results_4.jedec.raw.isSet(fuse)) {
+            if (results_4.jedec.isSet(fuse)) {
                 value += 4;
             }
 
             switch (value) {
                 1, 2, 4 => {},
                 else => {
-                    try std.io.getStdErr().writer().print("Expected ORM fuse {}:{} to have a value of 1, 2, or 4, but found {} for pin {s} in device {s}\n", .{ row, col, value, io.pin_number, @tagName(dev) });
+                    try helper.err("Expected ORM fuse {}:{} to have a value of 1, 2, or 4, but found {}",
+                        .{ fuse.row, fuse.col, value }, dev, .{ .pin_index = io.pin_index });
                 },
             }
 
-            if (value != 1) {
-                try writer.expression("value");
-                try writer.printRaw("{}", .{ value });
-                try writer.close();
-            }
-
-            try writer.close();
-
-            n_fuses += 1;
+            try helper.writeFuseOptValue(writer, fuse, value);
         }
 
-        if (n_fuses != 3) {
-            try std.io.getStdErr().writer().print("Expected exactly 3 ORM fuses for pin {s} in device {s}, but found {}!\n", .{ io.pin_number, @tagName(dev), n_fuses });
+        if (diff.countSet() != 3) {
+            try helper.err("Expected exactly 3 ORM fuses but found {}!", .{ diff.countSet() }, dev, .{ .pin_index = io.pin_index });
         }
 
         try writer.close();

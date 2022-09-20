@@ -2,11 +2,13 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx.zig");
+const jedec = @import("jedec.zig");
 const core = @import("core.zig");
-const devices = @import("devices/devices.zig");
+const devices = @import("devices.zig");
 const DeviceType = devices.DeviceType;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
+const JedecData = jedec.JedecData;
 
 pub fn main() void {
     helper.main();
@@ -22,7 +24,8 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
     try design.addPT("in", "out");
 
     var results = try tc.runToolchain(design);
-    try results.checkTerm();
+    try helper.logReport("slew_pin_{s}", .{ dev.getPins()[pin_index].pin_number() }, results);
+    try results.checkTerm(false);
     return results;
 }
 
@@ -33,38 +36,24 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     var default_slow: ?u1 = null;
     var default_fast: ?u1 = null;
 
-    var pin_index: u16 = 0;
-    while (pin_index < dev.getNumPins()) : (pin_index += 1) {
-        const pin_info = dev.getPins()[pin_index];
-        std.debug.assert(pin_index == pin_info.pin_index());
-        switch (pin_info) {
-            .input_output => {},
-            else => continue,
-        }
-        const pin_number = pin_info.pin_number();
-
+    var pin_iter = devices.pins.OutputIterator { .pins = dev.getPins() };
+    while (pin_iter.next()) |io| {
         try tc.cleanTempDir();
         helper.resetTemp();
 
-        const results_slow = try runToolchain(ta, tc, dev, pin_index, .slow);
-        const results_fast = try runToolchain(ta, tc, dev, pin_index, .fast);
+        const results_slow = try runToolchain(ta, tc, dev, io.pin_index, .slow);
+        const results_fast = try runToolchain(ta, tc, dev, io.pin_index, .fast);
 
-        var diff = try results_slow.jedec.clone(ta);
-        try diff.xor(results_fast.jedec);
+        const diff = try JedecData.initDiff(ta, results_slow.jedec, results_fast.jedec);
 
         try writer.expression("pin");
-        try writer.printRaw("{s}", .{ pin_number });
+        try writer.printRaw("{s}", .{ io.pin_number });
 
-        var diff_iter = diff.raw.iterator(.{});
+        var diff_iter = diff.iterator(.{});
         if (diff_iter.next()) |fuse| {
-            const row = diff.getRow(@intCast(u32, fuse));
-            const col = diff.getColumn(@intCast(u32, fuse));
+            try helper.writeFuse(writer, fuse);
 
-            try writer.expression("fuse");
-            try writer.printRaw("{}", .{ row });
-            try writer.printRaw("{}", .{ col });
-
-            const slow_value = results_slow.jedec.get(row, col);
+            const slow_value = results_slow.jedec.get(fuse);
             if (default_slow) |def| {
                 if (slow_value != def) {
                     try writer.expression("value");
@@ -75,7 +64,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
                 default_slow = slow_value;
             }
 
-            const fast_value = results_fast.jedec.get(row, col);
+            const fast_value = results_fast.jedec.get(fuse);
             if (default_fast) |def| {
                 if (fast_value != def) {
                     try writer.expression("value");
@@ -86,15 +75,13 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
                 default_fast = fast_value;
             }
 
-            try writer.close();
-
         } else {
-            try std.io.getStdErr().writer().print("Expected one slew fuse for device {} pin {s} but found none!\n", .{ dev, pin_number });
+            try helper.err("Expected one slew fuse but found none!", .{}, dev, .{ .pin_index = io.pin_index });
             return error.Think;
         }
 
         if (diff_iter.next()) |_| {
-            try std.io.getStdErr().writer().print("Expected one slew fuse for device {} pin {s} but found multiple!\n", .{ dev, pin_number });
+            try helper.err("Expected one slew fuse but found multiple!", .{}, dev, .{ .pin_index = io.pin_index });
             return error.Think;
         }
 

@@ -1,17 +1,20 @@
 const root = @import("root");
 const std = @import("std");
+const core = @import("core.zig");
 const sx = @import("sx.zig");
 const jedec = @import("jedec.zig");
 const toolchain = @import("toolchain.zig");
+const devices = @import("devices.zig");
 const TempAllocator = @import("temp_allocator");
-const DeviceType = @import("devices/devices.zig").DeviceType;
+const DeviceType = devices.DeviceType;
 const Toolchain = toolchain.Toolchain;
+const Fuse = jedec.Fuse;
 
 var temp_alloc = TempAllocator {};
 
 pub fn main() void {
-    run() catch |err| {
-        std.io.getStdErr().writer().print("{}\n", .{ err }) catch {};
+    run() catch |e| {
+        std.io.getStdErr().writer().print("{}\n", .{ e }) catch {};
         std.os.exit(1);
     };
 }
@@ -43,11 +46,13 @@ fn run() !void {
     defer out_dir.close();
 
     var keep = false;
-    if (args.next()) |arg| {
+    while (args.next()) |arg| {
         if (std.mem.eql(u8, arg, "--keep")) {
             keep = true;
         } else if (std.mem.eql(u8, arg, "--reports")) {
             report_dir = &out_dir;
+        } else {
+            return error.InvalidCommandLine;
         }
     }
 
@@ -75,8 +80,73 @@ pub fn logReport(comptime name_fmt: []const u8, name_args: anytype, results: too
     }
 }
 
-pub fn diff(alloc: std.mem.Allocator, a: jedec.JedecData, b: jedec.JedecData) !jedec.JedecData {
-    var result = try a.clone(alloc);
-    try result.xor(b);
-    return result;
+pub const ErrorContext = struct {
+    mcref: ?core.MacrocellRef = null,
+    glb: ?u8 = null,
+    mc: ?u8 = null,
+    pin_index: ?u16 = null,
+};
+pub fn err(comptime fmt: []const u8, args: anytype, device: DeviceType, context: ErrorContext) !void {
+    const stderr = std.io.getStdErr().writer();
+
+    if (context.mcref) |mcref| {
+        try stderr.print("{s} glb{} ({s}) mc{}: ", .{ @tagName(device), mcref.glb, devices.getGlbName(mcref.glb), mcref.mc });
+    } else if (context.glb) |glb| {
+        if (context.mc) |mc| {
+            try stderr.print("{s} glb{} ({s}) mc{}: ", .{ @tagName(device), glb, devices.getGlbName(glb), mc });
+        } else {
+            try stderr.print("{s} glb{} ({s}): ", .{ @tagName(device), glb, devices.getGlbName(glb) });
+        }
+    } else if (context.pin_index) |pin_index| {
+        try stderr.print("{s} pin {s}: ", .{ @tagName(device), device.getPins()[pin_index].pin_number() });
+    } else {
+        try stderr.print("{s}: ", .{ @tagName(device) });
+    }
+
+    try stderr.print(fmt ++ "\n", args);
 }
+
+pub fn extract(src: []const u8, prefix: []const u8, suffix: []const u8) ?[]const u8 {
+    if (std.mem.indexOf(u8, src, prefix)) |prefix_start| {
+        const remaining = src[prefix_start + prefix.len..];
+        if (std.mem.indexOf(u8, remaining, suffix)) |suffix_start| {
+            return remaining[0..suffix_start];
+        }
+    }
+    return null;
+}
+
+pub fn writeFuse(writer: anytype, fuse: Fuse) !void {
+    try writer.expression("fuse");
+    try writer.printRaw("{}", .{ fuse.row });
+    try writer.printRaw("{}", .{ fuse.col });
+    try writer.close();
+}
+
+pub fn writeFuseValue(writer: anytype, fuse: Fuse, value: usize) !void {
+    try writer.expression("fuse");
+    try writer.printRaw("{}", .{ fuse.row });
+    try writer.printRaw("{}", .{ fuse.col });
+    try writer.expression("value");
+    try writer.printRaw("{}", .{ value });
+    try writer.close();
+    try writer.close();
+}
+
+pub fn writeFuseOptValue(writer: anytype, fuse: Fuse, value: usize) !void {
+    try writer.expression("fuse");
+    try writer.printRaw("{}", .{ fuse.row });
+    try writer.printRaw("{}", .{ fuse.col });
+    if (value != 1) {
+        try writer.expression("value");
+        try writer.printRaw("{}", .{ value });
+        try writer.close();
+    }
+    try writer.close();
+}
+
+// pub const GISet = std.StaticBitSet(36);
+
+// pub const GlbInputSetUnmanaged = struct {
+//     raw: std.StaticBitSet(16*16*2+10)
+// }

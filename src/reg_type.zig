@@ -4,7 +4,7 @@ const toolchain = @import("toolchain.zig");
 const sx = @import("sx.zig");
 const core = @import("core.zig");
 const jedec = @import("jedec.zig");
-const devices = @import("devices/devices.zig");
+const devices = @import("devices.zig");
 const JedecData = jedec.JedecData;
 const DeviceType = devices.DeviceType;
 const Toolchain = toolchain.Toolchain;
@@ -43,7 +43,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
 
     var results = try tc.runToolchain(design);
     try helper.logReport("reg_type_glb{}_mc{}_{s}", .{ mcref.glb, mcref.mc, @tagName(reg_type) }, results);
-    try results.checkTerm();
+    try results.checkTerm(false);
     return results;
 }
 
@@ -64,13 +64,13 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             data.put(reg_type, results.jedec);
         }
 
-        var diff = try JedecData.initEmpty(ta, dev.getJedecWidth(), dev.getJedecHeight());
+        var diff = try dev.initJedecZeroes(ta);
         for (&[_]core.MacrocellType { .d_ff, .t_ff }) |reg_type| {
-            diff.raw.setUnion((try helper.diff(ta, data.get(reg_type).?, data.get(.latch).?)).raw);
+            diff.unionAll(try JedecData.initDiff(ta, data.get(reg_type).?, data.get(.latch).?));
         }
 
         // ignore differences in PTs and GLB routing
-        diff.setRange(0, 0, dev.getNumGlbInputs() * 2, dev.getJedecWidth(), 0);
+        diff.putRange(dev.getRoutingRange(), 0);
 
         if (mcref.mc == 0) {
             try writer.expression("glb");
@@ -87,34 +87,21 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
         var values = std.EnumMap(core.MacrocellType, usize) {};
         var bit_value: usize = 1;
-        var diff_iter = diff.raw.iterator(.{});
+        var diff_iter = diff.iterator(.{});
         while (diff_iter.next()) |fuse| {
-            const row = diff.getRow(@intCast(u32, fuse));
-            const col = diff.getColumn(@intCast(u32, fuse));
-
-            try writer.expression("fuse");
-            try writer.printRaw("{}", .{ row });
-            try writer.printRaw("{}", .{ col });
-
-            if (bit_value != 1) {
-                try writer.expression("value");
-                try writer.printRaw("{}", .{ bit_value });
-                try writer.close();
-            }
+            try helper.writeFuseOptValue(writer, fuse, bit_value);
 
             for (std.enums.values(core.MacrocellType)) |reg_type| {
-                if (data.get(reg_type).?.raw.isSet(fuse)) {
+                if (data.get(reg_type).?.isSet(fuse)) {
                     values.put(reg_type, (values.get(reg_type) orelse 0) + bit_value);
                 }
             }
 
-            try writer.close();
-
             bit_value *= 2;
         }
 
-        if (diff.raw.count() != 2) {
-            try std.io.getStdErr().writer().print("Expected two reg_type fuses for device {s} glb {} mc {} but found {}!\n", .{ @tagName(dev), mcref.glb, mcref.mc, diff.raw.count() });
+        if (diff.countSet() != 2) {
+            try helper.err("Expected two reg_type fuses but found {}!", .{ diff.countSet() }, dev, .{ .mcref = mcref });
         }
 
         for (std.enums.values(core.MacrocellType)) |reg_type| {

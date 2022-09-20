@@ -4,7 +4,7 @@ const toolchain = @import("toolchain.zig");
 const sx = @import("sx.zig");
 const core = @import("core.zig");
 const jedec = @import("jedec.zig");
-const devices = @import("devices/devices.zig");
+const devices = @import("devices.zig");
 const JedecData = jedec.JedecData;
 const DeviceType = devices.DeviceType;
 const Toolchain = toolchain.Toolchain;
@@ -128,7 +128,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
 
     var results = try tc.runToolchain(design);
     try helper.logReport("clk_mux_glb{}_mc{}_{s}", .{ mcref.glb, mcref.mc, @tagName(src) }, results);
-    try results.checkTerm();
+    try results.checkTerm(false);
     return results;
 }
 
@@ -146,7 +146,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         var data = std.EnumMap(ClockSource, JedecData) {};
         var values = std.EnumMap(ClockSource, usize) {};
 
-        var diff = try JedecData.initEmpty(ta, dev.getJedecWidth(), dev.getJedecHeight());
+        var diff = try dev.initJedecZeroes(ta);
 
         for (std.enums.values(ClockSource)) |src| {
             var results = try runToolchain(ta, tc, dev, mcref, src);
@@ -154,11 +154,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         }
 
         for (&[_]ClockSource { .clk0, .clk2, .shared_pt }) |src| {
-            diff.raw.setUnion((try helper.diff(ta, data.get(src).?, data.get(.gnd).?)).raw);
+            diff.unionAll(try JedecData.initDiff(ta, data.get(src).?, data.get(.gnd).?));
         }
 
         // ignore differences in PTs and GLB routing
-        diff.setRange(0, 0, dev.getNumGlbInputs() * 2, dev.getJedecWidth(), 0);
+        diff.putRange(dev.getRoutingRange(), 0);
 
         if (mcref.mc == 0) {
             try writer.expression("glb");
@@ -174,34 +174,21 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         try writer.printRaw("{}", .{ mcref.mc });
 
         var bit_value: usize = 1;
-        var diff_iter = diff.raw.iterator(.{});
+        var diff_iter = diff.iterator(.{});
         while (diff_iter.next()) |fuse| {
-            const row = diff.getRow(@intCast(u32, fuse));
-            const col = diff.getColumn(@intCast(u32, fuse));
-
-            try writer.expression("fuse");
-            try writer.printRaw("{}", .{ row });
-            try writer.printRaw("{}", .{ col });
-
-            if (bit_value != 1) {
-                try writer.expression("value");
-                try writer.printRaw("{}", .{ bit_value });
-                try writer.close();
-            }
+            try helper.writeFuseOptValue(writer, fuse, bit_value);
 
             for (std.enums.values(ClockSource)) |src| {
-                if (data.get(src).?.raw.isSet(fuse)) {
+                if (data.get(src).?.isSet(fuse)) {
                     values.put(src, (values.get(src) orelse 0) + bit_value);
                 }
             }
 
-            try writer.close();
-
             bit_value *= 2;
         }
 
-        if (diff.raw.count() != 3) {
-            try std.io.getStdErr().writer().print("Expected three clk_mux fuses for device {s} glb {} mc {} but found {}!\n", .{ @tagName(dev), mcref.glb, mcref.mc, diff.raw.count() });
+        if (diff.countSet() != 3) {
+            try helper.err("Expected three clk_mux fuses but found {}!", .{ diff.countSet() }, dev, .{ .mcref = mcref });
         }
 
         for (std.enums.values(ClockSource)) |src| {

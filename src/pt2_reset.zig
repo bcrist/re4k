@@ -4,7 +4,7 @@ const toolchain = @import("toolchain.zig");
 const sx = @import("sx.zig");
 const core = @import("core.zig");
 const jedec = @import("jedec.zig");
-const devices = @import("devices/devices.zig");
+const devices = @import("devices.zig");
 const JedecData = jedec.JedecData;
 const DeviceType = devices.DeviceType;
 const Toolchain = toolchain.Toolchain;
@@ -42,7 +42,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
 
     var results = try tc.runToolchain(design);
     try helper.logReport("pt2_reset_glb{}_mc{}_{}", .{ mcref.glb, mcref.mc, pt2_as }, results);
-    try results.checkTerm();
+    try results.checkTerm(false);
     return results;
 }
 
@@ -61,10 +61,10 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         const results_off = try runToolchain(ta, tc, dev, mcref, false);
         const results_on = try runToolchain(ta, tc, dev, mcref, true);
 
-        var diff = try helper.diff(ta, results_off.jedec, results_on.jedec);
+        var diff = try JedecData.initDiff(ta, results_off.jedec, results_on.jedec);
 
         // ignore differences in PTs and GLB routing
-        diff.setRange(0, 0, dev.getNumGlbInputs() * 2, dev.getJedecWidth(), 0);
+        diff.putRange(dev.getRoutingRange(), 0);
 
         if (mcref.mc == 0) {
             try writer.expression("glb");
@@ -83,35 +83,22 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         var value_on: usize = 0;
 
         var bit_value: usize = 1;
-        var diff_iter = diff.raw.iterator(.{});
+        var diff_iter = diff.iterator(.{});
         while (diff_iter.next()) |fuse| {
-            const row = diff.getRow(@intCast(u32, fuse));
-            const col = diff.getColumn(@intCast(u32, fuse));
+            try helper.writeFuseOptValue(writer, fuse, bit_value);
 
-            try writer.expression("fuse");
-            try writer.printRaw("{}", .{ row });
-            try writer.printRaw("{}", .{ col });
-
-            if (bit_value != 1) {
-                try writer.expression("value");
-                try writer.printRaw("{}", .{ bit_value });
-                try writer.close();
-            }
-
-            if (results_off.jedec.raw.isSet(fuse)) {
+            if (results_off.jedec.isSet(fuse)) {
                 value_off |= bit_value;
             }
-            if (results_on.jedec.raw.isSet(fuse)) {
+            if (results_on.jedec.isSet(fuse)) {
                 value_on |= bit_value;
             }
-
-            try writer.close();
 
             bit_value *= 2;
         }
 
-        if (diff.raw.count() != 1) {
-            try std.io.getStdErr().writer().print("Expected one pt2_reset fuses for device {s} glb {} mc {} but found {}!\n", .{ @tagName(dev), mcref.glb, mcref.mc, diff.raw.count() });
+        if (diff.countSet() != 1) {
+            try helper.err("Expected one pt2_reset fuses but found {}!", .{ diff.countSet() }, dev, .{ .mcref = mcref });
         }
 
         if (default_off) |def| {

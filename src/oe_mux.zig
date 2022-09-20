@@ -4,11 +4,12 @@ const toolchain = @import("toolchain.zig");
 const sx = @import("sx.zig");
 const core = @import("core.zig");
 const jedec = @import("jedec.zig");
-const devices = @import("devices/devices.zig");
-const device_pins = @import("devices/device_pins.zig");
+const devices = @import("devices.zig");
 const JedecData = jedec.JedecData;
+const Fuse = jedec.Fuse;
 const DeviceType = devices.DeviceType;
-const PinInfo = device_pins.PinInfo;
+const PinInfo = devices.pins.PinInfo;
+const InputOutputPinInfo = devices.pins.InputOutputPinInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 
@@ -16,11 +17,11 @@ pub fn main() void {
     helper.main();
 }
 
-fn runToolchainOnOff(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_info: PinInfo, off: bool) !toolchain.FitResults {
+fn runToolchainOnOff(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, io: InputOutputPinInfo, off: bool) !toolchain.FitResults {
      var design = Design.init(ta, dev);
     try design.pinAssignment(.{
         .signal = "out",
-        .pin_index = pin_info.input_output.pin_index,
+        .pin_index = io.pin_index,
     });
     try design.addPT("in", "out");
 
@@ -28,21 +29,21 @@ fn runToolchainOnOff(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin
         try design.addOutput("out.OE");
     }
 
-    const glb = pin_info.input_output.glb;
-    const mc = pin_info.input_output.mc;
+    const glb = io.glb;
+    const mc = io.mc;
 
     var results = try tc.runToolchain(design);
-    try results.checkTerm();
     if (off) {
         try helper.logReport("off.glb{}.mc{}", .{ glb, mc }, results);
     } else {
         try helper.logReport("on.glb{}.mc{}", .{ glb, mc }, results);
     }
+    try results.checkTerm(false);
     return results;
 }
 
 fn getFirstNonGOE(device: DeviceType, exclude_glb: u8) !u16 {
-    var iter = device_pins.OutputIterator {
+    var iter = devices.pins.OutputIterator {
         .pins = device.getPins(),
         .exclude_goes = true,
         .exclude_glb = exclude_glb,
@@ -56,7 +57,7 @@ fn getFirstNonGOE(device: DeviceType, exclude_glb: u8) !u16 {
 }
 
 fn getFirstInGLB(device: DeviceType, glb: u8, exclude_mc: u8) !u16 {
-    var iter = device_pins.OutputIterator {
+    var iter = devices.pins.OutputIterator {
         .pins = device.getPins(),
         .single_glb = glb,
     };
@@ -68,16 +69,16 @@ fn getFirstInGLB(device: DeviceType, glb: u8, exclude_mc: u8) !u16 {
     return error.NotFound;
 }
 
-fn runToolchainGOE(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_info: PinInfo, goe: bool) !toolchain.FitResults {
+fn runToolchainGOE(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, io: InputOutputPinInfo, goe: bool) !toolchain.FitResults {
      var design = Design.init(ta, dev);
     try design.pinAssignment(.{
         .signal = "out",
-        .pin_index = pin_info.input_output.pin_index,
+        .pin_index = io.pin_index,
     });
     try design.addPT("in", "out");
 
-    const glb = pin_info.input_output.glb;
-    const mc = pin_info.input_output.mc;
+    const glb = io.glb;
+    const mc = io.mc;
 
     try design.pinAssignment(.{
         .signal = "goe2",
@@ -96,25 +97,25 @@ fn runToolchainGOE(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_i
     }
 
     var results = try tc.runToolchain(design);
-    try results.checkTerm();
     if (goe) {
         try helper.logReport("goe.glb{}.mc{}", .{ glb, mc }, results);
     } else {
         try helper.logReport("nogoe.glb{}.mc{}", .{ glb, mc }, results);
     }
+    try results.checkTerm(false);
     return results;
 }
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_info: PinInfo, mode: core.OutputEnableMode) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, io: InputOutputPinInfo, mode: core.OutputEnableMode) !toolchain.FitResults {
     var design = Design.init(ta, dev);
     try design.pinAssignment(.{
         .signal = "out",
-        .pin_index = pin_info.input_output.pin_index,
+        .pin_index = io.pin_index,
     });
     try design.addPT("in", "out");
 
-    const glb = pin_info.input_output.glb;
-    const mc = pin_info.input_output.mc;
+    const glb = io.glb;
+    const mc = io.mc;
 
     switch (mode) {
         .input_only => {
@@ -130,7 +131,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_info
                 try design.addPT(.{ "in0", "in1" }, "out.OE");
             }
 
-            var iter = device_pins.OutputIterator {
+            var iter = devices.pins.OutputIterator {
                 .pins = dev.getPins(),
                 .exclude_glb = glb,
                 .exclude_goes = true,
@@ -148,7 +149,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_info
                 });
             }
 
-            iter = device_pins.OutputIterator {
+            iter = devices.pins.OutputIterator {
                 .pins = dev.getPins(),
                 .single_glb = glb,
                 .exclude_goes = true,
@@ -194,7 +195,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_info
         .goe3 => {
             try design.addPT("goe3", "out.OE");
 
-            var iter = device_pins.OutputIterator {
+            var iter = devices.pins.OutputIterator {
                 .pins = dev.getPins(),
                 .exclude_glb = glb,
                 .exclude_goes = true,
@@ -212,7 +213,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_info
                 });
             }
 
-            iter = device_pins.OutputIterator {
+            iter = devices.pins.OutputIterator {
                 .pins = dev.getPins(),
                 .single_glb = glb,
                 .exclude_goes = true,
@@ -233,8 +234,8 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_info
     }
 
     var results = try tc.runToolchain(design);
-    try results.checkTerm();
     try helper.logReport("{s}.glb{}.mc{}", .{ @tagName(mode), glb, mc }, results);
+    try results.checkTerm(false);
     return results;
 }
 
@@ -243,71 +244,49 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     try writer.expressionExpanded("oe_mux");
 
     var detail_pin_index: ?u16 = null;
-    var detail_fuses = std.ArrayList(usize).init(pa);
+    var detail_fuses = std.ArrayList(Fuse).init(pa);
 
-    var pin_index: u16 = 0;
-    while (pin_index < dev.getNumPins()) : (pin_index += 1) {
-        const pin_info = dev.getPins()[pin_index];
-        const io = switch (pin_info) {
-            .input_output => |info| info,
-            else => continue,
-        };
-
+    var pin_iter = devices.pins.OutputIterator { .pins = dev.getPins() };
+    while (pin_iter.next()) |io| {
         try tc.cleanTempDir();
         helper.resetTemp();
 
         // First we just check input-only and output-only configurations.
         // This should discover exactly one of the three OE mux configuration fuses for this pin.
-        var diff = try helper.diff(ta, 
-            (try runToolchainOnOff(ta, tc, dev, pin_info, false)).jedec,
-            (try runToolchainOnOff(ta, tc, dev, pin_info, true)).jedec,
+        var diff = try JedecData.initDiff(ta, 
+            (try runToolchainOnOff(ta, tc, dev, io, false)).jedec,
+            (try runToolchainOnOff(ta, tc, dev, io, true)).jedec,
         );
 
         // Next check GOE2 vs output-only; this should find the other two OE mux fuses.
-        diff.raw.setUnion((try helper.diff(ta, 
-                (try runToolchainGOE(ta, tc, dev, pin_info, false)).jedec,
-                (try runToolchainGOE(ta, tc, dev, pin_info, true)).jedec,
-            )).raw);
+        diff.unionAll(try JedecData.initDiff(ta, 
+                (try runToolchainGOE(ta, tc, dev, io, false)).jedec,
+                (try runToolchainGOE(ta, tc, dev, io, true)).jedec,
+            ));
 
         try writer.expression("pin");
         try writer.printRaw("{s}", .{ io.pin_number });
 
-        var n_fuses: usize = 0;
-
-        // var values = std.EnumMap(core.OutputEnableMode, usize) {};
-
         var bit_value: usize = 1;
-        var diff_iter = diff.raw.iterator(.{});
+        var diff_iter = diff.iterator(.{});
         while (diff_iter.next()) |fuse| {
-            const row = diff.getRow(@intCast(u32, fuse));
-            const col = diff.getColumn(@intCast(u32, fuse));
-
-            try writer.expression("fuse");
-            try writer.printRaw("{}", .{ row });
-            try writer.printRaw("{}", .{ col });
-            if (bit_value != 1) {
-                try writer.expression("value");
-                try writer.printRaw("{}", .{ bit_value });
-                try writer.close();
-            }
-            try writer.close();
+            try helper.writeFuseOptValue(writer, fuse, bit_value);
 
             if (detail_pin_index == null and io.goe_index == null) {
                 try detail_fuses.append(fuse);
             }
 
-            n_fuses += 1;
             bit_value *= 2;
         }
 
         try writer.close();
 
-        if (n_fuses != 3) {
-            try std.io.getStdErr().writer().print("Expected 3 fuses to define oe_mux options for device {} pin {s}, but found {}!\n", .{ dev, io.pin_number, n_fuses });
+        if (diff.countSet() != 3) {
+            try helper.err("Expected 3 fuses to define oe_mux options but found {}!", .{ diff.countSet() }, dev, .{ .pin_index = io.pin_index });
         }
 
         if (detail_pin_index == null and io.goe_index == null) {
-            detail_pin_index = pin_index;
+            detail_pin_index = io.pin_index;
         }
     }
 
@@ -318,12 +297,12 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             }) |mode| {
         const pin_info = dev.getPins()[detail_pin_index orelse unreachable];
 
-        var results = try runToolchain(ta, tc, dev, pin_info, mode);
+        var results = try runToolchain(ta, tc, dev, pin_info.input_output, mode);
 
         var value: usize = 0;
         var bit_value: usize = 1;
         for (detail_fuses.items) |fuse| {
-            if (results.jedec.raw.isSet(fuse)) {
+            if (results.jedec.isSet(fuse)) {
                 value += bit_value;
             }
             bit_value *= 2;

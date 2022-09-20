@@ -3,9 +3,12 @@ const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx.zig");
 const core = @import("core.zig");
-const DeviceType = @import("devices/devices.zig").DeviceType;
+const devices = @import("devices.zig");
+const jedec = @import("jedec.zig");
+const DeviceType = @import("devices.zig").DeviceType;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
+const JedecData = jedec.JedecData;
 
 pub fn main() void {
     helper.main();
@@ -21,7 +24,8 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
     try design.addPT("in", "out");
 
     var results = try tc.runToolchain(design);
-    try results.checkTerm();
+    try helper.logReport("drive_pin_{s}", .{ dev.getPins()[pin_index].pin_number() }, results);
+    try results.checkTerm(false);
     return results;
 }
 
@@ -32,38 +36,23 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     var default_pp: ?u1 = null;
     var default_od: ?u1 = null;
 
-    var pin_index: u16 = 0;
-    while (pin_index < dev.getNumPins()) : (pin_index += 1) {
-        const pin_info = dev.getPins()[pin_index];
-        std.debug.assert(pin_index == pin_info.pin_index());
-        switch (pin_info) {
-            .input_output => {},
-            else => continue,
-        }
-        const pin_number = pin_info.pin_number();
-
+    var pin_iter = devices.pins.OutputIterator { .pins = dev.getPins() };
+    while (pin_iter.next()) |io| {
         try tc.cleanTempDir();
         helper.resetTemp();
 
-        const results_pp = try runToolchain(ta, tc, dev, pin_index, .push_pull);
-        const results_od = try runToolchain(ta, tc, dev, pin_index, .open_drain);
-
-        var diff = try results_pp.jedec.clone(ta);
-        try diff.xor(results_od.jedec);
+        const results_pp = try runToolchain(ta, tc, dev, io.pin_index, .push_pull);
+        const results_od = try runToolchain(ta, tc, dev, io.pin_index, .open_drain);
 
         try writer.expression("pin");
-        try writer.printRaw("{s}", .{ pin_number });
+        try writer.printRaw("{s}", .{ io.pin_number });
 
-        var diff_iter = diff.raw.iterator(.{});
+        var diff = try JedecData.initDiff(ta, results_pp.jedec, results_od.jedec);
+        var diff_iter = diff.iterator(.{});
         if (diff_iter.next()) |fuse| {
-            const row = diff.getRow(@intCast(u32, fuse));
-            const col = diff.getColumn(@intCast(u32, fuse));
+            try helper.writeFuse(writer, fuse);
 
-            try writer.expression("fuse");
-            try writer.printRaw("{}", .{ row });
-            try writer.printRaw("{}", .{ col });
-
-            const pp_value = results_pp.jedec.get(row, col);
+            const pp_value = results_pp.jedec.get(fuse);
             if (default_pp) |def| {
                 if (pp_value != def) {
                     try writer.expression("value");
@@ -74,7 +63,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
                 default_pp = pp_value;
             }
 
-            const od_value = results_od.jedec.get(row, col);
+            const od_value = results_od.jedec.get(fuse);
             if (default_od) |def| {
                 if (od_value != def) {
                     try writer.expression("value");
@@ -85,15 +74,13 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
                 default_od = od_value;
             }
 
-            try writer.close();
-
         } else {
-            try std.io.getStdErr().writer().print("Expected one drive fuse for device {} pin {s} but found none!\n", .{ dev, pin_number });
+            try helper.err("Expected one drive fuse but found none!", .{}, dev, .{ .pin_index = io.pin_index });
             return error.Think;
         }
 
         if (diff_iter.next()) |_| {
-            try std.io.getStdErr().writer().print("Expected one drive fuse for device {} pin {s} but found multiple!\n", .{ dev, pin_number });
+            try helper.err("Expected one drive fuse but found multiple!", .{}, dev, .{ .pin_index = io.pin_index });
             return error.Think;
         }
 

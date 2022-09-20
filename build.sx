@@ -15,5 +15,6 @@
     (_ exe reg_type)
     (_ exe pt2_reset)
     (_ exe pt3_reset)
-    (exe clk_mux)
+    (_ exe clk_mux)
+    (exe grp)
 )

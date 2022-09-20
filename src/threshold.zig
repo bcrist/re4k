@@ -4,8 +4,9 @@ const toolchain = @import("toolchain.zig");
 const sx = @import("sx.zig");
 const core = @import("core.zig");
 const jedec = @import("jedec.zig");
-const devices = @import("devices/devices.zig");
+const devices = @import("devices.zig");
 const JedecData = jedec.JedecData;
+const Fuse = jedec.Fuse;
 const DeviceType = devices.DeviceType;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
@@ -24,7 +25,8 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
     try design.addPT("in", "out");
 
     var results = try tc.runToolchain(design);
-    try results.checkTerm();
+    try helper.logReport("threshold_pin_{s}", .{ dev.getPins()[pin_index].pin_number() }, results);
+    try results.checkTerm(false);
     return results;
 }
 
@@ -35,13 +37,9 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     try writer.expressionExpanded(@tagName(dev));
     try writer.expressionExpanded("input_threshold");
 
-    var pin_index: u16 = 0;
-    while (pin_index < dev.getNumPins()) : (pin_index += 1) {
-        const pin_info = dev.getPins()[pin_index];
-        switch (pin_info) {
-            .input_output, .input, .clock_input => {},
-            .misc => continue,
-        }
+    var pin_iter = devices.pins.InputIterator { .pins = dev.getPins() };
+    while (pin_iter.next()) |pin_info| {
+        const pin_index = pin_info.pin_index();
         const pin_number = pin_info.pin_number();
 
         try tc.cleanTempDir();
@@ -50,25 +48,24 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         const results_high = try runToolchain(ta, tc, dev, pin_index, .LVCMOS33);
         const results_low = try runToolchain(ta, tc, dev, pin_index, .LVCMOS15);
 
-        var diff = try results_high.jedec.clone(ta);
-        try diff.xor(results_low.jedec);
+        const diff = try JedecData.initDiff(ta, results_high.jedec, results_low.jedec);
 
         try writer.expression("pin");
         try writer.printRaw("{s}", .{ pin_number });
 
-        var diff_iter = diff.raw.iterator(.{});
+        var diff_iter = diff.iterator(.{});
         if (diff_iter.next()) |fuse| {
-            try writeFuse(fuse, results_high.jedec, results_low.jedec, diff, writer);
+            try writeFuse(fuse, results_high.jedec, results_low.jedec, writer);
         } else {
-            try std.io.getStdErr().writer().print("Expected one threshold fuse for device {} pin {s} but found none!\n", .{ dev, pin_number });
+            try helper.err("Expected one threshold fuse but found none!", .{}, dev, .{ .pin_index = pin_index });
         }
 
         if (diff_iter.next()) |fuse| {
-            try std.io.getStdErr().writer().print("Expected one threshold fuse for device {} pin {s} but found multiple!\n", .{ dev, pin_number });
-            try writeFuse(fuse, results_high.jedec, results_low.jedec, diff, writer);
+            try helper.err("Expected one threshold fuse but found multiple!", .{}, dev, .{ .pin_index = pin_index });
+            try writeFuse(fuse, results_high.jedec, results_low.jedec, writer);
 
             while (diff_iter.next()) |f| {
-                try writeFuse(f, results_high.jedec, results_low.jedec, diff, writer);
+                try writeFuse(f, results_high.jedec, results_low.jedec, writer);
             }
         }
 
@@ -92,15 +89,10 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     _ = pa;
 }
 
-fn writeFuse(fuse: usize, results_high: JedecData, results_low: JedecData, diff: JedecData, writer: anytype) !void {
-    const row = diff.getRow(@intCast(u32, fuse));
-    const col = diff.getColumn(@intCast(u32, fuse));
+fn writeFuse(fuse: Fuse, results_high: JedecData, results_low: JedecData, writer: anytype) !void {
+    try helper.writeFuse(writer, fuse);
 
-    try writer.expression("fuse");
-    try writer.printRaw("{}", .{ row });
-    try writer.printRaw("{}", .{ col });
-
-    const high_value = results_high.get(row, col);
+    const high_value = results_high.get(fuse);
     if (default_high) |def| {
         if (high_value != def) {
             try writer.expression("value");
@@ -111,7 +103,7 @@ fn writeFuse(fuse: usize, results_high: JedecData, results_low: JedecData, diff:
         default_high = high_value;
     }
 
-    const low_value = results_low.get(row, col);
+    const low_value = results_low.get(fuse);
     if (default_low) |def| {
         if (low_value != def) {
             try writer.expression("value");
@@ -121,6 +113,4 @@ fn writeFuse(fuse: usize, results_high: JedecData, results_low: JedecData, diff:
     } else {
         default_low = low_value;
     }
-    
-    try writer.close();
 }

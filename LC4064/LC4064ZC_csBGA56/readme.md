@@ -1,5 +1,5 @@
 # Note on Dedicated Inputs
-First off, it's interesting to note that the datasheet lists that this device has 32 I/Os and 12 dedicated inputs.  Across all other packages and families, no other device has more than 10 dedicated inputs.
+First off, it's interesting to note that the datasheet lists that this device has 32 I/Os and 12 dedicated inputs.  Across all other packages and families, the only other devices with more than 10 dedicated inputs are the LC4256V/B/C/ZE in TQFP-144, which claim 14 dedicated inputs.
 
 Second, there appears to be a bug in the fitter's fuse data for a couple of the "input-only" signals.  The fitter toggles two input threshold fuses for the input on ball E1, and no fuses for the input on F8.  Neither of those makes sense to do, so most likely, one of the E1 fuses actually corresponds to the F8 ball in hardware.
 

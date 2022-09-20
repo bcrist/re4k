@@ -1,8 +1,10 @@
 const std = @import("std");
+const builtin = @import("builtin");
 const core = @import("core.zig");
 const jedec = @import("jedec.zig");
+const helper = @import("helper.zig");
 
-const devices = @import("devices/devices.zig");
+const devices = @import("devices.zig");
 const DeviceType = devices.DeviceType;
 const JedecData = jedec.JedecData;
 
@@ -140,7 +142,8 @@ pub const Design = struct {
     outputs: std.ArrayListUnmanaged([]const u8),
     pts: std.ArrayListUnmanaged(ProductTerm),
     zero_hold_time: bool,
-    ignore_fitter_warnings: bool,
+    adjust_input_assignments: bool,
+    parse_glb_inputs: bool,
 
     pub fn init(alloc: std.mem.Allocator, device: DeviceType) Design {
         return .{
@@ -152,7 +155,8 @@ pub const Design = struct {
             .outputs = .{},
             .pts = .{},
             .zero_hold_time = false,
-            .ignore_fitter_warnings = false,
+            .adjust_input_assignments = false,
+            .parse_glb_inputs = false,
         };
     }
 
@@ -273,16 +277,25 @@ pub const Design = struct {
         const inputs_type_info = @typeInfo(@TypeOf(inputs));
         switch (inputs_type_info) {
             .Struct => {
-            //.Struct => |info| {
-                // inline for (info.fields) |field| {
-                //     try pt_inputs.append(@field(inputs, field.name));
-                // }
+                // e.g. tuple containing strings
                 inline for (inputs) |input| {
                     try pt_inputs.append(input);
                 }
             },
-            .Pointer => {
-                try pt_inputs.append(inputs);
+            .Pointer => |info| {
+                const child_type_info = @typeInfo(info.child);
+                switch (child_type_info) {
+                    .Pointer => {
+                        // e.g. slice of array containing strings
+                        for (inputs) |input| {
+                            try pt_inputs.append(input);
+                        }
+                    },
+                    else => {
+                        // e.g. string
+                        try pt_inputs.append(inputs);
+                    },
+                }
             },
             .Null => {}, // no inputs
             else => {
@@ -315,15 +328,30 @@ pub const Design = struct {
         const outputs_type_info = @typeInfo(@TypeOf(outputs));
         switch (outputs_type_info) {
             .Struct => {
+                // e.g. tuple containing strings
                 inline for (outputs) |output| {
                     if(try pt.addOutput(self.alloc, output)) {
                         try self.addOutput(output);
                     }
                 }
             },
-            .Pointer => {
-                if (try pt.addOutput(self.alloc, outputs)) {
-                    try self.addOutput(outputs);
+            .Pointer => |info| {
+                const child_type_info = @typeInfo(info.child);
+                switch (child_type_info) {
+                    .Pointer => {
+                        // e.g. slice of array containing strings
+                        for (outputs) |output| {
+                            if(try pt.addOutput(self.alloc, output)) {
+                                try self.addOutput(output);
+                            }
+                        }
+                    },
+                    else => {
+                        // e.g. string
+                        if (try pt.addOutput(self.alloc, outputs)) {
+                            try self.addOutput(outputs);
+                        }
+                    },
                 }
             },
             else => {
@@ -364,9 +392,13 @@ pub const Design = struct {
 
         try writer.writeAll("\n[Global Constraints]\n");
         try writer.writeAll("Spread_Placement=No;\n");
+        try writer.writeAll("Routing_Attempts=2;\n");
 
         var zerohold = if (self.zero_hold_time) "yes" else "no";
         try writer.print("Zero_hold_time={s};\n", .{ zerohold });
+
+        var adjust_inputs = if (self.adjust_input_assignments) "on" else "off";
+        try writer.print("Adjust_input_assignments={s};\n", .{ adjust_inputs });
 
         try writer.writeAll("\n[Location Assignments]\n");
         for (self.pins.items) |pin_assignment| {
@@ -589,65 +621,72 @@ pub const Design = struct {
 
 };
 
-pub const SignalFitFlags = enum {
-    uses_gclk,
-    uses_goe,
-    uses_shared_clk,
-    uses_shared_ce,
-    uses_shared_ar,
-    uses_shared_ap,
-    powerup_reset,
-    powerup_preset,
-    uses_input_reg,
-    uses_ar,
-    uses_ap,
-    uses_ce,
-    uses_oe,
-    uses_fast_path,
-    uses_orp_bypass,
-};
+// pub const SignalFitFlags = enum {
+//     uses_gclk,
+//     uses_goe,
+//     uses_shared_clk,
+//     uses_shared_ce,
+//     uses_shared_ar,
+//     uses_shared_ap,
+//     powerup_reset,
+//     powerup_preset,
+//     uses_input_reg,
+//     uses_ar,
+//     uses_ap,
+//     uses_ce,
+//     uses_oe,
+//     uses_fast_path,
+//     uses_orp_bypass,
+// };
 
-pub const SignalFitData = struct {
-    name: []const u8,
+// pub const SignalFitData = struct {
+//     name: []const u8,
+//     pin: u16,
+//     glb: u8,
+//     mc: u8,
+//     type: core.SignalType,
+//     iostd: core.LogicLevels,
+//     bus_maintenance: core.BusMaintenanceType,
+//     macrocell_type: core.MacrocellType,
+//     uses_input_reg: bool,
+//     num_unique_inputs: u16,
+//     num_shared_inputs: u16,
+//     num_pts: u8,
+//     num_logic_pts: u8,
+//     num_xor_pts: u8,
+//     num_ctrl_pts: u8,
+//     num_clusters: u8,
+//     num_logic_levels: u8,
+//     cluster_pt_usage: [16]u8,
+//     pg_enable_signal: []const u8,
+//     flags: std.EnumSet(SignalFitFlags),
+// };
+
+pub const GlbInputSignal = union(enum) {
+    fb: core.MacrocellRef,
     pin: u16,
-    glb: u8,
-    mc: u8,
-    type: core.SignalType,
-    iostd: core.LogicLevels,
-    bus_maintenance: core.BusMaintenanceType,
-    macrocell_type: core.MacrocellType,
-    uses_input_reg: bool,
-    num_unique_inputs: u16,
-    num_shared_inputs: u16,
-    num_pts: u8,
-    num_logic_pts: u8,
-    num_xor_pts: u8,
-    num_ctrl_pts: u8,
-    num_clusters: u8,
-    num_logic_levels: u8,
-    cluster_pt_usage: [16]u8,
-    pg_enable_signal: []const u8,
-    flags: std.EnumSet(SignalFitFlags),
 };
 
 pub const GlbInputFitSignal = struct {
     name: []const u8,
-    //source: GlbInputSignal,
+    source: GlbInputSignal,
 };
 
 pub const GlbFitData = struct {
     glb: u8,
-    inputs: [36]GlbInputFitSignal,
+    inputs: [36]?GlbInputFitSignal = [_]?GlbInputFitSignal { null } ** 36,
 };
 
 pub const FitResults = struct {
     term: std.ChildProcess.Term,
+    failed: bool,
+    warn: bool,
     report: []const u8,
     jedec: JedecData,
-    signals: []SignalFitData,
+    //signals: []SignalFitData,
     glbs: []GlbFitData,
 
-    pub fn checkTerm(self: FitResults) !void {
+    pub fn checkTerm(self: FitResults, ignore_warnings: bool) !void {
         switch (self.term) {
             .Exited => |code| {
                 if (code != 0) {
@@ -668,9 +707,14 @@ pub const FitResults = struct {
                 return error.FitterError;
             },
         }
+        if (self.failed) {
+            try std.io.getStdErr().writer().writeAll("Fitter failed to generate a valid device configuration!\n");
+            return error.FitterError;
+        } else if (self.warn and !ignore_warnings) {
+            try std.io.getStdErr().writer().writeAll("Fitter had warnings!\n");
+        }
     }
 };
-
 
 pub const Toolchain = struct {
 
@@ -720,47 +764,64 @@ pub const Toolchain = struct {
             try design.writeLci(f.writer());
         }
 
-        var proc_results = try std.ChildProcess.exec(.{
-            .allocator = self.alloc,
-            .argv = &[_][]const u8 {
-                "C:\\ispLEVER_Classic2_1\\ispcpld\\bin\\lpf4k.exe",
-                "-i", "test.tt4",
-                "-lci", "test.lci",
-                "-d", getDeviceFitterName(design.device),
-                "-fmt", "PLA",
-                "-v",
-            },
-        });
+        var child = std.ChildProcess.init(&[_][]const u8 {
+            "C:\\ispLEVER_Classic2_1\\ispcpld\\bin\\lpf4k.exe",
+            "-i", "test.tt4",
+            "-lci", "test.lci",
+            "-d", getDeviceFitterName(design.device),
+            "-fmt", "PLA",
+            //"-lca",
+            //"-lca_mfb",
+            //"-lca_ifb",
+            //"-klfm",
+            //"-ppi_off",
+            "-v",
+        }, self.alloc);
+        child.stdin_behavior = .Ignore;
+        child.stdout_behavior = .Ignore;
+        child.stderr_behavior = .Ignore;
 
-        var signals = try std.ArrayList(SignalFitData).initCapacity(self.alloc, 32);
+        try child.spawn();
+        // if the fitter takes more than about half a second, it's probably failed to route signals
+        std.os.windows.WaitForSingleObjectEx(child.handle, 500, false) catch {};
+        const term = try child.kill();
+
+        //var signals = try std.ArrayList(SignalFitData).initCapacity(self.alloc, 32);
 
         var log = try self.readFile("test.log");
 
-        if (!std.mem.eql(u8, log, "Project 'test' was Fitted Successfully!\r\n")) {
-            const stderr = std.io.getStdErr().writer();
+        var failed = !std.meta.eql(term, std.ChildProcess.Term { .Exited = 0 });
+        var warn = false;
 
+        if (!std.mem.eql(u8, log, "Project 'test' was Fitted Successfully!\r\n")) {
             if (!std.mem.endsWith(u8, log, "Project 'test' was Fitted Successfully!\r\n")) {
-                try stderr.writeAll("Fitter failed!\n");
-                try stderr.print("Log:\n{s}\n", .{ log });
-                try stderr.print("1>\n{s}\n", .{ proc_results.stdout });
-                try stderr.print("2>\n{s}\n", .{ proc_results.stderr });
-                return error.FitFailed;
-            } else if (!design.ignore_fitter_warnings) {
-                try stderr.writeAll("Fitter had warnings!\n");
-                try stderr.print("Log:\n{s}\n", .{ log });
+                failed = true;
+            } else {
+                warn = true;
             }
         }
 
+        var report: []const u8 = "";
+        var jed: JedecData = undefined;
+        if (failed) {
+            jed = try design.device.initJedecBlank(self.alloc);
+        } else {
+            report = try self.readFile("test.rpt");
+            jed = try JedecData.parse(self.alloc, design.device.getJedecWidth(), design.device.getJedecHeight(), "test.jed", try self.readFile("test.jed"));
+        }
+
         var results = FitResults {
-            .term = proc_results.term,
-            .report = try self.readFile("test.rpt"),
-            .jedec = try JedecData.parse(self.alloc, design.device.getJedecWidth(), design.device.getJedecHeight(), "test.jed", try self.readFile("test.jed")),
-            .signals = &[_]SignalFitData{},
+            .term = term,
+            .failed = failed,
+            .warn = warn,
+            .report = report,
+            .jedec = jed,
+            //.signals = &[_]SignalFitData{},
             .glbs = try self.alloc.alloc(GlbFitData, design.device.getNumGlbs()),
         };
 
-        try self.parseFitterReport(&results, &signals);
-        results.signals = signals.items;
+        try self.parseFitterReport(design, &results);
+        // results.signals = signals.items;
         return results;
     }
 
@@ -770,10 +831,69 @@ pub const Toolchain = struct {
         return f.readToEndAlloc(self.alloc, 0x100000000);
     }
 
-    fn parseFitterReport(self: *Toolchain, results: *FitResults, signals: *std.ArrayList(SignalFitData)) !void {
-        _ = self;
-        _ = results;
-        _ = signals;
+    fn parseGlbInputFitSignal(out: *GlbFitData, raw: []const u8, dev: DeviceType) !void {
+        const gi = try std.fmt.parseInt(u8, raw[0..2], 10);
+        const raw_name = raw[13..29];
+        var signal = std.mem.trim(u8, raw_name, " ");
+
+        if (signal.len == 0 or std.mem.eql(u8, signal, "...")) {
+            out.inputs[gi] = null;
+        } else {
+            var source: GlbInputSignal = undefined;
+            const raw_source = raw[3..12];
+
+            if (std.mem.eql(u8, raw_source[0..3], "pin")) {
+                const pin_number = std.mem.trim(u8, raw_source[3..], " ");
+                var pin_index: ?u16 = null;
+                for (dev.getPins()) |info| {
+                    if (std.mem.eql(u8, pin_number, info.pin_number())) {
+                        pin_index = info.pin_index();
+                        break;
+                    }
+                }
+                source = .{ .pin = pin_index.? };
+            } else {
+                const glb = raw_source[3] - 'A';
+                const mc = try std.fmt.parseInt(u8, std.mem.trim(u8, raw_source[5..], " "), 10);
+
+                source = .{ .fb = .{
+                    .glb = glb,
+                    .mc = mc,
+                }};
+            }
+
+            out.inputs[gi] = GlbInputFitSignal {
+                .name = signal,
+                .source = source,
+            };
+        }
+    }
+
+    fn parseFitterReport(self: *Toolchain, design: Design, results: *FitResults) !void {
+        const device = design.device;
+
+        if (design.parse_glb_inputs) {
+            var glb: u8 = 0;
+            while (glb < device.getNumGlbs()) : (glb += 1) {
+                const header = try std.fmt.allocPrint(self.alloc, "GLB_{s}_LOGIC_ARRAY_FANIN", .{ devices.getGlbName(glb) });
+                if (helper.extract(results.report, header, "------------------------------------------")) |raw| {
+                    var fit_data = GlbFitData {
+                        .glb = glb,
+                    };
+
+                    var line_iter = std.mem.tokenize(u8, raw, "\r\n");
+                    while (line_iter.next()) |line| {
+                        if (line[0] != '0' and line[0] != '1') {
+                            continue; // ignore remaining header/footer lines
+                        }
+
+                        try parseGlbInputFitSignal(&fit_data, line[0..36], device);
+                        try parseGlbInputFitSignal(&fit_data, line[40..], device);
+                    }
+                    results.glbs[glb] = fit_data;
+                }
+            }
+        }
     }
 
     pub fn cleanTempDir(self: *Toolchain) !void {

@@ -6,6 +6,7 @@
 * Bitstream configuration through zig
 * Bitstream decompilation
 * ORM bypass for non-ZE families
+* Extra inputs in LC4256 TQFP-144 - do they actually go to normal IO cells?
 
 # TODO: LC4032ZE
 * GLB inputs from GRP (WIP)

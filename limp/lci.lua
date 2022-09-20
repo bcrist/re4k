@@ -1166,8 +1166,6 @@ function write_lci_clk_mux (device, glb, mc, variant)
         assign_pin_location('b', device.glb(other_glb).mc(5))
     elseif variant == 'npt' then
         pla:pt({'a','b'}, 'out.C-')
-        local other_glb = 0
-        if glb == 0 then other_glb = 1 end
         assign_pin_location('a', device.glb(other_glb).mc(4))
         assign_pin_location('b', device.glb(other_glb).mc(5))
     elseif variant == 'shared_pt' then

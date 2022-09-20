@@ -1,6 +1,162 @@
 const std = @import("std");
 const core = @import("core.zig");
 const svf = @import("svf.zig");
+const devices = @import("devices.zig");
+
+const DeviceType = devices.DeviceType;
+
+pub const Fuse = struct {
+    row: u16,
+    col: u16,
+
+    pub fn init(row: u16, col: u16) Fuse {
+        return .{ .row = row, .col = col };
+    }
+
+    pub fn fromRaw(raw: usize, device_or_jedec: anytype) Fuse {
+        const width = getJedecWidth(device_or_jedec);
+        var row = raw / width;
+        return .{
+            .row = @intCast(u16, row),
+            .col = @intCast(u16, raw - row * width),
+        };
+    }
+
+    pub fn toRaw(self: Fuse, device_or_jedec: anytype) usize {
+        const width = getJedecWidth(device_or_jedec);
+        return self.row * width + self.col;
+    }
+
+    fn getJedecWidth(device_or_jedec: anytype) usize {
+        return switch (@TypeOf(device_or_jedec)) {
+            DeviceType => device_or_jedec.getJedecWidth(),
+            else => |arg_type| switch (@typeInfo(arg_type)) {
+                .Int => @as(usize, device_or_jedec),
+                else => device_or_jedec.width,
+            },
+        };
+    }
+
+    pub fn eql(self: Fuse, other: Fuse) bool {
+        return self.row == other.row and self.col == other.col;
+    }
+};
+
+pub const FuseRange = struct {
+    min: Fuse,
+    max: Fuse,
+
+    pub fn initEmpty() FuseRange {
+        return .{
+            .min = Fuse.init(1, 1),
+            .max = Fuse.init(0, 0),
+        };
+    }
+
+    pub fn init(fuse: Fuse) FuseRange {
+        return .{
+            .min = fuse,
+            .max = fuse,
+        };
+    }
+
+    pub fn between(a: Fuse, b: Fuse) FuseRange {
+        return .{
+            .min = Fuse.init(@minimum(a.row, b.row), @minimum(a.col, b.col)),
+            .max = Fuse.init(@maximum(a.row, b.row), @maximum(a.col, b.col)),
+        };
+    }
+
+    pub fn intersection(a: FuseRange, b: FuseRange) FuseRange {
+        return .{
+            .min = Fuse.init(@maximum(a.min.row, b.min.row), @maximum(a.min.col, b.min.col)),
+            .max = Fuse.init(@minimum(a.max.row, b.max.row), @maximum(a.max.col, b.max.col)),
+        };
+    }
+
+    pub fn expand(self: *FuseRange, fuse: Fuse) void {
+        if (self.isEmpty()) {
+            self.min = fuse;
+            self.max = fuse;
+        } else {
+            if (fuse.row < self.min.row) {
+                self.min.row = fuse.row;
+            } else if (fuse.row > self.max.row) {
+                self.max.row = fuse.row;
+            }
+
+            if (fuse.col < self.min.col) {
+                self.min.col = fuse.col;
+            } else if (fuse.col > self.max.col) {
+                self.max.col = fuse.col;
+            }
+        }
+    }
+
+    pub fn contains(self: FuseRange, fuse: Fuse) bool {
+        return fuse.row >= self.min.row and fuse.row <= self.max.row
+            and fuse.col >= self.min.col and fuse.col <= self.max.col;
+    }
+
+    pub fn containsRange(self: FuseRange, other: FuseRange) bool {
+        return other.isEmpty() or self.contains(other.min) and self.contains(other.max);
+    }
+
+    pub fn width(self: FuseRange) u16 {
+        if (self.max.col >= self.min.col) {
+            return self.max.col - self.min.col + 1;
+        } else {
+            return 0;
+        }
+    }
+
+    pub fn height(self: FuseRange) u16 {
+        if (self.max.row >= self.min.row) {
+            return self.max.row - self.min.row + 1;
+        } else {
+            return 0;
+        }
+    }
+
+    pub fn count(self: FuseRange) usize {
+        return @as(usize, self.width()) * self.height();
+    }
+
+    pub fn isEmpty(self: FuseRange) bool {
+        return self.max.row < self.min.row or self.max.col < self.min.col;
+    }
+
+    pub fn iterator(self: FuseRange) Iterator {
+        return .{ .range = self, .next_fuse = self.min };
+    }
+
+    pub const Iterator = struct {
+        range: FuseRange,
+        next_fuse: Fuse,
+
+        pub fn next(self: *Iterator) ?Fuse {
+            const fuse = self.next_fuse;
+
+            if (fuse.row > self.range.max.row) {
+                return null;
+            }
+
+            if (fuse.col == self.range.max.col) {
+                self.next_fuse.col = self.range.min.col;
+                self.next_fuse.row += 1;
+            } else {
+                self.next_fuse.col += 1;
+            }
+
+            return fuse;
+        }
+    };
+
+    pub fn eql(self: FuseRange, other: FuseRange) bool {
+        return self.isEmpty() and other.isEmpty()
+            or self.min.eql(other.min) and self.max.eql(other.max);
+    }
+};
 
 const JedecCommand = enum {
     qty_pins,
@@ -60,7 +216,7 @@ pub const JedecData = struct {
 
     width: u16,
     height: u16,
-    raw: std.DynamicBitSet,
+    raw: std.DynamicBitSetUnmanaged,
     usercode: ?u32 = null,
     security: ?u1 = null,
     pin_count: ?u16 = null,
@@ -73,7 +229,7 @@ pub const JedecData = struct {
         return JedecData {
             .width = width,
             .height = height,
-            .raw = try std.DynamicBitSet.initEmpty(allocator, @as(u32, width) * height),
+            .raw = try std.DynamicBitSetUnmanaged.initEmpty(allocator, @as(u32, width) * height),
         };
     }
 
@@ -81,8 +237,30 @@ pub const JedecData = struct {
         return JedecData {
             .width = width,
             .height = height,
-            .raw = try std.DynamicBitSet.initFull(allocator, @as(u32, width) * height),
+            .raw = try std.DynamicBitSetUnmanaged.initFull(allocator, @as(u32, width) * height),
         };
+    }
+
+    pub fn initDiff(allocator: std.mem.Allocator, a: JedecData, b: JedecData) !JedecData {
+        std.debug.assert(a.getRange().eql(b.getRange()));
+
+        var result = try a.clone(allocator);
+
+        result.raw.toggleSet(b.raw);
+
+        if (result.usercode != null or b.usercode != null) {
+            const s: u32 = result.usercode orelse 0;
+            const o: u32 = b.usercode orelse 0;
+            result.usercode = s ^ o;
+        }
+
+        if (result.security != null or b.security != null) {
+            const s: u1 = result.security orelse 0;
+            const o: u1 = b.security orelse 0;
+            result.security = s ^ o;
+        }
+
+        return result;
     }
 
     pub fn deinit(self: *JedecData) void {
@@ -327,11 +505,17 @@ pub const JedecData = struct {
         for (data) |c| {
             switch (c) {
                 '0' => {
-                    try self.setFuse(i, false);
+                    if (i >= self.raw.bit_length) {
+                        return error.InvalidFuse;
+                    }
+                    self.putRaw(i, 0);
                     i += 1;
                 },
                 '1' => {
-                    try self.setFuse(i, true);
+                    if (i >= self.raw.bit_length) {
+                        return error.InvalidFuse;
+                    }
+                    self.putRaw(i, 1);
                     i += 1;
                 },
                 '\r', '\n', '\t', ' ' => {},
@@ -353,33 +537,29 @@ pub const JedecData = struct {
                 else => return error.InvalidData,
             };
             if (val) |v| {
-                const len = self.length();
-                try self.setFuse(i, 0 != @truncate(u1, v >> 3));
+                const len = self.getRange().count();
+                if (i >= len) {
+                    return error.InvalidFuse;
+                }
+                self.putRaw(i, @truncate(u1, v >> 3));
                 i += 1;
-                if (i < len) try self.setFuse(i, 0 != @truncate(u1, v >> 2));
+                if (i < len) self.putRaw(i, @truncate(u1, v >> 2));
                 i += 1;
-                if (i < len) try self.setFuse(i, 0 != @truncate(u1, v >> 1));
+                if (i < len) self.putRaw(i, @truncate(u1, v >> 1));
                 i += 1;
-                if (i < len) try self.setFuse(i, 0 != @truncate(u1, v >> 0));
+                if (i < len) self.putRaw(i, @truncate(u1, v >> 0));
                 i += 1;
             }
         }
     }
 
-    pub fn setFuse(self: *JedecData, fuse: usize, value: bool) !void {
-        if (fuse >= self.length()) {
-            return error.InvalidFuse;
-        }
-        self.raw.setValue(fuse, value);
-    }
-
     pub fn checksum(self: JedecData) u16 {
         var sum: u16 = 0;
 
-        const MaskInt = std.DynamicBitSet.MaskInt;
+        const MaskInt = std.DynamicBitSetUnmanaged.MaskInt;
         var masks: []MaskInt = undefined;
-        masks.ptr = self.raw.unmanaged.masks;
-        masks.len = (self.length() + (@bitSizeOf(MaskInt) - 1)) / @bitSizeOf(MaskInt);
+        masks.ptr = self.raw.masks;
+        masks.len = (self.raw.bit_length + (@bitSizeOf(MaskInt) - 1)) / @bitSizeOf(MaskInt);
 
         for (masks) |mask| {
             var x = mask;
@@ -393,74 +573,140 @@ pub const JedecData = struct {
         return sum;
     }
 
-    pub fn length(self: JedecData) usize {
-        return self.width * @as(usize, self.height);
+    pub fn getRange(self: JedecData) FuseRange {
+        return FuseRange.between(Fuse.init(0, 0), Fuse.init(self.height - 1, self.width - 1));
     }
 
-    pub fn getRow(self: JedecData, fuse: u32) u32 {
-        return @intCast(u32, fuse / self.width);
+    pub fn isSet(self: JedecData, fuse: Fuse) bool {
+        return self.isSetRaw(fuse.toRaw(self));
     }
 
-    pub fn getColumn(self: JedecData, fuse: u32) u32 {
-        return @intCast(u32, fuse - self.getRow(fuse) * self.width);
+    pub fn isSetRaw(self: JedecData, raw: usize) bool {
+        return self.raw.isSet(raw);
     }
 
-    pub fn get(self: JedecData, row: u32, col: u32) u1 {
-        return switch (self.raw.isSet(row * self.width + col)) {
+    pub fn get(self: JedecData, fuse: Fuse) u1 {
+        return switch (self.raw.isSet(fuse.toRaw(self))) {
             true => 1,
             false => 0,
         };
     }
 
-    pub fn set(self: *JedecData, row: u32, col: u32, val: u1) void {
-        self.raw.setValue(row * self.width + col, val == 1);
+    pub fn getRaw(self: JedecData, raw: usize) u1 {
+        return switch (self.raw.isSet(raw)) {
+            true => 1,
+            false => 0,
+        };
     }
 
-    pub fn setRange(self: *JedecData, row0: u32, col0: u32, row1: u32, col1: u32, val: u1) void {
-        const bool_val = val != 0;
-        var r = row0;
-        while (r <= row1) : (r += 1) {
-            var first = r * self.width + col0;
-            var last = r * self.width + col1;
-            self.raw.setRangeValue(.{ .start = first, .end = last + 1 }, bool_val);
+    pub fn put(self: *JedecData, fuse: Fuse, val: u1) void {
+        self.putRaw(fuse.toRaw(self), val);
+    }
+
+    pub fn putRaw(self: *JedecData, raw: usize, val: u1) void {
+        self.raw.setValue(raw, val == 1);
+    }
+
+    pub fn putRange(self: *JedecData, range: FuseRange, val: u1) void {
+        var iter = range.iterator();
+        while (iter.next()) |fuse| {
+            self.put(fuse, val);
         }
     }
 
-    pub fn xor(self: *JedecData, other: JedecData) !void {
-        if (self.length() != other.length()) {
-            return error.IncompatibleJedecData;
-        }
+    pub fn copyRange(self: *JedecData, other: JedecData, range: FuseRange) void {
+        std.debug.assert(self.getgetRange().containsRange(range));
+        std.debug.assert(other.getgetRange().containsRange(range));
 
-        self.raw.toggleSet(other.raw);
+        var iter = range.iterator();
+        while (iter.next()) |fuse| {
+            self.put(fuse, other.get(fuse));
+        }
+    }
+
+    pub fn unionAll(self: *JedecData, other: JedecData) void {
+        std.debug.assert(self.getRange().eql(other.getRange()));
+
+        self.raw.setUnion(other.raw);
 
         if (self.usercode != null or other.usercode != null) {
             const s: u32 = self.usercode orelse 0;
             const o: u32 = other.usercode orelse 0;
-            self.usercode = s ^ o;
+            self.usercode = s | o;
         }
 
         if (self.security != null or other.security != null) {
             const s: u1 = self.security orelse 0;
             const o: u1 = other.security orelse 0;
-            self.security = s ^ o;
+            self.security = s | o;
         }
     }
 
-    // pub fn writeHex(self: JedecData, writer: anytype) !void {
-    //     var r: u32 = 0;
-    //     while (r < Self.rows) : (r += 1) {
-    //         var c: u32 = 0;
-    //         while (c < Self.width - 3) : (c += 4) {
-    //             const v: u4 = self.get(r, Self.width - c - 1)
-    //                     + self.get(r, Self.width - c - 2) * @as(u4, 2)
-    //                     + self.get(r, Self.width - c - 3) * @as(u4, 4)
-    //                     + self.get(r, Self.width - c - 4) * @as(u4, 8);
-    //             const base: u8 = if (v > 9) 'A' - 0xA else '0';
-    //             _ = try writer.writeByte(base + v);
-    //         }
+    pub fn unionRange(self: JedecData, other: JedecData, range: FuseRange) void {
+        std.debug.assert(self.getRange().containsRange(range));
+        std.debug.assert(other.getRange().containsRange(range));
 
-    //         std.debug.assert(c == Self.width);
-    //         _ = try writer.writeByte('\n');
-    //     }
-    // }
+        var iter = range.iterator();
+        while (iter.next()) |fuse| {
+            if (other.isSet(fuse)) {
+                self.put(fuse, 1);
+            }
+        }
+    }
+
+    pub fn countSet(self: JedecData) usize {
+        return self.raw.count();
+    }
+
+    pub fn countUnset(self: JedecData) usize {
+        return self.getRange().count() - self.raw.count();
+    }
+
+    pub fn countSetInRange(self: JedecData, range: FuseRange) usize {
+        var iter = range.iterator();
+        var count: usize = 0;
+        while (iter.next()) |fuse| {
+            if (self.isSet(fuse)) {
+                count += 1;
+            }
+        }
+        return count;
+    }
+
+    pub fn countUnsetInRange(self: JedecData, range: FuseRange) usize {
+        var iter = range.iterator();
+        var count: usize = 0;
+        while (iter.next()) |fuse| {
+            if (!self.isSet(fuse)) {
+                count += 1;
+            }
+        }
+        return count;
+    }
+
+    pub fn iterator(self: JedecData, comptime options: std.bit_set.IteratorOptions) Iterator(options) {
+        return .{
+            .raw = self.raw.iterator(options),
+            .width = self.width,
+        };
+    }
+
+    pub fn Iterator(comptime options: std.bit_set.IteratorOptions) type {
+        return struct {
+            raw: std.DynamicBitSetUnmanaged.Iterator(options),
+            width: usize,
+
+            const Self = @This();
+
+            pub fn next(self: *Self) ?Fuse {
+                if (self.raw.next()) |raw_fuse| {
+                    return Fuse.fromRaw(raw_fuse, self.width);
+                } else {
+                    return null;
+                }
+            }
+        };
+    }
+
 };
+
