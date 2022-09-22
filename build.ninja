@@ -2,15 +2,13 @@ rule limp
     command = limp-debug -qR $in
     generator = true
 
-build configure-LC4256: limp LC4256
 build configure-LC4128: limp LC4128
 build configure-LC4064: limp LC4064
 build configure-LC4032: limp LC4032
-build configure: phony configure-LC4256 configure-LC4128 configure-LC4064 configure-LC4032
+build configure: phony configure-LC4128 configure-LC4064 configure-LC4032
 
-subninja LC4256/build.ninja
 subninja LC4128/build.ninja
 subninja LC4064/build.ninja
 subninja LC4032/build.ninja
 
-default build-LC4256 build-LC4128 build-LC4064 build-LC4032
+default build-LC4128 build-LC4064 build-LC4032

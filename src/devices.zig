@@ -38,19 +38,12 @@ const Fuse = jedec.Fuse;
 //    'LC4128ZE_TQFP144',
 //    'LC4128ZE_ucBGA144',
 //    'LC4128ZE_csBGA144',
-//    'LC4256x_TQFP100',
-//    'LC4256V_TQFP144',
-//    'LC4256ZC_TQFP100',
-//    'LC4256ZC_csBGA132',
-//    'LC4256ZE_TQFP100',
-//    'LC4256ZE_TQFP144',
-//    'LC4256ZE_csBGA144',
 // }
 //
 // for _, device in ipairs(devices) do
 //     writeln('const ', device, ' = @import("devices/', device, '.zig");')
 // end
-// !! 38 ]]
+// !! 31 ]]
 //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
 const LC4032x_TQFP44 = @import("devices/LC4032x_TQFP44.zig");
 const LC4032x_TQFP48 = @import("devices/LC4032x_TQFP48.zig");
@@ -79,13 +72,6 @@ const LC4128ZE_TQFP100 = @import("devices/LC4128ZE_TQFP100.zig");
 const LC4128ZE_TQFP144 = @import("devices/LC4128ZE_TQFP144.zig");
 const LC4128ZE_ucBGA144 = @import("devices/LC4128ZE_ucBGA144.zig");
 const LC4128ZE_csBGA144 = @import("devices/LC4128ZE_csBGA144.zig");
-const LC4256x_TQFP100 = @import("devices/LC4256x_TQFP100.zig");
-const LC4256V_TQFP144 = @import("devices/LC4256V_TQFP144.zig");
-const LC4256ZC_TQFP100 = @import("devices/LC4256ZC_TQFP100.zig");
-const LC4256ZC_csBGA132 = @import("devices/LC4256ZC_csBGA132.zig");
-const LC4256ZE_TQFP100 = @import("devices/LC4256ZE_TQFP100.zig");
-const LC4256ZE_TQFP144 = @import("devices/LC4256ZE_TQFP144.zig");
-const LC4256ZE_csBGA144 = @import("devices/LC4256ZE_csBGA144.zig");
 
 //[[ ######################### END OF GENERATED CODE ######################### ]]
 
@@ -174,7 +160,7 @@ pub const DevicePackage = enum {
 };
 
 pub const DeviceType = enum {
-    //[[!! for _, device in ipairs(devices) do write(device, ',', nl) end !! 38 ]]
+    //[[!! for _, device in ipairs(devices) do write(device, ',', nl) end !! 31 ]]
     //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
     LC4032x_TQFP44,
     LC4032x_TQFP48,
@@ -203,13 +189,6 @@ pub const DeviceType = enum {
     LC4128ZE_TQFP144,
     LC4128ZE_ucBGA144,
     LC4128ZE_csBGA144,
-    LC4256x_TQFP100,
-    LC4256V_TQFP144,
-    LC4256ZC_TQFP100,
-    LC4256ZC_csBGA132,
-    LC4256ZE_TQFP100,
-    LC4256ZE_TQFP144,
-    LC4256ZE_csBGA144,
 
     //[[ ######################### END OF GENERATED CODE ######################### ]]
 
@@ -232,8 +211,6 @@ pub const DeviceType = enum {
             .LC4128x_TQFP100,
             .LC4128x_TQFP128,
             .LC4128V_TQFP144,
-            .LC4256x_TQFP100,
-            .LC4256V_TQFP144,
                 => .low_power,
 
             .LC4032ZC_TQFP48,
@@ -244,8 +221,6 @@ pub const DeviceType = enum {
             .LC4064ZC_csBGA132,
             .LC4128ZC_TQFP100,
             .LC4128ZC_csBGA132,
-            .LC4256ZC_TQFP100,
-            .LC4256ZC_csBGA132,
                 => .zero_power,
 
             .LC4032ZE_TQFP48,
@@ -259,9 +234,6 @@ pub const DeviceType = enum {
             .LC4128ZE_TQFP144,
             .LC4128ZE_ucBGA144,
             .LC4128ZE_csBGA144,
-            .LC4256ZE_TQFP100,
-            .LC4256ZE_TQFP144,
-            .LC4256ZE_csBGA144,
                 => .zero_power_enhanced,
         };
     }
@@ -290,12 +262,10 @@ pub const DeviceType = enum {
 
             .LC4064ZC_csBGA132,
             .LC4128ZC_csBGA132,
-            .LC4256ZC_csBGA132,
                 => .csBGA_132,
 
             .LC4064ZE_csBGA144,
             .LC4128ZE_csBGA144,
-            .LC4256ZE_csBGA144,
                 => .csBGA_144,
 
             .LC4064ZE_ucBGA64,
@@ -310,9 +280,6 @@ pub const DeviceType = enum {
             .LC4128x_TQFP100,
             .LC4128ZC_TQFP100,
             .LC4128ZE_TQFP100,
-            .LC4256x_TQFP100,
-            .LC4256ZC_TQFP100,
-            .LC4256ZE_TQFP100,
                 => .TQFP_100,
 
             .LC4128x_TQFP128,
@@ -320,8 +287,6 @@ pub const DeviceType = enum {
 
             .LC4128V_TQFP144,
             .LC4128ZE_TQFP144,
-            .LC4256V_TQFP144,
-            .LC4256ZE_TQFP144,
                 => .TQFP_144,
         };
     }
@@ -364,15 +329,6 @@ pub const DeviceType = enum {
             .LC4128ZE_ucBGA144,
             .LC4128ZE_csBGA144,
                 => 8,
-
-            .LC4256x_TQFP100,
-            .LC4256ZC_TQFP100,
-            .LC4256ZE_TQFP100,
-            .LC4256ZC_csBGA132,
-            .LC4256V_TQFP144,
-            .LC4256ZE_TQFP144,
-            .LC4256ZE_csBGA144,
-                => 16,
         };
     }
 
@@ -398,6 +354,44 @@ pub const DeviceType = enum {
     // The range at the end of the fusemap containing MC, I/O cell, and misc option fuses; row 72+
     pub fn getOptionsRange(self: DeviceType) FuseRange {
         return FuseRange.between(Fuse.init(self.getNumGlbInputs() * 2, 0), Fuse.init(self.getJedecHeight() - 1, self.getJedecWidth() - 1));
+    }
+
+    pub fn getGIRange(self: DeviceType, glb: u8, gi: u8) FuseRange {
+        return switch (self.getNumGlbs()) {
+            2 => switch (glb) {
+                0 => FuseRange.between(Fuse.init(gi*2, 86), Fuse.init(gi*2 + 1, 88)),
+                1 => FuseRange.between(Fuse.init(gi*2,  0), Fuse.init(gi*2 + 1,  2)),
+                else => unreachable,
+            },
+            4 => switch (self) {
+                .LC4064x_TQFP44, .LC4064x_TQFP48 => switch (glb) {
+                    0 => FuseRange.between(Fuse.init(gi*2, 264), Fuse.init(gi*2 + 1, 268)),
+                    1 => FuseRange.between(Fuse.init(gi*2, 176), Fuse.init(gi*2 + 1, 180)),
+                    2 => FuseRange.between(Fuse.init(gi*2,  88), Fuse.init(gi*2 + 1,  92)),
+                    3 => FuseRange.between(Fuse.init(gi*2,   0), Fuse.init(gi*2 + 1,   4)),
+                    else => unreachable,
+                },
+                else => switch (glb) {
+                    0 => FuseRange.between(Fuse.init(gi*2, 267), Fuse.init(gi*2 + 1, 272)),
+                    1 => FuseRange.between(Fuse.init(gi*2, 178), Fuse.init(gi*2 + 1, 183)),
+                    2 => FuseRange.between(Fuse.init(gi*2,  89), Fuse.init(gi*2 + 1,  94)),
+                    3 => FuseRange.between(Fuse.init(gi*2,   0), Fuse.init(gi*2 + 1,   5)),
+                    else => unreachable,
+                },
+            },
+            8 => switch (glb) {
+                0 => FuseRange.between(Fuse.init(gi*2,   555), Fuse.init(gi*2,   573)),
+                1 => FuseRange.between(Fuse.init(gi*2+1, 555), Fuse.init(gi*2+1, 573)),
+                2 => FuseRange.between(Fuse.init(gi*2+1, 370), Fuse.init(gi*2+1, 388)),
+                3 => FuseRange.between(Fuse.init(gi*2,   370), Fuse.init(gi*2,   388)),
+                4 => FuseRange.between(Fuse.init(gi*2,   185), Fuse.init(gi*2,   203)),
+                5 => FuseRange.between(Fuse.init(gi*2+1, 185), Fuse.init(gi*2+1, 203)),
+                6 => FuseRange.between(Fuse.init(gi*2+1,   0), Fuse.init(gi*2+1,  18)),
+                7 => FuseRange.between(Fuse.init(gi*2,     0), Fuse.init(gi*2,    18)),
+                else => unreachable,
+            },
+            else => unreachable,
+        };
     }
 
     pub fn initJedecZeroes(self: DeviceType, allocator: std.mem.Allocator) !JedecData {
@@ -444,31 +438,12 @@ pub const DeviceType = enum {
             .LC4128ZE_ucBGA144,
             .LC4128ZE_csBGA144,
                 => 740,
-
-            .LC4256x_TQFP100,
-            .LC4256ZC_TQFP100,
-            .LC4256ZE_TQFP100,
-            .LC4256ZC_csBGA132,
-            .LC4256V_TQFP144,
-            .LC4256ZE_TQFP144,
-            .LC4256ZE_csBGA144,
-                => 1592,
         };
     }
 
     pub fn getJedecHeight(self: DeviceType) u16 {
         return switch (self) {
-            .LC4064x_TQFP44,
-            .LC4064x_TQFP48,
-            .LC4256x_TQFP100,
-            .LC4256ZC_TQFP100,
-            .LC4256ZE_TQFP100,
-            .LC4256ZC_csBGA132,
-            .LC4256V_TQFP144,
-            .LC4256ZE_TQFP144,
-            .LC4256ZE_csBGA144,
-                => 95,
-
+            .LC4064x_TQFP44, .LC4064x_TQFP48 => 95,
             else => 100,
         };
     }
@@ -478,7 +453,6 @@ pub const DeviceType = enum {
             2 => "LC4032",
             4 => "LC4064",
             8 => "LC4128",
-            16 => "LC4256",
             else => "LC4xxx",
         };
     }
@@ -513,7 +487,7 @@ pub const DeviceType = enum {
 
     pub fn getPins(self: DeviceType) []const pins.PinInfo {
         return switch (self) {
-            //[[!! for _, device in ipairs(devices) do write('.', device, ' => &', device, '.pins,', nl) end !! 38 ]]
+            //[[!! for _, device in ipairs(devices) do write('.', device, ' => &', device, '.pins,', nl) end !! 31 ]]
             //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
             .LC4032x_TQFP44 => &LC4032x_TQFP44.pins,
             .LC4032x_TQFP48 => &LC4032x_TQFP48.pins,
@@ -542,13 +516,6 @@ pub const DeviceType = enum {
             .LC4128ZE_TQFP144 => &LC4128ZE_TQFP144.pins,
             .LC4128ZE_ucBGA144 => &LC4128ZE_ucBGA144.pins,
             .LC4128ZE_csBGA144 => &LC4128ZE_csBGA144.pins,
-            .LC4256x_TQFP100 => &LC4256x_TQFP100.pins,
-            .LC4256V_TQFP144 => &LC4256V_TQFP144.pins,
-            .LC4256ZC_TQFP100 => &LC4256ZC_TQFP100.pins,
-            .LC4256ZC_csBGA132 => &LC4256ZC_csBGA132.pins,
-            .LC4256ZE_TQFP100 => &LC4256ZE_TQFP100.pins,
-            .LC4256ZE_TQFP144 => &LC4256ZE_TQFP144.pins,
-            .LC4256ZE_csBGA144 => &LC4256ZE_csBGA144.pins,
 
             //[[ ######################### END OF GENERATED CODE ######################### ]]
         };

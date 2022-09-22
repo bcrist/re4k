@@ -37,6 +37,7 @@
          (gi 4
             (fuse 8 86 (pin 24))
             (fuse 8 87 (glb 0 (name A)) (mc 15))
+            (fuse 8 88 (glb 1 (name B)) (mc 7))
             (fuse 9 86 (pin 44))
             (fuse 9 87 (pin 32))
             (fuse 9 88 (glb 0 (name A)) (mc 7))
@@ -44,6 +45,7 @@
          (gi 5
             (fuse 10 86 (pin 18))
             (fuse 10 87 (glb 0 (name A)) (mc 14))
+            (fuse 10 88 (glb 1 (name B)) (mc 3))
             (fuse 11 86 (pin 38))
             (fuse 11 87 (pin 4))
             (fuse 11 88 (glb 0 (name A)) (mc 4))
@@ -81,6 +83,7 @@
             (fuse 19 88 (glb 1 (name B)) (mc 11))
          )
          (gi 10
+            (fuse 20 86 (pin 23))
             (fuse 20 87 (pin 26))
             (fuse 20 88 (glb 1 (name B)) (mc 3))
             (fuse 21 86 (pin 43))
@@ -96,6 +99,7 @@
             (fuse 23 88 (glb 0 (name A)) (mc 5))
          )
          (gi 12
+            (fuse 24 86 (pin 16))
             (fuse 24 87 (pin 27))
             (fuse 24 88 (glb 1 (name B)) (mc 7))
             (fuse 25 86 (pin 47))
@@ -106,6 +110,7 @@
             (fuse 26 86 (pin 14))
             (fuse 26 87 (pin 9))
             (fuse 26 88 (glb 0 (name A)) (mc 10))
+            (fuse 27 86 (pin 39))
             (fuse 27 87 (pin 2))
             (fuse 27 88 (glb 0 (name A)) (mc 5))
          )
@@ -127,6 +132,7 @@
          )
          (gi 16
             (fuse 32 86 (pin 18))
+            (fuse 32 87 (glb 1 (name B)) (mc 2))
             (fuse 32 88 (glb 0 (name A)) (mc 10))
             (fuse 33 86 (pin 34))
             (fuse 33 87 (glb 1 (name B)) (mc 15))
@@ -184,6 +190,7 @@
             (fuse 46 86 (pin 16))
             (fuse 46 87 (glb 1 (name B)) (mc 0))
             (fuse 46 88 (glb 1 (name B)) (mc 6))
+            (fuse 47 86 (pin 48))
             (fuse 47 87 (pin 2))
             (fuse 47 88 (glb 1 (name B)) (mc 11))
          )
@@ -196,6 +203,7 @@
             (fuse 49 88 (glb 0 (name A)) (mc 4))
          )
          (gi 25
+            (fuse 50 86 (pin 21))
             (fuse 50 87 (glb 1 (name B)) (mc 2))
             (fuse 50 88 (glb 1 (name B)) (mc 6))
             (fuse 51 86 (pin 42))
@@ -206,6 +214,7 @@
             (fuse 52 86 (pin 17))
             (fuse 52 87 (pin 26))
             (fuse 52 88 (glb 0 (name A)) (mc 12))
+            (fuse 53 86 (pin 42))
             (fuse 53 87 (glb 0 (name A)) (mc 0))
             (fuse 53 88 (glb 0 (name A)) (mc 7))
          )
@@ -230,12 +239,14 @@
             (fuse 58 87 (pin 7))
             (fuse 58 88 (glb 1 (name B)) (mc 4))
             (fuse 59 86 (pin 48))
+            (fuse 59 87 (glb 0 (name A)) (mc 1))
             (fuse 59 88 (glb 1 (name B)) (mc 10))
          )
          (gi 30
             (fuse 60 86 (pin 22))
             (fuse 60 87 (pin 9))
             (fuse 60 88 (glb 1 (name B)) (mc 5))
+            (fuse 61 86 (pin 48))
             (fuse 61 87 (pin 32))
             (fuse 61 88 (glb 0 (name A)) (mc 4))
          )
@@ -290,6 +301,7 @@
             (fuse 1 2 (glb 0 (name A)) (mc 5))
          )
          (gi 1
+            (fuse 2 0 (pin 14))
             (fuse 2 1 (glb 0 (name A)) (mc 15))
             (fuse 2 2 (glb 0 (name A)) (mc 11))
             (fuse 3 0 (pin 34))
@@ -356,11 +368,13 @@
             (fuse 18 0 (pin 17))
             (fuse 18 1 (pin 9))
             (fuse 18 2 (glb 0 (name A)) (mc 9))
+            (fuse 19 0 (pin 47))
             (fuse 19 1 (glb 1 (name B)) (mc 15))
             (fuse 19 2 (glb 1 (name B)) (mc 11))
          )
          (gi 10
             (fuse 20 0 (pin 23))
+            (fuse 20 1 (pin 26))
             (fuse 20 2 (glb 1 (name B)) (mc 3))
             (fuse 21 0 (pin 43))
             (fuse 21 1 (glb 0 (name A)) (mc 2))
@@ -379,6 +393,7 @@
             (fuse 24 1 (pin 27))
             (fuse 24 2 (glb 1 (name B)) (mc 7))
             (fuse 25 0 (pin 47))
+            (fuse 25 1 (pin 31))
             (fuse 25 2 (glb 0 (name A)) (mc 3))
          )
          (gi 13
@@ -403,9 +418,11 @@
             (fuse 30 2 (glb 1 (name B)) (mc 5))
             (fuse 31 0 (pin 39))
             (fuse 31 1 (glb 1 (name B)) (mc 14))
+            (fuse 31 2 (glb 1 (name B)) (mc 8))
          )
          (gi 16
             (fuse 32 0 (pin 18))
+            (fuse 32 1 (glb 1 (name B)) (mc 2))
             (fuse 32 2 (glb 0 (name A)) (mc 10))
             (fuse 33 0 (pin 34))
             (fuse 33 1 (glb 1 (name B)) (mc 15))
@@ -413,6 +430,7 @@
          )
          (gi 17
             (fuse 34 0 (pin 15))
+            (fuse 34 1 (pin 27))
             (fuse 34 2 (glb 0 (name A)) (mc 11))
             (fuse 35 0 (pin 40))
             (fuse 35 1 (glb 0 (name A)) (mc 1))
@@ -445,6 +463,7 @@
          (gi 21
             (fuse 42 0 (pin 22))
             (fuse 42 1 (pin 7))
+            (fuse 42 2 (glb 1 (name B)) (mc 3))
             (fuse 43 0 (pin 42))
             (fuse 43 1 (glb 1 (name B)) (mc 14))
             (fuse 43 2 (glb 1 (name B)) (mc 9))
@@ -495,6 +514,7 @@
             (fuse 54 2 (glb 0 (name A)) (mc 10))
             (fuse 55 0 (pin 38))
             (fuse 55 1 (pin 31))
+            (fuse 55 2 (glb 1 (name B)) (mc 11))
          )
          (gi 28
             (fuse 56 0 (pin 23))
@@ -509,6 +529,7 @@
             (fuse 58 1 (pin 7))
             (fuse 58 2 (glb 1 (name B)) (mc 4))
             (fuse 59 0 (pin 48))
+            (fuse 59 1 (glb 0 (name A)) (mc 1))
             (fuse 59 2 (glb 1 (name B)) (mc 10))
          )
          (gi 30
@@ -522,6 +543,7 @@
          (gi 31
             (fuse 62 0 (pin 15))
             (fuse 62 1 (glb 1 (name B)) (mc 1))
+            (fuse 62 2 (glb 1 (name B)) (mc 6))
             (fuse 63 0 (pin 39))
             (fuse 63 1 (glb 0 (name A)) (mc 2))
             (fuse 63 2 (glb 0 (name A)) (mc 7))
@@ -556,6 +578,7 @@
             (fuse 70 2 (glb 0 (name A)) (mc 9))
             (fuse 71 0 (pin 43))
             (fuse 71 1 (pin 33))
+            (fuse 71 2 (glb 1 (name B)) (mc 8))
          )
       )
    )

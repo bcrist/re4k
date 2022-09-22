@@ -37,13 +37,6 @@ fn getDeviceFitterName(device: DeviceType) []const u8 {
         .LC4128ZE_TQFP144  => "M4E_128_96",
         .LC4128ZE_csBGA144  => "M4E_128_96S",
         .LC4128ZE_ucBGA144  => "M4E_128_96U",
-        .LC4256x_TQFP100 => "M4S_256_64",
-        .LC4256ZC_TQFP100 => "M4Z_256_64",
-        .LC4256ZE_TQFP100 => "M4E_256_64",
-        .LC4256ZC_csBGA132  => "M4Z_256_96S",
-        .LC4256V_TQFP144 => "M4S_256_96",
-        .LC4256ZE_TQFP144 => "M4E_256_96",
-        .LC4256ZE_csBGA144 => "M4E_256_108S",
     };
 }
 
@@ -672,6 +665,169 @@ pub const GlbInputFitSignal = struct {
     source: GlbInputSignal,
 };
 
+
+pub const GISet = struct {
+    raw: std.StaticBitSet(36),
+
+    pub fn initSingle(gi: usize) GISet {
+        var self = .{
+            .raw = std.StaticBitSet(36).initEmpty(),
+        };
+        self.raw.set(gi);
+        return self;
+    }
+
+    pub fn initEmpty() GISet {
+        return .{
+            .raw = std.StaticBitSet(36).initEmpty(),
+        };
+    }
+
+    pub fn initFull() GISet {
+        return .{
+            .raw = std.StaticBitSet(36).initFull(),
+        };
+    }
+
+    pub fn add(self: *GISet, gi: usize) void {
+        self.raw.set(gi);
+    }
+
+    pub fn removeAll(self: *GISet, other: GISet) void {
+        var inverted = other;
+        inverted.raw.toggleAll();
+        self.raw.setIntersection(inverted.raw);
+    }
+
+    pub fn count(self: GISet) usize {
+        return self.raw.count();
+    }
+
+    pub fn pickRandom(self: GISet, rnd: std.rand.Random) usize {
+        var skip = rnd.intRangeLessThan(usize, 0, self.count());
+        var iter = self.raw.iterator(.{});
+        while (skip > 0) : (skip -= 1) {
+            _ = iter.next();
+        }
+        return iter.next() orelse unreachable;
+    }
+
+    pub fn iterator(self: *const GISet) Iterator {
+        return self.raw.iterator(.{});
+    }
+
+    const Iterator = std.StaticBitSet(36).Iterator(.{});
+};
+
+pub const GlbInputSet = struct {
+    const BitSet = std.StaticBitSet(16*16*2+10);
+
+    raw: BitSet,
+
+    pub fn initEmpty() GlbInputSet {
+        return .{
+            .raw = BitSet.initEmpty(),
+        };
+    }
+
+    pub fn initFull(signals: []const GlbInputFitSignal) GlbInputSet {
+        var self = .{
+            .raw = BitSet.initEmpty(),
+        };
+        self.raw.setRangeValue(.{ .start = 0, .end = signals.len }, true);
+        return self;
+    }
+
+    pub fn add(self: *GlbInputSet, s: GlbInputSignal, signals: []const GlbInputFitSignal) void {
+        if (indexOf(s, signals)) |i| {
+            return self.raw.set(i);
+        } else {
+            unreachable;
+        }
+    }
+
+    pub fn addAll(self: *GlbInputSet, other: GlbInputSet) void {
+        self.raw.setUnion(other.raw);
+    }
+
+    pub fn remove(self: *GlbInputSet, s: GlbInputSignal, signals: []const GlbInputFitSignal) void {
+        if (indexOf(s, signals)) |i| {
+            return self.raw.unset(i);
+        }
+    }
+
+    pub fn removeAll(self: *GlbInputSet, other: GlbInputSet) void {
+        var inverted = other;
+        inverted.raw.toggleAll();
+        self.raw.setIntersection(inverted.raw);
+    }
+
+    fn pickRandomRaw(self: GlbInputSet, rnd: std.rand.Random) usize {
+        var skip = rnd.intRangeLessThan(usize, 0, self.count());
+        var iter = self.raw.iterator(.{});
+        while (skip > 0) : (skip -= 1) {
+            _ = iter.next();
+        }
+        return iter.next() orelse unreachable;
+    }
+
+    pub fn removeRandom(self: *GlbInputSet, rnd: std.rand.Random, count_to_remove: usize) GlbInputSet {
+        var removed = GlbInputSet.initEmpty();
+        var n: usize = 0;
+        while (n < count_to_remove) : (n += 1) {
+            var to_remove = self.pickRandomRaw(rnd);
+            removed.raw.set(to_remove);
+            self.raw.unset(to_remove);
+        }
+        return removed;
+    }
+
+    pub fn contains(self: GlbInputSet, s: GlbInputSignal, signals: []const GlbInputFitSignal) bool {
+        if (indexOf(s, signals)) |i| {
+            return self.raw.isSet(i);
+        } else {
+            return false;
+        }
+    }
+
+    pub fn count(self: GlbInputSet) usize {
+        return self.raw.count();
+    }
+
+    pub fn iterator(self: *const GlbInputSet, signals: []const GlbInputFitSignal) Iterator {
+        return .{
+            .raw = self.raw.iterator(.{}),
+            .signals = signals,
+        };
+    }
+
+    const Iterator = struct {
+        raw: GlbInputSet.BitSet.Iterator(.{}),
+        signals: []const GlbInputFitSignal,
+
+        pub fn next(self: *Iterator) ?GlbInputFitSignal {
+            if (self.raw.next()) |index| {
+                return self.signals[index];
+            } else {
+                return null;
+            }
+        }
+    };
+
+    fn indexOf(signal: GlbInputSignal, signals: []const GlbInputFitSignal) ?usize {
+        for (signals) |s, i| {
+            if (std.meta.eql(signal, s.source)) {
+                return i;
+            }
+        }
+        return null;
+    }
+};
+
+
+
+
+
 pub const GlbFitData = struct {
     glb: u8,
     inputs: [36]?GlbInputFitSignal = [_]?GlbInputFitSignal { null } ** 36,
@@ -887,8 +1043,12 @@ pub const Toolchain = struct {
                             continue; // ignore remaining header/footer lines
                         }
 
-                        try parseGlbInputFitSignal(&fit_data, line[0..36], device);
-                        try parseGlbInputFitSignal(&fit_data, line[40..], device);
+                        if (line.len >= 36) {
+                            try parseGlbInputFitSignal(&fit_data, line[0..36], device);
+                            if (line.len >= 69) {
+                                try parseGlbInputFitSignal(&fit_data, line[40..], device);
+                            }
+                        }
                     }
                     results.glbs[glb] = fit_data;
                 }

@@ -14,334 +14,392 @@ const GlbInputSignal = toolchain.GlbInputSignal;
 const GlbInputFitSignal = toolchain.GlbInputFitSignal;
 const FitResults = toolchain.FitResults;
 
-const min_signals_to_route = 28;
-const max_signals_to_route = 36;
-const max_attempts_without_progress: usize = 10;
+const GISet = toolchain.GISet;
+const GlbInputSet = toolchain.GlbInputSet;
+
+const max_routed_signals = 33;
 
 pub fn main() void {
     helper.main();
 }
 
-fn runToolchainPrep(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, with_mc: bool) !FitResults {
-    // The idea here is to find the column that has MC6 for each GLB.  That's the one we're going to be routing
-    // signals to to discover input mux fuses.
+var report_number: usize = 0;
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, signals_to_test: GlbInputSet, all_signals: []const GlbInputFitSignal) !FitResults {
     var design = Design.init(ta, dev);
 
-    try design.pinAssignment(.{
-        .signal = "in",
-        .pin_index = dev.getClockPin(0).?.pin_index,
-    });
+    var temp_signal_names_storage = [_][]const u8 { "" } ** 36;
+    var signal_names: [][]const u8 = &temp_signal_names_storage;
+    signal_names.len = 0;
 
-    var glb: u8 = 0;
-    while (glb < dev.getNumGlbs()) : (glb += 1) {
-        var out = try std.fmt.allocPrint(ta, "out{}", .{ glb });
-        var dum = try std.fmt.allocPrint(ta, "dum{}", .{ glb });
-
-        try design.nodeAssignment(.{
-            .signal = dum,
-            .glb = glb,
-            .mc = 1,
-        });
-        try design.addPT("in", dum);
-
-        try design.nodeAssignment(.{
-            .signal = out,
-            .glb = glb,
-            .mc = 6,
-        });
-        if (with_mc) {
-            try design.addPT("in", out);
-        } else {
-            try design.addPT(.{}, out);
+    std.debug.assert(signals_to_test.count() <= 36);
+    var iter = signals_to_test.iterator(all_signals);
+    while (iter.next()) |signal| {
+        signal_names.len += 1;
+        std.debug.assert(signal_names.len <= temp_signal_names_storage.len);
+        signal_names[signal_names.len - 1] = signal.name;
+        switch (signal.source) {
+            .fb  =>             try design.nodeAssignment(.{ .signal = signal.name }),
+            .pin => |pin_index| try design.pinAssignment( .{ .signal = signal.name, .pin_index = pin_index }),
         }
     }
 
+    for (all_signals) |signal| {
+        switch (signal.source) {
+            .pin => {},
+            .fb => |mcref| {
+                try design.nodeAssignment(.{
+                    .signal = signal.name,
+                    .glb = mcref.glb,
+                    .mc = mcref.mc,
+                });
+                if (mcref.mc == 6) {
+                    try design.addPT(signal_names, signal.name);
+                } else {
+                    try design.addPT(.{}, signal.name);
+                }
+            },
+        }
+    }
+
+    design.adjust_input_assignments = true;
+    design.parse_glb_inputs = true;
+
     var results = try tc.runToolchain(design);
-    try helper.logReport("grp_prep_glb{}", .{ glb }, results);
-    try results.checkTerm(false);
+    try helper.logReport("grp_{}", .{ report_number }, results);
+    report_number += 1;
+    //try results.checkTerm(true);
     return results;
 }
 
-const GlbTest = struct {
-    arena: std.heap.ArenaAllocator,
+fn getAllSignals(pa: std.mem.Allocator, dev: DeviceType) ![]const GlbInputFitSignal {
+    var all_signals = try std.ArrayListUnmanaged(GlbInputFitSignal).initCapacity(
+        pa, @as(usize, dev.getNumGlbs()) * dev.getNumMcsPerGlb()
+        + dev.getPins().len
+        - 10 // there are always 4 JTAG and at least 6 power pins
+    );
+
+    var mc_iter = core.MacrocellIterator { .device = dev };
+    while (mc_iter.next()) |mcref| {
+        const signal_name = try std.fmt.allocPrint(pa, "fb_{s}{}", .{ devices.getGlbName(mcref.glb), mcref.mc });
+        all_signals.appendAssumeCapacity(.{
+            .name = signal_name,
+            .source = .{ .fb = .{
+                .glb = mcref.glb,
+                .mc = mcref.mc
+            }},
+        });
+    }
+
+    var pin_iter = devices.pins.InputIterator { .pins = dev.getPins() };
+    while (pin_iter.next()) |info| {
+        const signal_name = try std.fmt.allocPrint(pa, "pin_{s}", .{ info.pin_number() });
+        all_signals.appendAssumeCapacity(.{
+            .name = signal_name,
+            .source = .{ .pin = info.pin_index() },
+        });
+    }
+
+    return all_signals.items;
+}
+
+const GlbData = struct {
     device: DeviceType,
     glb: u8,
-    all_signals: []GlbInputFitSignal,
-    temp_signal_names: [][]const u8,
-    report_number: usize,
-    rng: std.rand.Xoshiro256,
-    columns_to_ignore: std.DynamicBitSetUnmanaged,
     fuse_bitmap: JedecData,
-    fuse_map: std.AutoHashMapUnmanaged(u32, GlbInputSignal),
-    fuse_count_by_gi: [36]u16,
+    fuse_map: std.AutoHashMap(Fuse, GlbInputSignal),
 
-    pub fn init(
-        device: DeviceType,
-        glb: u8,
-        columns_to_ignore: std.DynamicBitSetUnmanaged
-    ) !GlbTest {
-        var ret = GlbTest {
-            .arena = std.heap.ArenaAllocator.init(std.heap.page_allocator),
-            .device = device,
+    pub fn init(alloc: std.mem.Allocator, dev: DeviceType, glb: u8) !GlbData {
+        return GlbData {
+            .device = dev,
             .glb = glb,
-            .all_signals = undefined,
-            .temp_signal_names = undefined,
-            .report_number = 0,
-            .rng = std.rand.Xoshiro256.init(@bitCast(u64, std.time.milliTimestamp())),
-            .columns_to_ignore = columns_to_ignore,
-            .fuse_bitmap = undefined,
-            .fuse_map = std.AutoHashMapUnmanaged(u32, GlbInputSignal) {},
-            .fuse_count_by_gi = [_]u16 {0} ** 36,
+            .fuse_bitmap = try dev.initJedecZeroes(alloc),
+            .fuse_map = std.AutoHashMap(Fuse, GlbInputSignal).init(alloc),
         };
-        errdefer ret.arena.deinit();
-        var ga = ret.arena.allocator();
-
-        var all_signals = try std.ArrayListUnmanaged(GlbInputFitSignal).initCapacity(
-            ga, @as(usize, device.getNumGlbs()) * device.getNumMcsPerGlb()
-            + device.getPins().len
-            - 10 // there are always 4 JTAG and at least 6 power pins
-        );
-
-        var mc_iter = core.MacrocellIterator { .device = device };
-        while (mc_iter.next()) |mcref| {
-            const signal_name = try std.fmt.allocPrint(ga, "fb_{s}{}", .{ devices.getGlbName(mcref.glb), mcref.mc });
-            all_signals.appendAssumeCapacity(.{
-                .name = signal_name,
-                .source = .{ .fb = .{
-                    .glb = mcref.glb,
-                    .mc = mcref.mc
-                }},
-            });
-        }
-
-        var pin_iter = devices.pins.InputIterator { .pins = device.getPins() };
-        while (pin_iter.next()) |info| {
-            const signal_name = try std.fmt.allocPrint(ga, "pin_{s}", .{ info.pin_number() });
-            all_signals.appendAssumeCapacity(.{
-                .name = signal_name,
-                .source = .{ .pin = info.pin_index() },
-            });
-        }
-
-        ret.all_signals = all_signals.items;
-        ret.temp_signal_names = try ga.alloc([]const u8, device.getNumGlbInputs());
-        ret.fuse_bitmap = try device.initJedecZeroes(ga);
-
-        return ret;
     }
 
-    pub fn deinit(self: *GlbTest) void {
-        self.arena.deinit();
-    }
-
-    pub fn runToolchain(self: *GlbTest, ta: std.mem.Allocator, tc: *Toolchain) !FitResults {
-        var signals_to_test = self.all_signals;
-        std.debug.assert(signals_to_test.len >= 36);
-
-        var rnd = self.rng.random();
-
-        if (self.fuse_map.count() > 0) {
-            // For the GI with the fewest known fuses, don't pick any of the known ones;
-            // we want to encourage discovery of new fuses for that slot.
-            // But we don't do this every time because there are some edge cases where it backfires.
-
-            var min_gi: usize = 0;
-            var min_count = self.all_signals.len;
-            for (self.fuse_count_by_gi) |count, gi| {
-                if (count < min_count) {
-                    min_gi = gi;
-                    min_count = count;
-                }
-            }
-
-            var iter = self.fuse_map.iterator();
-            while (iter.next()) |entry| {
-                const fuse = Fuse.fromRaw(entry.key_ptr.*, self.fuse_bitmap);
-                const gi = fuse.row / 2;
-                if (gi == min_gi) {
-                    for (signals_to_test) |signal, index| {
-                        if (std.meta.eql(signal.source, entry.value_ptr.*)) {
-                            swapRemove(GlbInputFitSignal, &signals_to_test, index);
-                            break;
-                        }
-                    }
-                }
-            }
-
-        }
-
-        var signals_to_route = rnd.intRangeAtMost(usize, min_signals_to_route, max_signals_to_route);
-
-        while (signals_to_test.len > signals_to_route) {
-            swapRemove(GlbInputFitSignal, &signals_to_test, rnd.intRangeLessThan(usize, 0, signals_to_test.len));
-        }
-
-        var design = Design.init(ta, self.device);
-
-        var signal_names = self.temp_signal_names;
-        signal_names.len = 0;
-        for (signals_to_test) |signal| {
-            signal_names.len += 1;
-            signal_names[signal_names.len - 1] = signal.name;
-            switch (signal.source) {
-                .fb  =>             try design.nodeAssignment(.{ .signal = signal.name }),
-                .pin => |pin_index| try design.pinAssignment( .{ .signal = signal.name, .pin_index = pin_index }),
-            }
-        }
-
-        for (self.all_signals) |signal| {
-            switch (signal.source) {
-                .pin => {},
-                .fb => |mcref| {
-                    try design.nodeAssignment(.{
-                        .signal = signal.name,
-                        .glb = mcref.glb,
-                        .mc = mcref.mc,
-                    });
-                    if (mcref.mc == 6 and mcref.glb == self.glb) {
-                        try design.addPT(signal_names, signal.name);
-                    } else {
-                        try design.addPT(.{}, signal.name);
-                    }
-                },
-            }
-        }
-
-        design.adjust_input_assignments = true;
-        design.parse_glb_inputs = true;
-
-        var results = try tc.runToolchain(design);
-        try helper.logReport("grp_glb{}_{}", .{ self.glb, self.report_number }, results);
-        self.report_number += 1;
-        //try results.checkTerm(true);
-        return results;
-    }
-
-    pub fn analyzeResults(self: *GlbTest, ta: std.mem.Allocator, results: FitResults, compare: JedecData) !bool {
+    pub fn analyzeResults(self: *GlbData, results: FitResults) !usize {
         if (results.failed) {
-            return false;
+            return 0;
         }
+
         var new_fuses: usize = 0;
-        const diff = try JedecData.initDiff(ta, compare, results.jedec);
-        var diff_iter = diff.iterator(.{});
-        while (diff_iter.next()) |fuse| {
-            if (self.fuse_bitmap.isSet(fuse) or results.jedec.isSet(fuse)) {
-                continue;
-            }
 
-            const gi = fuse.row / 2;
+        const mux_size_str = helper.extract(results.report, "GLB Input Mux Size   :  ", "\r\n") orelse return error.FitterFormatError;
+        const mux_size = try std.fmt.parseInt(usize, mux_size_str, 10);
 
-            if (gi < self.device.getNumGlbInputs() and !self.columns_to_ignore.isSet(fuse.col)) {
-                if (results.glbs[self.glb].inputs[gi]) |signal| {
-                    self.fuse_bitmap.put(fuse, 1);
-                    self.fuse_count_by_gi[gi] += 1;
-                    try self.fuse_map.put(self.arena.allocator(), @intCast(u32, fuse.toRaw(diff)), signal.source);
-                    new_fuses += 1;
+        var gi_iter = GISet.initFull().iterator();
+        while (gi_iter.next()) |gi| {
+            var signal = blk: {
+                if (results.glbs[self.glb].inputs[gi]) |s| {
+                    break :blk s;
                 } else {
-                    try helper.err("Found glb input fuse {}:{} but report did not list a source for GI {}!\n",
-                        .{ fuse.row, fuse.col, gi }, self.device, .{ .glb = self.glb });
+                    continue;
+                }
+            };
+
+            var fuse_range = self.device.getGIRange(self.glb, @intCast(u8, gi));
+            std.debug.assert(fuse_range.count() == mux_size);
+
+            var iter = fuse_range.iterator();
+            while (iter.next()) |fuse| {
+                if (!results.jedec.isSet(fuse) and !self.fuse_bitmap.isSet(fuse)) {
+                    self.fuse_bitmap.put(fuse, 1);
+                    try self.fuse_map.put(fuse, signal.source);
+                    new_fuses += 1;
                 }
             }
         }
-        if (new_fuses > 0) {
-            std.debug.print("Found {} new fuses in GLB {} (total {})\n", .{ new_fuses, self.glb, self.fuse_map.count() });
-        }
-        return new_fuses > 0;
+
+        // if (new_fuses > 0) {
+        //     std.debug.print("Found {} new fuses in GLB {} (total {})\n", .{ new_fuses, self.glb, self.fuse_map.count() });
+        // }
+
+        return new_fuses;
     }
 
 };
 
-fn swapRemove(comptime T: type, slice: *[]T, index_to_remove: usize) void {
-    const s = slice.*;
-    if (s.len - 1 != index_to_remove) {
-        const old_item = s[index_to_remove];
-        s[index_to_remove] = s[s.len - 1];
-        s[s.len - 1] = old_item;
-    }
-    slice.*.len -= 1;
-}
+const TestData = struct {
+    ta: std.mem.Allocator,
+    tc: *Toolchain,
+    rng: std.rand.Xoshiro256,
+    device: DeviceType,
+    all_signals: []const GlbInputFitSignal,
+    glbs: []GlbData,
+    tested_input_sets: std.AutoHashMap(GlbInputSet, void),
+    dead_branches: usize = 0,
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    var progress = std.Progress{};
-    const prog_root = progress.start("", dev.getNumGlbs() + 1);
-    if (progress.terminal == null) {
-        std.debug.print("progress.terminal == null\n", .{});
-    }
-    prog_root.activate();
-
-    try writer.expressionExpanded(@tagName(dev));
-    try writer.expressionExpanded("global_routing_pool");
-
-    const results_empty = try runToolchainPrep(ta, tc, dev, false);
-    const results_with_mc = try runToolchainPrep(ta, tc, dev, true);
-
-    const mux_size_str = helper.extract(results_empty.report, "GLB Input Mux Size   :  ", "\r\n") orelse return error.FitterFormatError;
-    const mux_size = try std.fmt.parseInt(usize, mux_size_str, 10);
-    const expected_fuses = mux_size * dev.getNumGlbInputs();
-
-    var columns_to_ignore = try std.DynamicBitSetUnmanaged.initEmpty(pa, dev.getJedecWidth());
-
-    var diff = try JedecData.initDiff(ta, results_empty.jedec, results_with_mc.jedec);
-    var diff_iter = diff.iterator(.{});
-    while (diff_iter.next()) |fuse| {
-        if (fuse.row < 2 * dev.getNumGlbInputs()) {
-            columns_to_ignore.set(fuse.col);
-        }
-    }
-
-    prog_root.completeOne();
-    prog_root.end();
-
-    var glb: u8 = 0;
-    while (glb < dev.getNumGlbs()) : (glb += 1) {
-        var prog_glb = prog_root.start(devices.getGlbName(glb), expected_fuses);
-        prog_glb.activate();
-
-        var state = try GlbTest.init(dev, glb, columns_to_ignore);
-        defer state.deinit();
-
-        var results_0 = try state.runToolchain(ta, tc);
-        while (results_0.failed) {
-            results_0 = try state.runToolchain(ta, tc);
-        }
-        var results_1 = try state.runToolchain(ta, tc);
-        while (results_1.failed) {
-            results_1 = try state.runToolchain(ta, tc);
+    pub fn init(ta: std.mem.Allocator, pa: std.mem.Allocator, gpa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType) !TestData {
+        var glbs = try pa.alloc(GlbData, dev.getNumGlbs());
+        for (glbs) |*glb, i| {
+            glb.* = try GlbData.init(gpa, dev, @intCast(u8, i));
         }
 
-        _ = try state.analyzeResults(ta, results_0, results_1.jedec);
-        _ = try state.analyzeResults(ta, results_1, results_0.jedec);
+        return TestData {
+            .ta = ta,
+            .tc = tc,
+            .rng = std.rand.Xoshiro256.init(@bitCast(u64, std.time.milliTimestamp())),
+            .device = dev,
+            .all_signals = try getAllSignals(pa, dev),
+            .glbs = glbs,
+            .tested_input_sets = std.AutoHashMap(GlbInputSet, void).init(gpa),
+        };
+    }
 
-        var base_jedec = try results_0.jedec.clone(state.arena.allocator());
+    pub fn runTest(self: *TestData, signals_to_test: GlbInputSet) !bool {
+        if (self.tested_input_sets.contains(signals_to_test)) {
+            return false;
+        }
 
-        var attempt: usize = 0;
-        while (state.fuse_map.count() < expected_fuses and attempt < max_attempts_without_progress) : (attempt += 1) {
-            prog_glb.setCompletedItems(state.fuse_map.count());
-            progress.maybeRefresh();
-            try tc.cleanTempDir();
-            helper.resetTemp();
+        // {
+        //     std.debug.print("Testing signals:", .{});
+        //     var iter = signals_to_test.iterator(self.all_signals);
+        //     while (iter.next()) |signal| {
+        //         std.debug.print(" {s}", .{ signal.name });
+        //     }
+        //     std.debug.print("\n", .{});
+        // }
 
-            var results = try state.runToolchain(ta, tc);
-            if (try state.analyzeResults(ta, results, base_jedec)) {
-                // made progress; reset attempts
-                attempt = 0;
+        try self.tested_input_sets.put(signals_to_test, {});
+
+        try self.tc.cleanTempDir();
+        helper.resetTemp();
+
+        var results = try runToolchain(self.ta, self.tc, self.device, signals_to_test, self.all_signals);
+        var fuses_found: ?usize = null;
+        for (self.glbs) |*glb| {
+            var found = try glb.analyzeResults(results);
+            if (fuses_found) |found_in_other_glb| {
+                if (found != found_in_other_glb) {
+                    try helper.err("Report {}: Expected to find {} fuses but found {}!", .{ report_number - 1, found_in_other_glb, found }, self.device, .{ .glb = glb.glb });
+                }
+                fuses_found = @maximum(found_in_other_glb, found);
+            } else {
+                fuses_found = found;
             }
         }
 
-        if (state.fuse_map.count() != expected_fuses) {
-            try std.io.getStdErr().writer().print("Expected {} glb input mux fuses for device {s} glb {} but found {}!\n",
-                .{ expected_fuses, @tagName(dev), glb, state.fuse_map.count() });
+        if ((fuses_found orelse 0) > 0) {
+            // std.debug.print("Found {} new fuses\n", .{ fuses_found.? });
+            self.dead_branches = 0;
+            return true;
+        } else {
+            self.dead_branches += 1;
+            return false;
+        }
+    }
+
+    pub fn sortSignalsByLeastGIs(self: TestData, signals: []GlbInputFitSignal) !void {
+        var gi_counts = std.AutoHashMap(GlbInputSignal, usize).init(self.ta);
+        defer gi_counts.deinit();
+
+        const all_gis = GISet.initFull();
+        var gi_iter = all_gis.iterator();
+        while (gi_iter.next()) |gi| {
+            var fuse_iter = self.device.getGIRange(0, @intCast(u8, gi)).iterator();
+            while (fuse_iter.next()) |fuse| {
+                if (self.glbs[0].fuse_map.get(fuse)) |signal| {
+                    var result = try gi_counts.getOrPut(signal);
+                    var new_count: usize = 1;
+                    if (result.found_existing) {
+                        new_count += result.value_ptr.*;
+                    }
+                    result.value_ptr.* = new_count;
+                }
+            }
+        }
+
+        const SortCtx = struct {
+            fn lessThan(context: *const std.AutoHashMap(GlbInputSignal, usize), lhs: GlbInputFitSignal, rhs: GlbInputFitSignal) bool {
+                var lhs_count: usize = context.get(lhs.source) orelse 0;
+                var rhs_count: usize = context.get(rhs.source) orelse 0;
+                return lhs_count < rhs_count;
+            }
+        };
+        std.sort.sort(GlbInputFitSignal, signals, &gi_counts, SortCtx.lessThan);
+    }
+
+    fn getGIsContainingSignal(self: TestData, signal: GlbInputSignal, fromSet: GISet) GISet {
+        var gis_containing_signal = GISet.initEmpty();
+        var gi_iter = fromSet.iterator();
+        while (gi_iter.next()) |gi| {
+            var fuse_iter = self.device.getGIRange(0, @intCast(u8, gi)).iterator();
+            while (fuse_iter.next()) |fuse| {
+                if (self.glbs[0].fuse_map.get(fuse)) |fuse_signal| {
+                    if (std.meta.eql(signal, fuse_signal)) {
+                        gis_containing_signal.add(gi);
+                    }
+                }
+            }
+        }
+        return gis_containing_signal;
+    }
+
+    fn getSignalsInGIs(self: TestData, gis: GISet) GlbInputSet {
+        var signals = GlbInputSet.initEmpty();
+        var gi_iter = gis.iterator();
+        while (gi_iter.next()) |gi| {
+            var fuse_iter = self.device.getGIRange(0, @intCast(u8, gi)).iterator();
+            while (fuse_iter.next()) |fuse| {
+                if (self.glbs[0].fuse_map.get(fuse)) |fuse_signal| {
+                    signals.add(fuse_signal, self.all_signals);
+                }
+            }
+        }
+        return signals;
+    }
+
+    pub fn findNewFuseForSignal(self: *TestData, signal: GlbInputSignal, additional_signals: GlbInputSet, depth: usize) !bool {
+        var signals_to_test = additional_signals;
+        signals_to_test.add(signal, self.all_signals);
+
+        if (signals_to_test.count() > max_routed_signals) {
+            _ = signals_to_test.removeRandom(self.rng.random(), signals_to_test.count() - max_routed_signals);
+        }
+        if (try self.runTest(signals_to_test)) {
+            return true;
+        }
+
+        var gis = self.getGIsContainingSignal(signal, GISet.initFull());
+        var gi_iter = gis.iterator();
+        while (gi_iter.next()) |gi| {
+            var gi_signals = self.getSignalsInGIs(GISet.initSingle(gi));
+            gi_signals.removeAll(signals_to_test);
+
+            var signal_iter = gi_signals.iterator(self.all_signals);
+            while (signal_iter.next()) |extra_signal| {
+                signals_to_test.add(extra_signal.source, self.all_signals);
+            }
+        }
+
+        if (signals_to_test.count() > max_routed_signals) {
+            _ = signals_to_test.removeRandom(self.rng.random(), signals_to_test.count() - max_routed_signals);
+        }
+        if (try self.runTest(signals_to_test)) {
+            return true;
+        }
+
+        if (depth > 0) {
+            gi_iter = gis.iterator();
+            while (gi_iter.next()) |gi| {
+                var gi_signals = self.getSignalsInGIs(GISet.initSingle(gi));
+                var signal_iter = gi_signals.iterator(self.all_signals);
+                while (signal_iter.next()) |extra_signal| {
+                    if (try self.findNewFuseForSignal(extra_signal.source, signals_to_test, depth - 1)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+};
+
+
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
+    try writer.expressionExpanded(@tagName(dev));
+    try writer.expressionExpanded("global_routing_pool");
+
+    var gpa = std.heap.GeneralPurposeAllocator(.{ .thread_safe = false }) {};
+
+    var test_data = try TestData.init(ta, pa, gpa.allocator(), tc, dev);
+    const expected_fuses_per_glb = dev.getGIRange(0, 0).count() * 36;
+
+    // First we start off by simply randomly selecting signals to route.
+    // This works well to find 75-95% of the possible fuses, but it starts
+    // to break down quickly after that, so we'll switch strategies once
+    // we reach five attempts in a row that fail to discover any new fuses.
+    var failed_attempts: usize = 0;
+    while (test_data.glbs[0].fuse_map.count() < expected_fuses_per_glb and failed_attempts < 5) {
+        var all_signals_set = GlbInputSet.initFull(test_data.all_signals);
+        var signals = all_signals_set.removeRandom(test_data.rng.random(), 30);
+        if (!try test_data.runTest(signals)) {
+            failed_attempts += 1;
+        } else {
+            failed_attempts = 0;
+        }
+    }
+
+    var signals_by_least_gis = try pa.alloc(GlbInputFitSignal, test_data.all_signals.len);
+    std.mem.copy(GlbInputFitSignal, signals_by_least_gis, test_data.all_signals);
+
+    var max_depth: usize = 1;
+    fuse_found: while (test_data.glbs[0].fuse_map.count() < expected_fuses_per_glb) {
+        // All signals should have approximately the same number of GIs it is associated with
+        // so the missing fuses likely belong to signals with the fewest known GIs/fuses.
+        // Therefore, we try to create signal sets whereby these signals are forced to be displaced
+        // from their current known options, ideally while specifying as few other signals as possible.
+        try test_data.sortSignalsByLeastGIs(signals_by_least_gis);
+        for (signals_by_least_gis) |signal| {
+            if (try test_data.findNewFuseForSignal(signal.source, GlbInputSet.initEmpty(), max_depth)) {
+                continue :fuse_found;
+            }
+        }
+        if (max_depth < 5) {
+            max_depth += 1;
+        } else {
+            // Something is wrong, give up.
+            break;
+        }
+    }
+
+    for (test_data.glbs) |glb_data| {
+        if (glb_data.fuse_map.count() != expected_fuses_per_glb) {
+            try helper.err("Expected {} glb input mux fuses but found {}!",
+                .{ expected_fuses_per_glb, glb_data.fuse_map.count() }, dev, .{ .glb = glb_data.glb });
         }
 
         try writer.expression("glb");
-        try writer.printRaw("{}", .{ glb });
+        try writer.printRaw("{}", .{ glb_data.glb });
         try writer.expression("name");
-        try writer.printRaw("{s}", .{ devices.getGlbName(glb) });
+        try writer.printRaw("{s}", .{ devices.getGlbName(glb_data.glb) });
         try writer.close();
         writer.setCompact(false);
 
         var gi: i64 = -1;
-        var iter = state.fuse_bitmap.iterator(.{});
+        var iter = glb_data.fuse_bitmap.iterator(.{});
         while (iter.next()) |fuse| {
             if (gi != fuse.row / 2) {
                 if (gi != -1) {
@@ -356,7 +414,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             try writer.expression("fuse");
             try writer.printRaw("{} {}", .{ fuse.row, fuse.col });
 
-            if (state.fuse_map.get(@intCast(u32, fuse.toRaw(state.fuse_bitmap)))) |source| {
+            if (glb_data.fuse_map.get(fuse)) |source| {
                 switch (source) {
                     .fb => |mcref| {
                         try writer.expression("glb");
@@ -379,11 +437,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
             try writer.close(); // fuse
         }
-        try writer.close(); // last gi
+        if (gi != -1) {
+            try writer.close(); // last gi
+        }
         try writer.close(); // glb
-        prog_glb.end();
     }
 
     try writer.done();
-    prog_root.completeOne();
 }

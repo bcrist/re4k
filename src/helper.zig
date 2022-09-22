@@ -144,9 +144,3 @@ pub fn writeFuseOptValue(writer: anytype, fuse: Fuse, value: usize) !void {
     }
     try writer.close();
 }
-
-// pub const GISet = std.StaticBitSet(36);
-
-// pub const GlbInputSetUnmanaged = struct {
-//     raw: std.StaticBitSet(16*16*2+10)
-// }

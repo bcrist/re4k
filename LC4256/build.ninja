@@ -1,9 +1,0 @@
-subninja LC4256/LC4256x_TQFP100/build.ninja
-subninja LC4256/LC4256V_TQFP144/build.ninja
-subninja LC4256/LC4256ZC_TQFP100/build.ninja
-subninja LC4256/LC4256ZC_csBGA132/build.ninja
-subninja LC4256/LC4256ZE_TQFP100/build.ninja
-subninja LC4256/LC4256ZE_TQFP144/build.ninja
-subninja LC4256/LC4256ZE_csBGA144/build.ninja
-
-build build-LC4256: phony build-LC4256x_TQFP100 build-LC4256V_TQFP144 build-LC4256ZC_TQFP100 build-LC4256ZC_csBGA132 build-LC4256ZE_TQFP100 build-LC4256ZE_TQFP144 build-LC4256ZE_csBGA144
