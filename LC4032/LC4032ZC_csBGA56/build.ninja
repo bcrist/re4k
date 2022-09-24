@@ -1,4 +1,4 @@
-##!! include('build_ninja_2','LC4032ZC_csBGA56') !! 71 ##
+##!! include('build_ninja_2','LC4032ZC_csBGA56') !! 75 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 dev = LC4032\LC4032ZC_csBGA56
 
@@ -62,10 +62,14 @@ rule input_reg
     command = zig-out/bin/input_reg.exe $out
 build $dev/input_reg.sx: input_reg
 
+rule invert
+    command = zig-out/bin/invert.exe $out
+build $dev/invert.sx: invert
+
 rule pterms
     command = zig-out/bin/pterms.exe $out $in
 build $dev/pterms.sx: pterms $dev/grp.sx
 
-build build-LC4032ZC_csBGA56: phony $dev/grp.sx $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx $dev/pull.sx $dev/drive.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/ce_mux.sx $dev/reg_type.sx $dev/pt2_reset.sx $dev/pt3_reset.sx $dev/clk_mux.sx $dev/input_reg.sx $dev/pterms.sx
+build build-LC4032ZC_csBGA56: phony $dev/grp.sx $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx $dev/pull.sx $dev/drive.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/ce_mux.sx $dev/reg_type.sx $dev/pt2_reset.sx $dev/pt3_reset.sx $dev/clk_mux.sx $dev/input_reg.sx $dev/invert.sx $dev/pterms.sx
 
 ## ######################### END OF GENERATED CODE ######################### ##

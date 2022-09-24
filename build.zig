@@ -12,13 +12,13 @@ pub fn build(b: *std.build.Builder) void {
         .source = .{ .path = "pkg/tempallocator/temp_allocator.zig" },
     };
 
-    const input_reg = b.addExecutable("input_reg", "src/input_reg.zig");
-    input_reg.addPackage(temp_allocator);
-    input_reg.linkLibC();
-    input_reg.setTarget(target);
-    input_reg.setBuildMode(mode);
-    input_reg.install();
-    _ = makeRunStep(b, input_reg, "input_reg", "run input_reg");
+    const invert = b.addExecutable("invert", "src/invert.zig");
+    invert.addPackage(temp_allocator);
+    invert.linkLibC();
+    invert.setTarget(target);
+    invert.setBuildMode(mode);
+    invert.install();
+    _ = makeRunStep(b, invert, "invert", "run invert");
 
 }
 //[[ ######################### END OF GENERATED CODE ######################### ]]

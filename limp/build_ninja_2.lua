@@ -14,6 +14,7 @@ local standalone_jobs = {
     'pt3_reset',
     'clk_mux',
     'input_reg',
+    'invert',
 }
 local grp_jobs = {
     'pterms'

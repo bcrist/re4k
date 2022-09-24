@@ -60,14 +60,10 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
         .mc = io.mc,
         .input_register = inreg,
     });
-    if (inreg) {
-        try design.addPT("in", "out.D");
-    } else {
-        try design.addPT("in", "out.D");
-    }
+    try design.addPT("in", "out.D");
 
     var results = try tc.runToolchain(design);
-    try helper.logReport("input_reg_pin_{s}", .{ io.pin_number }, results);
+    try helper.logReport("input_reg_pin_{s}_{}", .{ io.pin_number, inreg }, results);
     try results.checkTerm(true);
     return results;
 }
