@@ -20,5 +20,6 @@
     (_ exe convert-grp)
     (_ exe pterms)
     (_ exe input_reg)
-    (exe invert)
+    (_ exe invert)
+    (exe pt0_xor)
 )

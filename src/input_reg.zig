@@ -72,7 +72,6 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     try writer.expressionExpanded(@tagName(dev));
     try writer.expressionExpanded("input_registers");
 
-
     var pin_iter = devices.pins.OutputIterator { .pins = dev.getPins() };
     while (pin_iter.next()) |io| {
         try tc.cleanTempDir();

@@ -15,6 +15,7 @@ local standalone_jobs = {
     'clk_mux',
     'input_reg',
     'invert',
+    'pt0_xor',
 }
 local grp_jobs = {
     'pterms'
