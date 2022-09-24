@@ -1,4 +1,4 @@
-##!! include('build_ninja_2','LC4064ZE_TQFP48') !! 63 ##
+##!! include('build_ninja_2','LC4064ZE_TQFP48') !! 67 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 dev = LC4064\LC4064ZE_TQFP48
 
@@ -58,6 +58,10 @@ rule clk_mux
     command = zig-out/bin/clk_mux.exe $out
 build $dev/clk_mux.sx: clk_mux
 
-build build-LC4064ZE_TQFP48: phony $dev/grp.sx $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx $dev/pull.sx $dev/drive.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/ce_mux.sx $dev/reg_type.sx $dev/pt2_reset.sx $dev/pt3_reset.sx $dev/clk_mux.sx
+rule pterms
+    command = zig-out/bin/pterms.exe $out $in
+build $dev/pterms.sx: pterms $dev/grp.sx
+
+build build-LC4064ZE_TQFP48: phony $dev/grp.sx $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx $dev/pull.sx $dev/drive.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/ce_mux.sx $dev/reg_type.sx $dev/pt2_reset.sx $dev/pt3_reset.sx $dev/clk_mux.sx $dev/pterms.sx
 
 ## ######################### END OF GENERATED CODE ######################### ##

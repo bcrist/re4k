@@ -17,5 +17,6 @@
     (_ exe pt3_reset)
     (_ exe clk_mux)
     (_ exe grp)
-    (exe convert-grp)
+    (_ exe convert-grp)
+    (exe pterms)
 )

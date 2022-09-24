@@ -6,9 +6,6 @@
 * Bitstream configuration through zig
 * Bitstream decompilation
 * ORM bypass for non-ZE families
-
-# TODO: LC4032ZE
-* GLB inputs from GRP (WIP)
 * Hardware verification
     * Shared PT Init polarity - hinted at in datasheet, but fitter won't let it happen
     * What happens if both GLB's PTOE/BIE are routed to the same GOE?  assuming they are summed, but should check with hardware.  I don't think the fitter will allow this config.

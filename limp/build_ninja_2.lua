@@ -1,5 +1,5 @@
 local device = ...
-local jobs = {
+local standalone_jobs = {
     'zerohold',
     'slew',
     'threshold',
@@ -13,6 +13,9 @@ local jobs = {
     'pt2_reset',
     'pt3_reset',
     'clk_mux',
+}
+local grp_jobs = {
+    'pterms'
 }
 
 writeln('dev = ', fs.compose_path(device:sub(1, 6), device), nl)
@@ -62,15 +65,25 @@ else
     nl()
 end
 
-for _, job in ipairs(jobs) do
+for _, job in ipairs(standalone_jobs) do
     writeln('rule ', job)
     writeln('    command = zig-out/bin/', job, '.exe $out')
     writeln('build $dev/', job, '.sx: ', job)
     nl()
 end
 
+for _, job in ipairs(grp_jobs) do
+    writeln('rule ', job)
+    writeln('    command = zig-out/bin/', job, '.exe $out $in')
+    writeln('build $dev/', job, '.sx: ', job, ' $dev/grp.sx')
+    nl()
+end
+
 write('build build-', device, ': phony $dev/grp.sx')
-for _, job in ipairs(jobs) do
+for _, job in ipairs(standalone_jobs) do
+    write(' $dev/', job, '.sx')
+end
+for _, job in ipairs(grp_jobs) do
     write(' $dev/', job, '.sx')
 end
 nl()

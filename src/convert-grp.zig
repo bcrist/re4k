@@ -38,6 +38,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
 }
 
 fn getFuseToPinMap(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType) !std.AutoHashMapUnmanaged(Fuse, u16) {
+    // Route input-only pins for this device type, since we can't know which signals in the reference device they correspond to.
     var fuse_to_pin_map = std.AutoHashMapUnmanaged(Fuse, u16) {};
 
     var iter = devices.pins.InputIterator { .pins = dev.getPins() };
@@ -79,100 +80,17 @@ fn getFuseToPinMap(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain,
     return fuse_to_pin_map;
 }
 
-fn parseInputFile(ta: std.mem.Allocator, pa: std.mem.Allocator, input_file: helper.InputFileData) !std.AutoHashMap(Fuse, GlbInputSignal) {
-    var results = std.AutoHashMap(Fuse, GlbInputSignal).init(pa);
-    try results.ensureTotalCapacity(@intCast(u32, input_file.device.getGIRange(0, 0).count() * 36 * input_file.device.getNumGlbs()));
-
-    var pin_number_to_index = std.StringHashMap(u16).init(ta);
-    defer pin_number_to_index.deinit();
-
-    try pin_number_to_index.ensureTotalCapacity(@intCast(u32, input_file.device.getPins().len));
-    for (input_file.device.getPins()) |pin_info| {
-        try pin_number_to_index.put(pin_info.pin_number(), pin_info.pin_index());
-    }
-
-    var parser = try sx.Parser.init(input_file.contents, ta);
-    defer parser.deinit();
-
-    parseInputFile0(&parser, input_file.device, &pin_number_to_index, &results) catch |err| switch (err) {
-        error.SExpressionSyntaxError => {
-            try parser.printParseErrorContext();
-            return err;
-        },
-        else => return err,
-    };
-
-    return results;
-}
-
-fn parseInputFile0(parser: *sx.Parser, input_device: DeviceType, pin_number_to_index: *const std.StringHashMap(u16), results: *std.AutoHashMap(Fuse, GlbInputSignal)) !void {
-    _ = try parser.requireAnyExpression(); // device name, we already know it
-    try parser.requireExpression("global_routing_pool");
-
-    var glb: u8 = 0;
-    while (glb < input_device.getNumGlbs()) : (glb += 1) {
-        try parser.requireExpression("glb");
-        var parsed_glb = try parser.requireAnyInt(u8, 10);
-        std.debug.assert(glb == parsed_glb);
-        if (try parser.expression("name")) {
-            try parser.ignoreRemainingExpression();
-        }
-
-        while (try parser.expression("gi")) {
-            _ = try parser.requireAnyInt(usize, 10);
-
-            while (try parser.expression("fuse")) {
-                var row = try parser.requireAnyInt(u16, 10);
-                var col = try parser.requireAnyInt(u16, 10);
-                var fuse = Fuse.init(row, col);
-
-                if (try parser.expression("pin")) {
-                    var pin_number = try parser.requireAnyString();
-                    var pin_index = pin_number_to_index.get(pin_number).?;
-                    try results.put(fuse, .{
-                        .pin = pin_index,
-                    });
-                    try parser.requireClose(); // pin
-                } else if (try parser.expression("glb")) {
-                    var fuse_glb = try parser.requireAnyInt(u8, 10);
-                    if (try parser.expression("name")) {
-                        try parser.ignoreRemainingExpression();
-                    }
-                    try parser.requireClose(); // glb
-
-                    try parser.requireExpression("mc");
-                    var fuse_mc = try parser.requireAnyInt(u8, 10);
-                    try parser.requireClose(); // mc
-
-                    try results.put(fuse, .{
-                        .fb = .{
-                            .glb = fuse_glb,
-                            .mc = fuse_mc,
-                        },
-                    });
-                }
-                try parser.requireClose(); // fuse
-            }
-            try parser.requireClose(); // gi
-        }
-        try parser.requireClose(); // glb
-    }
-    try parser.requireClose(); // global_routing_pool
-    try parser.requireClose(); // device
-    try parser.requireDone();
-}
 
 pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    var input_file = helper.getInputFile("grp.sx") orelse return error.InvalidCommandLine;
-    std.debug.assert(input_file.device.getNumGlbs() == dev.getNumGlbs());
-    std.debug.assert(input_file.device.getJedecWidth() == dev.getJedecWidth());
-    std.debug.assert(input_file.device.getJedecHeight() == dev.getJedecHeight());
-
     var fuse_to_pin_map = try getFuseToPinMap(ta, pa, tc, dev);
     try tc.cleanTempDir();
     helper.resetTemp();
 
-    var fuse_to_signal_map = try parseInputFile(ta, pa, input_file);
+    var input_device: DeviceType = undefined;
+    var fuse_to_signal_map = try helper.parseGRP(ta, pa, &input_device);
+    std.debug.assert(input_device.getNumGlbs() == dev.getNumGlbs());
+    std.debug.assert(input_device.getJedecWidth() == dev.getJedecWidth());
+    std.debug.assert(input_device.getJedecHeight() == dev.getJedecHeight());
 
     var signal_to_pin_map = std.AutoHashMap(GlbInputSignal, u16).init(ta);
     try signal_to_pin_map.ensureTotalCapacity(fuse_to_pin_map.count());
@@ -194,7 +112,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             .fb => {},
             .pin => |pin_index| {
                 var new_pin_index: u16 = unused_pin;
-                switch (input_file.device.getPins()[pin_index]) {
+                switch (input_device.getPins()[pin_index]) {
                     .clock_input => |info| {
                         if (dev.getClockPin(info.clock_index)) |new_info| {
                             new_pin_index = new_info.pin_index;

@@ -9,6 +9,7 @@ const TempAllocator = @import("temp_allocator");
 const DeviceType = devices.DeviceType;
 const Toolchain = toolchain.Toolchain;
 const Fuse = jedec.Fuse;
+const GlbInputSignal = toolchain.GlbInputSignal;
 
 var temp_alloc = TempAllocator {};
 
@@ -172,4 +173,95 @@ pub fn writeFuseOptValue(writer: anytype, fuse: Fuse, value: usize) !void {
         try writer.close();
     }
     try writer.close();
+}
+
+pub fn parseGRP(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*DeviceType) !std.AutoHashMap(Fuse, GlbInputSignal) {
+    const input_file = getInputFile("grp.sx") orelse return error.InvalidCommandLine;
+    const device = input_file.device;
+
+    var results = std.AutoHashMap(Fuse, GlbInputSignal).init(pa);
+    try results.ensureTotalCapacity(@intCast(u32, device.getGIRange(0, 0).count() * 36 * device.getNumGlbs()));
+
+    var pin_number_to_index = std.StringHashMap(u16).init(ta);
+    defer pin_number_to_index.deinit();
+    try pin_number_to_index.ensureTotalCapacity(@intCast(u32, device.getPins().len));
+    for (device.getPins()) |pin_info| {
+        try pin_number_to_index.put(pin_info.pin_number(), pin_info.pin_index());
+    }
+
+    var parser = try sx.Parser.init(input_file.contents, ta);
+    defer parser.deinit();
+
+    parseGRP0(&parser, device, &pin_number_to_index, &results) catch |e| switch (e) {
+        error.SExpressionSyntaxError => {
+            try parser.printParseErrorContext();
+            return e;
+        },
+        else => return e,
+    };
+
+    if (out_device) |ptr| {
+        ptr.* = device;
+    }
+
+    return results;
+}
+
+fn parseGRP0(parser: *sx.Parser, device: DeviceType, pin_number_to_index: *const std.StringHashMap(u16), results: *std.AutoHashMap(Fuse, GlbInputSignal)) !void {
+    _ = try parser.requireAnyExpression(); // device name, we already know it
+    try parser.requireExpression("global_routing_pool");
+
+    var glb: u8 = 0;
+    while (glb < device.getNumGlbs()) : (glb += 1) {
+        try parser.requireExpression("glb");
+        var parsed_glb = try parser.requireAnyInt(u8, 10);
+        std.debug.assert(glb == parsed_glb);
+        if (try parser.expression("name")) {
+            try parser.ignoreRemainingExpression();
+        }
+
+        while (try parser.expression("gi")) {
+            _ = try parser.requireAnyInt(usize, 10);
+
+            while (try parser.expression("fuse")) {
+                var row = try parser.requireAnyInt(u16, 10);
+                var col = try parser.requireAnyInt(u16, 10);
+                var fuse = Fuse.init(row, col);
+
+                if (try parser.expression("pin")) {
+                    var pin_number = try parser.requireAnyString();
+                    var pin_index = pin_number_to_index.get(pin_number).?;
+                    try results.put(fuse, .{
+                        .pin = pin_index,
+                    });
+                    try parser.requireClose(); // pin
+                } else if (try parser.expression("glb")) {
+                    var fuse_glb = try parser.requireAnyInt(u8, 10);
+                    if (try parser.expression("name")) {
+                        try parser.ignoreRemainingExpression();
+                    }
+                    try parser.requireClose(); // glb
+
+                    try parser.requireExpression("mc");
+                    var fuse_mc = try parser.requireAnyInt(u8, 10);
+                    try parser.requireClose(); // mc
+
+                    try results.put(fuse, .{
+                        .fb = .{
+                            .glb = fuse_glb,
+                            .mc = fuse_mc,
+                        },
+                    });
+                } else if (try parser.expression("unused")) {
+                    try parser.ignoreRemainingExpression();
+                }
+                try parser.requireClose(); // fuse
+            }
+            try parser.requireClose(); // gi
+        }
+        try parser.requireClose(); // glb
+    }
+    try parser.requireClose(); // global_routing_pool
+    try parser.requireClose(); // device
+    try parser.requireDone();
 }

@@ -62,6 +62,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, signals_
 
     design.adjust_input_assignments = true;
     design.parse_glb_inputs = true;
+    design.max_fit_time_ms = 500;
 
     var results = try tc.runToolchain(design);
     try helper.logReport("grp_{}", .{ report_number }, results);

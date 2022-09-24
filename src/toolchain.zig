@@ -137,6 +137,7 @@ pub const Design = struct {
     zero_hold_time: bool,
     adjust_input_assignments: bool,
     parse_glb_inputs: bool,
+    max_fit_time_ms: u32 = 0, // unlimited
 
     pub fn init(alloc: std.mem.Allocator, device: DeviceType) Design {
         return .{
@@ -938,9 +939,13 @@ pub const Toolchain = struct {
         child.stderr_behavior = .Ignore;
 
         try child.spawn();
-        // if the fitter takes more than about half a second, it's probably failed to route signals
-        std.os.windows.WaitForSingleObjectEx(child.handle, 500, false) catch {};
-        const term = try child.kill();
+
+        const term = if (design.max_fit_time_ms == 0) blk: {
+            break :blk try child.wait();
+        } else blk: {
+            std.os.windows.WaitForSingleObjectEx(child.handle, design.max_fit_time_ms, false) catch {};
+            break :blk try child.kill();
+        };
 
         //var signals = try std.ArrayList(SignalFitData).initCapacity(self.alloc, 32);
 
@@ -950,7 +955,8 @@ pub const Toolchain = struct {
         var warn = false;
 
         if (!std.mem.eql(u8, log, "Project 'test' was Fitted Successfully!\r\n")) {
-            if (!std.mem.endsWith(u8, log, "Project 'test' was Fitted Successfully!\r\n")) {
+            if (!std.mem.containsAtLeast(u8, log, 1, "Project 'test' was Fitted Successfully!")) {
+                std.debug.print("Unexpected fitter log:\n {s}\n", .{ log });
                 failed = true;
             } else {
                 warn = true;
