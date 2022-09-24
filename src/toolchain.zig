@@ -10,46 +10,44 @@ const JedecData = jedec.JedecData;
 
 fn getDeviceFitterName(device: DeviceType) []const u8 {
     return switch (device) {
-        .LC4032x_TQFP44   => "M4S_32_30",
-        .LC4032x_TQFP48   => "M4S_32_32",
+        .LC4032x_TQFP44    => "M4S_32_30",
+        .LC4032x_TQFP48    => "M4S_32_32",
         .LC4032ZC_TQFP48   => "M4Z_32_32",
-        .LC4032ZC_csBGA56   => "M4Z_32_32S",
+        .LC4032ZC_csBGA56  => "M4Z_32_32S",
         .LC4032ZE_TQFP48   => "M4E_32_32",
-        .LC4032ZE_csBGA64   => "M4E_32_32S",
-        .LC4064x_TQFP44   => "M4S_64_30",
-        .LC4064x_TQFP48   => "M4S_64_32",
+        .LC4032ZE_csBGA64  => "M4E_32_32S",
+        .LC4064x_TQFP44    => "M4S_64_30",
+        .LC4064x_TQFP48    => "M4S_64_32",
         .LC4064ZC_TQFP48   => "M4Z_64_32",
         .LC4064ZE_TQFP48   => "M4E_64_32",
         .LC4064ZC_csBGA56  => "M4Z_64_32S",
-        .LC4064ZE_csBGA64   => "M4E_64_48S",
-        .LC4064ZE_ucBGA64   => "M4E_64_48U",
-        .LC4064x_TQFP100  => "M4S_64_64",
+        .LC4064ZE_csBGA64  => "M4E_64_48S",
+        .LC4064ZE_ucBGA64  => "M4E_64_48U",
+        .LC4064x_TQFP100   => "M4S_64_64",
         .LC4064ZC_TQFP100  => "M4Z_64_64",
         .LC4064ZE_TQFP100  => "M4E_64_64",
-        .LC4064ZC_csBGA132  => "M4Z_64_64S",
-        .LC4064ZE_csBGA144  => "M4E_64_64S",
-        .LC4128x_TQFP100 => "M4S_128_64",
-        .LC4128ZC_TQFP100 => "M4Z_128_64",
-        .LC4128ZE_TQFP100 => "M4E_128_64",
-        .LC4128x_TQFP128  => "M4S_128_92",
-        .LC4128V_TQFP144  => "M4S_128_96",
-        .LC4128ZC_csBGA132  => "M4Z_128_96S",
+        .LC4064ZC_csBGA132 => "M4Z_64_64S",
+        .LC4064ZE_csBGA144 => "M4E_64_64S",
+        .LC4128x_TQFP100   => "M4S_128_64",
+        .LC4128ZC_TQFP100  => "M4Z_128_64",
+        .LC4128ZE_TQFP100  => "M4E_128_64",
+        .LC4128x_TQFP128   => "M4S_128_92",
+        .LC4128V_TQFP144   => "M4S_128_96",
+        .LC4128ZC_csBGA132 => "M4Z_128_96S",
         .LC4128ZE_TQFP144  => "M4E_128_96",
-        .LC4128ZE_csBGA144  => "M4E_128_96S",
-        .LC4128ZE_ucBGA144  => "M4E_128_96U",
+        .LC4128ZE_csBGA144 => "M4E_128_96S",
+        .LC4128ZE_ucBGA144 => "M4E_128_96U",
     };
 }
 
 pub const PinAssignment = struct {
     signal: []const u8,
     pin_index: ?u16 = null,
-    //input_register: ?bool = null,
     iostd: ?core.LogicLevels = null,
     drive: ?core.DriveType = null,
     bus_maintenance: ?core.BusMaintenanceType = null,
     slew_rate: ?core.SlewRate = null,
     //power_guard_signal: ?[]const u8 = null,
-
     powerup_state: ?u1 = null,
 };
 
@@ -57,6 +55,7 @@ pub const NodeAssignment = struct {
     signal: []const u8,
     glb: ?u8 = null,
     mc: ?u8 = null,
+    input_register: ?bool = null,
     powerup_state: ?u1 = null,
 };
 
@@ -158,7 +157,6 @@ pub const Design = struct {
         for (self.pins.items) |*existing| {
             if (std.mem.eql(u8, pa.signal, existing.signal)) {
                 if (pa.pin_index) |pin_index| existing.pin_index = pin_index;
-                // if (pa.input_register) |inreg| existing.input_register = inreg;
                 if (pa.iostd) |iostd| existing.iostd = iostd;
                 if (pa.drive) |drive| existing.drive = drive;
                 if (pa.bus_maintenance) |pull| existing.bus_maintenance = pull;
@@ -208,6 +206,7 @@ pub const Design = struct {
             if (std.mem.eql(u8, na.signal, existing.signal)) {
                 if (na.glb) |glb| existing.glb = glb;
                 if (na.mc) |mc| existing.mc = mc;
+                if (na.input_register) |inreg| existing.input_register = inreg;
                 if (na.powerup_state) |powerup| existing.powerup_state = powerup;
                 return;
             }
@@ -566,6 +565,29 @@ pub const Design = struct {
             }
             try writer.writeAll(";\n");
         }
+
+        try writer.writeAll("\n[Input Registers]\n");
+        for ([_]bool { false, true }) |state| {
+            const name = switch (state) {
+                false => "NONE",
+                true => "INREG",
+            };
+            try writer.print("{s}=", .{ name });
+            var first = true;
+            for (self.nodes.items) |node_assignment| {
+                if (node_assignment.input_register) |inreg| {
+                    if (state == inreg) {
+                        if (first) {
+                            first = false;
+                        } else {
+                            try writer.writeByte(',');
+                        }
+                        try writer.writeAll(node_assignment.signal);
+                    }
+                }
+            }
+            try writer.writeAll(";\n");
+        }
     }
 
     pub fn writePla(self: Design, writer: anytype) !void {
@@ -837,7 +859,7 @@ pub const GlbFitData = struct {
 pub const FitResults = struct {
     term: std.ChildProcess.Term,
     failed: bool,
-    warn: bool,
+    warnings: []const u8,
     report: []const u8,
     jedec: JedecData,
     //signals: []SignalFitData,
@@ -867,8 +889,8 @@ pub const FitResults = struct {
         if (self.failed) {
             try std.io.getStdErr().writer().writeAll("Fitter failed to generate a valid device configuration!\n");
             return error.FitterError;
-        } else if (self.warn and !ignore_warnings) {
-            try std.io.getStdErr().writer().writeAll("Fitter had warnings!\n");
+        } else if (self.warnings.len > 0 and !ignore_warnings) {
+            try std.io.getStdErr().writer().print("Fitter had warnings:\n{s}\n", .{ self.warnings });
         }
     }
 };
@@ -952,14 +974,14 @@ pub const Toolchain = struct {
         var log = try self.readFile("test.log");
 
         var failed = !std.meta.eql(term, std.ChildProcess.Term { .Exited = 0 });
-        var warn = false;
+        var warnings: []const u8 = "";
 
         if (!std.mem.eql(u8, log, "Project 'test' was Fitted Successfully!\r\n")) {
             if (!std.mem.containsAtLeast(u8, log, 1, "Project 'test' was Fitted Successfully!")) {
                 std.debug.print("Unexpected fitter log:\n {s}\n", .{ log });
                 failed = true;
             } else {
-                warn = true;
+                warnings = log;
             }
         }
 
@@ -975,7 +997,7 @@ pub const Toolchain = struct {
         var results = FitResults {
             .term = term,
             .failed = failed,
-            .warn = warn,
+            .warnings = warnings,
             .report = report,
             .jedec = jed,
             //.signals = &[_]SignalFitData{},

@@ -18,5 +18,6 @@
     (_ exe clk_mux)
     (_ exe grp)
     (_ exe convert-grp)
-    (exe pterms)
+    (_ exe pterms)
+    (exe input_reg)
 )

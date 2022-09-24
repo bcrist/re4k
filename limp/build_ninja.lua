@@ -301,75 +301,6 @@ This is just a quick test to validate that rows 92-94 associate to an I/O cell, 
 stays with the MC/logic alloc, evem when the ORM is in use.
 ]]})
 
-perOutputTest(dev, 'orm', { 'self', 'o1', 'o2', 'o3', 'o4', 'o5', 'o6', 'o7' })
-
-perMacrocellTest(dev, 'reset_init', { 'SET', 'RESET' })
-
-perMacrocellTest(dev, 'ce_mux', { 'always', 'npt', 'pt', 'shared' }, { diff_options = '--include 72:0-99:171'}) --86-87'})
-
-
-local gi_list = { 0, 1, 34, 35 }
-
-do
-    local variants = { 'p', 'n' }
-    local targets = {}
-    for _, glb in dev.glbs() do
-        for _, mc in glb.mcs() do
-            for _, gi in ipairs({ 0, 1 }) do
-                -- due to the shenanigans needed to prevent the fitter from stealing PTs from previous MCs, this only
-                -- works for lower GIs that are easier to fill with a specific signal
-                writeVariants(dev, 'pt0', variants, { 'glb'..mc.glb.index, 'mc'..mc.index, 'gi'..gi }, { mc.glb.index, mc.index, gi }, targets)
-            end
-        end
-    end
-    addToGroup('pt0', targets)
-end
-
-do
-    local variants = { 'p', 'n' }
-    local targets = {}
-    for _, glb in dev.glbs() do
-        for _, mc in glb.mcs() do
-            for _, gi in ipairs(gi_list) do
-                writeVariants(dev, 'pt1', variants, { 'glb'..mc.glb.index, 'mc'..mc.index, 'gi'..gi }, { mc.glb.index, mc.index, gi }, targets)
-            end
-        end
-    end
-    addToGroup('pt1', targets)
-end
-
-do
-    local variants = { 'p', 'n' }
-    local targets = {}
-    for _, glb in dev.glbs() do
-        for _, mc in glb.mcs() do
-            for _, gi in ipairs(gi_list) do
-                writeVariants(dev, 'pt2', variants, { 'glb'..mc.glb.index, 'mc'..mc.index, 'gi'..gi }, { mc.glb.index, mc.index, gi }, targets)
-            end
-        end
-    end
-    addToGroup('pt2', targets)
-end
-
-do
-    local variants = { 'p', 'n' }
-    local targets = {}
-    for _, glb in dev.glbs() do
-        for _, mc in glb.mcs() do
-            for _, gi in ipairs(gi_list) do
-                writeVariants(dev, 'pt3', variants, { 'glb'..mc.glb.index, 'mc'..mc.index, 'gi'..gi }, { mc.glb.index, mc.index, gi }, targets)
-            end
-        end
-    end
-    addToGroup('pt3', targets)
-end
-
-perMacrocellTest(dev, 'ff_type', { 'D', 'T', 'latch', 'none' }, { diff_options = '--include 79:0-80:171' })
-
-perMacrocellTest(dev, 'pt2_reset', { 'none', 'pt' }, { diff_options = '--include 82:0-82:171' })
-perMacrocellTest(dev, 'pt3_reset', { 'none', 'pt', 'shared' }, { diff_options = '--include 83:0-83:171' })
-
-perMacrocellTest(dev, 'clk_mux', { 'bclk0', 'bclk1', 'bclk2', 'bclk3', 'pt', 'npt', 'shared_pt', 'gnd' }, { diff_options = '--include 76:0-81:171'})
 
 perGlbTest(dev, 'shared_ptclk_polarity', { 'normal', 'invert' })
 
@@ -393,32 +324,8 @@ readme = [[
 
 ]]})
 
-perOutputTest(dev, 'inreg', { 'normal', 'inreg' }, { diff_options = '--include 85:0-85:171'})
-
 perMacrocellTest(dev, 'xor', { 'normal', 'invert', 'xor_pt0', 'xor_npt0' }, { diff_options = '--include 72:0-99:171'})
 
 globalTest(dev, 'osctimer', { 'none', 'oscout', 'timerout', 'timerout_timerres', 'oscout_dynoscdis' }, { diff_options = '--include 75:165-99:171 --exclude 85:0-86:171 --exclude 95:0-95:171 --exclude 87:168-90:168 --exclude 87:171-91:171'})
 
 globalTest(dev, 'osctimer_div', { '128', '1024', '1048576' }, { diff_options = '--include 75:165-99:171 --exclude 85:0-86:171 --exclude 95:0-95:171 --exclude 87:168-90:168 --exclude 87:171-91:171'})
-
-for group, targets in spairs(group_targets) do
-    write("build ", group, ": phony")
-    for target in spairs(targets) do
-        write(" ", target)
-    end
-    nl()
-end
-nl()
-
-write("build check: phony")
-for _, jed in ipairs(jed_jobs) do
-    write(" ", jed)
-end
-nl()
-nl()
-
-write("default")
-for target in spairs(default_targets) do
-    write(" ", target)
-end
-nl()
