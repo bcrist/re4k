@@ -10,7 +10,7 @@ const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
 
 pub fn main() void {
-    helper.main();
+    helper.main(0);
 }
 
 pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {

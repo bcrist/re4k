@@ -14,7 +14,7 @@ const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 
 pub fn main() void {
-    helper.main();
+    helper.main(0);
 }
 
 fn runToolchainOnOff(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, io: InputOutputPinInfo, off: bool) !toolchain.FitResults {

@@ -12,8 +12,8 @@ const Fuse = jedec.Fuse;
 
 var temp_alloc = TempAllocator {};
 
-pub fn main() void {
-    run() catch |e| {
+pub fn main(num_inputs: usize) void {
+    run(num_inputs) catch |e| {
         std.io.getStdErr().writer().print("{}\n", .{ e }) catch {};
         std.os.exit(1);
     };
@@ -23,7 +23,19 @@ pub fn resetTemp() void {
     temp_alloc.reset();
 }
 
-fn run() !void {
+pub const InputFileData = struct {
+    contents: []const u8,
+    filename: []const u8,
+    device: DeviceType,
+};
+
+var input_files: std.StringHashMapUnmanaged(InputFileData) = .{};
+
+pub fn getInputFile(filename: []const u8) ?InputFileData {
+    return input_files.get(filename);
+}
+
+fn run(num_inputs: usize) !void {
     temp_alloc = try TempAllocator.init(0x100_00000);
     defer temp_alloc.deinit();
 
@@ -44,6 +56,23 @@ fn run() !void {
 
     var out_dir = try std.fs.cwd().makeOpenPath(out_dir_path, .{});
     defer out_dir.close();
+
+    var i: usize = 0;
+    while (i < num_inputs) : (i += 1) {
+        const in_path = args.next() orelse return error.BadCommandLine;
+        const in_dir_path = std.fs.path.dirname(in_path) orelse return error.InvalidOutputPath;
+        const in_filename = std.fs.path.basename(in_path);
+        const in_device_str = std.fs.path.basename(in_dir_path);
+        const in_device = DeviceType.parse(in_device_str) orelse return error.InvalidDevice;
+
+        var contents = try std.fs.cwd().readFileAlloc(pa, in_path, 100_000_000);
+
+        try input_files.put(pa, in_filename, .{
+            .contents = contents,
+            .filename = in_filename,
+            .device = in_device,
+        });
+    }
 
     var keep = false;
     while (args.next()) |arg| {

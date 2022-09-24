@@ -13,7 +13,7 @@ const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 
 pub fn main() void {
-    helper.main();
+    helper.main(0);
 }
 
 fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: core.MacrocellRef, powerup_state: u1) !toolchain.FitResults {

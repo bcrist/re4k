@@ -540,6 +540,19 @@ pub const DeviceType = enum {
         }
         return null;
     }
+
+    pub fn getIOPin(self: DeviceType, glb: u8, mc: u8) ?pins.InputOutputPinInfo {
+        var iter = pins.OutputIterator {
+            .pins = self.getPins(),
+            .single_glb = glb,
+        };
+        while (iter.next()) |io| {
+            if (io.mc == mc) {
+                return io;
+            }
+        }
+        return null;
+    }
 };
 
 pub fn getGlbName(glb: u8) []const u8 {

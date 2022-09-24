@@ -1,6 +1,10 @@
-##!! include('build_ninja_2','LC4032ZE_csBGA64') !! 59 ##
+##!! include('build_ninja_2','LC4032ZE_csBGA64') !! 63 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 dev = LC4032\LC4032ZE_csBGA64
+
+rule convert-grp
+    command = zig-out/bin/convert-grp.exe $out $in
+build $dev/grp.sx: convert-grp LC4032\LC4032x_TQFP48\grp.sx
 
 rule zerohold
     command = zig-out/bin/zerohold.exe $out
@@ -54,6 +58,6 @@ rule clk_mux
     command = zig-out/bin/clk_mux.exe $out
 build $dev/clk_mux.sx: clk_mux
 
-build build-LC4032ZE_csBGA64: phony $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx $dev/pull.sx $dev/drive.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/ce_mux.sx $dev/reg_type.sx $dev/pt2_reset.sx $dev/pt3_reset.sx $dev/clk_mux.sx
+build build-LC4032ZE_csBGA64: phony $dev/grp.sx $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx $dev/pull.sx $dev/drive.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/ce_mux.sx $dev/reg_type.sx $dev/pt2_reset.sx $dev/pt3_reset.sx $dev/clk_mux.sx
 
 ## ######################### END OF GENERATED CODE ######################### ##

@@ -11,7 +11,7 @@ const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
 
 pub fn main() void {
-    helper.main();
+    helper.main(0);
 }
 
 fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_index: u16, slew: core.SlewRate) !toolchain.FitResults {

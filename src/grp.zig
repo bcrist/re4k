@@ -13,14 +13,13 @@ const Design = toolchain.Design;
 const GlbInputSignal = toolchain.GlbInputSignal;
 const GlbInputFitSignal = toolchain.GlbInputFitSignal;
 const FitResults = toolchain.FitResults;
-
 const GISet = toolchain.GISet;
 const GlbInputSet = toolchain.GlbInputSet;
 
 const max_routed_signals = 33;
 
 pub fn main() void {
-    helper.main();
+    helper.main(0);
 }
 
 var report_number: usize = 0;

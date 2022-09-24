@@ -43,6 +43,7 @@ function dir_visitor.exe (_, _, dir_path)
     local default_path = fs.compose_path_slash(dir_path, name .. '.zig')
     local executable = {
         name = name,
+        safe_name = name:gsub("[^A-Za-z0-9_]", "_"),
         dir = dir_path,
         path = default_path,
     }
@@ -186,15 +187,15 @@ end
 
 local write_exe = template [[
 
-const `name` = b.addExecutable("`name`", "`path`");`
+const `safe_name` = b.addExecutable("`name`", "`path`");`
 for dep in spairs(deps) do
-    write(nl, name, '.addPackage(', dep, ');')
+    write(nl, safe_name, '.addPackage(', dep, ');')
 end`
-`name`.linkLibC();
-`name`.setTarget(target);
-`name`.setBuildMode(mode);
-`name`.install();
-_ = makeRunStep(b, `name`, "`runStep`", "run `name`");
+`safe_name`.linkLibC();
+`safe_name`.setTarget(target);
+`safe_name`.setBuildMode(mode);
+`safe_name`.install();
+_ = makeRunStep(b, `safe_name`, "`runStep`", "run `name`");
 ]]
 
 for _, exe in spairs(exes) do
