@@ -60,7 +60,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
 
     var results = try tc.runToolchain(design);
     try helper.logReport("pt0_xor_glb{}_mc{}_{}", .{ mcref.glb, mcref.mc, xor }, results);
-    try results.checkTerm(true);
+    try results.checkTerm();
     return results;
 }
 

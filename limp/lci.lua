@@ -412,38 +412,3 @@ function write_lci_clusters (device, variant)
 
     pla:write(variant..'.tt4')
 end
-
-
-function write_lci_xor (device, glb, mc, variant)
-    local pla = make_pla()
-
-    write_lci_common { device = device }
-    writeln '\n[Location Assignments]'
-
-    for i = 0, mc - 1 do
-        local sig = 'd'..i
-        assign_node_location(sig, device.glb(glb).mc(i))
-        pla:pt('x0', sig)
-        pla:pt('x1', sig)
-        pla:pt('x2', sig)
-        pla:pt('x3', sig)
-        pla:pt('x4', sig)
-    end
-
-    assign_node_location('out', device.glb(glb).mc(mc))
-    pla:pt('in1', 'out.C')
-
-    if variant == 'normal' then
-        pla:pt('in1', 'out.D')
-        pla:pt('in2', 'out.D')
-    elseif variant == 'invert' then
-        pla:pt('in1', 'out.D-')
-        pla:pt('in2', 'out.D-')
-    elseif variant == 'xor_pt0' then
-        pla:pt({'in1','in2'}, 'out.D')
-    elseif variant == 'xor_npt0' then
-        pla:pt({'in1','in2'}, 'out.D-')
-    end
-
-    pla:write(variant..'.tt4')
-end

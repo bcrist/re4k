@@ -43,7 +43,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
 
     var results = try tc.runToolchain(design);
     try helper.logReport("reg_type_glb{}_mc{}_{s}", .{ mcref.glb, mcref.mc, @tagName(reg_type) }, results);
-    try results.checkTerm(false);
+    try results.checkTerm();
     return results;
 }
 
@@ -66,7 +66,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
         var diff = try dev.initJedecZeroes(ta);
         for (&[_]core.MacrocellType { .d_ff, .t_ff }) |reg_type| {
-            diff.unionAll(try JedecData.initDiff(ta, data.get(reg_type).?, data.get(.latch).?));
+            diff.unionDiff(data.get(reg_type).?, data.get(.latch).?);
         }
 
         // ignore differences in PTs and GLB routing

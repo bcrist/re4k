@@ -9,9 +9,12 @@ const TempAllocator = @import("temp_allocator");
 const DeviceType = devices.DeviceType;
 const Toolchain = toolchain.Toolchain;
 const Fuse = jedec.Fuse;
+const FuseRange = jedec.FuseRange;
 const GlbInputSignal = toolchain.GlbInputSignal;
+const MacrocellRef = core.MacrocellRef;
 
 var temp_alloc = TempAllocator {};
+//var arena: std.heap.ArenaAllocator = undefined;
 
 pub fn main(num_inputs: usize) void {
     run(num_inputs) catch |e| {
@@ -21,6 +24,8 @@ pub fn main(num_inputs: usize) void {
 }
 
 pub fn resetTemp() void {
+    //arena.deinit();
+    //arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     temp_alloc.reset();
 }
 
@@ -37,16 +42,19 @@ pub fn getInputFile(filename: []const u8) ?InputFileData {
 }
 
 fn run(num_inputs: usize) !void {
-    temp_alloc = try TempAllocator.init(0x100_00000);
+    //arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    //defer arena.deinit();
+    temp_alloc = try TempAllocator.init(0x1000_00000);
     defer temp_alloc.deinit();
 
     var perm_alloc = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     defer perm_alloc.deinit();
 
     var ta = temp_alloc.allocator();
+    //var ta = arena.allocator();
     var pa = perm_alloc.allocator();
 
-    var args = try std.process.ArgIterator.initWithAllocator(ta);
+    var args = try std.process.ArgIterator.initWithAllocator(pa);
     _ = args.next() orelse std.os.exit(255);
 
     const out_path = args.next() orelse return error.BadCommandLine;
@@ -61,13 +69,12 @@ fn run(num_inputs: usize) !void {
     var i: usize = 0;
     while (i < num_inputs) : (i += 1) {
         const in_path = args.next() orelse return error.BadCommandLine;
-        const in_dir_path = std.fs.path.dirname(in_path) orelse return error.InvalidOutputPath;
+        const in_dir_path = std.fs.path.dirname(in_path) orelse return error.InvalidInputPath;
         const in_filename = std.fs.path.basename(in_path);
         const in_device_str = std.fs.path.basename(in_dir_path);
         const in_device = DeviceType.parse(in_device_str) orelse return error.InvalidDevice;
 
         var contents = try std.fs.cwd().readFileAlloc(pa, in_path, 100_000_000);
-
         try input_files.put(pa, in_filename, .{
             .contents = contents,
             .filename = in_filename,
@@ -103,6 +110,7 @@ var report_dir: ?*std.fs.Dir = null;
 pub fn logReport(comptime name_fmt: []const u8, name_args: anytype, results: toolchain.FitResults) !void {
     if (report_dir) |dir| {
         const filename = try std.fmt.allocPrint(temp_alloc.allocator(), name_fmt ++ ".rpt", name_args);
+        //const filename = try std.fmt.allocPrint(arena.allocator(), name_fmt ++ ".rpt", name_args);
         var f = try dir.createFile(filename, .{});
         defer f.close();
 
@@ -111,7 +119,7 @@ pub fn logReport(comptime name_fmt: []const u8, name_args: anytype, results: too
 }
 
 pub const ErrorContext = struct {
-    mcref: ?core.MacrocellRef = null,
+    mcref: ?MacrocellRef = null,
     glb: ?u8 = null,
     mc: ?u8 = null,
     pin_index: ?u16 = null,
@@ -175,8 +183,49 @@ pub fn writeFuseOptValue(writer: anytype, fuse: Fuse, value: usize) !void {
     try writer.close();
 }
 
+pub fn parseClusterUsage(ta: std.mem.Allocator, glb: u8, report: []const u8, mc: u8) !std.StaticBitSet(16) {
+    var cluster_usage = std.StaticBitSet(16).initEmpty();
+    const header = try std.fmt.allocPrint(ta, "GLB_{s}_CLUSTER_TABLE", .{ devices.getGlbName(glb) });
+    if (extract(report, header, "<Note>")) |raw| {
+        var line_iter = std.mem.tokenize(u8, raw, "\r\n");
+        while (line_iter.next()) |line| {
+            if (line[0] != 'M') {
+                continue; // ignore remaining header/footer lines
+            }
+
+            var line_mc = try std.fmt.parseInt(u8, line[1..3], 10);
+            if (line_mc == mc) {
+                cluster_usage.setValue(0,  isClusterUsed(line[4]));
+                cluster_usage.setValue(1,  isClusterUsed(line[5]));
+                cluster_usage.setValue(2,  isClusterUsed(line[6]));
+                cluster_usage.setValue(3,  isClusterUsed(line[7]));
+                cluster_usage.setValue(4,  isClusterUsed(line[9]));
+                cluster_usage.setValue(5,  isClusterUsed(line[10]));
+                cluster_usage.setValue(6,  isClusterUsed(line[11]));
+                cluster_usage.setValue(7,  isClusterUsed(line[12]));
+                cluster_usage.setValue(8,  isClusterUsed(line[14]));
+                cluster_usage.setValue(9,  isClusterUsed(line[15]));
+                cluster_usage.setValue(10, isClusterUsed(line[16]));
+                cluster_usage.setValue(11, isClusterUsed(line[17]));
+                cluster_usage.setValue(12, isClusterUsed(line[19]));
+                cluster_usage.setValue(13, isClusterUsed(line[20]));
+                cluster_usage.setValue(14, isClusterUsed(line[21]));
+                cluster_usage.setValue(15, isClusterUsed(line[22]));
+            }
+        }
+    }
+    return cluster_usage;
+}
+
+fn isClusterUsed(report_value: u8) bool {
+    return switch (report_value) {
+        '0'...'5' => true,
+        else => false,
+    };
+}
+
 pub fn parseGRP(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*DeviceType) !std.AutoHashMap(Fuse, GlbInputSignal) {
-    const input_file = getInputFile("grp.sx") orelse return error.InvalidCommandLine;
+    const input_file = getInputFile("grp.sx") orelse return error.MissingGRPInputFile;
     const device = input_file.device;
 
     var results = std.AutoHashMap(Fuse, GlbInputSignal).init(pa);
@@ -262,6 +311,123 @@ fn parseGRP0(parser: *sx.Parser, device: DeviceType, pin_number_to_index: *const
         try parser.requireClose(); // glb
     }
     try parser.requireClose(); // global_routing_pool
+    try parser.requireClose(); // device
+    try parser.requireDone();
+}
+
+pub fn parseMCOptionsColumns(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*DeviceType) !std.AutoHashMap(MacrocellRef, FuseRange) {
+    const input_file = getInputFile("invert.sx") orelse return error.MissingInvertInputFile;
+    const device = input_file.device;
+
+    var results = std.AutoHashMap(MacrocellRef, FuseRange).init(pa);
+    try results.ensureTotalCapacity(device.getNumMcs());
+
+    var parser = try sx.Parser.init(input_file.contents, ta);
+    defer parser.deinit();
+
+    parseMCOptionsColumns0(&parser, device, &results) catch |e| switch (e) {
+        error.SExpressionSyntaxError => {
+            try parser.printParseErrorContext();
+            return e;
+        },
+        else => return e,
+    };
+
+    if (out_device) |ptr| {
+        ptr.* = device;
+    }
+
+    return results;
+}
+
+fn parseMCOptionsColumns0(parser: *sx.Parser, device: DeviceType, results: *std.AutoHashMap(MacrocellRef, FuseRange)) !void {
+    _ = try parser.requireAnyExpression(); // device name, we already know it
+    try parser.requireExpression("invert_sum");
+
+    var options_range = device.getOptionsRange();
+
+    var glb: u8 = 0;
+    while (glb < device.getNumGlbs()) : (glb += 1) {
+        try parser.requireExpression("glb");
+        var parsed_glb = try parser.requireAnyInt(u8, 10);
+        std.debug.assert(glb == parsed_glb);
+        if (try parser.expression("name")) {
+            try parser.ignoreRemainingExpression();
+        }
+
+        while (try parser.expression("mc")) {
+            var mc = try parser.requireAnyInt(u8, 10);
+
+            try parser.requireExpression("fuse");
+            _ = try parser.requireAnyInt(u16, 10);
+            var col = try parser.requireAnyInt(u16, 10);
+
+            var col_range = FuseRange.between(Fuse.init(0, col), Fuse.init(device.getJedecHeight() - 1, col));
+            var opt_range = col_range.intersection(options_range);
+            try results.put(.{ .glb = glb, .mc = mc }, opt_range);
+
+            try parser.requireClose(); // fuse
+            try parser.requireClose(); // mc
+        }
+        try parser.requireClose(); // glb
+    }
+    while (try parser.expression("value")) {
+        try parser.ignoreRemainingExpression();
+    }
+    try parser.requireClose(); // invert_sum
+    try parser.requireClose(); // device
+    try parser.requireDone();
+}
+
+pub fn parseORMRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*DeviceType) !std.DynamicBitSet {
+    const input_file = getInputFile("orm.sx") orelse return error.MissingORMInputFile;
+    const device = input_file.device;
+
+    var results = try std.DynamicBitSet.initEmpty(pa, device.getJedecHeight());
+
+    var parser = try sx.Parser.init(input_file.contents, ta);
+    defer parser.deinit();
+
+    parseORMRows0(&parser, &results) catch |e| switch (e) {
+        error.SExpressionSyntaxError => {
+            try parser.printParseErrorContext();
+            return e;
+        },
+        else => return e,
+    };
+
+    if (out_device) |ptr| {
+        ptr.* = device;
+    }
+
+    return results;
+}
+
+fn parseORMRows0(parser: *sx.Parser, results: *std.DynamicBitSet) !void {
+    _ = try parser.requireAnyExpression(); // device name, we already know it
+    try parser.requireExpression("output_routing_mux");
+
+    while (try parser.expression("pin")) {
+        _ = try parser.requireAnyString();
+
+        while (try parser.expression("fuse")) {
+            var row = try parser.requireAnyInt(u16, 10);
+            _ = try parser.requireAnyInt(u16, 10);
+
+            if (try parser.expression("value")) {
+                try parser.ignoreRemainingExpression();
+            }
+
+            results.set(row);
+
+            try parser.requireClose(); // fuse
+        }
+        try parser.requireClose(); // pin
+    }
+    while (try parser.expression("value")) {
+        try parser.ignoreRemainingExpression();
+    }
+    try parser.requireClose(); // invert_sum
     try parser.requireClose(); // device
     try parser.requireDone();
 }

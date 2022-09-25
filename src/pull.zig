@@ -30,7 +30,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
 
     var results = try tc.runToolchain(design);
     try helper.logReport("pull_pin{s}_{s}", .{ dev.getPins()[pin_index].pin_number(), @tagName(pull) }, results);
-    try results.checkTerm(true);
+    try results.checkTerm();
     return results;
 }
 
@@ -70,13 +70,13 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         const results_keeper = try runToolchain(ta, tc, dev, pin_index, .keeper);
 
         var diff = try JedecData.initDiff(ta, results_pullup.jedec, results_pulldown.jedec);
-        diff.unionAll(try JedecData.initDiff(ta, results_keeper.jedec, results_pulldown.jedec));
+        diff.unionDiff(results_keeper.jedec, results_pulldown.jedec);
 
         if (has_per_pin_config) {
             try writer.expression("pin");
             try writer.printRaw("{s}", .{ pin_number });
 
-            diff.unionAll(try JedecData.initDiff(ta, results_float.jedec, results_pulldown.jedec));
+            diff.unionDiff(results_float.jedec, results_pulldown.jedec);
         } else {
             var temp_diff = try JedecData.initDiff(ta, results_float.jedec, results_pulldown.jedec);
             var diff_iter = temp_diff.iterator(.{});

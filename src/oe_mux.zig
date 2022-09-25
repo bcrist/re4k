@@ -38,7 +38,7 @@ fn runToolchainOnOff(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, io:
     } else {
         try helper.logReport("on.glb{}.mc{}", .{ glb, mc }, results);
     }
-    try results.checkTerm(false);
+    try results.checkTerm();
     return results;
 }
 
@@ -102,7 +102,7 @@ fn runToolchainGOE(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, io: I
     } else {
         try helper.logReport("nogoe.glb{}.mc{}", .{ glb, mc }, results);
     }
-    try results.checkTerm(false);
+    try results.checkTerm();
     return results;
 }
 
@@ -235,7 +235,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, io: Inpu
 
     var results = try tc.runToolchain(design);
     try helper.logReport("{s}.glb{}.mc{}", .{ @tagName(mode), glb, mc }, results);
-    try results.checkTerm(false);
+    try results.checkTerm();
     return results;
 }
 
@@ -259,10 +259,10 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         );
 
         // Next check GOE2 vs output-only; this should find the other two OE mux fuses.
-        diff.unionAll(try JedecData.initDiff(ta, 
-                (try runToolchainGOE(ta, tc, dev, io, false)).jedec,
-                (try runToolchainGOE(ta, tc, dev, io, true)).jedec,
-            ));
+        diff.unionDiff(
+            (try runToolchainGOE(ta, tc, dev, io, false)).jedec,
+            (try runToolchainGOE(ta, tc, dev, io, true)).jedec,
+        );
 
         try writer.expression("pin");
         try writer.printRaw("{s}", .{ io.pin_number });

@@ -25,7 +25,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
 
     var results = try tc.runToolchain(design);
     try helper.logReport("slew_pin_{s}", .{ dev.getPins()[pin_index].pin_number() }, results);
-    try results.checkTerm(false);
+    try results.checkTerm();
     return results;
 }
 

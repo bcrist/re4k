@@ -128,7 +128,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
 
     var results = try tc.runToolchain(design);
     try helper.logReport("clk_mux_glb{}_mc{}_{s}", .{ mcref.glb, mcref.mc, @tagName(src) }, results);
-    try results.checkTerm(false);
+    try results.checkTerm();
     return results;
 }
 
@@ -154,7 +154,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         }
 
         for (&[_]ClockSource { .clk0, .clk2, .shared_pt }) |src| {
-            diff.unionAll(try JedecData.initDiff(ta, data.get(src).?, data.get(.gnd).?));
+            diff.unionDiff(data.get(src).?, data.get(.gnd).?);
         }
 
         // ignore differences in PTs and GLB routing

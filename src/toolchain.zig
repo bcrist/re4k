@@ -250,7 +250,7 @@ pub const Design = struct {
         }
 
         try self.inputs.append(self.alloc, sig);
-        try self.addPinIfNotNode(stripSignalSuffix(signal));
+        try self.addPinIfNotNode(stripSignalSuffix(sig));
     }
 
     pub fn addOutput(self: *Design, signal: []const u8) !void {
@@ -859,13 +859,12 @@ pub const GlbFitData = struct {
 pub const FitResults = struct {
     term: std.ChildProcess.Term,
     failed: bool,
-    warnings: []const u8,
     report: []const u8,
     jedec: JedecData,
     //signals: []SignalFitData,
     glbs: []GlbFitData,
 
-    pub fn checkTerm(self: FitResults, ignore_warnings: bool) !void {
+    pub fn checkTerm(self: FitResults) !void {
         switch (self.term) {
             .Exited => |code| {
                 if (code != 0) {
@@ -889,8 +888,6 @@ pub const FitResults = struct {
         if (self.failed) {
             try std.io.getStdErr().writer().writeAll("Fitter failed to generate a valid device configuration!\n");
             return error.FitterError;
-        } else if (self.warnings.len > 0 and !ignore_warnings) {
-            try std.io.getStdErr().writer().print("Fitter had warnings:\n{s}\n", .{ self.warnings });
         }
     }
 };
@@ -974,15 +971,10 @@ pub const Toolchain = struct {
         var log = try self.readFile("test.log");
 
         var failed = !std.meta.eql(term, std.ChildProcess.Term { .Exited = 0 });
-        var warnings: []const u8 = "";
 
-        if (!std.mem.eql(u8, log, "Project 'test' was Fitted Successfully!\r\n")) {
-            if (!std.mem.containsAtLeast(u8, log, 1, "Project 'test' was Fitted Successfully!")) {
-                std.debug.print("Unexpected fitter log:\n {s}\n", .{ log });
-                failed = true;
-            } else {
-                warnings = log;
-            }
+        if (!failed and !std.mem.containsAtLeast(u8, log, 1, "Project 'test' was Fitted Successfully!")) {
+            std.debug.print("Unexpected fitter log:\n {s}\n", .{ log });
+            failed = true;
         }
 
         var report: []const u8 = "";
@@ -997,7 +989,6 @@ pub const Toolchain = struct {
         var results = FitResults {
             .term = term,
             .failed = failed,
-            .warnings = warnings,
             .report = report,
             .jedec = jed,
             //.signals = &[_]SignalFitData{},

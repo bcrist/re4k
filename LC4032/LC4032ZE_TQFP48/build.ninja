@@ -1,79 +1,83 @@
-##!! include('build_ninja_2','LC4032ZE_TQFP48') !! 79 ##
+##!! include('build_ninja_2','LC4032ZE_TQFP48') !! 83 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 dev = LC4032\LC4032ZE_TQFP48
 
 rule convert-grp
     command = zig-out/bin/convert-grp.exe $out $in
-build $dev/grp.sx: convert-grp LC4032\LC4032x_TQFP48\grp.sx
-
-rule zerohold
-    command = zig-out/bin/zerohold.exe $out
-build $dev/zerohold.sx: zerohold
-
-rule slew
-    command = zig-out/bin/slew.exe $out
-build $dev/slew.sx: slew
-
-rule threshold
-    command = zig-out/bin/threshold.exe $out
-build $dev/threshold.sx: threshold
-
-rule pull
-    command = zig-out/bin/pull.exe $out
-build $dev/pull.sx: pull
-
-rule drive
-    command = zig-out/bin/drive.exe $out
-build $dev/drive.sx: drive
-
-rule oe_mux
-    command = zig-out/bin/oe_mux.exe $out
-build $dev/oe_mux.sx: oe_mux
-
-rule orm
-    command = zig-out/bin/orm.exe $out
-build $dev/orm.sx: orm
-
-rule powerup_state
-    command = zig-out/bin/powerup_state.exe $out
-build $dev/powerup_state.sx: powerup_state
+build $dev\grp.sx: convert-grp LC4032\LC4032x_TQFP48\grp.sx
 
 rule ce_mux
-    command = zig-out/bin/ce_mux.exe $out
+    command = zig-out/bin/ce_mux.exe $out $in
 build $dev/ce_mux.sx: ce_mux
 
-rule reg_type
-    command = zig-out/bin/reg_type.exe $out
-build $dev/reg_type.sx: reg_type
-
-rule pt2_reset
-    command = zig-out/bin/pt2_reset.exe $out
-build $dev/pt2_reset.sx: pt2_reset
-
-rule pt3_reset
-    command = zig-out/bin/pt3_reset.exe $out
-build $dev/pt3_reset.sx: pt3_reset
-
 rule clk_mux
-    command = zig-out/bin/clk_mux.exe $out
+    command = zig-out/bin/clk_mux.exe $out $in
 build $dev/clk_mux.sx: clk_mux
 
+rule cluster_steering
+    command = zig-out/bin/cluster_steering.exe $out $in
+build $dev/cluster_steering.sx: cluster_steering $dev/invert.sx $dev/orm.sx
+
+rule drive
+    command = zig-out/bin/drive.exe $out $in
+build $dev/drive.sx: drive
+
 rule input_reg
-    command = zig-out/bin/input_reg.exe $out
+    command = zig-out/bin/input_reg.exe $out $in
 build $dev/input_reg.sx: input_reg
 
 rule invert
-    command = zig-out/bin/invert.exe $out
+    command = zig-out/bin/invert.exe $out $in
 build $dev/invert.sx: invert
 
+rule oe_mux
+    command = zig-out/bin/oe_mux.exe $out $in
+build $dev/oe_mux.sx: oe_mux
+
+rule orm
+    command = zig-out/bin/orm.exe $out $in
+build $dev/orm.sx: orm
+
+rule powerup_state
+    command = zig-out/bin/powerup_state.exe $out $in
+build $dev/powerup_state.sx: powerup_state
+
 rule pt0_xor
-    command = zig-out/bin/pt0_xor.exe $out
+    command = zig-out/bin/pt0_xor.exe $out $in
 build $dev/pt0_xor.sx: pt0_xor
+
+rule pt2_reset
+    command = zig-out/bin/pt2_reset.exe $out $in
+build $dev/pt2_reset.sx: pt2_reset
+
+rule pt3_reset
+    command = zig-out/bin/pt3_reset.exe $out $in
+build $dev/pt3_reset.sx: pt3_reset
 
 rule pterms
     command = zig-out/bin/pterms.exe $out $in
 build $dev/pterms.sx: pterms $dev/grp.sx
 
-build build-LC4032ZE_TQFP48: phony $dev/grp.sx $dev/zerohold.sx $dev/slew.sx $dev/threshold.sx $dev/pull.sx $dev/drive.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/ce_mux.sx $dev/reg_type.sx $dev/pt2_reset.sx $dev/pt3_reset.sx $dev/clk_mux.sx $dev/input_reg.sx $dev/invert.sx $dev/pt0_xor.sx $dev/pterms.sx
+rule pull
+    command = zig-out/bin/pull.exe $out $in
+build $dev/pull.sx: pull
+
+rule reg_type
+    command = zig-out/bin/reg_type.exe $out $in
+build $dev/reg_type.sx: reg_type
+
+rule slew
+    command = zig-out/bin/slew.exe $out $in
+build $dev/slew.sx: slew
+
+rule threshold
+    command = zig-out/bin/threshold.exe $out $in
+build $dev/threshold.sx: threshold
+
+rule zerohold
+    command = zig-out/bin/zerohold.exe $out $in
+build $dev/zerohold.sx: zerohold
+
+build build-LC4032ZE_TQFP48: phony $dev/grp.sx $dev/ce_mux.sx $dev/clk_mux.sx $dev/cluster_steering.sx $dev/drive.sx $dev/input_reg.sx $dev/invert.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/pt0_xor.sx $dev/pt2_reset.sx $dev/pt3_reset.sx $dev/pterms.sx $dev/pull.sx $dev/reg_type.sx $dev/slew.sx $dev/threshold.sx $dev/zerohold.sx
 
 ## ######################### END OF GENERATED CODE ######################### ##

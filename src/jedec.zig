@@ -70,7 +70,7 @@ pub const FuseRange = struct {
     pub fn intersection(a: FuseRange, b: FuseRange) FuseRange {
         return .{
             .min = Fuse.init(@maximum(a.min.row, b.min.row), @maximum(a.min.col, b.min.col)),
-            .max = Fuse.init(@minimum(a.max.row, b.max.row), @maximum(a.max.col, b.max.col)),
+            .max = Fuse.init(@minimum(a.max.row, b.max.row), @minimum(a.max.col, b.max.col)),
         };
     }
 
@@ -639,6 +639,31 @@ pub const JedecData = struct {
             const s: u1 = self.security orelse 0;
             const o: u1 = other.security orelse 0;
             self.security = s | o;
+        }
+    }
+
+    pub fn unionDiff(self: *JedecData, a: JedecData, b: JedecData) void {
+        std.debug.assert(self.getRange().eql(a.getRange()));
+        std.debug.assert(self.getRange().eql(b.getRange()));
+
+        const MaskInt = @TypeOf(self.raw.masks[0]);
+        const num_masks = (self.raw.bit_length + (@bitSizeOf(MaskInt) - 1)) / @bitSizeOf(MaskInt);
+        for (self.raw.masks[0..num_masks]) |*mask, i| {
+            mask.* |= a.raw.masks[i] ^ b.raw.masks[i];
+        }
+
+        if (self.usercode != null or a.usercode != null or b.usercode != null) {
+            const su: u32 = self.usercode orelse 0;
+            const au: u32 = a.usercode orelse 0;
+            const bu: u32 = b.usercode orelse 0;
+            self.usercode = su | au | bu;
+        }
+
+        if (self.security != null or a.security != null or b.security != null) {
+            const ss: u1 = self.security orelse 0;
+            const as: u1 = a.security orelse 0;
+            const bs: u1 = b.security orelse 0;
+            self.security = ss | as | bs;
         }
     }
 

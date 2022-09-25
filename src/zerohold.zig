@@ -17,12 +17,12 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     var design = Design.init(ta, dev);
     try design.addPT("in", "out");
     const results_without_zero_hold = try tc.runToolchain(design);
-    try results_without_zero_hold.checkTerm(false);
+    try results_without_zero_hold.checkTerm();
     try tc.cleanTempDir();
 
     design.zero_hold_time = true;
     const results_with_zero_hold = try tc.runToolchain(design);
-    try results_with_zero_hold.checkTerm(false);
+    try results_with_zero_hold.checkTerm();
 
     const diff = try JedecData.initDiff(ta, results_without_zero_hold.jedec, results_with_zero_hold.jedec);
 

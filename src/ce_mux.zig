@@ -75,7 +75,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
 
     var results = try tc.runToolchain(design);
     try helper.logReport("ce_mux_glb{}_mc{}_{s}", .{ mcref.glb, mcref.mc, @tagName(src) }, results);
-    try results.checkTerm(false);
+    try results.checkTerm();
     return results;
 }
 
@@ -100,7 +100,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             data.put(src, results.jedec);
 
             if (src != .always) {
-                diff.unionAll(try JedecData.initDiff(ta, results.jedec, data.get(.always).?));
+                diff.unionDiff(results.jedec, data.get(.always).?);
             }
         }
 

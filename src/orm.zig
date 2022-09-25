@@ -49,7 +49,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
 
     var results = try tc.runToolchain(design);
     try helper.logReport("orm_{s}_plus{}", .{ out_info.pin_number, offset }, results);
-    try results.checkTerm(false);
+    try results.checkTerm();
     return results;
 }
 
@@ -71,7 +71,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         const results_4 = try runToolchain(ta, tc, dev, io.pin_index, 4);
 
         var diff = try JedecData.initDiff(ta, results_1.jedec, results_2.jedec);
-        diff.unionAll(try JedecData.initDiff(ta, results_1.jedec, results_4.jedec));
+        diff.unionDiff(results_1.jedec, results_4.jedec);
 
         try writer.expression("pin");
         try writer.printRaw("{s}", .{ io.pin_number });
