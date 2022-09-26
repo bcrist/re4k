@@ -6,7 +6,6 @@
 * Bitstream configuration through zig
 * Bitstream decompilation
 * PT4 OE routing fuse
-* Wide routing (1b)
 * shared clk/init polarity
 * gclk/goe polarity
 * 5-PT fast bypass for non-ZE families

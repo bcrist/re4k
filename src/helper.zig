@@ -14,7 +14,6 @@ const GlbInputSignal = toolchain.GlbInputSignal;
 const MacrocellRef = core.MacrocellRef;
 
 var temp_alloc = TempAllocator {};
-//var arena: std.heap.ArenaAllocator = undefined;
 
 pub fn main(num_inputs: usize) void {
     run(num_inputs) catch |e| {
@@ -24,8 +23,6 @@ pub fn main(num_inputs: usize) void {
 }
 
 pub fn resetTemp() void {
-    //arena.deinit();
-    //arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     temp_alloc.reset();
 }
 
@@ -42,8 +39,6 @@ pub fn getInputFile(filename: []const u8) ?InputFileData {
 }
 
 fn run(num_inputs: usize) !void {
-    //arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    //defer arena.deinit();
     temp_alloc = try TempAllocator.init(0x1000_00000);
     defer temp_alloc.deinit();
 
@@ -51,7 +46,6 @@ fn run(num_inputs: usize) !void {
     defer perm_alloc.deinit();
 
     var ta = temp_alloc.allocator();
-    //var ta = arena.allocator();
     var pa = perm_alloc.allocator();
 
     var args = try std.process.ArgIterator.initWithAllocator(pa);
@@ -110,7 +104,6 @@ var report_dir: ?*std.fs.Dir = null;
 pub fn logReport(comptime name_fmt: []const u8, name_args: anytype, results: toolchain.FitResults) !void {
     if (report_dir) |dir| {
         const filename = try std.fmt.allocPrint(temp_alloc.allocator(), name_fmt ++ ".rpt", name_args);
-        //const filename = try std.fmt.allocPrint(arena.allocator(), name_fmt ++ ".rpt", name_args);
         var f = try dir.createFile(filename, .{});
         defer f.close();
 
@@ -428,6 +421,65 @@ fn parseORMRows0(parser: *sx.Parser, results: *std.DynamicBitSet) !void {
         try parser.ignoreRemainingExpression();
     }
     try parser.requireClose(); // invert_sum
+    try parser.requireClose(); // device
+    try parser.requireDone();
+}
+
+pub fn parseClusterSteeringRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*DeviceType) !std.DynamicBitSet {
+    const input_file = getInputFile("cluster_steering.sx") orelse return error.MissingClusterSteeringInputFile;
+    const device = input_file.device;
+
+    var results = try std.DynamicBitSet.initEmpty(pa, device.getJedecHeight());
+
+    var parser = try sx.Parser.init(input_file.contents, ta);
+    defer parser.deinit();
+
+    parseClusterSteeringRows0(&parser, &results) catch |e| switch (e) {
+        error.SExpressionSyntaxError => {
+            try parser.printParseErrorContext();
+            return e;
+        },
+        else => return e,
+    };
+
+    if (out_device) |ptr| {
+        ptr.* = device;
+    }
+
+    return results;
+}
+
+fn parseClusterSteeringRows0(parser: *sx.Parser, results: *std.DynamicBitSet) !void {
+    _ = try parser.requireAnyExpression(); // device name, we already know it
+    try parser.requireExpression("cluster_steering");
+
+    while (try parser.expression("glb")) {
+        _ = try parser.requireAnyInt(u16, 10);
+
+        while (try parser.expression("mc")) {
+            _ = try parser.requireAnyInt(u16, 10);
+
+            while (try parser.expression("fuse")) {
+                var row = try parser.requireAnyInt(u16, 10);
+                _ = try parser.requireAnyInt(u16, 10);
+
+                if (try parser.expression("value")) {
+                    try parser.ignoreRemainingExpression();
+                }
+
+                results.set(row);
+
+                try parser.requireClose(); // fuse
+            }
+
+            try parser.requireClose(); // mc
+        }
+        try parser.requireClose(); // glb
+    }
+    while (try parser.expression("value")) {
+        try parser.ignoreRemainingExpression();
+    }
+    try parser.requireClose(); // cluster_steering
     try parser.requireClose(); // device
     try parser.requireDone();
 }

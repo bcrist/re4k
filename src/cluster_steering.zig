@@ -85,7 +85,6 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     try writer.expressionExpanded("cluster_steering");
 
     var glb_arena = try TempAllocator.init(0x100_00000);
-    //var glb_arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     defer glb_arena.deinit();
     var ga = glb_arena.allocator();
 
@@ -94,8 +93,6 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     var glb: u8 = 0;
     while (glb < dev.getNumGlbs()) : (glb += 1) {
         glb_arena.reset();
-        //glb_arena.deinit();
-        //glb_arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 
         var steering_data = ClusterSteeringMap.init(ga);
         try steering_data.ensureTotalCapacity(80);

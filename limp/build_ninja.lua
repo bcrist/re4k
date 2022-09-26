@@ -316,15 +316,7 @@ readme = [[
         1 : Route this cluster allocator's output to this MC
         0 : Route this cluster allocator's output to the cluster allocator for MC+4, wrapping around if above 15
 
-    rows 74, 75: Cluster allocator steering
-         0   0 : Route this cluster to the allocator for MC-2
-         0   1 : Route this cluster to the allocator for MC+1
-         1   0 : Route this cluster to this allocator
-         1   1 : Route this cluster to the allocator for MC-1
-
 ]]})
-
-perMacrocellTest(dev, 'xor', { 'normal', 'invert', 'xor_pt0', 'xor_npt0' }, { diff_options = '--include 72:0-99:171'})
 
 globalTest(dev, 'osctimer', { 'none', 'oscout', 'timerout', 'timerout_timerres', 'oscout_dynoscdis' }, { diff_options = '--include 75:165-99:171 --exclude 85:0-86:171 --exclude 95:0-95:171 --exclude 87:168-90:168 --exclude 87:171-91:171'})
 

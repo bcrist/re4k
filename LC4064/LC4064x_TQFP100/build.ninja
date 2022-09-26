@@ -1,4 +1,4 @@
-##!! include('build_ninja_2','LC4064x_TQFP100') !! 83 ##
+##!! include('build_ninja_2','LC4064x_TQFP100') !! 87 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 dev = LC4064\LC4064x_TQFP100
 
@@ -74,10 +74,14 @@ rule threshold
     command = zig-out/bin/threshold.exe $out $in
 build $dev/threshold.sx: threshold
 
+rule wide_steering
+    command = zig-out/bin/wide_steering.exe $out $in
+build $dev/wide_steering.sx: wide_steering $dev/cluster_steering.sx
+
 rule zerohold
     command = zig-out/bin/zerohold.exe $out $in
 build $dev/zerohold.sx: zerohold
 
-build build-LC4064x_TQFP100: phony $dev/grp.sx $dev/ce_mux.sx $dev/clk_mux.sx $dev/cluster_steering.sx $dev/drive.sx $dev/input_reg.sx $dev/invert.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/pt0_xor.sx $dev/pt2_reset.sx $dev/pt3_reset.sx $dev/pterms.sx $dev/pull.sx $dev/reg_type.sx $dev/slew.sx $dev/threshold.sx $dev/zerohold.sx
+build build-LC4064x_TQFP100: phony $dev/grp.sx $dev/ce_mux.sx $dev/clk_mux.sx $dev/cluster_steering.sx $dev/drive.sx $dev/input_reg.sx $dev/invert.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/pt0_xor.sx $dev/pt2_reset.sx $dev/pt3_reset.sx $dev/pterms.sx $dev/pull.sx $dev/reg_type.sx $dev/slew.sx $dev/threshold.sx $dev/wide_steering.sx $dev/zerohold.sx
 
 ## ######################### END OF GENERATED CODE ######################### ##

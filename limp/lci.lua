@@ -379,36 +379,3 @@ function write_lci_shared_ptinit_polarity (device, glb, variant)
 
     pla:write(variant..'.tt4')
 end
-
-function write_lci_clusters (device, variant)
-    local pla = make_pla()
-    write_lci_common { device = device }
-    writeln '\n[Location Assignments]'
-
-    local n = variant + 0
-    for i = 1, n do
-        local inputs = {
-            'i0',
-            'i1',
-            'i2',
-            'i3',
-            'i4',
-            'i5',
-            'i6',
-        }
-
-        if i & 1 == 0 then inputs[1] = '~i0' end
-        if i & 2 == 0 then inputs[2] = '~i1' end
-        if i & 4 == 0 then inputs[3] = '~i2' end
-        if i & 8 == 0 then inputs[4] = '~i3' end
-        if i & 16 == 0 then inputs[5] = '~i4' end
-        if i & 32 == 0 then inputs[6] = '~i5' end
-        if i & 64 == 0 then inputs[7] = '~i6' end
-
-        pla:pt(inputs, 'out')
-    end
-
-    assign_node_location('out', device.glb(0).mc(1))
-
-    pla:write(variant..'.tt4')
-end

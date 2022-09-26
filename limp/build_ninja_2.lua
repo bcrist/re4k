@@ -17,7 +17,8 @@ local jobs = {
     invert           = {},
     pt0_xor          = {},
     pterms           = { 'grp' },
-    cluster_steering = { 'invert', 'orm' }
+    cluster_steering = { 'invert', 'orm' },
+    wide_steering    = { 'cluster_steering' },
 }
 
 writeln('dev = ', fs.compose_path(device:sub(1, 6), device), nl)
