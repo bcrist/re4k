@@ -22,3 +22,9 @@ temp/
 *.cmi
 *_pin.csv
 LCIEdit.dum
+
+#Kicad
+**/gerbers/
+*-backups/
+fp-info-cache
+*.kicad_*-bak

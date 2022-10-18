@@ -28,6 +28,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
     // making the main output registered should prevent the use of the ORP bypass,
     // except in the case where offset == 0.
     // We'll test the ORP bypass mux separately, for families that have it.
+    // (see output_routing_mode.zig)
     try design.addPT("in", "out.D");
 
     const out_info = dev.getPins()[pin_index].input_output;

@@ -140,17 +140,6 @@ local function get_package (pkg_name)
     return pkg
 end
 
-write [[
-const std = @import("std");
-const Pkg = std.build.Pkg;
-
-pub fn build(b: *std.build.Builder) void {
-    const target = b.standardTargetOptions(.{});
-    const mode = b.standardReleaseOptions();
-
-    ]]
-indent()
-
 local write_pkg = template [[
 const `name` = Pkg {
     .name = "`name`",
@@ -235,7 +224,3 @@ for _, package in spairs(packages) do
         write(nl, '_ = ', package.name, ';')
     end
 end
-
-unindent()
-nl()
-write '}'

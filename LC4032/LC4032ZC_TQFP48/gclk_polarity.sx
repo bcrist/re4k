@@ -1,0 +1,17 @@
+
+(LC4032ZC_TQFP48
+   (gclk_polarity
+      (glb 0 (name A)
+         (clk 0 1 (fuse 79 89) (fuse 80 89 (value 2)))
+         (clk 2 3 (fuse 81 89) (fuse 82 89 (value 2)))
+      )
+      (glb 1 (name B)
+         (clk 0 1 (fuse 79 3) (fuse 80 3 (value 2)))
+         (clk 2 3 (fuse 81 3) (fuse 82 3 (value 2)))
+      )
+      (value 3 both_non_inverted)
+      (value 2 second_complemented)
+      (value 1 first_complemented)
+      (value 0 both_inverted)
+   )
+)

@@ -1,0 +1,6 @@
+(sym_lib_table
+  (lib (name "semiconductor")(type "KiCad")(uri "${KIPRJMOD}/../symbols/semiconductor.kicad_sym")(options "")(descr ""))
+  (lib (name "discrete")(type "KiCad")(uri "${KIPRJMOD}/../symbols/discrete.kicad_sym")(options "")(descr ""))
+  (lib (name "connector")(type "KiCad")(uri "${KIPRJMOD}/../symbols/connector.kicad_sym")(options "")(descr ""))
+  (lib (name "switch")(type "KiCad")(uri "${KIPRJMOD}/../symbols/switch.kicad_sym")(options "")(descr ""))
+)

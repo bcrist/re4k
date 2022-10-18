@@ -51,7 +51,7 @@ fn run(num_inputs: usize) !void {
     var args = try std.process.ArgIterator.initWithAllocator(pa);
     _ = args.next() orelse std.os.exit(255);
 
-    const out_path = args.next() orelse return error.BadCommandLine;
+    const out_path = args.next() orelse return error.NeedOutputPath;
     const out_dir_path = std.fs.path.dirname(out_path) orelse return error.InvalidOutputPath;
     const out_filename = std.fs.path.basename(out_path);
     const device_str = std.fs.path.basename(out_dir_path);
@@ -62,7 +62,7 @@ fn run(num_inputs: usize) !void {
 
     var i: usize = 0;
     while (i < num_inputs) : (i += 1) {
-        const in_path = args.next() orelse return error.BadCommandLine;
+        const in_path = args.next() orelse return error.NotEnoughInputFiles;
         const in_dir_path = std.fs.path.dirname(in_path) orelse return error.InvalidInputPath;
         const in_filename = std.fs.path.basename(in_path);
         const in_device_str = std.fs.path.basename(in_dir_path);

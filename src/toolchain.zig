@@ -49,6 +49,8 @@ pub const PinAssignment = struct {
     slew_rate: ?core.SlewRate = null,
     //power_guard_signal: ?[]const u8 = null,
     powerup_state: ?u1 = null,
+    orp_bypass: ?bool = null,
+    fast_bypass: ?bool = null,
 };
 
 pub const NodeAssignment = struct {
@@ -166,6 +168,8 @@ pub const Design = struct {
                     // existing.power_guard_signal = pg;
                     // try self.addPinIfNotNode(pg);
                 // }
+                if (pa.orp_bypass) |bypass| existing.orp_bypass = bypass;
+                if (pa.fast_bypass) |bypass| existing.fast_bypass = bypass;
                 return;
             }
         }
@@ -587,6 +591,54 @@ pub const Design = struct {
                 }
             }
             try writer.writeAll(";\n");
+        }
+
+        if (device.getFamily() != .zero_power_enhanced) {
+            try writer.writeAll("\n[Fast Bypass]\n");
+            for ([_]bool { false, true }) |state| {
+                const name = switch (state) {
+                    false => "NONE",
+                    true => "FORCED",
+                };
+                try writer.print("{s}=", .{ name });
+                var first = true;
+                for (self.pins.items) |pin_assignment| {
+                    if (pin_assignment.fast_bypass) |bypass| {
+                        if (state == bypass) {
+                            if (first) {
+                                first = false;
+                            } else {
+                                try writer.writeByte(',');
+                            }
+                            try writer.writeAll(pin_assignment.signal);
+                        }
+                    }
+                }
+                try writer.writeAll(";\n");
+            }
+
+            try writer.writeAll("\n[ORP Bypass]\n");
+            for ([_]bool { false, true }) |state| {
+                const name = switch (state) {
+                    false => "NONE",
+                    true => "BYPASS",
+                };
+                try writer.print("{s}=", .{ name });
+                var first = true;
+                for (self.pins.items) |pin_assignment| {
+                    if (pin_assignment.orp_bypass) |bypass| {
+                        if (state == bypass) {
+                            if (first) {
+                                first = false;
+                            } else {
+                                try writer.writeByte(',');
+                            }
+                            try writer.writeAll(pin_assignment.signal);
+                        }
+                    }
+                }
+                try writer.writeAll(";\n");
+            }
         }
     }
 
