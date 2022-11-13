@@ -62,15 +62,15 @@ pub const FuseRange = struct {
 
     pub fn between(a: Fuse, b: Fuse) FuseRange {
         return .{
-            .min = Fuse.init(@minimum(a.row, b.row), @minimum(a.col, b.col)),
-            .max = Fuse.init(@maximum(a.row, b.row), @maximum(a.col, b.col)),
+            .min = Fuse.init(@min(a.row, b.row), @min(a.col, b.col)),
+            .max = Fuse.init(@max(a.row, b.row), @max(a.col, b.col)),
         };
     }
 
     pub fn intersection(a: FuseRange, b: FuseRange) FuseRange {
         return .{
-            .min = Fuse.init(@maximum(a.min.row, b.min.row), @maximum(a.min.col, b.min.col)),
-            .max = Fuse.init(@minimum(a.max.row, b.max.row), @minimum(a.max.col, b.max.col)),
+            .min = Fuse.init(@max(a.min.row, b.min.row), @max(a.min.col, b.min.col)),
+            .max = Fuse.init(@min(a.max.row, b.max.row), @min(a.max.col, b.max.col)),
         };
     }
 

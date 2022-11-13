@@ -1,5 +1,5 @@
 const std = @import("std");
-const microzig = @import("pkg/microzig/src/main.zig");
+const microbe = @import("pkg/microbe/src/microbe.zig");
 const hw_tests_lc4032ze = @import("hardware-tests/firmware/lc4032ze.zig");
 const hw_tests_lc4064zc = @import("hardware-tests/firmware/lc4064zc.zig");
 
@@ -9,26 +9,36 @@ pub fn build(b: *std.build.Builder) void {
     const target = b.standardTargetOptions(.{});
     const mode = b.standardReleaseOptions();
 
-    if (b.option(bool, "firmware", "Build firmware for hardware-tests boards")) |o| {
-        if (o) {
-            var lc4032ze = microzig.addEmbeddedExecutable(b,
-                "hw-test-firmware-lc4032ze.bin",
-                "hardware-tests/firmware/lc4032ze.zig",
-                .{ .chip = microzig.chips.stm32g030x8 },
-                .{}
+    const FirmwareType = enum {
+        lc4032ze,
+        lc4032zc,
+    };
+    if (b.option(FirmwareType, "firmware", "Build firmware for hardware-tests boards")) |firmware_type| switch (firmware_type) {
+        inline else => |fw| {
+            var firmware = microbe.addEmbeddedExecutable(b,
+                "hw-test-firmware-" ++ @tagName(fw) ++ ".elf",
+                "hardware-tests/firmware/" ++ @tagName(fw) ++ ".zig",
+                microbe.chips.stm32g030k8,
+                microbe.defaultSections(2048),
             );
-            lc4032ze.setBuildMode(mode);
-            lc4032ze.install();
+            firmware.setBuildMode(mode);
+            firmware.install();
+            var raw = firmware.installRaw("hw-test-firmware-" ++ @tagName(fw) ++ ".bin", .{});
 
-            var lc4064zc = microzig.addEmbeddedExecutable(b,
-                "hw-test-firmware-lc4064zc.bin",
-                "hardware-tests/firmware/lc4064zc.zig",
-                .{ .chip = microzig.chips.stm32g030x8 },
-                .{}
-            );
-            lc4064zc.setBuildMode(mode);
-            lc4064zc.install();
-        }
+            const raw_step = b.step("bin", "Convert ELF to bin file");
+            raw_step.dependOn(&raw.step);
+
+            var flash = b.addSystemCommand(&.{
+                "C:\\Program Files (x86)\\STMicroelectronics\\STM32 ST-LINK Utility\\ST-LINK Utility\\ST-LINK_CLI.exe",
+                "-c", "SWD", "UR", "LPM",
+                "-P", b.getInstallPath(.bin, "hw-test-firmware-" ++ @tagName(fw) ++ ".bin"), "0x08000000",
+                "-V", "after_programming",
+                "-HardRst", "PULSE=100",
+            });
+            flash.step.dependOn(&raw.step);
+            const flash_step = b.step("flash", "Flash firmware with ST-LINK");
+            flash_step.dependOn(&flash.step);
+        },
     } else {
         //[[!! include 'build_zig' !! 16 ]]
         //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]

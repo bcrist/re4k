@@ -1,7 +1,5 @@
 const std = @import("std");
-const microzig = @import("microzig");
-const reg = microzig.chip.registers;
+const microbe = @import("microbe");
 
 pub fn main() void {
-    while (true) {}
 }

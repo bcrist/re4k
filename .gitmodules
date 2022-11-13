@@ -1,9 +1,6 @@
 [submodule "pkg/tempallocator"]
 	path = pkg/tempallocator
 	url = https://github.com/bcrist/Zig-TempAllocator
-[submodule "pkg/microzig"]
-	path = pkg/microzig
-	url = git@github.com:bcrist/microzig
-[submodule "pkg/regz"]
-	path = pkg/regz
-	url = https://github.com/ZigEmbeddedGroup/regz
+[submodule "pkg/microbe"]
+	path = pkg/microbe
+	url = git@github.com:/bcrist/microbe
