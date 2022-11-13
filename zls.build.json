@@ -1,0 +1,8 @@
+{
+    "build_options": [
+        {
+            "name": "firmware",
+            "value": null
+        }
+    ]
+}
