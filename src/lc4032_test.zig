@@ -34,13 +34,45 @@ pub fn main() !void {
     try design.pinAssignment(.{ .signal = "s3", .pin_index = 20, });
     try design.pinAssignment(.{ .signal = "s4", .pin_index = 21, });
 
+    // counter bit 0
+    try design.addPT("~d3.Q", "d3.D");
+
+    // counter bit 1
+    try design.addPT(.{"d3.Q", "~d4.Q"}, "d4.D");
+    try design.addPT(.{"~d3.Q", "d4.Q"}, "d4.D");
+
+    // counter bit 2
+    try design.addPT(.{"d3.Q", "d4.Q", "~d5.Q"}, "d5.D");
+    try design.addPT(.{"d5.Q", "~d4.Q"}, "d5.D");
+    try design.addPT(.{"d5.Q", "~d3.Q"}, "d5.D");
+
+    // counter bit 3
+    try design.addPT(.{"d3.Q", "d4.Q", "d5.Q", "~d6.Q"}, "d6.D");
+    try design.addPT(.{"d6.Q", "~d5.Q"}, "d6.D");
+    try design.addPT(.{"d6.Q", "~d4.Q"}, "d6.D");
+    try design.addPT(.{"d6.Q", "~d3.Q"}, "d6.D");
+
+    // counter bit 4
+    try design.addPT(.{"d3.Q", "d4.Q", "d5.Q", "d6.Q", "~d7.Q"}, "d7.D");
+    try design.addPT(.{"d7.Q", "~d6.Q"}, "d7.D");
+    try design.addPT(.{"d7.Q", "~d5.Q"}, "d7.D");
+    try design.addPT(.{"d7.Q", "~d4.Q"}, "d7.D");
+    try design.addPT(.{"d7.Q", "~d3.Q"}, "d7.D");
+
+    // register S2/3/4 directly
     try design.addPT("~s4", "d0.D");
     try design.addPT("~s3", "d1.D");
     try design.addPT("~s2", "d2.D");
 
+    // clock from S1
     try design.addPT("s1", "d0.C");
     try design.addPT("s1", "d1.C");
     try design.addPT("s1", "d2.C");
+    try design.addPT("s1", "d3.C");
+    try design.addPT("s1", "d4.C");
+    try design.addPT("s1", "d5.C");
+    try design.addPT("s1", "d6.C");
+    try design.addPT("s1", "d7.C");
 
     var results = try tc.runToolchain(design);
     try results.checkTerm();
