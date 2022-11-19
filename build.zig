@@ -11,7 +11,7 @@ pub fn build(b: *std.build.Builder) void {
 
     const FirmwareType = enum {
         lc4032ze,
-        lc4032zc,
+        lc4064zc,
     };
     if (b.option(FirmwareType, "firmware", "Build firmware for hardware-tests boards")) |firmware_type| switch (firmware_type) {
         inline else => |fw| {
@@ -21,6 +21,8 @@ pub fn build(b: *std.build.Builder) void {
                 microbe.chips.stm32g030k8,
                 microbe.defaultSections(2048),
             );
+            firmware.addPackagePath("svf", "src/svf.zig");
+            firmware.addPackagePath("devices", "src/devices.zig");
             firmware.setBuildMode(mode);
             firmware.install();
             var raw = firmware.installRaw("hw-test-firmware-" ++ @tagName(fw) ++ ".bin", .{});
@@ -40,20 +42,28 @@ pub fn build(b: *std.build.Builder) void {
             flash_step.dependOn(&flash.step);
         },
     } else {
-        //[[!! include 'build_zig' !! 16 ]]
+        //[[!! include 'build_zig' !! 24 ]]
         //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
         const temp_allocator = Pkg {
             .name = "temp_allocator",
             .source = .{ .path = "pkg/tempallocator/temp_allocator.zig" },
         };
 
-        const output_routing_mode = b.addExecutable("output_routing_mode", "src/output_routing_mode.zig");
-        output_routing_mode.addPackage(temp_allocator);
-        output_routing_mode.linkLibC();
-        output_routing_mode.setTarget(target);
-        output_routing_mode.setBuildMode(mode);
-        output_routing_mode.install();
-        _ = makeRunStep(b, output_routing_mode, "output_routing_mode", "run output_routing_mode");
+        const lc4032_test = b.addExecutable("lc4032_test", "src/lc4032_test.zig");
+        lc4032_test.addPackage(temp_allocator);
+        lc4032_test.linkLibC();
+        lc4032_test.setTarget(target);
+        lc4032_test.setBuildMode(mode);
+        lc4032_test.install();
+        _ = makeRunStep(b, lc4032_test, "lc4032_test", "run lc4032_test");
+
+        const lc4064_test = b.addExecutable("lc4064_test", "src/lc4064_test.zig");
+        lc4064_test.addPackage(temp_allocator);
+        lc4064_test.linkLibC();
+        lc4064_test.setTarget(target);
+        lc4064_test.setBuildMode(mode);
+        lc4064_test.install();
+        _ = makeRunStep(b, lc4064_test, "lc4064_test", "run lc4064_test");
 
         //[[ ######################### END OF GENERATED CODE ######################### ]]
     }

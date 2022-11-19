@@ -1,9 +1,0 @@
-fuse,lc4032ze\goe23_polarity\goe2low_goe3low.jed,lc4032ze\goe23_polarity\goe2low_goe3high.jed,lc4032ze\goe23_polarity\goe2high_goe3low.jed,lc4032ze\goe23_polarity\goe2high_goe3high.jed
-73:85,1,0,1,0
-73:171,0,1,0,1
-74:85,0,1,0,1
-74:171,1,0,1,0
-88:171,0,0,0,1
-89:171,0,1,1,1
-92:103,1,0,1,0
-92:104,0,1,0,1
