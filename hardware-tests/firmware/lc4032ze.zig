@@ -24,7 +24,7 @@ pub const interrupts = struct {
 };
 
 var uart: microbe.Uart(.{
-    .baud_rate = 128000,
+    .baud_rate = 9600,
     .tx = .PA9,
     .rx = .PA10,
     .cts = .PA11,
@@ -314,7 +314,7 @@ fn writeChip() !void {
         _ = jtag.tap(0).data(RowDataType, data.row_data, .idle);
         idleForCommand(.ISC_PROGRAM_INCR);
 
-        try uart.writer().print("Wrote row {}: {X}\r\n", .{ row, data.row_data });
+        //try uart.writer().print("Wrote row {}: {X}\r\n", .{ row, data.row_data });
 
         RTS.modifyInline(0);
         data.bits_left_in_row = width;
