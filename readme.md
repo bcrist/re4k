@@ -13,7 +13,9 @@
     * Shared PT Init polarity - hinted at in datasheet, but fitter won't let it happen
     * What happens if both GLB's PTOE/BIE are routed to the same GOE?  assuming they are summed, but should check with hardware.  I don't think the fitter will allow this config.
     * Which of the OSCTIMER output enables is for OSCOUT vs TIMEROUT?  Fitter always seems to enable them both at the same time.
+    * There are two mystery fuses directly under the OSCTIMER divider fuses.  Possibly input enable flags for TIMERRES and DYNOSCDIS?
     * Can you use input register feedback on MCs that aren't connected to pins?
+    * What happens if you violate the one-cold rule for GIs fuses?
 
 
 # Bus Termination Options
