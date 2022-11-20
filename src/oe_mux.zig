@@ -124,8 +124,8 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, io: Inpu
         .output_only => {
             // don't define an OE signal; this is the default
         },
-        .from_orp_active_low, .from_orp_active_high => {
-            if (mode == .from_orp_active_low) {
+        .from_orm_active_low, .from_orm_active_high => {
+            if (mode == .from_orm_active_low) {
                 try design.addPT(.{ "in0", "in1" }, "out.OE-");
             } else {
                 try design.addPT(.{ "in0", "in1" }, "out.OE");
@@ -292,7 +292,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
     for ([_]core.OutputEnableMode {
                 .input_only, .output_only,
-                .from_orp_active_low, .from_orp_active_high,
+                .from_orm_active_low, .from_orm_active_high,
                 .goe0, .goe1, .goe2, .goe3
             }) |mode| {
         const pin_info = dev.getPins()[detail_pin_index orelse unreachable];
@@ -330,10 +330,10 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     try writer.printRaw("3 goe3", .{});
     try writer.close();
     try writer.expression("value");
-    try writer.printRaw("4 from_orp_active_high", .{});
+    try writer.printRaw("4 from_orm_active_high", .{});
     try writer.close();
     try writer.expression("value");
-    try writer.printRaw("5 from_orp_active_low", .{});
+    try writer.printRaw("5 from_orm_active_low", .{});
     try writer.close();
     try writer.expression("value");
     try writer.printRaw("6 output_only", .{});

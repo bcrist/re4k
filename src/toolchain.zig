@@ -49,7 +49,7 @@ pub const PinAssignment = struct {
     slew_rate: ?core.SlewRate = null,
     //power_guard_signal: ?[]const u8 = null,
     powerup_state: ?u1 = null,
-    orp_bypass: ?bool = null,
+    orm_bypass: ?bool = null,
     fast_bypass: ?bool = null,
 };
 
@@ -168,7 +168,7 @@ pub const Design = struct {
                     // existing.power_guard_signal = pg;
                     // try self.addPinIfNotNode(pg);
                 // }
-                if (pa.orp_bypass) |bypass| existing.orp_bypass = bypass;
+                if (pa.orm_bypass) |bypass| existing.orm_bypass = bypass;
                 if (pa.fast_bypass) |bypass| existing.fast_bypass = bypass;
                 return;
             }
@@ -626,7 +626,7 @@ pub const Design = struct {
                 try writer.print("{s}=", .{ name });
                 var first = true;
                 for (self.pins.items) |pin_assignment| {
-                    if (pin_assignment.orp_bypass) |bypass| {
+                    if (pin_assignment.orm_bypass) |bypass| {
                         if (state == bypass) {
                             if (first) {
                                 first = false;
@@ -1011,12 +1011,7 @@ pub const Toolchain = struct {
 
         try child.spawn();
 
-        const term = if (design.max_fit_time_ms == 0) blk: {
-            break :blk try child.wait();
-        } else blk: {
-            std.os.windows.WaitForSingleObjectEx(child.handle, design.max_fit_time_ms, false) catch {};
-            break :blk try child.kill();
-        };
+        const term = waitForChild(&child, design) catch std.ChildProcess.Term { .Unknown = 0 };
 
         //var signals = try std.ArrayList(SignalFitData).initCapacity(self.alloc, 32);
 
@@ -1050,6 +1045,18 @@ pub const Toolchain = struct {
         try self.parseFitterReport(design, &results);
         // results.signals = signals.items;
         return results;
+    }
+
+    fn waitForChild(child: *std.ChildProcess, design: Design) !std.ChildProcess.Term {
+        if (design.max_fit_time_ms == 0) {
+            return child.wait();
+        } else {
+            std.os.windows.WaitForSingleObjectEx(child.handle, design.max_fit_time_ms, false) catch {};
+            return child.kill() catch |err| switch (err) {
+                error.AlreadyTerminated => return child.wait(),
+                else => return err,
+            };
+        }
     }
 
     fn readFile(self: *Toolchain, path: []const u8) ![]const u8 {

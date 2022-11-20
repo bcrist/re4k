@@ -1,4 +1,3 @@
-
 (LC4128ZE_TQFP144
    (clock_enable_mux
       (glb 0 (name A)

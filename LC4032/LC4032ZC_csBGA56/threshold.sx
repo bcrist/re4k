@@ -1,4 +1,3 @@
-
 (LC4032ZC_csBGA56
    (input_threshold
       (pin A1 (fuse 99 113))

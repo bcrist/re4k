@@ -76,14 +76,14 @@ pub const MacrocellType = enum {
 };
 
 pub const OutputEnableMode = enum {
-    input_only,
-    output_only,
-    from_orp_active_low,
-    from_orp_active_high,
     goe0,
     goe1,
     goe2,
     goe3,
+    from_orm_active_low,
+    from_orm_active_high,
+    output_only,
+    input_only,
 };
 
 pub const GlbInputSignal = union {

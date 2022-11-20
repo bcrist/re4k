@@ -1,4 +1,3 @@
-
 (LC4128ZE_csBGA144
    (input_threshold
       (pin B5 (fuse 99 599))

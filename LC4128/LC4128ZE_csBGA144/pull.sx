@@ -1,4 +1,3 @@
-
 (LC4128ZE_csBGA144
    (bus_maintenance
       (pin B5 (fuse 95 599) (fuse 96 599 (value 2)))

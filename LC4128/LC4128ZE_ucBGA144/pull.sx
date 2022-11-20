@@ -1,4 +1,3 @@
-
 (LC4128ZE_ucBGA144
    (bus_maintenance
       (pin A6 (fuse 95 578) (fuse 96 578 (value 2)))

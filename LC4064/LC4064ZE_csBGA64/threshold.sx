@@ -1,4 +1,3 @@
-
 (LC4064ZE_csBGA64
    (input_threshold
       (pin B4 (fuse 99 277))

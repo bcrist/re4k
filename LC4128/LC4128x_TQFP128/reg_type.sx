@@ -1,4 +1,3 @@
-
 (LC4128x_TQFP128
    (register_type
       (glb 0 (name A)

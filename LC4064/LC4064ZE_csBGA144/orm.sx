@@ -1,4 +1,3 @@
-
 (LC4064ZE_csBGA144
    (output_routing_mux
       (pin D6 (fuse 89 277) (fuse 90 277 (value 2)) (fuse 91 277 (value 4)))

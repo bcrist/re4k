@@ -1,4 +1,3 @@
-
 (LC4064ZC_csBGA132
    (output_routing_mode
       (pin C7 (fuse 95 277) (fuse 96 277 (value 2)))

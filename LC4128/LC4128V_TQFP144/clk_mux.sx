@@ -1,4 +1,3 @@
-
 (LC4128V_TQFP144
    (clock_mux
       (glb 0 (name A)

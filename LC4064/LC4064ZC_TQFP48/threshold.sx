@@ -1,4 +1,3 @@
-
 (LC4064ZC_TQFP48
    (input_threshold
       (pin 2 (fuse 99 317))

@@ -1,4 +1,3 @@
-
 (LC4064ZE_ucBGA64
    (slew_rate
       (pin A4 (fuse 97 277))

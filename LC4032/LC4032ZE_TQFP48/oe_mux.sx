@@ -1,4 +1,3 @@
-
 (LC4032ZE_TQFP48
    (oe_mux
       (pin 2 (fuse 92 114) (fuse 93 114 (value 2)) (fuse 94 114 (value 4)))
@@ -35,8 +34,8 @@
       (pin 48 (fuse 92 113) (fuse 93 113 (value 2)) (fuse 94 113 (value 4)))
       (value 7 input_only)
       (value 6 output_only)
-      (value 5 from_orp_active_low)
-      (value 4 from_orp_active_high)
+      (value 5 from_orm_active_low)
+      (value 4 from_orm_active_high)
       (value 2 goe0)
       (value 3 goe1)
       (value 0 goe2)
@@ -45,8 +44,8 @@
       (value 1 goe1)
       (value 2 goe2)
       (value 3 goe3)
-      (value 4 from_orp_active_high)
-      (value 5 from_orp_active_low)
+      (value 4 from_orm_active_high)
+      (value 5 from_orm_active_low)
       (value 6 output_only)
       (value 7 input_only)
    )

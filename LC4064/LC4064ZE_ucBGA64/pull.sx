@@ -1,4 +1,3 @@
-
 (LC4064ZE_ucBGA64
    (bus_maintenance
       (pin A4 (fuse 95 277) (fuse 96 277 (value 2)))

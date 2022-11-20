@@ -62,7 +62,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
         .signal = "out",
         .pin_index = pin_index,
         .fast_bypass = fast_bypass,
-        .orp_bypass = (bypass == .orm_bypass),
+        .orm_bypass = (bypass == .orm_bypass),
     });
 
     var out_signal = if (bypass == .fast_bypass_inverted) "out.-" else "out";

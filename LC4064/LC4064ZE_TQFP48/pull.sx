@@ -1,4 +1,3 @@
-
 (LC4064ZE_TQFP48
    (bus_maintenance
       (pin 2 (fuse 95 317) (fuse 96 317 (value 2)))

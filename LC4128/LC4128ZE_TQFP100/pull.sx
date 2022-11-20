@@ -1,4 +1,3 @@
-
 (LC4128ZE_TQFP100
    (bus_maintenance
       (pin 3 (fuse 95 661) (fuse 96 661 (value 2)))

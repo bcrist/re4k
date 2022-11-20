@@ -1,4 +1,3 @@
-
 (LC4032ZC_csBGA56
    (output_routing_mode
       (pin A1 (fuse 95 113) (fuse 96 113 (value 2)))

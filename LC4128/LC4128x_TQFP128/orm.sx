@@ -1,4 +1,3 @@
-
 (LC4128x_TQFP128
    (output_routing_mux
       (pin 4 (fuse 89 661) (fuse 90 661 (value 2)) (fuse 91 661 (value 4)))

@@ -1,4 +1,3 @@
-
 (LC4128x_TQFP128
    (input_threshold
       (pin 4 (fuse 99 661))

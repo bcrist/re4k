@@ -16,10 +16,10 @@ const MacrocellRef = core.MacrocellRef;
 var temp_alloc = TempAllocator {};
 
 pub fn main(num_inputs: usize) void {
-    run(num_inputs) catch |e| {
-        std.io.getStdErr().writer().print("{}\n", .{ e }) catch {};
-        std.os.exit(1);
-    };
+    run(num_inputs) catch unreachable; //catch |e| {
+    //     std.io.getStdErr().writer().print("{}\n", .{ e }) catch {};
+    //     std.os.exit(1);
+    // };
 }
 
 pub fn resetTemp() void {
@@ -37,6 +37,8 @@ var input_files: std.StringHashMapUnmanaged(InputFileData) = .{};
 pub fn getInputFile(filename: []const u8) ?InputFileData {
     return input_files.get(filename);
 }
+
+var slow_mode = false;
 
 fn run(num_inputs: usize) !void {
     temp_alloc = try TempAllocator.init(0x1000_00000);
@@ -82,21 +84,25 @@ fn run(num_inputs: usize) !void {
             keep = true;
         } else if (std.mem.eql(u8, arg, "--reports")) {
             report_dir = &out_dir;
+        } else if (std.mem.eql(u8, arg, "--slow")) {
+            slow_mode = true;
         } else {
             return error.InvalidCommandLine;
         }
     }
 
-    var f = try out_dir.createFile(out_filename, .{});
-    defer f.close();
+    var atf = try out_dir.atomicFile(out_filename, .{});
+    defer atf.deinit();
 
-    var sx_writer = sx.writer(pa, f.writer());
+    var sx_writer = sx.writer(pa, atf.file.writer());
     defer sx_writer.deinit();
 
     var tc = try Toolchain.init(ta);
     defer tc.deinit(keep);
 
     try root.run(ta, pa, &tc, device, &sx_writer);
+
+    try atf.finish();
 }
 
 var report_dir: ?*std.fs.Dir = null;
@@ -108,6 +114,10 @@ pub fn logReport(comptime name_fmt: []const u8, name_args: anytype, results: too
         defer f.close();
 
         try f.writer().writeAll(results.report);
+    }
+    if (slow_mode) {
+        try std.io.getStdOut().writer().writeAll("Press enter to continue...\n");
+        while ('\n' != std.io.getStdIn().reader().readByte() catch '\n') {}
     }
 }
 

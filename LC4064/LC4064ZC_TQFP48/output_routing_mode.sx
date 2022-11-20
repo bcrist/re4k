@@ -1,4 +1,3 @@
-
 (LC4064ZC_TQFP48
    (output_routing_mode
       (pin 2 (fuse 95 317) (fuse 96 317 (value 2)))

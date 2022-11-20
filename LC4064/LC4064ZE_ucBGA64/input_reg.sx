@@ -1,4 +1,3 @@
-
 (LC4064ZE_ucBGA64
    (input_registers
       (pin A4 (fuse 85 277))

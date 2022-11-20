@@ -1,4 +1,3 @@
-
 (LC4128ZE_csBGA144
    (input_registers
       (pin B5 (fuse 85 599))

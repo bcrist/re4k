@@ -1,4 +1,3 @@
-
 (LC4064x_TQFP48
    (bus_maintenance
       (fuse 85 351 (value 1))
