@@ -2,6 +2,10 @@
     (notest)
     (pkg temp_allocator)
 )
+(dir pkg/sx
+    (notest)
+    (pkg sx)
+)
 (dir src
     (exe drive)
     (exe oe_mux)

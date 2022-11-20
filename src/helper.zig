@@ -1,7 +1,7 @@
 const root = @import("root");
 const std = @import("std");
 const core = @import("core.zig");
-const sx = @import("sx.zig");
+const sx = @import("sx");
 const jedec = @import("jedec.zig");
 const toolchain = @import("toolchain.zig");
 const devices = @import("devices.zig");
@@ -231,12 +231,14 @@ pub fn parseGRP(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*Devi
         try pin_number_to_index.put(pin_info.pin_number(), pin_info.pin_index());
     }
 
-    var parser = try sx.Parser.init(input_file.contents, ta);
+    var stream = std.io.fixedBufferStream(input_file.contents);
+    var parser = sx.reader(ta, stream.reader());
     defer parser.deinit();
 
     parseGRP0(&parser, device, &pin_number_to_index, &results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
-            try parser.printParseErrorContext();
+            var ctx = try parser.getNextTokenContext();
+            try ctx.printForString(input_file.contents, std.io.getStdErr().writer(), 120);
             return e;
         },
         else => return e,
@@ -249,7 +251,12 @@ pub fn parseGRP(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*Devi
     return results;
 }
 
-fn parseGRP0(parser: *sx.Parser, device: DeviceType, pin_number_to_index: *const std.StringHashMap(u16), results: *std.AutoHashMap(Fuse, GlbInputSignal)) !void {
+fn parseGRP0(
+    parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader),
+    device: DeviceType,
+    pin_number_to_index: *const std.StringHashMap(u16),
+    results: *std.AutoHashMap(Fuse, GlbInputSignal)
+) !void {
     _ = try parser.requireAnyExpression(); // device name, we already know it
     try parser.requireExpression("global_routing_pool");
 
@@ -315,12 +322,14 @@ pub fn parseMCOptionsColumns(ta: std.mem.Allocator, pa: std.mem.Allocator, out_d
     var results = std.AutoHashMap(MacrocellRef, FuseRange).init(pa);
     try results.ensureTotalCapacity(device.getNumMcs());
 
-    var parser = try sx.Parser.init(input_file.contents, ta);
+    var stream = std.io.fixedBufferStream(input_file.contents);
+    var parser = sx.reader(ta, stream.reader());
     defer parser.deinit();
 
     parseMCOptionsColumns0(&parser, device, &results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
-            try parser.printParseErrorContext();
+            var ctx = try parser.getNextTokenContext();
+            try ctx.printForString(input_file.contents, std.io.getStdErr().writer(), 120);
             return e;
         },
         else => return e,
@@ -333,7 +342,7 @@ pub fn parseMCOptionsColumns(ta: std.mem.Allocator, pa: std.mem.Allocator, out_d
     return results;
 }
 
-fn parseMCOptionsColumns0(parser: *sx.Parser, device: DeviceType, results: *std.AutoHashMap(MacrocellRef, FuseRange)) !void {
+fn parseMCOptionsColumns0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), device: DeviceType, results: *std.AutoHashMap(MacrocellRef, FuseRange)) !void {
     _ = try parser.requireAnyExpression(); // device name, we already know it
     try parser.requireExpression("invert_sum");
 
@@ -378,12 +387,14 @@ pub fn parseORMRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*
 
     var results = try std.DynamicBitSet.initEmpty(pa, device.getJedecHeight());
 
-    var parser = try sx.Parser.init(input_file.contents, ta);
+    var stream = std.io.fixedBufferStream(input_file.contents);
+    var parser = sx.reader(ta, stream.reader());
     defer parser.deinit();
 
     parseORMRows0(&parser, &results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
-            try parser.printParseErrorContext();
+            var ctx = try parser.getNextTokenContext();
+            try ctx.printForString(input_file.contents, std.io.getStdErr().writer(), 120);
             return e;
         },
         else => return e,
@@ -396,7 +407,7 @@ pub fn parseORMRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*
     return results;
 }
 
-fn parseORMRows0(parser: *sx.Parser, results: *std.DynamicBitSet) !void {
+fn parseORMRows0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), results: *std.DynamicBitSet) !void {
     _ = try parser.requireAnyExpression(); // device name, we already know it
     try parser.requireExpression("output_routing_mux");
 
@@ -431,12 +442,14 @@ pub fn parseClusterSteeringRows(ta: std.mem.Allocator, pa: std.mem.Allocator, ou
 
     var results = try std.DynamicBitSet.initEmpty(pa, device.getJedecHeight());
 
-    var parser = try sx.Parser.init(input_file.contents, ta);
+    var stream = std.io.fixedBufferStream(input_file.contents);
+    var parser = sx.reader(ta, stream.reader());
     defer parser.deinit();
 
     parseClusterSteeringRows0(&parser, &results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
-            try parser.printParseErrorContext();
+            var ctx = try parser.getNextTokenContext();
+            try ctx.printForString(input_file.contents, std.io.getStdErr().writer(), 120);
             return e;
         },
         else => return e,
@@ -449,7 +462,7 @@ pub fn parseClusterSteeringRows(ta: std.mem.Allocator, pa: std.mem.Allocator, ou
     return results;
 }
 
-fn parseClusterSteeringRows0(parser: *sx.Parser, results: *std.DynamicBitSet) !void {
+fn parseClusterSteeringRows0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), results: *std.DynamicBitSet) !void {
     _ = try parser.requireAnyExpression(); // device name, we already know it
     try parser.requireExpression("cluster_steering");
 

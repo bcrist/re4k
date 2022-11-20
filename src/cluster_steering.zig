@@ -2,7 +2,7 @@ const std = @import("std");
 const TempAllocator = @import("temp_allocator");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
-const sx = @import("sx.zig");
+const sx = @import("sx");
 const jedec = @import("jedec.zig");
 const core = @import("core.zig");
 const devices = @import("devices.zig");
@@ -200,8 +200,6 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     }
 
     try writer.done();
-
-    _ = pa;
 }
 
 fn checkSteeringData(steering_data: *ClusterSteeringMap, cluster_usage: std.StaticBitSet(16), jed: JedecData, mc: i16, mode: ClusterSteeringMode) !void {

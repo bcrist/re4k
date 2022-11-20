@@ -1,7 +1,7 @@
 const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
-const sx = @import("sx.zig");
+const sx = @import("sx");
 const core = @import("core.zig");
 const jedec = @import("jedec.zig");
 const devices = @import("devices.zig");
@@ -213,7 +213,7 @@ const TestData = struct {
                 if (found != found_in_other_glb) {
                     try helper.err("Report {}: Expected to find {} fuses but found {}!", .{ report_number - 1, found_in_other_glb, found }, self.device, .{ .glb = glb.glb });
                 }
-                fuses_found = @maximum(found_in_other_glb, found);
+                fuses_found = @max(found_in_other_glb, found);
             } else {
                 fuses_found = found;
             }

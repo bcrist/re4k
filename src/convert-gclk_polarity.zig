@@ -1,7 +1,7 @@
 const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
-const sx = @import("sx.zig");
+const sx = @import("sx");
 const jedec = @import("jedec.zig");
 const core = @import("core.zig");
 const devices = @import("devices.zig");
@@ -21,12 +21,14 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     std.debug.assert(input_file.device.getJedecWidth() == dev.getJedecWidth());
     std.debug.assert(input_file.device.getJedecHeight() == dev.getJedecHeight());
 
-    var parser = try sx.Parser.init(input_file.contents, ta);
+    var stream = std.io.fixedBufferStream(input_file.contents);
+    var parser = sx.reader(ta, stream.reader());
     defer parser.deinit();
 
     parseAndWrite(dev, &parser, writer) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
-            try parser.printParseErrorContext();
+            var ctx = try parser.getNextTokenContext();
+            try ctx.printForString(input_file.contents, std.io.getStdErr().writer(), 120);
             return e;
         },
         else => return e,
@@ -36,7 +38,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     _ = tc;
 }
 
-fn parseAndWrite(dev: DeviceType, parser: *sx.Parser, writer: *sx.Writer(std.fs.File.Writer)) !void {
+fn parseAndWrite(dev: DeviceType, parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), writer: *sx.Writer(std.fs.File.Writer)) !void {
     _ = try parser.requireAnyExpression();
     try parser.requireExpression("gclk_polarity");
     try writer.expressionExpanded(@tagName(dev));

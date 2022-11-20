@@ -3,4 +3,7 @@
 	url = https://github.com/bcrist/Zig-TempAllocator
 [submodule "pkg/microbe"]
 	path = pkg/microbe
-	url = git@github.com:/bcrist/microbe
+	url = https://github.com/bcrist/microbe
+[submodule "pkg/sx"]
+	path = pkg/sx
+	url = https://github.com/bcrist/Zig-SX
