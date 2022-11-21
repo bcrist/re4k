@@ -506,3 +506,58 @@ fn parseClusterSteeringRows0(parser: *sx.Reader(std.io.FixedBufferStream([]const
     try parser.requireClose(); // device
     try parser.requireDone();
 }
+
+pub fn parseOEMuxRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*DeviceType) !std.DynamicBitSet {
+    const input_file = getInputFile("oe_mux.sx") orelse return error.MissingOEMuxInputFile;
+    const device = input_file.device;
+
+    var results = try std.DynamicBitSet.initEmpty(pa, device.getJedecHeight());
+
+    var stream = std.io.fixedBufferStream(input_file.contents);
+    var parser = sx.reader(ta, stream.reader());
+    defer parser.deinit();
+
+    parseOEMuxRows0(&parser, &results) catch |e| switch (e) {
+        error.SExpressionSyntaxError => {
+            var ctx = try parser.getNextTokenContext();
+            try ctx.printForString(input_file.contents, std.io.getStdErr().writer(), 120);
+            return e;
+        },
+        else => return e,
+    };
+
+    if (out_device) |ptr| {
+        ptr.* = device;
+    }
+
+    return results;
+}
+
+fn parseOEMuxRows0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), results: *std.DynamicBitSet) !void {
+    _ = try parser.requireAnyExpression(); // device name, we already know it
+    try parser.requireExpression("oe_mux");
+
+    while (try parser.expression("pin")) {
+        _ = try parser.requireAnyString();
+
+        while (try parser.expression("fuse")) {
+            var row = try parser.requireAnyInt(u16, 10);
+            _ = try parser.requireAnyInt(u16, 10);
+
+            if (try parser.expression("value")) {
+                try parser.ignoreRemainingExpression();
+            }
+
+            results.set(row);
+
+            try parser.requireClose(); // fuse
+        }
+        try parser.requireClose(); // pin
+    }
+    while (try parser.expression("value")) {
+        try parser.ignoreRemainingExpression();
+    }
+    try parser.requireClose(); // oe_mux
+    try parser.requireClose(); // device
+    try parser.requireDone();
+}

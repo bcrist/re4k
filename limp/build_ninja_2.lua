@@ -61,6 +61,7 @@ local jobs = {
     reg_type         = {},
     pt2_reset        = {},
     pt3_reset        = {},
+    pt4_oe           = { 'oe_mux' },
     clk_mux          = {},
     input_reg        = {},
     invert           = {},

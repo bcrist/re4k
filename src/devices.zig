@@ -356,6 +356,10 @@ pub const DeviceType = enum {
         return FuseRange.between(Fuse.init(self.getNumGlbInputs() * 2, 0), Fuse.init(self.getJedecHeight() - 1, self.getJedecWidth() - 1));
     }
 
+    pub fn getRowRange(self: DeviceType, min_row: u16, max_row: u16) FuseRange {
+        return FuseRange.between(Fuse.init(min_row, 0), Fuse.init(max_row, self.getJedecWidth() - 1));
+    }
+
     pub fn getGIRange(self: DeviceType, glb: u8, gi: u8) FuseRange {
         return switch (self.getNumGlbs()) {
             2 => switch (glb) {

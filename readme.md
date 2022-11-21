@@ -84,7 +84,6 @@ specific column, and pairs of macrocell slices are grouped together, so overall 
 # TODO
 * Bitstream configuration through zig
 * Bitstream decompilation
-* PT4 OE routing fuse
 * shared clk/init polarity
 * goe polarity
 * OSCTIMER for ZE family

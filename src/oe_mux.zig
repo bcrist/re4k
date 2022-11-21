@@ -81,7 +81,7 @@ fn runToolchainGOE(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, io: I
     const mc = io.mc;
 
     try design.pinAssignment(.{
-        .signal = "goe2",
+        .signal = "oe",
         .pin_index = try getFirstNonGOE(dev, glb),
     });
     try design.pinAssignment(.{
@@ -90,10 +90,10 @@ fn runToolchainGOE(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, io: I
     });
 
     try design.addPT(.{}, "gout");
-    try design.addPT("goe2", "gout.OE");
+    try design.addPT("oe", "gout.OE");
 
     if (goe) {
-        try design.addPT("goe2", "out.OE");
+        try design.addPT("oe", "out.OE");
     }
 
     var results = try tc.runToolchain(design);
@@ -290,28 +290,28 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         }
     }
 
-    for ([_]core.OutputEnableMode {
-                .input_only, .output_only,
-                .from_orm_active_low, .from_orm_active_high,
-                .goe0, .goe1, .goe2, .goe3
-            }) |mode| {
-        const pin_info = dev.getPins()[detail_pin_index orelse unreachable];
+    // for ([_]core.OutputEnableMode {
+    //             .input_only, .output_only,
+    //             .from_orm_active_low, .from_orm_active_high,
+    //             .goe0, .goe1, .goe2, .goe3
+    //         }) |mode| {
+    //     const pin_info = dev.getPins()[detail_pin_index orelse unreachable];
 
-        var results = try runToolchain(ta, tc, dev, pin_info.input_output, mode);
+    //     var results = try runToolchain(ta, tc, dev, pin_info.input_output, mode);
 
-        var value: usize = 0;
-        var bit_value: usize = 1;
-        for (detail_fuses.items) |fuse| {
-            if (results.jedec.isSet(fuse)) {
-                value += bit_value;
-            }
-            bit_value *= 2;
-        }
+    //     var value: usize = 0;
+    //     var bit_value: usize = 1;
+    //     for (detail_fuses.items) |fuse| {
+    //         if (results.jedec.isSet(fuse)) {
+    //             value += bit_value;
+    //         }
+    //         bit_value *= 2;
+    //     }
 
-        try writer.expression("value");
-        try writer.printRaw("{} {s}", .{ value, @tagName(mode) });
-        try writer.close();
-    }
+    //     try writer.expression("value");
+    //     try writer.printRaw("{} {s}", .{ value, @tagName(mode) });
+    //     try writer.close();
+    // }
 
     // For now I'm just assuming the OE mux inputs have the same ordering on all devices/families.
     // It's incredibly difficult to coax the fitter into placing a particular OE line.  It's mostly

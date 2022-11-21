@@ -51,6 +51,7 @@ pub const PinAssignment = struct {
     powerup_state: ?u1 = null,
     orm_bypass: ?bool = null,
     fast_bypass: ?bool = null,
+    input_register: ?bool = null,
 };
 
 pub const NodeAssignment = struct {
@@ -170,6 +171,7 @@ pub const Design = struct {
                 // }
                 if (pa.orm_bypass) |bypass| existing.orm_bypass = bypass;
                 if (pa.fast_bypass) |bypass| existing.fast_bypass = bypass;
+                if (pa.input_register) |inreg| existing.input_register = inreg;
                 return;
             }
         }
@@ -578,6 +580,18 @@ pub const Design = struct {
             };
             try writer.print("{s}=", .{ name });
             var first = true;
+            for (self.pins.items) |pin_assignment| {
+                if (pin_assignment.input_register) |inreg| {
+                    if (state == inreg) {
+                        if (first) {
+                            first = false;
+                        } else {
+                            try writer.writeByte(',');
+                        }
+                        try writer.writeAll(pin_assignment.signal);
+                    }
+                }
+            }
             for (self.nodes.items) |node_assignment| {
                 if (node_assignment.input_register) |inreg| {
                     if (state == inreg) {
@@ -1011,7 +1025,7 @@ pub const Toolchain = struct {
 
         try child.spawn();
 
-        const term = waitForChild(&child, design) catch std.ChildProcess.Term { .Unknown = 0 };
+        const term = waitForChild(&child, design.max_fit_time_ms) catch std.ChildProcess.Term { .Unknown = 0 };
 
         //var signals = try std.ArrayList(SignalFitData).initCapacity(self.alloc, 32);
 
@@ -1047,16 +1061,22 @@ pub const Toolchain = struct {
         return results;
     }
 
-    fn waitForChild(child: *std.ChildProcess, design: Design) !std.ChildProcess.Term {
-        if (design.max_fit_time_ms == 0) {
-            return child.wait();
-        } else {
-            std.os.windows.WaitForSingleObjectEx(child.handle, design.max_fit_time_ms, false) catch {};
-            return child.kill() catch |err| switch (err) {
-                error.AlreadyTerminated => return child.wait(),
+    fn waitForChild(child: *std.ChildProcess, timeout_ms: u32) !std.ChildProcess.Term {
+        if (timeout_ms > 0) {
+            std.os.windows.WaitForSingleObjectEx(child.handle, timeout_ms, false) catch {};
+            std.os.windows.TerminateProcess(child.handle, 1) catch |err| switch (err) {
+                error.PermissionDenied => {
+                    // Usually when TerminateProcess triggers a ACCESS_DENIED error, it
+                    // indicates that the process has already exited, but there may be
+                    // some rare edge cases where our process handle no longer has the
+                    // PROCESS_TERMINATE access right, so let's do another check to make
+                    // sure the process is really no longer running:
+                    std.os.windows.WaitForSingleObjectEx(child.handle, 0, false) catch return err;
+                },
                 else => return err,
             };
         }
+        return child.wait();
     }
 
     fn readFile(self: *Toolchain, path: []const u8) ![]const u8 {

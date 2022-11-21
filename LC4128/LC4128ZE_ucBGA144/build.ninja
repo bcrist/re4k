@@ -1,4 +1,4 @@
-##!! include('build_ninja_2','LC4128ZE_ucBGA144') !! 91 ##
+##!! include('build_ninja_2','LC4128ZE_ucBGA144') !! 95 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 dev = LC4128\LC4128ZE_ucBGA144
 
@@ -58,6 +58,10 @@ rule pt3_reset
     command = zig-out/bin/pt3_reset.exe $out $in
 build $dev/pt3_reset.sx: pt3_reset
 
+rule pt4_oe
+    command = zig-out/bin/pt4_oe.exe $out $in
+build $dev/pt4_oe.sx: pt4_oe $dev\oe_mux.sx
+
 rule pterms
     command = zig-out/bin/pterms.exe $out $in
 build $dev/pterms.sx: pterms $dev\grp.sx
@@ -86,6 +90,6 @@ rule zerohold
     command = zig-out/bin/zerohold.exe $out $in
 build $dev/zerohold.sx: zerohold
 
-build build-LC4128ZE_ucBGA144: phony  $dev/ce_mux.sx $dev/clk_mux.sx $dev/cluster_steering.sx $dev/drive.sx $dev/gclk_polarity.sx $dev/grp.sx $dev/input_reg.sx $dev/invert.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/pt0_xor.sx $dev/pt2_reset.sx $dev/pt3_reset.sx $dev/pterms.sx $dev/pull.sx $dev/reg_type.sx $dev/slew.sx $dev/threshold.sx $dev/wide_steering.sx $dev/zerohold.sx
+build build-LC4128ZE_ucBGA144: phony  $dev/ce_mux.sx $dev/clk_mux.sx $dev/cluster_steering.sx $dev/drive.sx $dev/gclk_polarity.sx $dev/grp.sx $dev/input_reg.sx $dev/invert.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/pt0_xor.sx $dev/pt2_reset.sx $dev/pt3_reset.sx $dev/pt4_oe.sx $dev/pterms.sx $dev/pull.sx $dev/reg_type.sx $dev/slew.sx $dev/threshold.sx $dev/wide_steering.sx $dev/zerohold.sx
 
 ## ######################### END OF GENERATED CODE ######################### ##

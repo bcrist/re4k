@@ -42,7 +42,7 @@ pub fn build(b: *std.build.Builder) void {
             flash_step.dependOn(&flash.step);
         },
     } else {
-        //[[!! include 'build_zig' !! 246 ]]
+        //[[!! include 'build_zig' !! 255 ]]
         //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
         const sx = Pkg {
             .name = "sx",
@@ -223,6 +223,15 @@ pub fn build(b: *std.build.Builder) void {
         pt3_reset.setBuildMode(mode);
         pt3_reset.install();
         _ = makeRunStep(b, pt3_reset, "pt3_reset", "run pt3_reset");
+
+        const pt4_oe = b.addExecutable("pt4_oe", "src/pt4_oe.zig");
+        pt4_oe.addPackage(sx);
+        pt4_oe.addPackage(temp_allocator);
+        pt4_oe.linkLibC();
+        pt4_oe.setTarget(target);
+        pt4_oe.setBuildMode(mode);
+        pt4_oe.install();
+        _ = makeRunStep(b, pt4_oe, "pt4_oe", "run pt4_oe");
 
         const pterms = b.addExecutable("pterms", "src/pterms.zig");
         pterms.addPackage(sx);

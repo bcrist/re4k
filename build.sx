@@ -31,6 +31,7 @@
     (exe gclk_polarity)
     (exe convert-gclk_polarity)
     (exe output_routing_mode)
+    (exe pt4_oe)
     (exe lc4032_test)
     (exe lc4064_test)
 )
