@@ -2,6 +2,10 @@
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 dev = LC4064\LC4064ZE_csBGA64
 
+rule bclk_polarity
+    command = zig-out/bin/bclk_polarity.exe $out $in
+build $dev/bclk_polarity.sx: bclk_polarity
+
 rule ce_mux
     command = zig-out/bin/ce_mux.exe $out $in
 build $dev/ce_mux.sx: ce_mux
@@ -17,10 +21,6 @@ build $dev/cluster_steering.sx: cluster_steering $dev\invert.sx $dev\orm.sx
 rule drive
     command = zig-out/bin/drive.exe $out $in
 build $dev/drive.sx: drive
-
-rule gclk_polarity
-    command = zig-out/bin/gclk_polarity.exe $out $in
-build $dev/gclk_polarity.sx: gclk_polarity
 
 rule convert-grp
     command = zig-out/bin/convert-grp.exe $out $in
@@ -90,6 +90,6 @@ rule zerohold
     command = zig-out/bin/zerohold.exe $out $in
 build $dev/zerohold.sx: zerohold
 
-build build-LC4064ZE_csBGA64: phony  $dev/ce_mux.sx $dev/clk_mux.sx $dev/cluster_steering.sx $dev/drive.sx $dev/gclk_polarity.sx $dev/grp.sx $dev/input_reg.sx $dev/invert.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/pt0_xor.sx $dev/pt2_reset.sx $dev/pt3_reset.sx $dev/pt4_oe.sx $dev/pterms.sx $dev/pull.sx $dev/reg_type.sx $dev/slew.sx $dev/threshold.sx $dev/wide_steering.sx $dev/zerohold.sx
+build build-LC4064ZE_csBGA64: phony  $dev/bclk_polarity.sx $dev/ce_mux.sx $dev/clk_mux.sx $dev/cluster_steering.sx $dev/drive.sx $dev/grp.sx $dev/input_reg.sx $dev/invert.sx $dev/oe_mux.sx $dev/orm.sx $dev/powerup_state.sx $dev/pt0_xor.sx $dev/pt2_reset.sx $dev/pt3_reset.sx $dev/pt4_oe.sx $dev/pterms.sx $dev/pull.sx $dev/reg_type.sx $dev/slew.sx $dev/threshold.sx $dev/wide_steering.sx $dev/zerohold.sx
 
 ## ######################### END OF GENERATED CODE ######################### ##

@@ -1,5 +1,5 @@
 (LC4128V_TQFP144
-   (gclk_polarity
+   (bclk_polarity
       (glb 0 (name A)
          (clk 0 1 (fuse 79 656) (fuse 80 656 (value 2)))
          (clk 2 3 (fuse 81 656) (fuse 82 656 (value 2)))

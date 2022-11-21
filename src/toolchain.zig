@@ -704,7 +704,7 @@ pub const Design = struct {
 };
 
 // pub const SignalFitFlags = enum {
-//     uses_gclk,
+//     uses_bclk,
 //     uses_goe,
 //     uses_shared_clk,
 //     uses_shared_ce,

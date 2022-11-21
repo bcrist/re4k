@@ -16,7 +16,7 @@ pub fn main() void {
 }
 
 pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    const input_file = helper.getInputFile("gclk_polarity.sx") orelse return error.MissingInputFile;
+    const input_file = helper.getInputFile("bclk_polarity.sx") orelse return error.MissingInputFile;
     std.debug.assert(input_file.device.getNumGlbs() == dev.getNumGlbs());
     std.debug.assert(input_file.device.getJedecWidth() == dev.getJedecWidth());
     std.debug.assert(input_file.device.getJedecHeight() == dev.getJedecHeight());
@@ -40,9 +40,9 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
 fn parseAndWrite(dev: DeviceType, parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), writer: *sx.Writer(std.fs.File.Writer)) !void {
     _ = try parser.requireAnyExpression();
-    try parser.requireExpression("gclk_polarity");
+    try parser.requireExpression("bclk_polarity");
     try writer.expressionExpanded(@tagName(dev));
-    try writer.expressionExpanded("gclk_polarity");
+    try writer.expressionExpanded("bclk_polarity");
 
     var glb: u8 = 0;
     while (glb < dev.getNumGlbs()) : (glb += 1) {
@@ -102,6 +102,6 @@ fn parseAndWrite(dev: DeviceType, parser: *sx.Reader(std.io.FixedBufferStream([]
     }
 
     try writer.done();
-    try parser.requireClose(); // gclk_polarity
+    try parser.requireClose(); // bclk_polarity
     try parser.requireClose(); // device
 }

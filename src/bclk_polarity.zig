@@ -14,14 +14,14 @@ pub fn main() void {
     helper.main(0);
 }
 
-const GClkMode = enum {
+const BClkMode = enum {
     both_non_inverted,
     second_complemented,
     first_complemented,
     both_inverted,
 };
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, glb: u8, mode01: GClkMode, mode23: GClkMode) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, glb: u8, mode01: BClkMode, mode23: BClkMode) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
     try design.pinAssignment(.{
@@ -103,16 +103,16 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, glb: u8,
     }
 
     var results = try tc.runToolchain(design);
-    try helper.logReport("gclk_polarity_glb{}_{s}_{s}", .{ glb, @tagName(mode01), @tagName(mode23) }, results);
+    try helper.logReport("bclk_polarity_glb{}_{s}_{s}", .{ glb, @tagName(mode01), @tagName(mode23) }, results);
     try results.checkTerm();
     return results;
 }
 
 pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
     try writer.expressionExpanded(@tagName(dev));
-    try writer.expressionExpanded("gclk_polarity");
+    try writer.expressionExpanded("bclk_polarity");
 
-    var defaults = std.EnumMap(GClkMode, usize) {};
+    var defaults = std.EnumMap(BClkMode, usize) {};
 
     var glb: u8 = 0;
     while (glb < dev.getNumGlbs()) : (glb += 1) {
@@ -131,22 +131,22 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             try tc.cleanTempDir();
             helper.resetTemp();
 
-            var jeds = std.EnumMap(GClkMode, JedecData) {};
-            for (std.enums.values(GClkMode)) |mode| {
+            var jeds = std.EnumMap(BClkMode, JedecData) {};
+            for (std.enums.values(BClkMode)) |mode| {
                 var results = try if (base_clk == 0) runToolchain(ta, tc, dev, glb, mode, .both_non_inverted) else runToolchain(ta, tc, dev, glb, .both_non_inverted, mode);
                 jeds.put(mode, results.jedec);
             }
 
             const diff = try JedecData.initDiff(ta, jeds.get(.both_non_inverted).?, jeds.get(.both_inverted).?);
 
-            var values = std.EnumMap(GClkMode, usize) {};
+            var values = std.EnumMap(BClkMode, usize) {};
 
             var bit_value: usize = 1;
             var diff_iter = diff.iterator(.{});
             while (diff_iter.next()) |fuse| {
                 try helper.writeFuseOptValue(writer, fuse, bit_value);
 
-                for (std.enums.values(GClkMode)) |mode| {
+                for (std.enums.values(BClkMode)) |mode| {
                     if (jeds.get(mode)) |jed| {
                         var val: usize = values.get(mode) orelse 0;
                         if (jed.isSet(fuse)) {
@@ -160,10 +160,10 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             }
 
             if (diff.countSet() != 2) {
-                try helper.err("Expected two gclk polarity fuses, but found {}!", .{ diff.countSet() }, dev, .{ .glb = glb });
+                try helper.err("Expected two bclk polarity fuses, but found {}!", .{ diff.countSet() }, dev, .{ .glb = glb });
             }
 
-            for (std.enums.values(GClkMode)) |mode| {
+            for (std.enums.values(BClkMode)) |mode| {
                 var val: usize = values.get(mode) orelse 0;
                 if (defaults.get(mode)) |def| {
                     if (def != val) {

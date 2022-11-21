@@ -1,5 +1,5 @@
-(LC4032ZC_TQFP48
-   (gclk_polarity
+(LC4032ZC_csBGA56
+   (bclk_polarity
       (glb 0 (name A)
          (clk 0 1 (fuse 79 89) (fuse 80 89 (value 2)))
          (clk 2 3 (fuse 81 89) (fuse 82 89 (value 2)))

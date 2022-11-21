@@ -29,7 +29,7 @@ local jobs = {
         LC4128ZE_ucBGA144 = "LC4128V_TQFP144",
         LC4128ZE_csBGA144 = "LC4128V_TQFP144",
     }},
-    gclk_polarity = { device_map = {
+    bclk_polarity = { device_map = {
         -- These devices only have 2 dedicated clock inputs, 0 and 2, but use the same
         -- die as the TQFP48 version, so the clock polarity should generally be set up for
         -- complementary versions of both clocks.

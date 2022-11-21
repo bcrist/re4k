@@ -1,7 +1,5 @@
 const std = @import("std");
 const microbe = @import("pkg/microbe/src/microbe.zig");
-const hw_tests_lc4032ze = @import("hardware-tests/firmware/lc4032ze.zig");
-const hw_tests_lc4064zc = @import("hardware-tests/firmware/lc4064zc.zig");
 
 const Pkg = std.build.Pkg;
 
@@ -53,6 +51,15 @@ pub fn build(b: *std.build.Builder) void {
             .source = .{ .path = "pkg/tempallocator/temp_allocator.zig" },
         };
 
+        const bclk_polarity = b.addExecutable("bclk_polarity", "src/bclk_polarity.zig");
+        bclk_polarity.addPackage(sx);
+        bclk_polarity.addPackage(temp_allocator);
+        bclk_polarity.linkLibC();
+        bclk_polarity.setTarget(target);
+        bclk_polarity.setBuildMode(mode);
+        bclk_polarity.install();
+        _ = makeRunStep(b, bclk_polarity, "bclk_polarity", "run bclk_polarity");
+
         const ce_mux = b.addExecutable("ce_mux", "src/ce_mux.zig");
         ce_mux.addPackage(sx);
         ce_mux.addPackage(temp_allocator);
@@ -80,14 +87,14 @@ pub fn build(b: *std.build.Builder) void {
         cluster_steering.install();
         _ = makeRunStep(b, cluster_steering, "cluster_steering", "run cluster_steering");
 
-        const convert_gclk_polarity = b.addExecutable("convert-gclk_polarity", "src/convert-gclk_polarity.zig");
-        convert_gclk_polarity.addPackage(sx);
-        convert_gclk_polarity.addPackage(temp_allocator);
-        convert_gclk_polarity.linkLibC();
-        convert_gclk_polarity.setTarget(target);
-        convert_gclk_polarity.setBuildMode(mode);
-        convert_gclk_polarity.install();
-        _ = makeRunStep(b, convert_gclk_polarity, "convert-gclk_polarity", "run convert-gclk_polarity");
+        const convert_bclk_polarity = b.addExecutable("convert-bclk_polarity", "src/convert-bclk_polarity.zig");
+        convert_bclk_polarity.addPackage(sx);
+        convert_bclk_polarity.addPackage(temp_allocator);
+        convert_bclk_polarity.linkLibC();
+        convert_bclk_polarity.setTarget(target);
+        convert_bclk_polarity.setBuildMode(mode);
+        convert_bclk_polarity.install();
+        _ = makeRunStep(b, convert_bclk_polarity, "convert-bclk_polarity", "run convert-bclk_polarity");
 
         const convert_grp = b.addExecutable("convert-grp", "src/convert-grp.zig");
         convert_grp.addPackage(sx);
@@ -106,15 +113,6 @@ pub fn build(b: *std.build.Builder) void {
         drive.setBuildMode(mode);
         drive.install();
         _ = makeRunStep(b, drive, "drive", "run drive");
-
-        const gclk_polarity = b.addExecutable("gclk_polarity", "src/gclk_polarity.zig");
-        gclk_polarity.addPackage(sx);
-        gclk_polarity.addPackage(temp_allocator);
-        gclk_polarity.linkLibC();
-        gclk_polarity.setTarget(target);
-        gclk_polarity.setBuildMode(mode);
-        gclk_polarity.install();
-        _ = makeRunStep(b, gclk_polarity, "gclk_polarity", "run gclk_polarity");
 
         const grp = b.addExecutable("grp", "src/grp.zig");
         grp.addPackage(sx);

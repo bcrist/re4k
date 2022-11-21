@@ -1,5 +1,5 @@
 (LC4064x_TQFP44
-   (gclk_polarity
+   (bclk_polarity
       (glb 0 (name A)
          (clk 0 1 (fuse 79 269) (fuse 80 269 (value 2)))
          (clk 2 3 (fuse 81 269) (fuse 82 269 (value 2)))
