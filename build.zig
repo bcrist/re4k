@@ -40,7 +40,7 @@ pub fn build(b: *std.build.Builder) void {
             flash_step.dependOn(&flash.step);
         },
     } else {
-        //[[!! include 'build_zig' !! 255 ]]
+        //[[!! include 'build_zig' !! 282 ]]
         //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
         const sx = Pkg {
             .name = "sx",
@@ -113,6 +113,15 @@ pub fn build(b: *std.build.Builder) void {
         drive.setBuildMode(mode);
         drive.install();
         _ = makeRunStep(b, drive, "drive", "run drive");
+
+        const goes = b.addExecutable("goes", "src/goes.zig");
+        goes.addPackage(sx);
+        goes.addPackage(temp_allocator);
+        goes.linkLibC();
+        goes.setTarget(target);
+        goes.setBuildMode(mode);
+        goes.install();
+        _ = makeRunStep(b, goes, "goes", "run goes");
 
         const grp = b.addExecutable("grp", "src/grp.zig");
         grp.addPackage(sx);
@@ -257,6 +266,24 @@ pub fn build(b: *std.build.Builder) void {
         reg_type.setBuildMode(mode);
         reg_type.install();
         _ = makeRunStep(b, reg_type, "reg_type", "run reg_type");
+
+        const shared_pt_async_polarity = b.addExecutable("shared_pt_async_polarity", "src/shared_pt_async_polarity.zig");
+        shared_pt_async_polarity.addPackage(sx);
+        shared_pt_async_polarity.addPackage(temp_allocator);
+        shared_pt_async_polarity.linkLibC();
+        shared_pt_async_polarity.setTarget(target);
+        shared_pt_async_polarity.setBuildMode(mode);
+        shared_pt_async_polarity.install();
+        _ = makeRunStep(b, shared_pt_async_polarity, "shared_pt_async_polarity", "run shared_pt_async_polarity");
+
+        const shared_pt_clk_polarity = b.addExecutable("shared_pt_clk_polarity", "src/shared_pt_clk_polarity.zig");
+        shared_pt_clk_polarity.addPackage(sx);
+        shared_pt_clk_polarity.addPackage(temp_allocator);
+        shared_pt_clk_polarity.linkLibC();
+        shared_pt_clk_polarity.setTarget(target);
+        shared_pt_clk_polarity.setBuildMode(mode);
+        shared_pt_clk_polarity.install();
+        _ = makeRunStep(b, shared_pt_clk_polarity, "shared_pt_clk_polarity", "run shared_pt_clk_polarity");
 
         const slew = b.addExecutable("slew", "src/slew.zig");
         slew.addPackage(sx);

@@ -1,4 +1,4 @@
-##!! include('build_ninja_2','LC4128ZC_TQFP100') !! 99 ##
+##!! include('build_ninja_2','LC4128ZC_TQFP100') !! 111 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 dev = LC4128\LC4128ZC_TQFP100
 
@@ -21,6 +21,10 @@ build $dev/cluster_steering.sx: cluster_steering $dev\invert.sx $dev\orm.sx
 rule drive
     command = zig-out/bin/drive.exe $out $in
 build $dev/drive.sx: drive
+
+rule goes
+    command = zig-out/bin/goes.exe $out $in
+build $dev/goes.sx: goes $dev\shared_pt_clk_polarity.sx
 
 rule convert-grp
     command = zig-out/bin/convert-grp.exe $out $in
@@ -78,6 +82,14 @@ rule reg_type
     command = zig-out/bin/reg_type.exe $out $in
 build $dev/reg_type.sx: reg_type
 
+rule shared_pt_async_polarity
+    command = zig-out/bin/shared_pt_async_polarity.exe $out $in
+build $dev/shared_pt_async_polarity.sx: shared_pt_async_polarity $dev\shared_pt_clk_polarity.sx
+
+rule shared_pt_clk_polarity
+    command = zig-out/bin/shared_pt_clk_polarity.exe $out $in
+build $dev/shared_pt_clk_polarity.sx: shared_pt_clk_polarity
+
 rule slew
     command = zig-out/bin/slew.exe $out $in
 build $dev/slew.sx: slew
@@ -94,6 +106,6 @@ rule zerohold
     command = zig-out/bin/zerohold.exe $out $in
 build $dev/zerohold.sx: zerohold
 
-build build-LC4128ZC_TQFP100: phony  $dev/bclk_polarity.sx $dev/ce_mux.sx $dev/clk_mux.sx $dev/cluster_steering.sx $dev/drive.sx $dev/grp.sx $dev/input_reg.sx $dev/invert.sx $dev/oe_mux.sx $dev/orm.sx $dev/output_routing_mode.sx $dev/powerup_state.sx $dev/pt0_xor.sx $dev/pt2_reset.sx $dev/pt3_reset.sx $dev/pt4_oe.sx $dev/pterms.sx $dev/pull.sx $dev/reg_type.sx $dev/slew.sx $dev/threshold.sx $dev/wide_steering.sx $dev/zerohold.sx
+build build-LC4128ZC_TQFP100: phony  $dev/bclk_polarity.sx $dev/ce_mux.sx $dev/clk_mux.sx $dev/cluster_steering.sx $dev/drive.sx $dev/goes.sx $dev/grp.sx $dev/input_reg.sx $dev/invert.sx $dev/oe_mux.sx $dev/orm.sx $dev/output_routing_mode.sx $dev/powerup_state.sx $dev/pt0_xor.sx $dev/pt2_reset.sx $dev/pt3_reset.sx $dev/pt4_oe.sx $dev/pterms.sx $dev/pull.sx $dev/reg_type.sx $dev/shared_pt_async_polarity.sx $dev/shared_pt_clk_polarity.sx $dev/slew.sx $dev/threshold.sx $dev/wide_steering.sx $dev/zerohold.sx
 
 ## ######################### END OF GENERATED CODE ######################### ##

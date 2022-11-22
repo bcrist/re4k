@@ -402,10 +402,10 @@ pub const JedecData = struct {
         }
     }
 
-    pub fn write(self: JedecData, writer: anytype, options: core.FuseFileWriteOptions) !void {
+    pub fn write(self: JedecData, allocator: std.mem.Allocator, writer: anytype, options: core.FuseFileWriteOptions) !void {
         switch (options.format) {
             .jed => {
-                try self.writeJed(writer, options);
+                try self.writeJed(allocator, writer, options);
             },
             .svf => {
                 try svf.write(self, writer, options);
@@ -413,8 +413,8 @@ pub const JedecData = struct {
         }
     }
 
-    fn writeJed(self: JedecData, writer: anytype, options: core.FuseFileWriteOptions) !void {
-        var w = @import("checksum_writer.zig").checksumWriter(u16, self.raw.allocator, writer);
+    fn writeJed(self: JedecData, allocator: std.mem.Allocator, writer: anytype, options: core.FuseFileWriteOptions) !void {
+        var w = @import("checksum_writer.zig").checksumWriter(u16, allocator, writer);
 
         try w.writeByte(0x2); // STX
         try w.writeByte('*');
@@ -424,14 +424,14 @@ pub const JedecData = struct {
             try w.print("QP{}*{s}", .{ qp, options.line_ending });
         }
 
-        try w.print("QF{}*{s}", .{ self.length(), options.line_ending });
+        try w.print("QF{}*{s}", .{ self.getRange().count(), options.line_ending });
 
         if (self.security) |g| {
             try w.print("G{}*{s}", .{ g, options.line_ending });
         }
 
         if (options.jed_compact) {
-            const len = self.length();
+            const len = self.getRange().count();
             const num_set = self.raw.count();
             var default: u1 = undefined;
             var default_hex: u8 = undefined;

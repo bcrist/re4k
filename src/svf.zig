@@ -2,6 +2,8 @@ const std = @import("std");
 const core = @import("core.zig");
 const jedec = @import("jedec.zig");
 
+const Fuse = jedec.Fuse;
+
 pub const JtagCommand = enum (u8) {
     ISC_ENABLE = 0x15,
     ISC_DISABLE = 0x1E,
@@ -154,7 +156,7 @@ fn writeRowHex(data: jedec.JedecData, row: u16, writer: anytype) !void {
             var c = col - b;
             if (c < data.width) {
                 val *= 2;
-                val += data.get(row, @intCast(u32, c));
+                val += data.get(Fuse.init(row, @intCast(u16, c)));
             }
         }
         try writer.print("{X:0>1}", .{ val });
@@ -163,10 +165,11 @@ fn writeRowHex(data: jedec.JedecData, row: u16, writer: anytype) !void {
 
 fn writeHex(comptime T: type, data: T, writer: anytype) !void {
     // TODO this assumes it's running on little endian, maybe refactor?
-    const bits = @bitSizeOf(T);
-    const digits = (bits + 3) / 4;
-    const fmt = "{X:0>" ++ std.fmt.comptimePrint("{}", .{ digits }) ++ "}";
-    try writer.print(fmt, .{ data });
+    if (T != bool) {
+        const bits = @bitSizeOf(T);
+        const digits = comptime (bits + 3) / 4;
+        try writer.print(std.fmt.comptimePrint("{{X:0>{}}}", .{ digits }), .{ data });
+    }
 }
 
 fn writeCommand(command: JtagCommand, comptime T: type, tdi_data: ?T, tdo_data: ?T, writer: anytype, nl: []const u8) !void {

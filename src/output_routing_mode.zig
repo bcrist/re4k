@@ -72,7 +72,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
     try design.addPT("in4", out_signal);
 
     var results = try tc.runToolchain(design);
-    try helper.logReport("bypass_pin{}_{s}", .{ pin_index, @tagName(bypass) }, results);
+    try helper.logResults("bypass_pin{}_{s}", .{ pin_index, @tagName(bypass) }, results);
     try results.checkTerm();
     return results;
 }

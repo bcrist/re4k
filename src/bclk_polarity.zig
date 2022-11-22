@@ -103,7 +103,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, glb: u8,
     }
 
     var results = try tc.runToolchain(design);
-    try helper.logReport("bclk_polarity_glb{}_{s}_{s}", .{ glb, @tagName(mode01), @tagName(mode23) }, results);
+    try helper.logResults("bclk_polarity_glb{}_{s}_{s}", .{ glb, @tagName(mode01), @tagName(mode23) }, results);
     try results.checkTerm();
     return results;
 }

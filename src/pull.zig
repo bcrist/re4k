@@ -29,7 +29,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
     try design.addPT("in", "out");
 
     var results = try tc.runToolchain(design);
-    try helper.logReport("pull_pin{s}_{s}", .{ dev.getPins()[pin_index].pin_number(), @tagName(pull) }, results);
+    try helper.logResults("pull_pin{s}_{s}", .{ dev.getPins()[pin_index].pin_number(), @tagName(pull) }, results);
     try results.checkTerm();
     return results;
 }

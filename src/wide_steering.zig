@@ -45,7 +45,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
     }
 
     var results = try tc.runToolchain(design);
-    try helper.logReport("wide_steering_glb{}_mc{}_pts{}", .{ report_mcref.glb, report_mcref.mc, pts }, results);
+    try helper.logResults("wide_steering_glb{}_mc{}_pts{}", .{ report_mcref.glb, report_mcref.mc, pts }, results);
     try results.checkTerm();
     return results;
 }

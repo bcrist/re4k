@@ -35,7 +35,7 @@ pub const interrupts = struct {
 const SlowClock = microbe.Bus("SlowClock", .{ .PB0 }, .{ .mode = .output });
 
 var uart: microbe.Uart(.{
-    .baud_rate = 9600,
+    .baud_rate = 128000,
     .tx = .PA9,
     .rx = .PA10,
     .cts = .PA11,

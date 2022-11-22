@@ -41,7 +41,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
     try design.addPT("as", "dum.AP");
 
     var results = try tc.runToolchain(design);
-    try helper.logReport("pt2_reset_glb{}_mc{}_{}", .{ mcref.glb, mcref.mc, pt2_as }, results);
+    try helper.logResults("pt2_reset_glb{}_mc{}_{}", .{ mcref.glb, mcref.mc, pt2_as }, results);
     try results.checkTerm();
     return results;
 }

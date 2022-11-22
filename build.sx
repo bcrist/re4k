@@ -7,6 +7,8 @@
     (pkg sx)
 )
 (dir src
+    (exe goes)
+    (exe shared_pt_async_polarity)
     (exe drive)
     (exe oe_mux)
     (exe pull)
@@ -30,6 +32,7 @@
     (exe wide_steering)
     (exe bclk_polarity)
     (exe convert-bclk_polarity)
+    (exe shared_pt_clk_polarity)
     (exe output_routing_mode)
     (exe pt4_oe)
     (exe lc4032_test)

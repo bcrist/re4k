@@ -86,7 +86,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin: dev
     }
 
     var results = try tc.runToolchain(design);
-    try helper.logReport("pt4_oe_{s}_glb{}_mc{}_{}", .{ pin.pin_number, pin.glb, pin.mc, pt4_oe }, results);
+    try helper.logResults("pt4_oe_{s}_glb{}_mc{}_{}", .{ pin.pin_number, pin.glb, pin.mc, pt4_oe }, results);
     try results.checkTerm();
     return results;
 }

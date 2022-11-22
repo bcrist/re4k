@@ -36,6 +36,8 @@ local jobs = {
         LC4032x_TQFP44 = "LC4032x_TQFP48",
         LC4064x_TQFP44 = "LC4064x_TQFP48",
     }},
+    shared_pt_clk_polarity = {},
+    shared_pt_async_polarity = { 'shared_pt_clk_polarity' },
     output_routing_mode = { device_map = {
         LC4032ZE_TQFP48   = false,
         LC4032ZE_csBGA64  = false,
@@ -69,6 +71,7 @@ local jobs = {
     pterms           = { 'grp' },
     cluster_steering = { 'invert', 'orm' },
     wide_steering    = { 'cluster_steering' },
+    goes             = { 'shared_pt_clk_polarity' },
 }
 
 writeln('dev = ', fs.compose_path(device:sub(1, 6), device), nl)

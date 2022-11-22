@@ -24,7 +24,7 @@ pub const interrupts = struct {
 };
 
 var uart: microbe.Uart(.{
-    .baud_rate = 9600,
+    .baud_rate = 128000,
     .tx = .PA9,
     .rx = .PA10,
     .cts = .PA11,

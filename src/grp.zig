@@ -65,7 +65,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, signals_
     design.max_fit_time_ms = 500;
 
     var results = try tc.runToolchain(design);
-    try helper.logReport("grp_{}", .{ report_number }, results);
+    try helper.logResults("grp_{}", .{ report_number }, results);
     report_number += 1;
     //try results.checkTerm();
     return results;

@@ -84,6 +84,8 @@ fn run(num_inputs: usize) !void {
             keep = true;
         } else if (std.mem.eql(u8, arg, "--reports")) {
             report_dir = &out_dir;
+        } else if (std.mem.eql(u8, arg, "--jeds")) {
+            jed_dir = &out_dir;
         } else if (std.mem.eql(u8, arg, "--slow")) {
             slow_mode = true;
         } else {
@@ -106,14 +108,22 @@ fn run(num_inputs: usize) !void {
 }
 
 var report_dir: ?*std.fs.Dir = null;
+var jed_dir: ?*std.fs.Dir = null;
 
-pub fn logReport(comptime name_fmt: []const u8, name_args: anytype, results: toolchain.FitResults) !void {
+pub fn logResults(comptime name_fmt: []const u8, name_args: anytype, results: toolchain.FitResults) !void {
     if (report_dir) |dir| {
         const filename = try std.fmt.allocPrint(temp_alloc.allocator(), name_fmt ++ ".rpt", name_args);
         var f = try dir.createFile(filename, .{});
         defer f.close();
 
         try f.writer().writeAll(results.report);
+    }
+    if (jed_dir) |dir| {
+        const filename = try std.fmt.allocPrint(temp_alloc.allocator(), name_fmt ++ ".jed", name_args);
+        var f = try dir.createFile(filename, .{});
+        defer f.close();
+
+        try results.jedec.write(temp_alloc.allocator(), f.writer(), .{});
     }
     if (slow_mode) {
         try std.io.getStdOut().writer().writeAll("Press enter to continue...\n");
@@ -558,6 +568,55 @@ fn parseOEMuxRows0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reade
         try parser.ignoreRemainingExpression();
     }
     try parser.requireClose(); // oe_mux
+    try parser.requireClose(); // device
+    try parser.requireDone();
+}
+
+pub fn parseSharedPTClockPolarityFuses(ta: std.mem.Allocator, pa: std.mem.Allocator, dev: DeviceType) ![]Fuse {
+    const input_file = getInputFile("shared_pt_clk_polarity.sx") orelse return error.MissingSharedPtClkPolarityInputFile;
+    if (input_file.device != dev) return error.InputFileDeviceMismatch;
+
+    var results = try pa.alloc(Fuse, dev.getNumGlbs());
+
+    var stream = std.io.fixedBufferStream(input_file.contents);
+    var parser = sx.reader(ta, stream.reader());
+    defer parser.deinit();
+
+    parseSharedPTClockPolarityFuses0(&parser, results) catch |e| switch (e) {
+        error.SExpressionSyntaxError => {
+            var ctx = try parser.getNextTokenContext();
+            try ctx.printForString(input_file.contents, std.io.getStdErr().writer(), 120);
+            return e;
+        },
+        else => return e,
+    };
+
+    return results;
+}
+
+fn parseSharedPTClockPolarityFuses0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), results: []Fuse) !void {
+    _ = try parser.requireAnyExpression(); // device name, we already know it
+    try parser.requireExpression("shared_pt_clk_polarity");
+
+    while (try parser.expression("glb")) {
+        var glb = try parser.requireAnyInt(u8, 10);
+
+        if (try parser.expression("name")) {
+            try parser.ignoreRemainingExpression();
+        }
+
+        try parser.requireExpression("fuse");
+        var row = try parser.requireAnyInt(u16, 10);
+        var col = try parser.requireAnyInt(u16, 10);
+        results[glb] = Fuse.init(row, col);
+        try parser.requireClose(); // fuse
+
+        try parser.requireClose(); // glb
+    }
+    while (try parser.expression("value")) {
+        try parser.ignoreRemainingExpression();
+    }
+    try parser.requireClose(); // shared_pt_clk_polarity
     try parser.requireClose(); // device
     try parser.requireDone();
 }

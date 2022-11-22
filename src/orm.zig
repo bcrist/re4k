@@ -49,7 +49,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
     }
 
     var results = try tc.runToolchain(design);
-    try helper.logReport("orm_{s}_plus{}", .{ out_info.pin_number, offset }, results);
+    try helper.logResults("orm_{s}_plus{}", .{ out_info.pin_number, offset }, results);
     try results.checkTerm();
     return results;
 }

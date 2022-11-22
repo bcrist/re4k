@@ -42,7 +42,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
     }
 
     var results = try tc.runToolchain(design);
-    try helper.logReport("reg_type_glb{}_mc{}_{s}", .{ mcref.glb, mcref.mc, @tagName(reg_type) }, results);
+    try helper.logResults("reg_type_glb{}_mc{}_{s}", .{ mcref.glb, mcref.mc, @tagName(reg_type) }, results);
     try results.checkTerm();
     return results;
 }

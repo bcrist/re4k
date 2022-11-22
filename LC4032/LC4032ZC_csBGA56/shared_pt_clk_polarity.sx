@@ -1,0 +1,12 @@
+(LC4032ZC_csBGA56
+   (shared_pt_clk_polarity
+      (glb 0 (name A)
+         (fuse 72 171)
+      )
+      (glb 1 (name B)
+         (fuse 72 85)
+      )
+      (value 1 positive)
+      (value 0 negative)
+   )
+)

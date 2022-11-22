@@ -1,0 +1,22 @@
+(LC4032ZE_TQFP48
+   (goe_polarity
+      (goe0 (fuse 88 171))
+      (goe1 (fuse 89 171))
+      (goe2 (fuse 90 171))
+      (goe3 (fuse 91 171))
+      (value 0 active_low)
+      (value 1 active_high)
+   )
+   (shared_ptoe_bus
+      (glb 0 (name A)
+         (goe0 (fuse 73 171))
+         (goe1 (fuse 74 171))
+      )
+      (glb 1 (name B)
+         (goe0 (fuse 73 85))
+         (goe1 (fuse 74 85))
+      )
+      (value 0 enabled)
+      (value 1 disabled)
+   )
+)

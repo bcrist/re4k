@@ -34,9 +34,9 @@ fn runToolchainOnOff(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, io:
 
     var results = try tc.runToolchain(design);
     if (off) {
-        try helper.logReport("off.glb{}.mc{}", .{ glb, mc }, results);
+        try helper.logResults("off.glb{}.mc{}", .{ glb, mc }, results);
     } else {
-        try helper.logReport("on.glb{}.mc{}", .{ glb, mc }, results);
+        try helper.logResults("on.glb{}.mc{}", .{ glb, mc }, results);
     }
     try results.checkTerm();
     return results;
@@ -98,9 +98,9 @@ fn runToolchainGOE(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, io: I
 
     var results = try tc.runToolchain(design);
     if (goe) {
-        try helper.logReport("goe.glb{}.mc{}", .{ glb, mc }, results);
+        try helper.logResults("goe.glb{}.mc{}", .{ glb, mc }, results);
     } else {
-        try helper.logReport("nogoe.glb{}.mc{}", .{ glb, mc }, results);
+        try helper.logResults("nogoe.glb{}.mc{}", .{ glb, mc }, results);
     }
     try results.checkTerm();
     return results;
@@ -234,7 +234,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, io: Inpu
     }
 
     var results = try tc.runToolchain(design);
-    try helper.logReport("{s}.glb{}.mc{}", .{ @tagName(mode), glb, mc }, results);
+    try helper.logResults("{s}.glb{}.mc{}", .{ @tagName(mode), glb, mc }, results);
     try results.checkTerm();
     return results;
 }

@@ -54,7 +54,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
     try design.addPT("gas", "gdum.AR");
 
     var results = try tc.runToolchain(design);
-    try helper.logReport("pt3_reset_glb{}_mc{}_{}", .{ mcref.glb, mcref.mc, pt3_ar }, results);
+    try helper.logResults("pt3_reset_glb{}_mc{}_{}", .{ mcref.glb, mcref.mc, pt3_ar }, results);
     try results.checkTerm();
     return results;
 }

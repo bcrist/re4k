@@ -27,7 +27,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
     try design.addPT("in", "out.D");
 
     var results = try tc.runToolchain(design);
-    try helper.logReport("powerup_state_glb{}_mc{}_{}", .{ mcref.glb, mcref.mc, powerup_state }, results);
+    try helper.logResults("powerup_state_glb{}_mc{}_{}", .{ mcref.glb, mcref.mc, powerup_state }, results);
     try results.checkTerm();
     return results;
 }

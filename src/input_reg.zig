@@ -63,7 +63,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
     try design.addPT("in", "out.D");
 
     var results = try tc.runToolchain(design);
-    try helper.logReport("input_reg_pin_{s}_{}", .{ io.pin_number, inreg }, results);
+    try helper.logResults("input_reg_pin_{s}_{}", .{ io.pin_number, inreg }, results);
     try results.checkTerm();
     return results;
 }

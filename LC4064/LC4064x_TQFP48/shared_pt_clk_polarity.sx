@@ -1,0 +1,18 @@
+(LC4064x_TQFP48
+   (shared_pt_clk_polarity
+      (glb 0 (name A)
+         (fuse 72 351)
+      )
+      (glb 1 (name B)
+         (fuse 72 263)
+      )
+      (glb 2 (name C)
+         (fuse 72 175)
+      )
+      (glb 3 (name D)
+         (fuse 72 87)
+      )
+      (value 1 positive)
+      (value 0 negative)
+   )
+)
