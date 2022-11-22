@@ -47,11 +47,10 @@ pub const PinAssignment = struct {
     drive: ?core.DriveType = null,
     bus_maintenance: ?core.BusMaintenanceType = null,
     slew_rate: ?core.SlewRate = null,
-    //power_guard_signal: ?[]const u8 = null,
+    power_guard_signal: ?[]const u8 = null,
     powerup_state: ?u1 = null,
     orm_bypass: ?bool = null,
     fast_bypass: ?bool = null,
-    input_register: ?bool = null,
 };
 
 pub const NodeAssignment = struct {
@@ -140,6 +139,7 @@ pub const Design = struct {
     adjust_input_assignments: bool,
     parse_glb_inputs: bool,
     max_fit_time_ms: u32 = 0, // unlimited
+    uses_power_guard: bool = false,
 
     pub fn init(alloc: std.mem.Allocator, device: DeviceType) Design {
         return .{
@@ -165,13 +165,16 @@ pub const Design = struct {
                 if (pa.bus_maintenance) |pull| existing.bus_maintenance = pull;
                 if (pa.slew_rate) |slew| existing.slew_rate = slew;
                 if (pa.powerup_state) |powerup| existing.powerup_state = powerup;
-                // if (pa.power_guard_signal) |pg| {
-                    // existing.power_guard_signal = pg;
-                    // try self.addPinIfNotNode(pg);
-                // }
+                if (pa.power_guard_signal) |pg_enable| {
+                    self.uses_power_guard = true;
+                    existing.power_guard_signal = pg_enable;
+                    try self.addPinIfNotNode(pg_enable);
+                    try self.nodeAssignment(.{
+                        .signal = try std.fmt.allocPrint(self.alloc, "{s}_PG", .{ pa.signal }),
+                    });
+                }
                 if (pa.orm_bypass) |bypass| existing.orm_bypass = bypass;
                 if (pa.fast_bypass) |bypass| existing.fast_bypass = bypass;
-                if (pa.input_register) |inreg| existing.input_register = inreg;
                 return;
             }
         }
@@ -184,9 +187,13 @@ pub const Design = struct {
         }
 
         try self.pins.append(self.alloc, pa);
-        // if (pa.power_guard_signal) |pg| {
-        //     try self.addPinIfNotNode(pg);
-        // }
+        if (pa.power_guard_signal) |pg_enable| {
+            self.uses_power_guard = true;
+            try self.addPinIfNotNode(pg_enable);
+            try self.nodeAssignment(.{
+                .signal = try std.fmt.allocPrint(self.alloc, "{s}_PG", .{ pa.signal }),
+            });
+        }
     }
 
     pub fn addPinIfNotNode(self: *Design, signal: []const u8) !void {
@@ -580,18 +587,6 @@ pub const Design = struct {
             };
             try writer.print("{s}=", .{ name });
             var first = true;
-            for (self.pins.items) |pin_assignment| {
-                if (pin_assignment.input_register) |inreg| {
-                    if (state == inreg) {
-                        if (first) {
-                            first = false;
-                        } else {
-                            try writer.writeByte(',');
-                        }
-                        try writer.writeAll(pin_assignment.signal);
-                    }
-                }
-            }
             for (self.nodes.items) |node_assignment| {
                 if (node_assignment.input_register) |inreg| {
                     if (state == inreg) {
@@ -667,7 +662,18 @@ pub const Design = struct {
             try writer.print(" {s}", .{ node.signal });
         }
         try writer.writeAll("\n");
-        // TODO power guard
+
+        if (self.uses_power_guard) {
+            try writer.writeAll("#$ EXTERNAL PG 3 D'i' E'i' Q'o'\n");
+            var n: usize = 0;
+            for (self.pins.items) |pin| {
+                if (pin.power_guard_signal) |pg_enable| {
+                    try writer.print("#$ INSTANCE I{} PG 3 {s} {s} {s}_PG\n", .{ n, pin.signal, pg_enable, pin.signal });
+                    n += 1;
+                }
+            }
+        }
+
         try writer.writeAll(".type f\n");
         try writer.print(".i {}\n", .{ self.inputs.items.len });
         try writer.print(".o {}\n", .{ self.outputs.items.len });
@@ -702,47 +708,6 @@ pub const Design = struct {
     }
 
 };
-
-// pub const SignalFitFlags = enum {
-//     uses_bclk,
-//     uses_goe,
-//     uses_shared_clk,
-//     uses_shared_ce,
-//     uses_shared_ar,
-//     uses_shared_ap,
-//     powerup_reset,
-//     powerup_preset,
-//     uses_input_reg,
-//     uses_ar,
-//     uses_ap,
-//     uses_ce,
-//     uses_oe,
-//     uses_fast_path,
-//     uses_orp_bypass,
-// };
-
-// pub const SignalFitData = struct {
-//     name: []const u8,
-//     pin: u16,
-//     glb: u8,
-//     mc: u8,
-//     type: core.SignalType,
-//     iostd: core.LogicLevels,
-//     bus_maintenance: core.BusMaintenanceType,
-//     macrocell_type: core.MacrocellType,
-//     uses_input_reg: bool,
-//     num_unique_inputs: u16,
-//     num_shared_inputs: u16,
-//     num_pts: u8,
-//     num_logic_pts: u8,
-//     num_xor_pts: u8,
-//     num_ctrl_pts: u8,
-//     num_clusters: u8,
-//     num_logic_levels: u8,
-//     cluster_pt_usage: [16]u8,
-//     pg_enable_signal: []const u8,
-//     flags: std.EnumSet(SignalFitFlags),
-// };
 
 pub const GlbInputSignal = union(enum) {
     fb: core.MacrocellRef,

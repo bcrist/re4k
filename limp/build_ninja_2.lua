@@ -1,4 +1,13 @@
 local device = ...
+
+local function ZE_only (device) 
+    return nil ~= device:find('ZE_', 1, true)
+end
+
+local function non_ZE_only (device)
+    return nil == device:find('ZE_', 1, true)
+end
+
 local jobs = {
     grp = { device_map = {
         -- For some packages, not all inputs on the die are attached to pins, so it's
@@ -38,19 +47,7 @@ local jobs = {
     }},
     shared_pt_clk_polarity = {},
     shared_pt_async_polarity = { 'shared_pt_clk_polarity' },
-    output_routing_mode = { device_map = {
-        LC4032ZE_TQFP48   = false,
-        LC4032ZE_csBGA64  = false,
-        LC4064ZE_TQFP48   = false,
-        LC4064ZE_csBGA64  = false,
-        LC4064ZE_ucBGA64  = false,
-        LC4064ZE_TQFP100  = false,
-        LC4064ZE_csBGA144 = false,
-        LC4128ZE_TQFP100  = false,
-        LC4128ZE_TQFP144  = false,
-        LC4128ZE_ucBGA144 = false,
-        LC4128ZE_csBGA144 = false,
-    }},
+    output_routing_mode = { device_predicate = non_ZE_only },
     zerohold         = {},
     slew             = {},
     threshold        = {},
@@ -72,6 +69,8 @@ local jobs = {
     cluster_steering = { 'invert', 'orm' },
     wide_steering    = { 'cluster_steering' },
     goes             = { 'shared_pt_clk_polarity' },
+    power_guard      = { device_predicate = ZE_only },
+    -- osctimer         = { device_predicate = ZE_only },
 }
 
 writeln('dev = ', fs.compose_path(device:sub(1, 6), device), nl)
@@ -87,6 +86,11 @@ for job, config in spairs(jobs) do
             deps = { job }
             dep_dev = fs.compose_path(other_dev:sub(1, 6), other_dev)
         elseif other_dev == false then
+            cmd = nil
+        end
+    end
+    if config.device_predicate then
+        if not config.device_predicate(device) then
             cmd = nil
         end
     end
@@ -107,6 +111,11 @@ for job, config in spairs(jobs) do
     if config.device_map then
         local other_dev = config.device_map[device]
         if other_dev == false then
+            job = nil
+        end
+    end
+    if config.device_predicate then
+        if not config.device_predicate(device) then
             job = nil
         end
     end

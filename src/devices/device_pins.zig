@@ -84,9 +84,22 @@ pub const InputIterator = struct {
             }
             const pi = self.pins[i];
             switch (pi) {
-                .input => {},
-                .clock_input => {
+                .input => |info| {
+                    if (self.single_glb) |glb| {
+                        if (info.glb != glb) continue;
+                    }
+                    if (self.exclude_glb) |glb| {
+                        if (info.glb == glb) continue;
+                    }
+                },
+                .clock_input => |info| {
                     if (self.exclude_clocks) continue;
+                    if (self.single_glb) |glb| {
+                        if (info.glb != glb) continue;
+                    }
+                    if (self.exclude_glb) |glb| {
+                        if (info.glb == glb) continue;
+                    }
                 },
                 .input_output => |info| {
                     if (self.single_glb) |glb| {

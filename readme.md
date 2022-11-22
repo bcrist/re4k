@@ -85,7 +85,6 @@ specific column, and pairs of macrocell slices are grouped together, so overall 
 * Bitstream configuration through zig
 * Bitstream decompilation
 * OSCTIMER for ZE family
-* power guard for ZE family
 * Hardware verification
     * What happens if both GLB's PTOE/BIE are routed to the same GOE?  assuming they are summed, but should check with hardware.  I don't think the fitter will allow this config.
     * Which of the OSCTIMER output enables is for OSCOUT vs TIMEROUT?  Fitter always seems to enable them both at the same time.

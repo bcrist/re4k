@@ -40,7 +40,7 @@ pub fn build(b: *std.build.Builder) void {
             flash_step.dependOn(&flash.step);
         },
     } else {
-        //[[!! include 'build_zig' !! 282 ]]
+        //[[!! include 'build_zig' !! 291 ]]
         //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
         const sx = Pkg {
             .name = "sx",
@@ -194,6 +194,15 @@ pub fn build(b: *std.build.Builder) void {
         output_routing_mode.setBuildMode(mode);
         output_routing_mode.install();
         _ = makeRunStep(b, output_routing_mode, "output_routing_mode", "run output_routing_mode");
+
+        const power_guard = b.addExecutable("power_guard", "src/power_guard.zig");
+        power_guard.addPackage(sx);
+        power_guard.addPackage(temp_allocator);
+        power_guard.linkLibC();
+        power_guard.setTarget(target);
+        power_guard.setBuildMode(mode);
+        power_guard.install();
+        _ = makeRunStep(b, power_guard, "power_guard", "run power_guard");
 
         const powerup_state = b.addExecutable("powerup_state", "src/powerup_state.zig");
         powerup_state.addPackage(sx);
