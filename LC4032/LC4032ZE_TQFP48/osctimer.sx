@@ -1,0 +1,31 @@
+(LC4032ZE_TQFP48
+   (osctimer
+      (enable
+         (fuse 91 168)
+         (value 0 enabled)
+         (value 1 disabled)
+      )
+      (enable
+         (fuse 92 168)
+         (value 0 enabled)
+         (value 1 disabled)
+      )
+      (timer_out
+         (fuse 93 169)
+         (value 0 enabled)
+         (value 1 disabled)
+      )
+      (osc_out
+         (fuse 93 170)
+         (value 0 enabled)
+         (value 1 disabled)
+      )
+      (timer_div
+         (fuse 92 169 (value 1))
+         (fuse 92 170 (value 2))
+         (value 0 div128)
+         (value 2 div1024)
+         (value 1 div1048576)
+      )
+   )
+)

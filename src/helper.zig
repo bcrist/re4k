@@ -123,7 +123,9 @@ pub fn logResults(comptime name_fmt: []const u8, name_args: anytype, results: to
         var f = try dir.createFile(filename, .{});
         defer f.close();
 
-        try results.jedec.write(temp_alloc.allocator(), f.writer(), .{});
+        try results.jedec.write(temp_alloc.allocator(), f.writer(), .{
+            .jed_one_char = '.'
+        });
     }
     if (slow_mode) {
         try std.io.getStdOut().writer().writeAll("Press enter to continue...\n");

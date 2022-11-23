@@ -94,6 +94,12 @@ pub const GlbInputSignal = union {
     pin: u16,
 };
 
+pub const TimerDivisor = enum(u32) {
+    div128 = 128,
+    div1024 = 1024,
+    div1048576 = 1048576,
+};
+
 pub const FuseFileFormat = enum {
     jed,
     svf,
@@ -102,7 +108,10 @@ pub const FuseFileFormat = enum {
 pub const FuseFileWriteOptions = struct {
     format: FuseFileFormat = .jed,
     jed_compact: bool = false,
+    jed_zero_char: u8 = '0',
+    jed_one_char: u8 = '1',
     svf_erase: bool = true,
     svf_verify: bool = true,
     line_ending: []const u8 = "\n",
+
 };

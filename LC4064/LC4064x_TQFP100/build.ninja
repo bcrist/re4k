@@ -1,4 +1,4 @@
-##!! include('build_ninja_2','LC4064x_TQFP100') !! 111 ##
+##!! include('build_ninja','LC4064x_TQFP100') !! 111 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
 dev = LC4064\LC4064x_TQFP100
 

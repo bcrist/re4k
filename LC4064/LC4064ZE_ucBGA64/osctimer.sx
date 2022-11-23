@@ -1,0 +1,31 @@
+(LC4064ZE_ucBGA64
+   (osctimer
+      (enable
+         (fuse 92 351)
+         (value 0 enabled)
+         (value 1 disabled)
+      )
+      (enable
+         (fuse 92 352)
+         (value 0 enabled)
+         (value 1 disabled)
+      )
+      (timer_out
+         (fuse 93 353)
+         (value 0 enabled)
+         (value 1 disabled)
+      )
+      (osc_out
+         (fuse 93 354)
+         (value 0 enabled)
+         (value 1 disabled)
+      )
+      (timer_div
+         (fuse 92 353 (value 1))
+         (fuse 92 354 (value 2))
+         (value 0 div128)
+         (value 2 div1024)
+         (value 1 div1048576)
+      )
+   )
+)

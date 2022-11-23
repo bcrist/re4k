@@ -478,9 +478,9 @@ pub const JedecData = struct {
                 var col: u16 = 0;
                 while (col < self.width) : (col += 1) {
                     if (self.raw.isSet(fuse)) {
-                        try w.writeByte('1');
+                        try w.writeByte(options.jed_one_char);
                     } else {
-                        try w.writeByte('0');
+                        try w.writeByte(options.jed_zero_char);
                     }
                     fuse += 1;
                 }

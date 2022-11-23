@@ -7,6 +7,7 @@
     (pkg sx)
 )
 (dir src
+    (exe osctimer)
     (exe power_guard)
     (exe goes)
     (exe shared_pt_async_polarity)

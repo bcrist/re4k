@@ -40,7 +40,7 @@ pub fn build(b: *std.build.Builder) void {
             flash_step.dependOn(&flash.step);
         },
     } else {
-        //[[!! include 'build_zig' !! 291 ]]
+        //[[!! include 'build_zig' !! 300 ]]
         //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
         const sx = Pkg {
             .name = "sx",
@@ -185,6 +185,15 @@ pub fn build(b: *std.build.Builder) void {
         orm.setBuildMode(mode);
         orm.install();
         _ = makeRunStep(b, orm, "orm", "run orm");
+
+        const osctimer = b.addExecutable("osctimer", "src/osctimer.zig");
+        osctimer.addPackage(sx);
+        osctimer.addPackage(temp_allocator);
+        osctimer.linkLibC();
+        osctimer.setTarget(target);
+        osctimer.setBuildMode(mode);
+        osctimer.install();
+        _ = makeRunStep(b, osctimer, "osctimer", "run osctimer");
 
         const output_routing_mode = b.addExecutable("output_routing_mode", "src/output_routing_mode.zig");
         output_routing_mode.addPackage(sx);

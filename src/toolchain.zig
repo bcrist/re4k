@@ -138,8 +138,9 @@ pub const Design = struct {
     zero_hold_time: bool,
     adjust_input_assignments: bool,
     parse_glb_inputs: bool,
-    max_fit_time_ms: u32 = 0, // unlimited
-    uses_power_guard: bool = false,
+    max_fit_time_ms: u32,
+    uses_power_guard: bool,
+    osctimer_div: ?core.TimerDivisor,
 
     pub fn init(alloc: std.mem.Allocator, device: DeviceType) Design {
         return .{
@@ -153,6 +154,9 @@ pub const Design = struct {
             .zero_hold_time = false,
             .adjust_input_assignments = false,
             .parse_glb_inputs = false,
+            .max_fit_time_ms = 0, // unlimited
+            .uses_power_guard = false,
+            .osctimer_div = null,
         };
     }
 
@@ -364,6 +368,22 @@ pub const Design = struct {
                 @compileError("Expected outputs to be a string or tuple of strings!");
             },
         }
+    }
+
+    pub fn oscillator(self: *Design, div: core.TimerDivisor) !void {
+        self.osctimer_div = div;
+        try self.nodeAssignment(.{
+            .signal = "OSC_disable",
+        });
+        try self.nodeAssignment(.{
+            .signal = "OSC_reset",
+        });
+        try self.nodeAssignment(.{
+            .signal = "OSC_out",
+        });
+        try self.nodeAssignment(.{
+            .signal = "OSC_tout",
+        });
     }
 
     pub fn writeLci(self: Design, writer: anytype) !void {
@@ -602,7 +622,13 @@ pub const Design = struct {
             try writer.writeAll(";\n");
         }
 
-        if (device.getFamily() != .zero_power_enhanced) {
+        if (device.getFamily() == .zero_power_enhanced) {
+            if (self.osctimer_div) |divisor| {
+                try writer.writeAll("\n[OSCTIMER Assignments]\n");
+                try writer.writeAll("layer = OFF;\n");
+                try writer.print("OSCTIMER = OSC_disable, OSC_reset, OSC_out, OSC_tout, {};\n", .{ @enumToInt(divisor) });
+            }
+        } else {
             try writer.writeAll("\n[Fast Bypass]\n");
             for ([_]bool { false, true }) |state| {
                 const name = switch (state) {
@@ -662,6 +688,12 @@ pub const Design = struct {
             try writer.print(" {s}", .{ node.signal });
         }
         try writer.writeAll("\n");
+
+        if (self.osctimer_div) |divisor| {
+            try writer.print("#$ PROPERTY LATTICE OSCTIMER osc= OSC_disable, OSC_reset, OSC_out, OSC_tout, {};\n", .{ @enumToInt(divisor) });
+            try writer.writeAll("#$ EXTERNAL OSCTIMER 4 DYNOSCDIS'i' TIMERRES'i' OSCOUT'o' TIMEROUT'o'\n");
+            try writer.writeAll("#$ INSTANCE osc OSCTIMER 4 OSC_disable OSC_reset OSC_out OSC_tout\n");
+        }
 
         if (self.uses_power_guard) {
             try writer.writeAll("#$ EXTERNAL PG 3 D'i' E'i' Q'o'\n");
@@ -877,10 +909,6 @@ pub const GlbInputSet = struct {
         return null;
     }
 };
-
-
-
-
 
 pub const GlbFitData = struct {
     glb: u8,

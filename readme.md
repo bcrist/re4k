@@ -82,9 +82,9 @@ than necessary, but the unused "fuses" are not backed by EEPROM; trying to progr
 specific column, and pairs of macrocell slices are grouped together, so overall there will be 2 columns used, then 8 columns unused, then 2 more used columns, etc.
 
 # TODO
+* Single combined .sx file for each device - check that no fuse is marked for multiple uses and every expected fuse is mentioned once
 * Bitstream configuration through zig
 * Bitstream decompilation
-* OSCTIMER for ZE family
 * Hardware verification
     * What happens if both GLB's PTOE/BIE are routed to the same GOE?  assuming they are summed, but should check with hardware.  I don't think the fitter will allow this config.
     * Which of the OSCTIMER output enables is for OSCOUT vs TIMEROUT?  Fitter always seems to enable them both at the same time.
@@ -128,10 +128,20 @@ When an input expects to see 2.5V or higher inputs, this fuse should be used to 
 This probably also controls whether or not the 200mV input hysteresis should be applied (according to the datasheet it's active at 2.5V and 3.3V)
 
 ## GOE Numbering Conventions
-I've chosen to make some assumptions regarding the naming of GOE signals.
+All devices have 4 global OE signals.  The polarity of these signals can be configured globally, and their source depends on the device.
 
-    * The 3 fuses are placed in little endian order in the 3 rows dedicated to them (e.g. for devices with 100 rows, row 92's fuse has value 1, 93's has value 2, and 94's has value 4)
-    * The names specified in figure 8 in the datasheets correspond to values 0-7, from top to bottom, encoded as described above.
+For LC4032 devices:
 
-For OE mux values 4-7, the above assumptions are consistent with the fitter output.  For the GOE0-3 inputs, the exact naming is mostly arbitrary.  There are two external pins labeled GOE0 and GOE1 which can be routed directly to one specific internal GOE signal, but there's no real reason it has to be internal GOE0 and 1.  In fact, under these rules the external GOE0/1 are routed to internal GOE2/3 (at least on the LC4032)
+- GOE0: Shared PT OE bus bit 0
+- GOE1: Shared PT OE bus bit 1
+- GOE2: A0 input buffer
+- GOE3: B15 input buffer
 
+For other devices:
+
+- GOE0: Selectable; either shared PT OE bus bit 0, or specific input buffer noted in datasheet
+- GOE1: Selectable; either shared PT OE bus bit 1, or specific input buffer noted in datasheet
+- GOE2: Shared PT OE bus bit 2
+- GOE3: Shared PT OE bus bit 3
+
+The shared PT OE bus is a set of 2 or 4 signals (depending on the device type, as above) where each bit can be connected to any of the GLBs' shared enable PT (note this is shared with the power guard feature on ZE devices).
