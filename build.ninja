@@ -7,6 +7,9 @@ build configure-LC4064: limp LC4064
 build configure-LC4032: limp LC4032
 build configure: phony configure-LC4128 configure-LC4064 configure-LC4032
 
+rule combine
+    command = zig-out/bin/combine.exe $out $in
+
 subninja LC4128/build.ninja
 subninja LC4064/build.ninja
 subninja LC4032/build.ninja

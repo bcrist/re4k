@@ -40,7 +40,7 @@ pub fn build(b: *std.build.Builder) void {
             flash_step.dependOn(&flash.step);
         },
     } else {
-        //[[!! include 'build_zig' !! 300 ]]
+        //[[!! include 'build_zig' !! 309 ]]
         //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
         const sx = Pkg {
             .name = "sx",
@@ -86,6 +86,15 @@ pub fn build(b: *std.build.Builder) void {
         cluster_steering.setBuildMode(mode);
         cluster_steering.install();
         _ = makeRunStep(b, cluster_steering, "cluster_steering", "run cluster_steering");
+
+        const combine = b.addExecutable("combine", "src/combine.zig");
+        combine.addPackage(sx);
+        combine.addPackage(temp_allocator);
+        combine.linkLibC();
+        combine.setTarget(target);
+        combine.setBuildMode(mode);
+        combine.install();
+        _ = makeRunStep(b, combine, "combine", "run combine");
 
         const convert_bclk_polarity = b.addExecutable("convert-bclk_polarity", "src/convert-bclk_polarity.zig");
         convert_bclk_polarity.addPackage(sx);

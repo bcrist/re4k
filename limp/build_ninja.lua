@@ -1,4 +1,5 @@
 local device = ...
+local device_base = device:sub(1, 6)
 
 local function ZE_only (device) 
     return nil ~= device:find('ZE_', 1, true)
@@ -73,7 +74,7 @@ local jobs = {
     osctimer         = { device_predicate = ZE_only },
 }
 
-writeln('dev = ', fs.compose_path(device:sub(1, 6), device), nl)
+writeln('dev = ', fs.compose_path(device_base, device), nl)
 
 for job, config in spairs(jobs) do
     local cmd = job
@@ -106,7 +107,9 @@ for job, config in spairs(jobs) do
     end
 end
 
-write('build build-', device, ': phony ')
+local combined = fs.compose_path(device_base, device .. '.sx')
+write('build ', combined, ': combine')
+
 for job, config in spairs(jobs) do
     if config.device_map then
         local other_dev = config.device_map[device]
@@ -124,3 +127,5 @@ for job, config in spairs(jobs) do
     end
 end
 nl()
+
+writeln('build build-', device, ': phony ', combined)

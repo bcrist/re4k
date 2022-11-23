@@ -7,6 +7,7 @@
     (pkg sx)
 )
 (dir src
+    (exe combine)
     (exe osctimer)
     (exe power_guard)
     (exe goes)
