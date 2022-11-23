@@ -2680,8 +2680,8 @@
          (mc 14 (fuse 73 80))
          (mc 15 (fuse 73 81))
       )
-      (value 0 normal)
-      (value 1 invert)
+      (value 0 disabled)
+      (value 1 enabled)
    )
    (output_enable_source
       (pin B4 (glb 0 (name A)) (mc 0) (oe 0) (fuse 92 277) (fuse 93 277 (value 2)) (fuse 94 277 (value 4)))
