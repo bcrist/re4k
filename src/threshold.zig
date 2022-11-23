@@ -53,9 +53,20 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
         var diff_iter = diff.iterator(.{});
         if (diff_iter.next()) |fuse| {
-            try writeFuse(fuse, results_high.jedec, results_low.jedec, writer);
+            if (dev != .LC4064ZC_csBGA56 or pin_index != 24 or fuse.row != 99 or fuse.col != 159) {
+                // workaround for fitter bug, see readme.md
+                try writeFuse(fuse, results_high.jedec, results_low.jedec, writer);
+            }
+        } else if (dev == .LC4064ZC_csBGA56 and pin_index == 30) {
+            // workaround for fitter bug, see readme.md
+            try helper.writeFuse(writer, Fuse.init(99, 159));
         } else {
             try helper.err("Expected one threshold fuse but found none!", .{}, dev, .{ .pin_index = pin_index });
+        }
+
+        if (dev == .LC4064ZC_csBGA56 and pin_index == 24) {
+            // workaround for fitter bug, see readme.md
+            _ = diff_iter.next();
         }
 
         if (diff_iter.next()) |fuse| {
