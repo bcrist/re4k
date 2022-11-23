@@ -71,7 +71,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin: dev
             .pin_index = io.pin_index,
         });
 
-        const goe = switch (n % 4) {
+        const oe = switch (n % 4) {
             0 => "node0.Q",
             1 => "node1.Q",
             2 => "node2.Q",
@@ -80,7 +80,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin: dev
         };
 
         try design.addPT(.{}, signal_name);
-        try design.addPT(.{ goe, "node4.Q" }, oe_signal_name);
+        try design.addPT(.{ oe, "node4.Q" }, oe_signal_name);
 
         n += 1;
     }
@@ -121,8 +121,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             diff.putRange(dev.getRowRange(@intCast(u16, row), @intCast(u16, row)), 0);
         }
 
-        try writer.expression("pin");
-        try writer.printRaw("{s}", .{ io.pin_number });
+        try helper.writePin(writer, io);
 
         var value_off: usize = 0;
         var value_on: usize = 0;
@@ -148,9 +147,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
         if (default_off) |def| {
             if (value_off != def) {
-                try writer.expression("value");
-                try writer.printRaw("{} disabled", .{ value_off });
-                try writer.close();
+                try helper.writeValue(writer, value_off, "disabled");
             }
         } else {
             default_off = value_off;
@@ -158,9 +155,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
         if (default_on) |def| {
             if (value_on != def) {
-                try writer.expression("value");
-                try writer.printRaw("{} enabled", .{ value_on });
-                try writer.close();
+                try helper.writeValue(writer, value_on, "enabled");
             }
         } else {
             default_on = value_on;
@@ -170,15 +165,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     }
 
     if (default_off) |def| {
-        try writer.expression("value");
-        try writer.printRaw("{} disabled", .{ def });
-        try writer.close();
+        try helper.writeValue(writer, def, "disabled");
     }
 
     if (default_on) |def| {
-        try writer.expression("value");
-        try writer.printRaw("{} enabled", .{ def });
-        try writer.close();
+        try helper.writeValue(writer, def, "enabled");
     }
 
     try writer.done();

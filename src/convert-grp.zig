@@ -135,17 +135,12 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
     var glb: u8 = 0;
     while (glb < dev.getNumGlbs()) : (glb += 1) {
-        try writer.expression("glb");
-        try writer.printRaw("{}", .{ glb });
-        try writer.expression("name");
-        try writer.printRaw("{s}", .{ devices.getGlbName(glb) });
-        try writer.close();
-        writer.setCompact(false);
+        try helper.writeGlb(writer, glb);
 
         var gi: u8 = 0;
         while (gi < 36) : (gi += 1) {
             try writer.expression("gi");
-            try writer.printRaw("{}", .{ gi });
+            try writer.int(gi, 10);
             writer.setCompact(false);
 
             var fuse_iter = dev.getGIRange(glb, gi).iterator();
@@ -153,27 +148,23 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
                 var signal = fuse_to_signal_map.get(fuse).?;
 
                 try writer.expression("fuse");
-                try writer.printRaw("{} {}", .{ fuse.row, fuse.col });
+                try writer.int(fuse.row, 10);
+                try writer.int(fuse.col, 10);
 
                 switch (signal) {
                     .fb => |mcref| {
-                        try writer.expression("glb");
-                        try writer.printRaw("{}", .{ mcref.glb });
-                        try writer.expression("name");
-                        try writer.printRaw("{s}", .{ devices.getGlbName(mcref.glb) });
-                        try writer.close(); // name
-                        try writer.close(); // glb
-                        try writer.expression("mc");
-                        try writer.printRaw("{}", .{ mcref.mc });
-                        try writer.close(); // mc
+                        try helper.writeGlb(writer, mcref.glb);
+                        writer.setCompact(true);
+                        try writer.close();
+                        try helper.writeMc(writer, mcref.mc);
+                        try writer.close();
                     },
                     .pin => |pin_index| {
                         if (pin_index == unused_pin) {
                             try writer.expression("unused");
                             try writer.close(); // unused
                         } else {
-                            try writer.expression("pin");
-                            try writer.printRaw("{s}", .{ dev.getPins()[pin_index].pin_number() });
+                            try helper.writePin(writer, dev.getPins()[pin_index]);
                             try writer.close(); // pin
                         }
                     },

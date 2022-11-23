@@ -10,7 +10,7 @@ fn buildPins() [144]device_pins.PinInfo {
     return .{
         b.misc("B5", .no_connect),
         b.misc("A5", .no_connect),
-        b.goe("D6", 0, 0, 0, 0),
+        b.oe("D6", 0, 0, 0, 0),
         b.io("B6", 0, 0, 1),
         b.io("A6", 0, 0, 2),
         b.io("C6", 0, 0, 3),
@@ -130,7 +130,7 @@ fn buildPins() [144]device_pins.PinInfo {
         b.in("A11", 1, 3),
         b.misc("B8", .no_connect),
         b.misc("A9", .no_connect),
-        b.goe("B7", 1, 3, 0, 1),
+        b.oe("B7", 1, 3, 0, 1),
         b.io("D7", 1, 3, 1),
         b.io("A8", 1, 3, 2),
         b.io("C8", 1, 3, 3),

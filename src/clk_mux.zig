@@ -161,17 +161,10 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         diff.putRange(dev.getRoutingRange(), 0);
 
         if (mcref.mc == 0) {
-            try writer.expression("glb");
-            try writer.printRaw("{}", .{ mcref.glb });
-            try writer.expression("name");
-            try writer.printRaw("{s}", .{ devices.getGlbName(mcref.glb) });
-            try writer.close();
-
-            writer.setCompact(false);
+            try helper.writeGlb(writer, mcref.glb);
         }
 
-        try writer.expression("mc");
-        try writer.printRaw("{}", .{ mcref.mc });
+        try helper.writeMc(writer, mcref.mc);
 
         var bit_value: usize = 1;
         var diff_iter = diff.iterator(.{});
@@ -195,9 +188,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             const value = values.get(src) orelse 0;
             if (defaults.get(src)) |default| {
                 if (value != default) {
-                    try writer.expression("value");
-                    try writer.printRaw("{} {s}", .{ value, @tagName(src) });
-                    try writer.close();
+                    try helper.writeValue(writer, value, src);
                 }
             } else {
                 defaults.put(src, value);
@@ -213,9 +204,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
     for (std.enums.values(ClockSource)) |src| {
         if (defaults.get(src)) |default| {
-            try writer.expression("value");
-            try writer.printRaw("{} {s}", .{ default, @tagName(src) });
-            try writer.close();
+            try helper.writeValue(writer, default, src);
         }
     }
 

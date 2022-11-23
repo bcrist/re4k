@@ -1,4 +1,4 @@
-pin,type,bank,glb,mc,goe,clk
+pin,type,bank,glb,mc,oe,clk
 1,tdi,,,,,
 2,io,0,0,5,,
 3,io,0,0,6,,

@@ -175,12 +175,14 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     var gi: u8 = 0;
     while (gi < 36) : (gi += 1) {
         try writer.expression("gi");
-        try writer.printRaw("{}", .{ gi });
+        try writer.int(gi, 10);
         try writer.expression("row");
-        try writer.printRaw("{} non-inverted", .{ gi * 2 });
+        try writer.int(gi * 2, 10);
+        try writer.string("non-inverted");
         try writer.close(); // row
         try writer.expression("row");
-        try writer.printRaw("{} inverted", .{ gi * 2 + 1 });
+        try writer.int(gi * 2 + 1, 10);
+        try writer.string("inverted");
         try writer.close(); // row
         try writer.close(); // gi
     }
@@ -191,16 +193,10 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         helper.resetTemp();
 
         if (mcref.mc == 0) {
-            try writer.expression("glb");
-            try writer.printRaw("{}", .{ mcref.glb });
-            try writer.expression("name");
-            try writer.printRaw("{s}", .{ devices.getGlbName(mcref.glb) });
-            try writer.close();
-            writer.setCompact(false);
+            try helper.writeGlb(writer, mcref.glb);
         }
 
-        try writer.expression("mc");
-        try writer.printRaw("{}", .{ mcref.mc });
+        try helper.writeMc(writer, mcref.mc);
         writer.setCompact(false);
 
         var results = try runToolchain(ta, tc, dev, mcref);
@@ -270,19 +266,28 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         }
 
         try writer.expression("column");
-        try writer.printRaw("{} pt0", .{ pt1 - dc });
+        try writer.int(pt1 - dc, 10);
+        try writer.string("pt0");
         try writer.close();
+
         try writer.expression("column");
-        try writer.printRaw("{} pt1", .{ pt1 });
+        try writer.int(pt1, 10);
+        try writer.string("pt1");
         try writer.close();
+
         try writer.expression("column");
-        try writer.printRaw("{} pt2", .{ pt2 });
+        try writer.int(pt2, 10);
+        try writer.string("pt2");
         try writer.close();
+
         try writer.expression("column");
-        try writer.printRaw("{} pt3", .{ pt2 + dc });
+        try writer.int(pt2 + dc, 10);
+        try writer.string("pt3");
         try writer.close();
+
         try writer.expression("column");
-        try writer.printRaw("{} pt4", .{ pt2 + dc + dc });
+        try writer.int(pt2 + dc + dc, 10);
+        try writer.string("pt4");
         try writer.close();
 
         try writer.close(); // mc
@@ -292,20 +297,23 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             var bclk = column_routing.get(.block_clk) orelse return error.BlockClkNotFound;
 
             try writer.expression("column");
-            try writer.printRaw("{} \"Shared PT Init\"", .{ binit });
+            try writer.int(binit, 10);
+            try writer.string("Shared PT Init");
             try writer.close();
 
             try writer.expression("column");
-            try writer.printRaw("{} \"Shared PT Clock\"", .{ bclk });
+            try writer.int(bclk, 10);
+            try writer.string("Shared PT Clock");
             try writer.close();
 
             var boe = bclk + bclk - binit;
 
             try writer.expression("column");
+            try writer.int(boe, 10);
             if (dev.getFamily() == .zero_power_enhanced) {
-                try writer.printRaw("{} \"Shared PT OE / BIE\"", .{ boe });
+                try writer.string("Shared PT OE / BIE");
             } else {
-                try writer.printRaw("{} \"Shared PT OE\"", .{ boe });
+                try writer.string("Shared PT OE");
             }
             try writer.close();
 

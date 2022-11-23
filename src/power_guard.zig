@@ -75,7 +75,6 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     var pin_iter = devices.pins.InputIterator { .pins = dev.getPins() };
     while (pin_iter.next()) |pin_info| {
         const pin_index = pin_info.pin_index();
-        const pin_number = pin_info.pin_number();
 
         try tc.cleanTempDir();
         helper.resetTemp();
@@ -85,8 +84,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
         const diff = try JedecData.initDiff(ta, results_enabled.jedec, results_disabled.jedec);
 
-        try writer.expression("pin");
-        try writer.printRaw("{s}", .{ pin_number });
+        try helper.writePin(writer, pin_info);
 
         var diff_iter = diff.iterator(.{});
         if (diff_iter.next()) |fuse| {
@@ -113,15 +111,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     }
 
     if (default_enabled) |def| {
-        try writer.expression("value");
-        try writer.printRaw("{} enabled", .{ def });
-        try writer.close();
+        try helper.writeValue(writer, def, "enabled");
     }
 
     if (default_disabled) |def| {
-        try writer.expression("value");
-        try writer.printRaw("{} disabled", .{ def });
-        try writer.close();
+        try helper.writeValue(writer, def, "disabled");
     }
 
     try writer.done();
@@ -135,9 +129,7 @@ fn writeFuse(fuse: Fuse, results_enabled: JedecData, results_disabled: JedecData
     const enabled_value = results_enabled.get(fuse);
     if (default_enabled) |def| {
         if (enabled_value != def) {
-            try writer.expression("value");
-            try writer.printRaw("{} enabled", .{ enabled_value });
-            try writer.close();
+            try helper.writeValue(writer, enabled_value, "enabled");
         }
     } else {
         default_enabled = enabled_value;
@@ -146,9 +138,7 @@ fn writeFuse(fuse: Fuse, results_enabled: JedecData, results_disabled: JedecData
     const disabled_value = results_disabled.get(fuse);
     if (default_disabled) |def| {
         if (disabled_value != def) {
-            try writer.expression("value");
-            try writer.printRaw("{} disabled", .{ disabled_value });
-            try writer.close();
+            try helper.writeValue(writer, disabled_value, "disabled");
         }
     } else {
         default_disabled = disabled_value;

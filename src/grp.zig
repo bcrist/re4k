@@ -391,12 +391,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
                 .{ expected_fuses_per_glb, glb_data.fuse_map.count() }, dev, .{ .glb = glb_data.glb });
         }
 
-        try writer.expression("glb");
-        try writer.printRaw("{}", .{ glb_data.glb });
-        try writer.expression("name");
-        try writer.printRaw("{s}", .{ devices.getGlbName(glb_data.glb) });
-        try writer.close();
-        writer.setCompact(false);
+        try helper.writeGlb(writer, glb_data.glb);
 
         var gi: i64 = -1;
         var iter = glb_data.fuse_bitmap.iterator(.{});
@@ -407,29 +402,25 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
                 }
                 gi = fuse.row / 2;
                 try writer.expression("gi");
-                try writer.printRaw("{}", .{ gi });
+                try writer.int(gi, 10);
                 writer.setCompact(false);
             }
 
             try writer.expression("fuse");
-            try writer.printRaw("{} {}", .{ fuse.row, fuse.col });
+            try writer.int(fuse.row, 10);
+            try writer.int(fuse.col, 10);
 
             if (glb_data.fuse_map.get(fuse)) |source| {
                 switch (source) {
                     .fb => |mcref| {
-                        try writer.expression("glb");
-                        try writer.printRaw("{}", .{ mcref.glb });
-                        try writer.expression("name");
-                        try writer.printRaw("{s}", .{ devices.getGlbName(mcref.glb) });
-                        try writer.close(); // name
+                        try helper.writeGlb(writer, mcref.glb);
+                        writer.setCompact(true);
                         try writer.close(); // glb
-                        try writer.expression("mc");
-                        try writer.printRaw("{}", .{ mcref.mc });
+                        try helper.writeMc(writer, mcref.mc);
                         try writer.close(); // mc
                     },
                     .pin => |pin_index| {
-                        try writer.expression("pin");
-                        try writer.printRaw("{s}", .{ dev.getPins()[pin_index].pin_number() });
+                        try helper.writePin(writer, dev.getPins()[pin_index]);
                         try writer.close(); // pin
                     },
                 }

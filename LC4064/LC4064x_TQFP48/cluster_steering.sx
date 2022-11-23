@@ -1,6 +1,6 @@
 (LC4064x_TQFP48
    (cluster_steering
-      (glb 0
+      (glb 0 (name A)
          (mc 0 (fuse 74 273) (fuse 75 273 (value 2)))
          (mc 1 (fuse 74 274) (fuse 75 274 (value 2)))
          (mc 2 (fuse 74 283) (fuse 75 283 (value 2)))
@@ -18,7 +18,7 @@
          (mc 14 (fuse 74 343) (fuse 75 343 (value 2)))
          (mc 15 (fuse 74 344) (fuse 75 344 (value 2)))
       )
-      (glb 1
+      (glb 1 (name B)
          (mc 0 (fuse 74 185) (fuse 75 185 (value 2)))
          (mc 1 (fuse 74 186) (fuse 75 186 (value 2)))
          (mc 2 (fuse 74 195) (fuse 75 195 (value 2)))
@@ -36,7 +36,7 @@
          (mc 14 (fuse 74 255) (fuse 75 255 (value 2)))
          (mc 15 (fuse 74 256) (fuse 75 256 (value 2)))
       )
-      (glb 2
+      (glb 2 (name C)
          (mc 0 (fuse 74 97) (fuse 75 97 (value 2)))
          (mc 1 (fuse 74 98) (fuse 75 98 (value 2)))
          (mc 2 (fuse 74 107) (fuse 75 107 (value 2)))
@@ -54,7 +54,7 @@
          (mc 14 (fuse 74 167) (fuse 75 167 (value 2)))
          (mc 15 (fuse 74 168) (fuse 75 168 (value 2)))
       )
-      (glb 3
+      (glb 3 (name D)
          (mc 0 (fuse 74 9) (fuse 75 9 (value 2)))
          (mc 1 (fuse 74 10) (fuse 75 10 (value 2)))
          (mc 2 (fuse 74 19) (fuse 75 19 (value 2)))

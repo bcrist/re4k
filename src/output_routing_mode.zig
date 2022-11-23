@@ -99,8 +99,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         var diff = try JedecData.initDiff(ta, jeds.get(.orm).?, jeds.get(.fast_bypass).?);
         diff.unionDiff(jeds.get(.orm).?, jeds.get(.orm_bypass).?);
 
-        try writer.expression("pin");
-        try writer.printRaw("{s}", .{ io.pin_number });
+        try helper.writePin(writer, io);
 
         var values = std.EnumMap(ORPMode, usize) {};
 
@@ -140,9 +139,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
     for (std.enums.values(ORPMode)) |mode| {
         if (defaults.get(mode)) |def| {
-            try writer.expression("value");
-            try writer.printRaw("{} {s}", .{ def, @tagName(mode) });
-            try writer.close();
+            try helper.writeValue(writer, def, mode);
         }
     }
 

@@ -8,7 +8,7 @@ pub const pins = buildPins();
 fn buildPins() [64]device_pins.PinInfo {
     var b = device_pins.PinInfoBuilder {};
     return .{
-        b.goe("B4", 0, 0, 0, 0),
+        b.oe("B4", 0, 0, 0, 0),
         b.io("B3", 0, 0, 1),
         b.io("C2", 0, 0, 6),
         b.io("C1", 0, 0, 7),
@@ -45,7 +45,7 @@ fn buildPins() [64]device_pins.PinInfo {
         b.clk("G4", 0, 0, 1),
         b.clk("H5", 1, 1, 2),
         b.clk("A4", 1, 1, 3),
-        b.goe("B5", 1, 1, 15, 1),
+        b.oe("B5", 1, 1, 15, 1),
         b.misc("C5", .no_connect),
         b.misc("D8", .no_connect),
         b.io("D7", 1, 1, 10),

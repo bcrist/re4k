@@ -61,12 +61,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
     var glb: u8 = 0;
     while (glb < dev.getNumGlbs()) : (glb += 1) {
-        try writer.expression("glb");
-        try writer.printRaw("{}", .{ glb });
-        try writer.expression("name");
-        try writer.printRaw("{s}", .{ devices.getGlbName(glb) });
-        try writer.close();
-        writer.setCompact(false);
+        try helper.writeGlb(writer, glb);
 
         const positive_results = try runToolchain(ta, tc, dev, glb, .positive);
         const negative_results = try runToolchain(ta, tc, dev, glb, .negative);
@@ -117,9 +112,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
     var default_iter = defaults.iterator();
     while (default_iter.next()) |entry| {
-        try writer.expression("value");
-        try writer.printRaw("{} {s}", .{ entry.value.*, @tagName(entry.key) });
-        try writer.close();
+        try helper.writeValue(writer, entry.value.*, entry.key);
     }
 
     try writer.done();

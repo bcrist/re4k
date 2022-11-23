@@ -67,17 +67,10 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         diff.putRange(dev.getRoutingRange(), 0);
 
         if (mcref.mc == 0) {
-            try writer.expression("glb");
-            try writer.printRaw("{}", .{ mcref.glb });
-            try writer.expression("name");
-            try writer.printRaw("{s}", .{ devices.getGlbName(mcref.glb) });
-            try writer.close();
-
-            writer.setCompact(false);
+            try helper.writeGlb(writer, mcref.glb);
         }
 
-        try writer.expression("mc");
-        try writer.printRaw("{}", .{ mcref.mc });
+        try helper.writeMc(writer, mcref.mc);
 
         var value_off: usize = 0;
         var value_on: usize = 0;
@@ -103,9 +96,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
         if (default_off) |def| {
             if (value_off != def) {
-                try writer.expression("value");
-                try writer.printRaw("{} disabled", .{ value_off });
-                try writer.close();
+                try helper.writeValue(writer, value_off, "disabled");
             }
         } else {
             default_off = value_off;
@@ -113,9 +104,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
         if (default_on) |def| {
             if (value_on != def) {
-                try writer.expression("value");
-                try writer.printRaw("{} pt2", .{ value_on });
-                try writer.close();
+                try helper.writeValue(writer, value_on, "pt2");
             }
         } else {
             default_on = value_on;
@@ -129,15 +118,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     }
 
     if (default_off) |def| {
-        try writer.expression("value");
-        try writer.printRaw("{} disabled", .{ def });
-        try writer.close();
+        try helper.writeValue(writer, def, "disabled");
     }
 
     if (default_on) |def| {
-        try writer.expression("value");
-        try writer.printRaw("{} pt2", .{ def });
-        try writer.close();
+        try helper.writeValue(writer, def, "pt2");
     }
 
     try writer.done();

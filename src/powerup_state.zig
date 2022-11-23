@@ -50,17 +50,10 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         const diff = try JedecData.initDiff(ta, results_reset.jedec, results_set.jedec);
 
         if (mcref.mc == 0) {
-            try writer.expression("glb");
-            try writer.printRaw("{}", .{ mcref.glb });
-            try writer.expression("name");
-            try writer.printRaw("{s}", .{ devices.getGlbName(mcref.glb) });
-            try writer.close();
-
-            writer.setCompact(false);
+            try helper.writeGlb(writer, mcref.glb);
         }
 
-        try writer.expression("mc");
-        try writer.printRaw("{}", .{ mcref.mc });
+        try helper.writeMc(writer, mcref.mc);
 
         var diff_iter = diff.iterator(.{});
         if (diff_iter.next()) |fuse| {
@@ -86,15 +79,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     }
 
     if (default_reset) |def| {
-        try writer.expression("value");
-        try writer.printRaw("{} reset", .{ def });
-        try writer.close();
+        try helper.writeValue(writer, def, "reset");
     }
 
     if (default_set) |def| {
-        try writer.expression("value");
-        try writer.printRaw("{} set", .{ def });
-        try writer.close();
+        try helper.writeValue(writer, def, "set");
     }
 
     try writer.done();
@@ -108,9 +97,7 @@ fn writeFuse(fuse: Fuse, results_reset: JedecData, results_set: JedecData, write
     const value_reset = results_reset.get(fuse);
     if (default_reset) |def| {
         if (value_reset != def) {
-            try writer.expression("value");
-            try writer.printRaw("{} reset", .{ value_reset });
-            try writer.close();
+            try helper.writeValue(writer, value_reset, "reset");
         }
     } else {
         default_reset = value_reset;
@@ -119,9 +106,7 @@ fn writeFuse(fuse: Fuse, results_reset: JedecData, results_set: JedecData, write
     const value_set = results_set.get(fuse);
     if (default_set) |def| {
         if (value_set != def) {
-            try writer.expression("value");
-            try writer.printRaw("{} low", .{ value_set });
-            try writer.close();
+            try helper.writeValue(writer, value_set, "set");
         }
     } else {
         default_set = value_set;

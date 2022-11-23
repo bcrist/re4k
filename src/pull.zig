@@ -59,7 +59,6 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
                 continue;
             },
         }
-        const pin_number = pin_info.pin_number();
 
         try tc.cleanTempDir();
         helper.resetTemp();
@@ -73,8 +72,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         diff.unionDiff(results_keeper.jedec, results_pulldown.jedec);
 
         if (has_per_pin_config) {
-            try writer.expression("pin");
-            try writer.printRaw("{s}", .{ pin_number });
+            try helper.writePin(writer, pin_info);
 
             diff.unionDiff(results_float.jedec, results_pulldown.jedec);
         } else {
@@ -152,27 +150,19 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     }
 
     if (default_val_pullup) |val| {
-        try writer.expression("value");
-        try writer.printRaw("{} pullup", .{ val });
-        try writer.close();
+        try helper.writeValue(writer, val, .pullup);
     }
 
     if (default_val_keeper) |val| {
-        try writer.expression("value");
-        try writer.printRaw("{} keeper", .{ val });
-        try writer.close();
+        try helper.writeValue(writer, val, .keeper);
     }
 
     if (default_val_float) |val| {
-        try writer.expression("value");
-        try writer.printRaw("{} float", .{ val });
-        try writer.close();
+        try helper.writeValue(writer, val, .float);
     }
 
     if (default_val_pulldown) |val| {
-        try writer.expression("value");
-        try writer.printRaw("{} pulldown", .{ val });
-        try writer.close();
+        try helper.writeValue(writer, val, .pulldown);
     }
 
     try writer.close();
@@ -188,12 +178,8 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             try helper.writeFuse(writer, fuse);
         }
 
-        try writer.expression("value");
-        try writer.printRaw("0 float", .{});
-        try writer.close();
-        try writer.expression("value");
-        try writer.printRaw("1 other", .{});
-        try writer.close();
+        try helper.writeValue(writer, 0, .float);
+        try helper.writeValue(writer, 1, .other);
     }
 
     try writer.done();

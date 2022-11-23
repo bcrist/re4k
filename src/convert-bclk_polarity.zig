@@ -49,16 +49,11 @@ fn parseAndWrite(dev: DeviceType, parser: *sx.Reader(std.io.FixedBufferStream([]
         try parser.requireExpression("glb");
         var found_glb = try parser.requireAnyInt(u8, 10);
         std.debug.assert(found_glb == glb);
-        try writer.expression("glb");
-        try writer.printRaw("{}", .{ glb });
 
         if (try parser.expression("name")) {
             try parser.ignoreRemainingExpression();
         }
-        try writer.expression("name");
-        try writer.printRaw("{s}", .{ devices.getGlbName(glb) });
-        try writer.close();
-        writer.setCompact(false);
+        try helper.writeGlb(writer, glb);
 
         var base_clk: usize = 0;
         while (base_clk < 4) : (base_clk += 2) {
@@ -68,7 +63,8 @@ fn parseAndWrite(dev: DeviceType, parser: *sx.Reader(std.io.FixedBufferStream([]
             std.debug.assert(found_clk_a == base_clk);
             std.debug.assert(found_clk_b == base_clk + 1);
             try writer.expression("clk");
-            try writer.printRaw("{} {}", .{ base_clk, base_clk + 1 });
+            try writer.int(base_clk, 10);
+            try writer.int(base_clk + 1, 10);
 
             while (try parser.expression("fuse")) {
                 var row = try parser.requireAnyInt(u16, 10);
@@ -94,9 +90,7 @@ fn parseAndWrite(dev: DeviceType, parser: *sx.Reader(std.io.FixedBufferStream([]
         var val = try parser.requireAnyInt(usize, 10);
         var mode = try parser.requireAnyString();
         if (std.mem.eql(u8, mode, "first_complemented") or dev.getClockPin(1) != null) {
-            try writer.expression("value");
-            try writer.printRaw("{} {s}", .{ val, mode });
-            try writer.close();
+            try helper.writeValue(writer, val, mode);
         }
         try parser.requireClose(); // value
     }

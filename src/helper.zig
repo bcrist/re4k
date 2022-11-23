@@ -169,30 +169,107 @@ pub fn extract(src: []const u8, prefix: []const u8, suffix: []const u8) ?[]const
     return null;
 }
 
+pub fn writeGlb(writer: anytype, glb: u8) !void {
+    try writer.expression("glb");
+    try writer.int(glb, 10);
+    try writer.expression("name");
+    try writer.string(devices.getGlbName(glb));
+    try writer.close();
+    writer.setCompact(false);
+}
+
+pub fn writeMc(writer: anytype, mc: u8) !void {
+    try writer.expression("mc");
+    try writer.int(mc, 10);
+}
+
+pub fn writePin(writer: anytype, pin_info: anytype) !void {
+    switch (@TypeOf(pin_info)) {
+        devices.pins.PinInfo => {
+            switch (pin_info) {
+                inline else => |info| try writePin(writer, info),
+            }
+        },
+        devices.pins.InputPinInfo => {
+            try writer.expression("pin");
+            try writer.string(pin_info.pin_number);
+            try writer.expression("info");
+            try writer.string("input");
+            try writer.close();
+            try writeGlb(writer, pin_info.glb);
+            writer.setCompact(true);
+            try writer.close();
+        },
+        devices.pins.InputOutputPinInfo => {
+            try writer.expression("pin");
+            try writer.string(pin_info.pin_number);
+            try writeGlb(writer, pin_info.glb);
+            writer.setCompact(true);
+            try writer.close();
+            try writeMc(writer, pin_info.mc);
+            try writer.close();
+            if (pin_info.oe_index) |oe| {
+                try writer.expression("oe");
+                try writer.int(oe, 10);
+                try writer.close();
+            }
+        },
+        devices.pins.ClockInputPinInfo => {
+            try writer.expression("pin");
+            try writer.string(pin_info.pin_number);
+            try writer.expression("clk");
+            try writer.int(pin_info.clock_index, 10);
+            try writer.close();
+            try writeGlb(writer, pin_info.glb);
+            writer.setCompact(true);
+            try writer.close();
+        },
+        devices.pins.MiscPinInfo => {
+            try writer.expression("pin");
+            try writer.string(pin_info.pin_number);
+            try writer.expression("info");
+            try writer.string(@tagName(pin_info.misc_type));
+            try writer.close();
+        },
+        else => unreachable,
+    }
+}
+
+pub fn writeValue(writer: anytype, value: usize, desc: anytype) !void {
+    try writer.expression("value");
+    try writer.int(value, 10);
+    switch (@typeInfo(@TypeOf(desc))) {
+        .Enum, .EnumLiteral => try writer.string(@tagName(desc)),
+        .Pointer => try writer.string(desc),
+        else => unreachable,
+    }
+    try writer.close();
+}
+
 pub fn writeFuse(writer: anytype, fuse: Fuse) !void {
     try writer.expression("fuse");
-    try writer.printRaw("{}", .{ fuse.row });
-    try writer.printRaw("{}", .{ fuse.col });
+    try writer.int(fuse.row, 10);
+    try writer.int(fuse.col, 10);
     try writer.close();
 }
 
 pub fn writeFuseValue(writer: anytype, fuse: Fuse, value: usize) !void {
     try writer.expression("fuse");
-    try writer.printRaw("{}", .{ fuse.row });
-    try writer.printRaw("{}", .{ fuse.col });
+    try writer.int(fuse.row, 10);
+    try writer.int(fuse.col, 10);
     try writer.expression("value");
-    try writer.printRaw("{}", .{ value });
+    try writer.int(value, 10);
     try writer.close();
     try writer.close();
 }
 
 pub fn writeFuseOptValue(writer: anytype, fuse: Fuse, value: usize) !void {
     try writer.expression("fuse");
-    try writer.printRaw("{}", .{ fuse.row });
-    try writer.printRaw("{}", .{ fuse.col });
+    try writer.int(fuse.row, 10);
+    try writer.int(fuse.col, 10);
     if (value != 1) {
         try writer.expression("value");
-        try writer.printRaw("{}", .{ value });
+        try writer.int(value, 10);
         try writer.close();
     }
     try writer.close();
@@ -257,7 +334,7 @@ pub fn parseGRP(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*Devi
     var parser = sx.reader(ta, stream.reader());
     defer parser.deinit();
 
-    parseGRP0(&parser, device, &pin_number_to_index, &results) catch |e| switch (e) {
+    parseGRP0(ta, &parser, device, &pin_number_to_index, &results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
             var ctx = try parser.getNextTokenContext();
             try ctx.printForString(input_file.contents, std.io.getStdErr().writer(), 120);
@@ -274,6 +351,7 @@ pub fn parseGRP(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*Devi
 }
 
 fn parseGRP0(
+    ta: std.mem.Allocator,
     parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader),
     device: DeviceType,
     pin_number_to_index: *const std.StringHashMap(u16),
@@ -282,14 +360,12 @@ fn parseGRP0(
     _ = try parser.requireAnyExpression(); // device name, we already know it
     try parser.requireExpression("global_routing_pool");
 
+    var temp = std.ArrayList(u8).init(ta);
+
     var glb: u8 = 0;
     while (glb < device.getNumGlbs()) : (glb += 1) {
-        try parser.requireExpression("glb");
-        var parsed_glb = try parser.requireAnyInt(u8, 10);
+        var parsed_glb = try requireGlb(parser);
         std.debug.assert(glb == parsed_glb);
-        if (try parser.expression("name")) {
-            try parser.ignoreRemainingExpression();
-        }
 
         while (try parser.expression("gi")) {
             _ = try parser.requireAnyInt(usize, 10);
@@ -299,18 +375,16 @@ fn parseGRP0(
                 var col = try parser.requireAnyInt(u16, 10);
                 var fuse = Fuse.init(row, col);
 
-                if (try parser.expression("pin")) {
-                    var pin_number = try parser.requireAnyString();
-                    var pin_index = pin_number_to_index.get(pin_number).?;
+                if (try parsePin(parser, &temp)) {
+                    var pin_index = pin_number_to_index.get(temp.items);
+                    if (pin_index == null) {
+                        try std.io.getStdErr().writer().print("Failed to lookup pin number: {s}\n", .{ temp.items });
+                    }
                     try results.put(fuse, .{
-                        .pin = pin_index,
+                        .pin = pin_index.?,
                     });
                     try parser.requireClose(); // pin
-                } else if (try parser.expression("glb")) {
-                    var fuse_glb = try parser.requireAnyInt(u8, 10);
-                    if (try parser.expression("name")) {
-                        try parser.ignoreRemainingExpression();
-                    }
+                } else if (try parseGlb(parser)) |fuse_glb| {
                     try parser.requireClose(); // glb
 
                     try parser.requireExpression("mc");
@@ -335,6 +409,26 @@ fn parseGRP0(
     try parser.requireClose(); // global_routing_pool
     try parser.requireClose(); // device
     try parser.requireDone();
+}
+
+fn parseGlb(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader)) !?u8 {
+    if (try parser.expression("glb")) {
+        var parsed_glb = try parser.requireAnyInt(u8, 10);
+        if (try parser.expression("name")) {
+            try parser.ignoreRemainingExpression();
+        }
+        return parsed_glb;
+    } else {
+        return null;
+    }
+}
+fn requireGlb(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader)) !u8 {
+    try parser.requireExpression("glb");
+    var parsed_glb = try parser.requireAnyInt(u8, 10);
+    if (try parser.expression("name")) {
+        try parser.ignoreRemainingExpression();
+    }
+    return parsed_glb;
 }
 
 pub fn parseMCOptionsColumns(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*DeviceType) !std.AutoHashMap(MacrocellRef, FuseRange) {
@@ -372,12 +466,8 @@ fn parseMCOptionsColumns0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8
 
     var glb: u8 = 0;
     while (glb < device.getNumGlbs()) : (glb += 1) {
-        try parser.requireExpression("glb");
-        var parsed_glb = try parser.requireAnyInt(u8, 10);
+        var parsed_glb = try requireGlb(parser);
         std.debug.assert(glb == parsed_glb);
-        if (try parser.expression("name")) {
-            try parser.ignoreRemainingExpression();
-        }
 
         while (try parser.expression("mc")) {
             var mc = try parser.requireAnyInt(u8, 10);
@@ -433,9 +523,7 @@ fn parseORMRows0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader)
     _ = try parser.requireAnyExpression(); // device name, we already know it
     try parser.requireExpression("output_routing_mux");
 
-    while (try parser.expression("pin")) {
-        _ = try parser.requireAnyString();
-
+    while (try parsePin(parser, null)) {
         while (try parser.expression("fuse")) {
             var row = try parser.requireAnyInt(u16, 10);
             _ = try parser.requireAnyInt(u16, 10);
@@ -456,6 +544,40 @@ fn parseORMRows0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader)
     try parser.requireClose(); // invert_sum
     try parser.requireClose(); // device
     try parser.requireDone();
+}
+
+fn parsePin(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), out: ?*std.ArrayList(u8)) !bool {
+    if (try parser.expression("pin")) {
+        const pin_number = try parser.requireAnyString();
+        if (out) |o| {
+            o.clearRetainingCapacity();
+            try o.appendSlice(pin_number);
+        }
+
+        if (try parser.expression("info")) {
+            try parser.ignoreRemainingExpression();
+        }
+
+        if (try parser.expression("clk")) {
+            try parser.ignoreRemainingExpression();
+        }
+
+        if (try parser.expression("glb")) {
+            try parser.ignoreRemainingExpression();
+        }
+
+        if (try parser.expression("mc")) {
+            try parser.ignoreRemainingExpression();
+        }
+
+        if (try parser.expression("oe")) {
+            try parser.ignoreRemainingExpression();
+        }
+
+        return true;
+    } else {
+        return false;
+    }
 }
 
 pub fn parseClusterSteeringRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*DeviceType) !std.DynamicBitSet {
@@ -488,9 +610,7 @@ fn parseClusterSteeringRows0(parser: *sx.Reader(std.io.FixedBufferStream([]const
     _ = try parser.requireAnyExpression(); // device name, we already know it
     try parser.requireExpression("cluster_steering");
 
-    while (try parser.expression("glb")) {
-        _ = try parser.requireAnyInt(u16, 10);
-
+    while (try parseGlb(parser)) |_| {
         while (try parser.expression("mc")) {
             _ = try parser.requireAnyInt(u16, 10);
 
@@ -549,9 +669,7 @@ fn parseOEMuxRows0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reade
     _ = try parser.requireAnyExpression(); // device name, we already know it
     try parser.requireExpression("oe_mux");
 
-    while (try parser.expression("pin")) {
-        _ = try parser.requireAnyString();
-
+    while (try parsePin(parser, null)) {
         while (try parser.expression("fuse")) {
             var row = try parser.requireAnyInt(u16, 10);
             _ = try parser.requireAnyInt(u16, 10);
@@ -600,13 +718,7 @@ fn parseSharedPTClockPolarityFuses0(parser: *sx.Reader(std.io.FixedBufferStream(
     _ = try parser.requireAnyExpression(); // device name, we already know it
     try parser.requireExpression("shared_pt_clk_polarity");
 
-    while (try parser.expression("glb")) {
-        var glb = try parser.requireAnyInt(u8, 10);
-
-        if (try parser.expression("name")) {
-            try parser.ignoreRemainingExpression();
-        }
-
+    while (try parseGlb(parser)) |glb| {
         try parser.requireExpression("fuse");
         var row = try parser.requireAnyInt(u16, 10);
         var col = try parser.requireAnyInt(u16, 10);

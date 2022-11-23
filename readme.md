@@ -82,13 +82,11 @@ than necessary, but the unused "fuses" are not backed by EEPROM; trying to progr
 specific column, and pairs of macrocell slices are grouped together, so overall there will be 2 columns used, then 8 columns unused, then 2 more used columns, etc.
 
 # TODO
-* Single combined .sx file for each device - check that no fuse is marked for multiple uses and every expected fuse is mentioned once
 * Bitstream configuration through zig
 * Bitstream decompilation
 * Hardware verification
     * What happens if both GLB's PTOE/BIE are routed to the same GOE?  assuming they are summed, but should check with hardware.  I don't think the fitter will allow this config.
-    * Which of the OSCTIMER output enables is for OSCOUT vs TIMEROUT?  Fitter always seems to enable them both at the same time.
-    * There are two mystery fuses directly under the OSCTIMER divider fuses.  Possibly input enable flags for TIMERRES and DYNOSCDIS?
+    * Why are there two fuses to enable the OSCTIMER? what happens if only one is enabled?
     * Can you use input register feedback on MCs that aren't connected to pins?
     * What happens if you violate the one-cold rule for GIs fuses?
 

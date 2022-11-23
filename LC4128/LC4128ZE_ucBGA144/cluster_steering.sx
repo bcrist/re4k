@@ -1,6 +1,6 @@
 (LC4128ZE_ucBGA144
    (cluster_steering
-      (glb 0
+      (glb 0 (name A)
          (mc 0 (fuse 74 578) (fuse 75 578 (value 2)))
          (mc 1 (fuse 74 579) (fuse 75 579 (value 2)))
          (mc 2 (fuse 74 588) (fuse 75 588 (value 2)))
@@ -18,7 +18,7 @@
          (mc 14 (fuse 74 648) (fuse 75 648 (value 2)))
          (mc 15 (fuse 74 649) (fuse 75 649 (value 2)))
       )
-      (glb 1
+      (glb 1 (name B)
          (mc 0 (fuse 74 661) (fuse 75 661 (value 2)))
          (mc 1 (fuse 74 662) (fuse 75 662 (value 2)))
          (mc 2 (fuse 74 671) (fuse 75 671 (value 2)))
@@ -36,7 +36,7 @@
          (mc 14 (fuse 74 731) (fuse 75 731 (value 2)))
          (mc 15 (fuse 74 732) (fuse 75 732 (value 2)))
       )
-      (glb 2
+      (glb 2 (name C)
          (mc 0 (fuse 74 476) (fuse 75 476 (value 2)))
          (mc 1 (fuse 74 477) (fuse 75 477 (value 2)))
          (mc 2 (fuse 74 486) (fuse 75 486 (value 2)))
@@ -54,7 +54,7 @@
          (mc 14 (fuse 74 546) (fuse 75 546 (value 2)))
          (mc 15 (fuse 74 547) (fuse 75 547 (value 2)))
       )
-      (glb 3
+      (glb 3 (name D)
          (mc 0 (fuse 74 393) (fuse 75 393 (value 2)))
          (mc 1 (fuse 74 394) (fuse 75 394 (value 2)))
          (mc 2 (fuse 74 403) (fuse 75 403 (value 2)))
@@ -72,7 +72,7 @@
          (mc 14 (fuse 74 463) (fuse 75 463 (value 2)))
          (mc 15 (fuse 74 464) (fuse 75 464 (value 2)))
       )
-      (glb 4
+      (glb 4 (name E)
          (mc 0 (fuse 74 208) (fuse 75 208 (value 2)))
          (mc 1 (fuse 74 209) (fuse 75 209 (value 2)))
          (mc 2 (fuse 74 218) (fuse 75 218 (value 2)))
@@ -90,7 +90,7 @@
          (mc 14 (fuse 74 278) (fuse 75 278 (value 2)))
          (mc 15 (fuse 74 279) (fuse 75 279 (value 2)))
       )
-      (glb 5
+      (glb 5 (name F)
          (mc 0 (fuse 74 291) (fuse 75 291 (value 2)))
          (mc 1 (fuse 74 292) (fuse 75 292 (value 2)))
          (mc 2 (fuse 74 301) (fuse 75 301 (value 2)))
@@ -108,7 +108,7 @@
          (mc 14 (fuse 74 361) (fuse 75 361 (value 2)))
          (mc 15 (fuse 74 362) (fuse 75 362 (value 2)))
       )
-      (glb 6
+      (glb 6 (name G)
          (mc 0 (fuse 74 106) (fuse 75 106 (value 2)))
          (mc 1 (fuse 74 107) (fuse 75 107 (value 2)))
          (mc 2 (fuse 74 116) (fuse 75 116 (value 2)))
@@ -126,7 +126,7 @@
          (mc 14 (fuse 74 176) (fuse 75 176 (value 2)))
          (mc 15 (fuse 74 177) (fuse 75 177 (value 2)))
       )
-      (glb 7
+      (glb 7 (name H)
          (mc 0 (fuse 74 23) (fuse 75 23 (value 2)))
          (mc 1 (fuse 74 24) (fuse 75 24 (value 2)))
          (mc 2 (fuse 74 33) (fuse 75 33 (value 2)))

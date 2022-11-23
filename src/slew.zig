@@ -46,8 +46,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
         const diff = try JedecData.initDiff(ta, results_slow.jedec, results_fast.jedec);
 
-        try writer.expression("pin");
-        try writer.printRaw("{s}", .{ io.pin_number });
+        try helper.writePin(writer, io);
 
         var diff_iter = diff.iterator(.{});
         if (diff_iter.next()) |fuse| {
@@ -56,9 +55,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             const slow_value = results_slow.jedec.get(fuse);
             if (default_slow) |def| {
                 if (slow_value != def) {
-                    try writer.expression("value");
-                    try writer.printRaw("{} slow", .{ slow_value });
-                    try writer.close();
+                    try helper.writeValue(writer, slow_value, "slow");
                 }
             } else {
                 default_slow = slow_value;
@@ -67,9 +64,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             const fast_value = results_fast.jedec.get(fuse);
             if (default_fast) |def| {
                 if (fast_value != def) {
-                    try writer.expression("value");
-                    try writer.printRaw("{} fast", .{ fast_value });
-                    try writer.close();
+                    try helper.writeValue(writer, fast_value, "fast");
                 }
             } else {
                 default_fast = fast_value;
@@ -89,15 +84,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     }
 
     if (default_slow) |def| {
-        try writer.expression("value");
-        try writer.printRaw("{} slow", .{ def });
-        try writer.close();
+        try helper.writeValue(writer, def, "slow");
     }
 
     if (default_fast) |def| {
-        try writer.expression("value");
-        try writer.printRaw("{} fast", .{ def });
-        try writer.close();
+        try helper.writeValue(writer, def, "fast");
     }
 
     try writer.done();

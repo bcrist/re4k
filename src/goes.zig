@@ -26,17 +26,17 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, oe0: Pol
     if (use_goe_pins) {
         try design.pinAssignment(.{
             .signal = "oe0",
-            .pin_index = dev.getGOEPin(0).pin_index,
+            .pin_index = dev.getOEPin(0).pin_index,
         });
         try design.pinAssignment(.{
             .signal = "oe1",
-            .pin_index = dev.getGOEPin(1).pin_index,
+            .pin_index = dev.getOEPin(1).pin_index,
         });
     } else {
         var pin_iter = devices.pins.InputIterator {
             .pins = dev.getPins(),
             .exclude_glb = 0,
-            .exclude_goes = true,
+            .exclude_oes = true,
         };
         try design.pinAssignment(.{
             .signal = "oe0",
@@ -51,7 +51,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, oe0: Pol
     var pin_iter = devices.pins.OutputIterator {
         .pins = dev.getPins(),
         .single_glb = 0,
-        .exclude_goes = true,
+        .exclude_oes = true,
     };
     var n: u1 = 0;
     while (pin_iter.next()) |io| {

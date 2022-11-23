@@ -33,13 +33,8 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
         try helper.writeFuse(writer, fuse);
 
-        try writer.expression("value");
-        try writer.printRaw("{} disabled", .{ results_without_zero_hold.jedec.get(fuse) });
-        try writer.close();
-
-        try writer.expression("value");
-        try writer.printRaw("{} enabled", .{ results_with_zero_hold.jedec.get(fuse) });
-        try writer.close();
+        try helper.writeValue(writer, results_without_zero_hold.jedec.get(fuse), "disabled");
+        try helper.writeValue(writer, results_with_zero_hold.jedec.get(fuse), "enabled");
 
         try writer.done();
     } else {

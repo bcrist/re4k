@@ -42,10 +42,10 @@ fn runToolchainOnOff(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, io:
     return results;
 }
 
-fn getFirstNonGOE(device: DeviceType, exclude_glb: u8) !u16 {
+fn getFirstNonOE(device: DeviceType, exclude_glb: u8) !u16 {
     var iter = devices.pins.OutputIterator {
         .pins = device.getPins(),
-        .exclude_goes = true,
+        .exclude_oes = true,
         .exclude_glb = exclude_glb,
     };
 
@@ -82,7 +82,7 @@ fn runToolchainGOE(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, io: I
 
     try design.pinAssignment(.{
         .signal = "oe",
-        .pin_index = try getFirstNonGOE(dev, glb),
+        .pin_index = try getFirstNonOE(dev, glb),
     });
     try design.pinAssignment(.{
         .signal = "gout",
@@ -134,7 +134,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, io: Inpu
             var iter = devices.pins.OutputIterator {
                 .pins = dev.getPins(),
                 .exclude_glb = glb,
-                .exclude_goes = true,
+                .exclude_oes = true,
             };
             if (iter.next()) |info| {
                 try design.pinAssignment(.{
@@ -152,7 +152,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, io: Inpu
             iter = devices.pins.OutputIterator {
                 .pins = dev.getPins(),
                 .single_glb = glb,
-                .exclude_goes = true,
+                .exclude_oes = true,
             };
             while (iter.next()) |info| {
                 if (info.mc != mc) {
@@ -174,21 +174,21 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, io: Inpu
         .goe0 => {
             try design.pinAssignment(.{
                 .signal = "goe0",
-                .pin_index = dev.getGOEPin(0).pin_index,
+                .pin_index = dev.getOEPin(0).pin_index,
             });
             try design.addPT("goe0", "out.OE");
         },
         .goe1 => {
             try design.pinAssignment(.{
                 .signal = "goe1",
-                .pin_index = dev.getGOEPin(1).pin_index,
+                .pin_index = dev.getOEPin(1).pin_index,
             });
             try design.addPT("goe1", "out.OE");
         },
         .goe2 => {
             try design.pinAssignment(.{
                 .signal = "goe2",
-                .pin_index = try getFirstNonGOE(dev, glb),
+                .pin_index = try getFirstNonOE(dev, glb),
             });
             try design.addPT("goe2", "out.OE");
         },
@@ -198,7 +198,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, io: Inpu
             var iter = devices.pins.OutputIterator {
                 .pins = dev.getPins(),
                 .exclude_glb = glb,
-                .exclude_goes = true,
+                .exclude_oes = true,
             };
             if (iter.next()) |info| {
                 try design.pinAssignment(.{
@@ -216,7 +216,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, io: Inpu
             iter = devices.pins.OutputIterator {
                 .pins = dev.getPins(),
                 .single_glb = glb,
-                .exclude_goes = true,
+                .exclude_oes = true,
             };
             while (iter.next()) |info| {
                 if (info.mc != mc) {
@@ -264,15 +264,14 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             (try runToolchainGOE(ta, tc, dev, io, true)).jedec,
         );
 
-        try writer.expression("pin");
-        try writer.printRaw("{s}", .{ io.pin_number });
+        try helper.writePin(writer, io);
 
         var bit_value: usize = 1;
         var diff_iter = diff.iterator(.{});
         while (diff_iter.next()) |fuse| {
             try helper.writeFuseOptValue(writer, fuse, bit_value);
 
-            if (detail_pin_index == null and io.goe_index == null) {
+            if (detail_pin_index == null and io.oe_index == null) {
                 try detail_fuses.append(fuse);
             }
 
@@ -285,7 +284,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             try helper.err("Expected 3 fuses to define oe_mux options but found {}!", .{ diff.countSet() }, dev, .{ .pin_index = io.pin_index });
         }
 
-        if (detail_pin_index == null and io.goe_index == null) {
+        if (detail_pin_index == null and io.oe_index == null) {
             detail_pin_index = io.pin_index;
         }
     }
@@ -317,30 +316,14 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     // It's incredibly difficult to coax the fitter into placing a particular OE line.  It's mostly
     // doable on the 4032, which only has two shared PTOEs, but larger devices have up to 4 per GLB
     // TODO figure out a way to reliably test permutations of OE mux for all devices
-    try writer.expression("value");
-    try writer.printRaw("0 goe0", .{});
-    try writer.close();
-    try writer.expression("value");
-    try writer.printRaw("1 goe1", .{});
-    try writer.close();
-    try writer.expression("value");
-    try writer.printRaw("2 goe2", .{});
-    try writer.close();
-    try writer.expression("value");
-    try writer.printRaw("3 goe3", .{});
-    try writer.close();
-    try writer.expression("value");
-    try writer.printRaw("4 from_orm_active_high", .{});
-    try writer.close();
-    try writer.expression("value");
-    try writer.printRaw("5 from_orm_active_low", .{});
-    try writer.close();
-    try writer.expression("value");
-    try writer.printRaw("6 output_only", .{});
-    try writer.close();
-    try writer.expression("value");
-    try writer.printRaw("7 input_only", .{});
-    try writer.close();
+    try helper.writeValue(writer, 0, .goe0);
+    try helper.writeValue(writer, 1, .goe1);
+    try helper.writeValue(writer, 2, .goe2);
+    try helper.writeValue(writer, 3, .goe3);
+    try helper.writeValue(writer, 4, .from_orm_active_high);
+    try helper.writeValue(writer, 5, .from_orm_active_low);
+    try helper.writeValue(writer, 6, .output_only);
+    try helper.writeValue(writer, 7, .input_only);
 
     try writer.done();
 }

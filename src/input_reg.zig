@@ -84,8 +84,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
         diff.putRange(dev.getRoutingRange(), 0);
 
-        try writer.expression("pin");
-        try writer.printRaw("{s}", .{ io.pin_number });
+        try helper.writePin(writer, io);
 
         var n_fuses: usize = 0;
 
@@ -104,12 +103,9 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         try writer.close();
     }
 
-    try writer.expression("value");
-    try writer.printRaw("{} normal", .{ 1 });
-    try writer.close();
-    try writer.expression("value");
-    try writer.printRaw("{} input_register", .{ 0 });
-    try writer.close();
+    // TODO verify that these match the JEDEC data
+    try helper.writeValue(writer, 1, "normal");
+    try helper.writeValue(writer, 0, "input_register");
 
     try writer.done();
 

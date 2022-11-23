@@ -1,4 +1,4 @@
-pin,type,bank,glb,mc,goe,clk
+pin,type,bank,glb,mc,oe,clk
 1,gnd,,,,,
 2,tdi,,,,,
 3,vcco_bank_0,,,,,

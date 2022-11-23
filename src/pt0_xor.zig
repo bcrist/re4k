@@ -84,17 +84,10 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         diff.putRange(dev.getRoutingRange(), 0);
 
         if (mcref.mc == 0) {
-            try writer.expression("glb");
-            try writer.printRaw("{}", .{ mcref.glb });
-            try writer.expression("name");
-            try writer.printRaw("{s}", .{ devices.getGlbName(mcref.glb) });
-            try writer.close();
-
-            writer.setCompact(false);
+            try helper.writeGlb(writer, mcref.glb);
         }
 
-        try writer.expression("mc");
-        try writer.printRaw("{}", .{ mcref.mc });
+        try helper.writeMc(writer, mcref.mc);
 
         var diff_iter = diff.iterator(.{});
         if (diff_iter.next()) |fuse| {
@@ -103,9 +96,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             const disabled_value = results_disabled.jedec.get(fuse);
             if (default_disabled) |def| {
                 if (disabled_value != def) {
-                    try writer.expression("value");
-                    try writer.printRaw("{} disabled", .{ disabled_value });
-                    try writer.close();
+                    try helper.writeValue(writer, disabled_value, "disabled");
                 }
             } else {
                 default_disabled = disabled_value;
@@ -114,9 +105,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             const enabled_value = results_enabled.jedec.get(fuse);
             if (default_enabled) |def| {
                 if (enabled_value != def) {
-                    try writer.expression("value");
-                    try writer.printRaw("{} enabled", .{ enabled_value });
-                    try writer.close();
+                    try helper.writeValue(writer, enabled_value, "enabled");
                 }
             } else {
                 default_enabled = enabled_value;
@@ -138,15 +127,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     }
 
     if (default_disabled) |def| {
-        try writer.expression("value");
-        try writer.printRaw("{} disabled", .{ def });
-        try writer.close();
+        try helper.writeValue(writer, def, "disabled");
     }
 
     if (default_enabled) |def| {
-        try writer.expression("value");
-        try writer.printRaw("{} enabled", .{ def });
-        try writer.close();
+        try helper.writeValue(writer, def, "enabled");
     }
 
     try writer.done();

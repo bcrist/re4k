@@ -73,17 +73,10 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         diff.putRange(dev.getRoutingRange(), 0);
 
         if (mcref.mc == 0) {
-            try writer.expression("glb");
-            try writer.printRaw("{}", .{ mcref.glb });
-            try writer.expression("name");
-            try writer.printRaw("{s}", .{ devices.getGlbName(mcref.glb) });
-            try writer.close();
-
-            writer.setCompact(false);
+            try helper.writeGlb(writer, mcref.glb);
         }
 
-        try writer.expression("mc");
-        try writer.printRaw("{}", .{ mcref.mc });
+        try helper.writeMc(writer, mcref.mc);
 
         var values = std.EnumMap(core.MacrocellType, usize) {};
         var bit_value: usize = 1;
@@ -108,9 +101,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             const value = values.get(reg_type) orelse 0;
             if (defaults.get(reg_type)) |default| {
                 if (value != default) {
-                    try writer.expression("value");
-                    try writer.printRaw("{} {s}", .{ value, @tagName(reg_type) });
-                    try writer.close();
+                    try helper.writeValue(writer, value, reg_type);
                 }
             } else {
                 defaults.put(reg_type, value);
@@ -126,9 +117,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
     for (std.enums.values(core.MacrocellType)) |reg_type| {
         if (defaults.get(reg_type)) |default| {
-            try writer.expression("value");
-            try writer.printRaw("{} {s}", .{ default, @tagName(reg_type) });
-            try writer.close();
+            try helper.writeValue(writer, default, reg_type);
         }
     }
 

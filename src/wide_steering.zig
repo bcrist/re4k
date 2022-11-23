@@ -71,17 +71,10 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         helper.resetTemp();
 
         if (mcref.mc == 0) {
-            try writer.expression("glb");
-            try writer.printRaw("{}", .{ mcref.glb });
-            try writer.expression("name");
-            try writer.printRaw("{s}", .{ devices.getGlbName(mcref.glb) });
-            try writer.close();
-
-            writer.setCompact(false);
+            try helper.writeGlb(writer, mcref.glb);
         }
 
-        try writer.expression("mc");
-        try writer.printRaw("{}", .{ mcref.mc });
+        try helper.writeMc(writer, mcref.mc);
 
         var wide_mcref = mcref;
         wide_mcref.mc = @truncate(u4, mcref.mc +% 4);
@@ -108,9 +101,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
                 const narrow_value = results_narrow.jedec.get(fuse);
                 if (default_narrow) |def| {
                     if (narrow_value != def) {
-                        try writer.expression("value");
-                        try writer.printRaw("{} to_mc", .{ narrow_value });
-                        try writer.close();
+                        try helper.writeValue(writer, narrow_value, "to_mc");
                     }
                 } else {
                     default_narrow = narrow_value;
@@ -119,9 +110,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
                 const wide_value = results_wide.jedec.get(fuse);
                 if (default_wide) |def| {
                     if (wide_value != def) {
-                        try writer.expression("value");
-                        try writer.printRaw("{} to_mc_plus_four", .{ wide_value });
-                        try writer.close();
+                        try helper.writeValue(writer, wide_value, "to_mc_plus_four");
                     }
                 } else {
                     default_wide = wide_value;
@@ -143,15 +132,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     }
 
     if (default_narrow) |def| {
-        try writer.expression("value");
-        try writer.printRaw("{} to_mc", .{ def });
-        try writer.close();
+        try helper.writeValue(writer, def, "to_mc");
     }
 
     if (default_wide) |def| {
-        try writer.expression("value");
-        try writer.printRaw("{} to_mc_plus_four", .{ def });
-        try writer.close();
+        try helper.writeValue(writer, def, "to_mc_plus_four");
     }
 
     try writer.done();

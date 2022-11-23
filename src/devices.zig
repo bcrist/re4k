@@ -525,12 +525,12 @@ pub const DeviceType = enum {
         };
     }
 
-    pub fn getGOEPin(self: DeviceType, goe_index: u1) pins.InputOutputPinInfo {
-        var iter = pins.GoeIterator {
+    pub fn getOEPin(self: DeviceType, oe_index: u1) pins.InputOutputPinInfo {
+        var iter = pins.OeIterator {
             .pins = self.getPins(),
         };
-        while (iter.next()) |goe| {
-            if (goe.goe_index.? == goe_index) return goe;
+        while (iter.next()) |oe| {
+            if (oe.oe_index.? == oe_index) return oe;
         }
         unreachable;
     }

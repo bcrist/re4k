@@ -116,17 +116,13 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
     var glb: u8 = 0;
     while (glb < dev.getNumGlbs()) : (glb += 1) {
-        try writer.expression("glb");
-        try writer.printRaw("{}", .{ glb });
-        try writer.expression("name");
-        try writer.printRaw("{s}", .{ devices.getGlbName(glb) });
-        try writer.close();
-        writer.setCompact(false);
+        try helper.writeGlb(writer, glb);
 
         var base_clk: usize = 0;
         while (base_clk < 4) : (base_clk += 2) {
             try writer.expression("clk");
-            try writer.printRaw("{} {}", .{ base_clk, base_clk + 1 });
+            try writer.int(base_clk, 10);
+            try writer.int(base_clk + 1, 10);
 
             try tc.cleanTempDir();
             helper.resetTemp();
@@ -180,9 +176,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
     var default_iter = defaults.iterator();
     while (default_iter.next()) |entry| {
-        try writer.expression("value");
-        try writer.printRaw("{} {s}", .{ entry.value.*, @tagName(entry.key) });
-        try writer.close();
+        try helper.writeValue(writer, entry.value.*, entry.key);
     }
 
     try writer.done();

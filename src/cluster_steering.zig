@@ -97,9 +97,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         var steering_data = ClusterSteeringMap.init(ga);
         try steering_data.ensureTotalCapacity(80);
 
-        try writer.expression("glb");
-        try writer.printRaw("{}", .{ glb });
-        writer.setCompact(false);
+        try helper.writeGlb(writer, glb);
 
         var mc: u8 = 0;
         while (mc < 16) : (mc += 1) {
@@ -123,8 +121,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
         mc = 0;
         while (mc < 16) : (mc += 1) {
-            try writer.expression("mc");
-            try writer.printRaw("{}", .{ mc });
+            try helper.writeMc(writer, mc);
 
             var column = mc_columns.get(.{ .glb = glb, .mc = mc }).?.min.col;
 
@@ -181,9 +178,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
                 writer.setCompact(false);
                 val_iter = values.iterator();
                 while (val_iter.next()) |entry| {
-                    try writer.expression("value");
-                    try writer.printRaw("{} {s}", .{ entry.value.*, @tagName(entry.key) });
-                    try writer.close(); // value
+                    try helper.writeValue(writer, entry.value.*, entry.key);
                 }
             }
 
@@ -194,9 +189,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
     var defaults_iter = default_values.iterator();
     while (defaults_iter.next()) |entry| {
-        try writer.expression("value");
-        try writer.printRaw("{} {s}", .{ entry.value.*, @tagName(entry.key) });
-        try writer.close(); // value
+        try helper.writeValue(writer, entry.value.*, entry.key);
     }
 
     try writer.done();

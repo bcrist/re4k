@@ -20,7 +20,7 @@ pub const InputOutputPinInfo = struct {
     bank: u8,
     glb: u8,
     mc: u8,
-    goe_index: ?u1,
+    oe_index: ?u1,
 };
 
 pub const MiscPinInfo = struct {
@@ -71,7 +71,7 @@ pub const InputIterator = struct {
     next_index: u16 = 0,
     single_glb: ?u8 = null,
     exclude_glb: ?u8 = null,
-    exclude_goes: bool = false,
+    exclude_oes: bool = false,
     exclude_clocks: bool = false,
     exclude_pin: ?u16 = null,
 
@@ -108,7 +108,7 @@ pub const InputIterator = struct {
                     if (self.exclude_glb) |glb| {
                         if (info.glb == glb) continue;
                     }
-                    if (self.exclude_goes and info.goe_index != null) {
+                    if (self.exclude_oes and info.oe_index != null) {
                         continue;
                     }
                 },
@@ -145,12 +145,12 @@ pub const ClockIterator = struct {
     }
 };
 
-pub const GoeIterator = struct {
+pub const OeIterator = struct {
     pins: []const PinInfo,
     next_index: u16 = 0,
     exclude_pin: ?u16 = null,
 
-    pub fn next(self: *GoeIterator) ?InputOutputPinInfo {
+    pub fn next(self: *OeIterator) ?InputOutputPinInfo {
         const len = self.pins.len;
         var i = self.next_index;
         while (i < len) : (i += 1) {
@@ -159,7 +159,7 @@ pub const GoeIterator = struct {
             }
             switch (self.pins[i]) {
                 .input_output => |info| {
-                    if (info.goe_index) |_| {
+                    if (info.oe_index) |_| {
                         self.next_index = i + 1;
                         return info;
                     }
@@ -176,7 +176,7 @@ pub const OutputIterator = struct {
     next_index: u16 = 0,
     single_glb: ?u8 = null,
     exclude_glb: ?u8 = null,
-    exclude_goes: bool = false,
+    exclude_oes: bool = false,
     exclude_pin: ?u16 = null,
 
     pub fn next(self: *OutputIterator) ?InputOutputPinInfo {
@@ -194,7 +194,7 @@ pub const OutputIterator = struct {
                     if (self.exclude_glb) |glb| {
                         if (info.glb == glb) continue;
                     }
-                    if (self.exclude_goes and info.goe_index != null) {
+                    if (self.exclude_oes and info.oe_index != null) {
                         continue;
                     }
                     self.next_index = i + 1;
@@ -242,18 +242,18 @@ pub const PinInfoBuilder = struct {
             .bank = bank,
             .glb = glb,
             .mc = mc,
-            .goe_index = null,
+            .oe_index = null,
         }};
     }
 
-    pub fn goe(self: *PinInfoBuilder, pin_number: []const u8, bank: u8, glb: u8, mc: u8, goe_index: u1) PinInfo {
+    pub fn oe(self: *PinInfoBuilder, pin_number: []const u8, bank: u8, glb: u8, mc: u8, oe_index: u1) PinInfo {
         return .{ .input_output = .{
             .pin_index = self.next(),
             .pin_number = pin_number,
             .bank = bank,
             .glb = glb,
             .mc = mc,
-            .goe_index = goe_index,
+            .oe_index = oe_index,
         }};
     }
 

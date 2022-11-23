@@ -40,7 +40,6 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     var pin_iter = devices.pins.InputIterator { .pins = dev.getPins() };
     while (pin_iter.next()) |pin_info| {
         const pin_index = pin_info.pin_index();
-        const pin_number = pin_info.pin_number();
 
         try tc.cleanTempDir();
         helper.resetTemp();
@@ -50,8 +49,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
         const diff = try JedecData.initDiff(ta, results_high.jedec, results_low.jedec);
 
-        try writer.expression("pin");
-        try writer.printRaw("{s}", .{ pin_number });
+        try helper.writePin(writer, pin_info);
 
         var diff_iter = diff.iterator(.{});
         if (diff_iter.next()) |fuse| {
@@ -73,15 +71,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     }
 
     if (default_high) |def| {
-        try writer.expression("value");
-        try writer.printRaw("{} high", .{ def });
-        try writer.close();
+        try helper.writeValue(writer, def, "high");
     }
 
     if (default_low) |def| {
-        try writer.expression("value");
-        try writer.printRaw("{} low", .{ def });
-        try writer.close();
+        try helper.writeValue(writer, def, "low");
     }
 
     try writer.done();
@@ -95,9 +89,7 @@ fn writeFuse(fuse: Fuse, results_high: JedecData, results_low: JedecData, writer
     const high_value = results_high.get(fuse);
     if (default_high) |def| {
         if (high_value != def) {
-            try writer.expression("value");
-            try writer.printRaw("{} high", .{ high_value });
-            try writer.close();
+            try helper.writeValue(writer, high_value, "high");
         }
     } else {
         default_high = high_value;
@@ -106,9 +98,7 @@ fn writeFuse(fuse: Fuse, results_high: JedecData, results_low: JedecData, writer
     const low_value = results_low.get(fuse);
     if (default_low) |def| {
         if (low_value != def) {
-            try writer.expression("value");
-            try writer.printRaw("{} low", .{ low_value });
-            try writer.close();
+            try helper.writeValue(writer, low_value, "low");
         }
     } else {
         default_low = low_value;

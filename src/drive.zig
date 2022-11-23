@@ -44,8 +44,9 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         const results_pp = try runToolchain(ta, tc, dev, io.pin_index, .push_pull);
         const results_od = try runToolchain(ta, tc, dev, io.pin_index, .open_drain);
 
-        try writer.expression("pin");
-        try writer.printRaw("{s}", .{ io.pin_number });
+        try helper.writePin(writer, io);
+        // try writer.expression("pin");
+        // try writer.string(io.pin_number);
 
         var diff = try JedecData.initDiff(ta, results_pp.jedec, results_od.jedec);
         var diff_iter = diff.iterator(.{});
@@ -55,9 +56,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             const pp_value = results_pp.jedec.get(fuse);
             if (default_pp) |def| {
                 if (pp_value != def) {
-                    try writer.expression("value");
-                    try writer.printRaw("{} push-pull", .{ pp_value });
-                    try writer.close();
+                    try helper.writeValue(writer, pp_value, "push-pull");
                 }
             } else {
                 default_pp = pp_value;
@@ -66,9 +65,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             const od_value = results_od.jedec.get(fuse);
             if (default_od) |def| {
                 if (od_value != def) {
-                    try writer.expression("value");
-                    try writer.printRaw("{} open-drain", .{ od_value });
-                    try writer.close();
+                    try helper.writeValue(writer, od_value, "open-drain");
                 }
             } else {
                 default_od = od_value;
@@ -88,15 +85,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     }
 
     if (default_pp) |def| {
-        try writer.expression("value");
-        try writer.printRaw("{} push-pull", .{ def });
-        try writer.close();
+        try helper.writeValue(writer, def, "push-pull");
     }
 
     if (default_od) |def| {
-        try writer.expression("value");
-        try writer.printRaw("{} open-drain", .{ def });
-        try writer.close();
+        try helper.writeValue(writer, def, "open-drain");
     }
 
     try writer.done();

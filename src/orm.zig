@@ -74,8 +74,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         var diff = try JedecData.initDiff(ta, results_1.jedec, results_2.jedec);
         diff.unionDiff(results_1.jedec, results_4.jedec);
 
-        try writer.expression("pin");
-        try writer.printRaw("{s}", .{ io.pin_number });
+        try helper.writePin(writer, io);
 
         var diff_iter = diff.iterator(.{});
         while (diff_iter.next()) |fuse| {
@@ -108,30 +107,14 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         try writer.close();
     }
 
-    try writer.expression("value");
-    try writer.printRaw("0 \"from MC+0\"", .{});
-    try writer.close();
-    try writer.expression("value");
-    try writer.printRaw("1 \"from MC+1\"", .{});
-    try writer.close();
-    try writer.expression("value");
-    try writer.printRaw("2 \"from MC+2\"", .{});
-    try writer.close();
-    try writer.expression("value");
-    try writer.printRaw("3 \"from MC+3\"", .{});
-    try writer.close();
-    try writer.expression("value");
-    try writer.printRaw("4 \"from MC+4\"", .{});
-    try writer.close();
-    try writer.expression("value");
-    try writer.printRaw("5 \"from MC+5\"", .{});
-    try writer.close();
-    try writer.expression("value");
-    try writer.printRaw("6 \"from MC+6\"", .{});
-    try writer.close();
-    try writer.expression("value");
-    try writer.printRaw("7 \"from MC+7\"", .{});
-    try writer.close();
+    try helper.writeValue(writer, 0, "from MC+0");
+    try helper.writeValue(writer, 1, "from MC+1");
+    try helper.writeValue(writer, 2, "from MC+2");
+    try helper.writeValue(writer, 3, "from MC+3");
+    try helper.writeValue(writer, 4, "from MC+4");
+    try helper.writeValue(writer, 5, "from MC+5");
+    try helper.writeValue(writer, 6, "from MC+6");
+    try helper.writeValue(writer, 7, "from MC+7");
 
     try writer.done();
 

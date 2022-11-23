@@ -1,6 +1,6 @@
 (LC4032ZC_TQFP48
    (cluster_steering
-      (glb 0
+      (glb 0 (name A)
          (mc 0 (fuse 74 93) (fuse 75 93 (value 2)))
          (mc 1 (fuse 74 94) (fuse 75 94 (value 2)))
          (mc 2 (fuse 74 103) (fuse 75 103 (value 2)))
@@ -18,7 +18,7 @@
          (mc 14 (fuse 74 163) (fuse 75 163 (value 2)))
          (mc 15 (fuse 74 164) (fuse 75 164 (value 2)))
       )
-      (glb 1
+      (glb 1 (name B)
          (mc 0 (fuse 74 7) (fuse 75 7 (value 2)))
          (mc 1 (fuse 74 8) (fuse 75 8 (value 2)))
          (mc 2 (fuse 74 17) (fuse 75 17 (value 2)))

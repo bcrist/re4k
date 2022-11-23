@@ -119,15 +119,8 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             if (osc == timer and osc == both and both != none) {
                 try writer.expressionExpanded("enable");
                 try helper.writeFuse(writer, fuse);
-
-                try writer.expression("value");
-                try writer.printRaw("{} enabled", .{ both });
-                try writer.close();
-
-                try writer.expression("value");
-                try writer.printRaw("{} disabled", .{ none });
-                try writer.close();
-
+                try helper.writeValue(writer, both, "enabled");
+                try helper.writeValue(writer, none, "disabled");
                 try writer.close(); // enable
             }
         }
@@ -143,15 +136,8 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
                 found_osc_out = true;
                 try writer.expressionExpanded("osc_out");
                 try helper.writeFuse(writer, fuse);
-
-                try writer.expression("value");
-                try writer.printRaw("{} enabled", .{ results_osc.jedec.get(fuse) });
-                try writer.close();
-
-                try writer.expression("value");
-                try writer.printRaw("{} disabled", .{ 1 ^ results_osc.jedec.get(fuse) });
-                try writer.close();
-
+                try helper.writeValue(writer, results_osc.jedec.get(fuse), "enabled");
+                try helper.writeValue(writer, results_timer.jedec.get(fuse), "disabled");
                 try writer.close(); // osc_out
             }
 
@@ -162,15 +148,8 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
                 found_timer_out = true;
                 try writer.expressionExpanded("timer_out");
                 try helper.writeFuse(writer, fuse);
-
-                try writer.expression("value");
-                try writer.printRaw("{} enabled", .{ results_timer.jedec.get(fuse) });
-                try writer.close();
-
-                try writer.expression("value");
-                try writer.printRaw("{} disabled", .{ 1 ^ results_timer.jedec.get(fuse) });
-                try writer.close();
-
+                try helper.writeValue(writer, results_timer.jedec.get(fuse), "enabled");
+                try helper.writeValue(writer, results_osc.jedec.get(fuse), "disabled");
                 try writer.close(); // timer_out
             }
         }
@@ -211,17 +190,9 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             try helper.err("Expected 2 fuses for timer_div options, but found {}!\n", .{ diff.countSet() }, dev, .{});
         }
 
-        try writer.expression("value");
-        try writer.printRaw("{} div128", .{ val128 });
-        try writer.close();
-
-        try writer.expression("value");
-        try writer.printRaw("{} div1024", .{ val1024 });
-        try writer.close();
-
-        try writer.expression("value");
-        try writer.printRaw("{} div1048576", .{ val1048576 });
-        try writer.close();
+        try helper.writeValue(writer, val128, "div128");
+        try helper.writeValue(writer, val1024, "div1024");
+        try helper.writeValue(writer, val1048576, "div1048576");
 
         try writer.close(); // timer_div
     }

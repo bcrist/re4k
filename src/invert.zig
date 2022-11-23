@@ -55,17 +55,10 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         const diff = try JedecData.initDiff(ta, results_normal.jedec, results_invert.jedec);
 
         if (mcref.mc == 0) {
-            try writer.expression("glb");
-            try writer.printRaw("{}", .{ mcref.glb });
-            try writer.expression("name");
-            try writer.printRaw("{s}", .{ devices.getGlbName(mcref.glb) });
-            try writer.close();
-
-            writer.setCompact(false);
+            try helper.writeGlb(writer, mcref.glb);
         }
 
-        try writer.expression("mc");
-        try writer.printRaw("{}", .{ mcref.mc });
+        try helper.writeMc(writer, mcref.mc);
 
         var diff_iter = diff.iterator(.{});
         if (diff_iter.next()) |fuse| {
@@ -74,9 +67,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             const normal_value = results_normal.jedec.get(fuse);
             if (default_normal) |def| {
                 if (normal_value != def) {
-                    try writer.expression("value");
-                    try writer.printRaw("{} non-inverted", .{ normal_value });
-                    try writer.close();
+                    try helper.writeValue(writer, normal_value, "non-inverted");
                 }
             } else {
                 default_normal = normal_value;
@@ -85,9 +76,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             const invert_value = results_invert.jedec.get(fuse);
             if (default_invert) |def| {
                 if (invert_value != def) {
-                    try writer.expression("value");
-                    try writer.printRaw("{} inverted", .{ invert_value });
-                    try writer.close();
+                    try helper.writeValue(writer, invert_value, "inverted");
                 }
             } else {
                 default_invert = invert_value;
@@ -111,15 +100,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     }
 
     if (default_normal) |def| {
-        try writer.expression("value");
-        try writer.printRaw("{} non-inverted", .{ def });
-        try writer.close();
+        try helper.writeValue(writer, def, "non-inverted");
     }
 
     if (default_invert) |def| {
-        try writer.expression("value");
-        try writer.printRaw("{} inverted", .{ def });
-        try writer.close();
+        try helper.writeValue(writer, def, "inverted");
     }
 
     try writer.done();

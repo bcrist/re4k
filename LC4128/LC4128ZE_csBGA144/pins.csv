@@ -1,4 +1,4 @@
-pin,type,bank,glb,mc,goe,clk
+pin,type,bank,glb,mc,oe,clk
 B5,io,0,0,5,,
 A5,io,0,0,6,,
 D6,io,0,0,0,0,
