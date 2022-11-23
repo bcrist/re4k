@@ -11,9 +11,9 @@
       (goe0 (fuse 88 101))
       (goe1 (fuse 89 101))
       (value 0 pin)
-      (value 1 shared_ptoe_bus)
+      (value 1 shared_pt_oe_bus)
    )
-   (shared_ptoe_bus
+   (shared_pt_oe_bus
       (glb 0 (name A)
          (goe0 (fuse 73 656))
          (goe1 (fuse 74 656))

@@ -1,5 +1,5 @@
 (LC4128ZC_TQFP100
-   (pt0_xor_sum
+   (pt0_xor
       (glb 0 (name A)
          (mc 0 (fuse 72 578))
          (mc 1 (fuse 72 579))

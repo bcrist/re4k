@@ -51,6 +51,15 @@ pub fn build(b: *std.build.Builder) void {
             .source = .{ .path = "pkg/tempallocator/temp_allocator.zig" },
         };
 
+        const async_source = b.addExecutable("async_source", "src/async_source.zig");
+        async_source.addPackage(sx);
+        async_source.addPackage(temp_allocator);
+        async_source.linkLibC();
+        async_source.setTarget(target);
+        async_source.setBuildMode(mode);
+        async_source.install();
+        _ = makeRunStep(b, async_source, "async_source", "run async_source");
+
         const bclk_polarity = b.addExecutable("bclk_polarity", "src/bclk_polarity.zig");
         bclk_polarity.addPackage(sx);
         bclk_polarity.addPackage(temp_allocator);
@@ -60,32 +69,32 @@ pub fn build(b: *std.build.Builder) void {
         bclk_polarity.install();
         _ = makeRunStep(b, bclk_polarity, "bclk_polarity", "run bclk_polarity");
 
-        const ce_mux = b.addExecutable("ce_mux", "src/ce_mux.zig");
-        ce_mux.addPackage(sx);
-        ce_mux.addPackage(temp_allocator);
-        ce_mux.linkLibC();
-        ce_mux.setTarget(target);
-        ce_mux.setBuildMode(mode);
-        ce_mux.install();
-        _ = makeRunStep(b, ce_mux, "ce_mux", "run ce_mux");
+        const ce_source = b.addExecutable("ce_source", "src/ce_source.zig");
+        ce_source.addPackage(sx);
+        ce_source.addPackage(temp_allocator);
+        ce_source.linkLibC();
+        ce_source.setTarget(target);
+        ce_source.setBuildMode(mode);
+        ce_source.install();
+        _ = makeRunStep(b, ce_source, "ce_source", "run ce_source");
 
-        const clk_mux = b.addExecutable("clk_mux", "src/clk_mux.zig");
-        clk_mux.addPackage(sx);
-        clk_mux.addPackage(temp_allocator);
-        clk_mux.linkLibC();
-        clk_mux.setTarget(target);
-        clk_mux.setBuildMode(mode);
-        clk_mux.install();
-        _ = makeRunStep(b, clk_mux, "clk_mux", "run clk_mux");
+        const clock_source = b.addExecutable("clock_source", "src/clock_source.zig");
+        clock_source.addPackage(sx);
+        clock_source.addPackage(temp_allocator);
+        clock_source.linkLibC();
+        clock_source.setTarget(target);
+        clock_source.setBuildMode(mode);
+        clock_source.install();
+        _ = makeRunStep(b, clock_source, "clock_source", "run clock_source");
 
-        const cluster_steering = b.addExecutable("cluster_steering", "src/cluster_steering.zig");
-        cluster_steering.addPackage(sx);
-        cluster_steering.addPackage(temp_allocator);
-        cluster_steering.linkLibC();
-        cluster_steering.setTarget(target);
-        cluster_steering.setBuildMode(mode);
-        cluster_steering.install();
-        _ = makeRunStep(b, cluster_steering, "cluster_steering", "run cluster_steering");
+        const cluster_routing = b.addExecutable("cluster_routing", "src/cluster_routing.zig");
+        cluster_routing.addPackage(sx);
+        cluster_routing.addPackage(temp_allocator);
+        cluster_routing.linkLibC();
+        cluster_routing.setTarget(target);
+        cluster_routing.setBuildMode(mode);
+        cluster_routing.install();
+        _ = makeRunStep(b, cluster_routing, "cluster_routing", "run cluster_routing");
 
         const combine = b.addExecutable("combine", "src/combine.zig");
         combine.addPackage(sx);
@@ -141,14 +150,23 @@ pub fn build(b: *std.build.Builder) void {
         grp.install();
         _ = makeRunStep(b, grp, "grp", "run grp");
 
-        const input_reg = b.addExecutable("input_reg", "src/input_reg.zig");
-        input_reg.addPackage(sx);
-        input_reg.addPackage(temp_allocator);
-        input_reg.linkLibC();
-        input_reg.setTarget(target);
-        input_reg.setBuildMode(mode);
-        input_reg.install();
-        _ = makeRunStep(b, input_reg, "input_reg", "run input_reg");
+        const init_source = b.addExecutable("init_source", "src/init_source.zig");
+        init_source.addPackage(sx);
+        init_source.addPackage(temp_allocator);
+        init_source.linkLibC();
+        init_source.setTarget(target);
+        init_source.setBuildMode(mode);
+        init_source.install();
+        _ = makeRunStep(b, init_source, "init_source", "run init_source");
+
+        const init_state = b.addExecutable("init_state", "src/init_state.zig");
+        init_state.addPackage(sx);
+        init_state.addPackage(temp_allocator);
+        init_state.linkLibC();
+        init_state.setTarget(target);
+        init_state.setBuildMode(mode);
+        init_state.install();
+        _ = makeRunStep(b, init_state, "init_state", "run init_state");
 
         const invert = b.addExecutable("invert", "src/invert.zig");
         invert.addPackage(sx);
@@ -177,23 +195,14 @@ pub fn build(b: *std.build.Builder) void {
         lc4064_test.install();
         _ = makeRunStep(b, lc4064_test, "lc4064_test", "run lc4064_test");
 
-        const oe_mux = b.addExecutable("oe_mux", "src/oe_mux.zig");
-        oe_mux.addPackage(sx);
-        oe_mux.addPackage(temp_allocator);
-        oe_mux.linkLibC();
-        oe_mux.setTarget(target);
-        oe_mux.setBuildMode(mode);
-        oe_mux.install();
-        _ = makeRunStep(b, oe_mux, "oe_mux", "run oe_mux");
-
-        const orm = b.addExecutable("orm", "src/orm.zig");
-        orm.addPackage(sx);
-        orm.addPackage(temp_allocator);
-        orm.linkLibC();
-        orm.setTarget(target);
-        orm.setBuildMode(mode);
-        orm.install();
-        _ = makeRunStep(b, orm, "orm", "run orm");
+        const oe_source = b.addExecutable("oe_source", "src/oe_source.zig");
+        oe_source.addPackage(sx);
+        oe_source.addPackage(temp_allocator);
+        oe_source.linkLibC();
+        oe_source.setTarget(target);
+        oe_source.setBuildMode(mode);
+        oe_source.install();
+        _ = makeRunStep(b, oe_source, "oe_source", "run oe_source");
 
         const osctimer = b.addExecutable("osctimer", "src/osctimer.zig");
         osctimer.addPackage(sx);
@@ -203,6 +212,15 @@ pub fn build(b: *std.build.Builder) void {
         osctimer.setBuildMode(mode);
         osctimer.install();
         _ = makeRunStep(b, osctimer, "osctimer", "run osctimer");
+
+        const output_routing = b.addExecutable("output_routing", "src/output_routing.zig");
+        output_routing.addPackage(sx);
+        output_routing.addPackage(temp_allocator);
+        output_routing.linkLibC();
+        output_routing.setTarget(target);
+        output_routing.setBuildMode(mode);
+        output_routing.install();
+        _ = makeRunStep(b, output_routing, "output_routing", "run output_routing");
 
         const output_routing_mode = b.addExecutable("output_routing_mode", "src/output_routing_mode.zig");
         output_routing_mode.addPackage(sx);
@@ -222,15 +240,6 @@ pub fn build(b: *std.build.Builder) void {
         power_guard.install();
         _ = makeRunStep(b, power_guard, "power_guard", "run power_guard");
 
-        const powerup_state = b.addExecutable("powerup_state", "src/powerup_state.zig");
-        powerup_state.addPackage(sx);
-        powerup_state.addPackage(temp_allocator);
-        powerup_state.linkLibC();
-        powerup_state.setTarget(target);
-        powerup_state.setBuildMode(mode);
-        powerup_state.install();
-        _ = makeRunStep(b, powerup_state, "powerup_state", "run powerup_state");
-
         const pt0_xor = b.addExecutable("pt0_xor", "src/pt0_xor.zig");
         pt0_xor.addPackage(sx);
         pt0_xor.addPackage(temp_allocator);
@@ -239,24 +248,6 @@ pub fn build(b: *std.build.Builder) void {
         pt0_xor.setBuildMode(mode);
         pt0_xor.install();
         _ = makeRunStep(b, pt0_xor, "pt0_xor", "run pt0_xor");
-
-        const pt2_reset = b.addExecutable("pt2_reset", "src/pt2_reset.zig");
-        pt2_reset.addPackage(sx);
-        pt2_reset.addPackage(temp_allocator);
-        pt2_reset.linkLibC();
-        pt2_reset.setTarget(target);
-        pt2_reset.setBuildMode(mode);
-        pt2_reset.install();
-        _ = makeRunStep(b, pt2_reset, "pt2_reset", "run pt2_reset");
-
-        const pt3_reset = b.addExecutable("pt3_reset", "src/pt3_reset.zig");
-        pt3_reset.addPackage(sx);
-        pt3_reset.addPackage(temp_allocator);
-        pt3_reset.linkLibC();
-        pt3_reset.setTarget(target);
-        pt3_reset.setBuildMode(mode);
-        pt3_reset.install();
-        _ = makeRunStep(b, pt3_reset, "pt3_reset", "run pt3_reset");
 
         const pt4_oe = b.addExecutable("pt4_oe", "src/pt4_oe.zig");
         pt4_oe.addPackage(sx);
@@ -294,15 +285,6 @@ pub fn build(b: *std.build.Builder) void {
         reg_type.install();
         _ = makeRunStep(b, reg_type, "reg_type", "run reg_type");
 
-        const shared_pt_async_polarity = b.addExecutable("shared_pt_async_polarity", "src/shared_pt_async_polarity.zig");
-        shared_pt_async_polarity.addPackage(sx);
-        shared_pt_async_polarity.addPackage(temp_allocator);
-        shared_pt_async_polarity.linkLibC();
-        shared_pt_async_polarity.setTarget(target);
-        shared_pt_async_polarity.setBuildMode(mode);
-        shared_pt_async_polarity.install();
-        _ = makeRunStep(b, shared_pt_async_polarity, "shared_pt_async_polarity", "run shared_pt_async_polarity");
-
         const shared_pt_clk_polarity = b.addExecutable("shared_pt_clk_polarity", "src/shared_pt_clk_polarity.zig");
         shared_pt_clk_polarity.addPackage(sx);
         shared_pt_clk_polarity.addPackage(temp_allocator);
@@ -311,6 +293,15 @@ pub fn build(b: *std.build.Builder) void {
         shared_pt_clk_polarity.setBuildMode(mode);
         shared_pt_clk_polarity.install();
         _ = makeRunStep(b, shared_pt_clk_polarity, "shared_pt_clk_polarity", "run shared_pt_clk_polarity");
+
+        const shared_pt_init_polarity = b.addExecutable("shared_pt_init_polarity", "src/shared_pt_init_polarity.zig");
+        shared_pt_init_polarity.addPackage(sx);
+        shared_pt_init_polarity.addPackage(temp_allocator);
+        shared_pt_init_polarity.linkLibC();
+        shared_pt_init_polarity.setTarget(target);
+        shared_pt_init_polarity.setBuildMode(mode);
+        shared_pt_init_polarity.install();
+        _ = makeRunStep(b, shared_pt_init_polarity, "shared_pt_init_polarity", "run shared_pt_init_polarity");
 
         const slew = b.addExecutable("slew", "src/slew.zig");
         slew.addPackage(sx);
@@ -330,14 +321,23 @@ pub fn build(b: *std.build.Builder) void {
         threshold.install();
         _ = makeRunStep(b, threshold, "threshold", "run threshold");
 
-        const wide_steering = b.addExecutable("wide_steering", "src/wide_steering.zig");
-        wide_steering.addPackage(sx);
-        wide_steering.addPackage(temp_allocator);
-        wide_steering.linkLibC();
-        wide_steering.setTarget(target);
-        wide_steering.setBuildMode(mode);
-        wide_steering.install();
-        _ = makeRunStep(b, wide_steering, "wide_steering", "run wide_steering");
+        const wide_routing = b.addExecutable("wide_routing", "src/wide_routing.zig");
+        wide_routing.addPackage(sx);
+        wide_routing.addPackage(temp_allocator);
+        wide_routing.linkLibC();
+        wide_routing.setTarget(target);
+        wide_routing.setBuildMode(mode);
+        wide_routing.install();
+        _ = makeRunStep(b, wide_routing, "wide_routing", "run wide_routing");
+
+        const xor = b.addExecutable("xor", "src/xor.zig");
+        xor.addPackage(sx);
+        xor.addPackage(temp_allocator);
+        xor.linkLibC();
+        xor.setTarget(target);
+        xor.setBuildMode(mode);
+        xor.install();
+        _ = makeRunStep(b, xor, "xor", "run xor");
 
         const zerohold = b.addExecutable("zerohold", "src/zerohold.zig");
         zerohold.addPackage(sx);

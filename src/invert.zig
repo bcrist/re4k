@@ -39,7 +39,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
 
 pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
     try writer.expressionExpanded(@tagName(dev));
-    try writer.expressionExpanded("invert_sum");
+    try writer.expressionExpanded("invert");
 
     var default_normal: ?u1 = null;
     var default_invert: ?u1 = null;
@@ -67,7 +67,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             const normal_value = results_normal.jedec.get(fuse);
             if (default_normal) |def| {
                 if (normal_value != def) {
-                    try helper.writeValue(writer, normal_value, "non-inverted");
+                    try helper.writeValue(writer, normal_value, "normal");
                 }
             } else {
                 default_normal = normal_value;
@@ -76,7 +76,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             const invert_value = results_invert.jedec.get(fuse);
             if (default_invert) |def| {
                 if (invert_value != def) {
-                    try helper.writeValue(writer, invert_value, "inverted");
+                    try helper.writeValue(writer, invert_value, "invert");
                 }
             } else {
                 default_invert = invert_value;
@@ -100,11 +100,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     }
 
     if (default_normal) |def| {
-        try helper.writeValue(writer, def, "non-inverted");
+        try helper.writeValue(writer, def, "normal");
     }
 
     if (default_invert) |def| {
-        try helper.writeValue(writer, def, "inverted");
+        try helper.writeValue(writer, def, "invert");
     }
 
     try writer.done();

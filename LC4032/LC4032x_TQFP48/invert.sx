@@ -1,5 +1,5 @@
 (LC4032x_TQFP48
-   (invert_sum
+   (invert
       (glb 0 (name A)
          (mc 0 (fuse 73 93))
          (mc 1 (fuse 73 94))
@@ -36,7 +36,7 @@
          (mc 14 (fuse 73 77))
          (mc 15 (fuse 73 78))
       )
-      (value 0 non-inverted)
-      (value 1 inverted)
+      (value 0 normal)
+      (value 1 invert)
    )
 )

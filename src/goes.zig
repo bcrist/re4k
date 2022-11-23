@@ -110,7 +110,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     //    * For LC4032 devices, the first pin GOE (i.e. not from the shared OE bus) corresponds to GOE2, and the second corresponds to GOE3
     //    * For non-LC4032 devices, the first pin GOE corresponds to GOE0 and the second to GOE1
     //    * For non-LC4032 devices, the GOE0/1 source fuses are always directly above the GOE polarity fuses, and 0 means "use external pin as GOE"
-    //    * Shared PT OE routing fuses are in a single block, between the shared PT clock polarity and shared PT async polarity fuses (2 for LC4032, 4 for others)
+    //    * Shared PT OE routing fuses are in a single block, between the shared PT clock polarity and shared PT init polarity fuses (2 for LC4032, 4 for others)
 
     const results_pos_pos = try runToolchain(ta, tc, dev, .positive, .positive, true);
     const results_pos_neg = try runToolchain(ta, tc, dev, .positive, .negative, true);
@@ -184,15 +184,8 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     try helper.writeFuse(writer, fuse);
     try writer.close();
 
-    try writer.expression("value");
-    try writer.int(0, 10);
-    try writer.string("active_low");
-    try writer.close();
-
-    try writer.expression("value");
-    try writer.int(1, 10);
-    try writer.string("active_high");
-    try writer.close();
+    try helper.writeValue(writer, 0, "active_low");
+    try helper.writeValue(writer, 1, "active_high");
 
     try writer.close(); // goe_polarity
 
@@ -212,20 +205,13 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         try helper.writeFuse(writer, Fuse.init(fuse.row - 2, fuse.col));
         try writer.close();
 
-        try writer.expression("value");
-        try writer.int(0, 10);
-        try writer.string("pin");
-        try writer.close();
-
-        try writer.expression("value");
-        try writer.int(1, 10);
-        try writer.string("shared_ptoe_bus");
-        try writer.close();
+        try helper.writeValue(writer, 0, "pin");
+        try helper.writeValue(writer, 1, "shared_pt_oe_bus");
 
         try writer.close(); // goe_source
     }
 
-    try writer.expressionExpanded("shared_ptoe_bus");
+    try writer.expressionExpanded("shared_pt_oe_bus");
 
     var glb: usize = 0;
     while (glb < sptclk_polarity_fuses.len) : (glb += 1) {
@@ -250,17 +236,10 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         try writer.close(); // glb
     }
 
-    try writer.expression("value");
-    try writer.int(0, 10);
-    try writer.string("enabled");
-    try writer.close();
+    try helper.writeValue(writer, 0, "enabled");
+    try helper.writeValue(writer, 1, "disabled");
 
-    try writer.expression("value");
-    try writer.int(1, 10);
-    try writer.string("disabled");
-    try writer.close();
-
-    try writer.close(); // shared_ptoe_bus
+    try writer.close(); // shared_pt_oe_bus
 
     try writer.done();
 }

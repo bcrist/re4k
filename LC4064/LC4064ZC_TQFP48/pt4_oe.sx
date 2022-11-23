@@ -1,5 +1,5 @@
 (LC4064ZC_TQFP48
-   (pt4_oe
+   (pt4_output_enable
       (pin 2 (glb 0 (name A)) (mc 8) (fuse 84 317))
       (pin 3 (glb 0 (name A)) (mc 10) (fuse 84 327))
       (pin 4 (glb 0 (name A)) (mc 11) (fuse 84 328))

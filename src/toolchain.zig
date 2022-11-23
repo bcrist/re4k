@@ -48,7 +48,7 @@ pub const PinAssignment = struct {
     bus_maintenance: ?core.BusMaintenanceType = null,
     slew_rate: ?core.SlewRate = null,
     power_guard_signal: ?[]const u8 = null,
-    powerup_state: ?u1 = null,
+    init_state: ?u1 = null,
     orm_bypass: ?bool = null,
     fast_bypass: ?bool = null,
 };
@@ -58,7 +58,7 @@ pub const NodeAssignment = struct {
     glb: ?u8 = null,
     mc: ?u8 = null,
     input_register: ?bool = null,
-    powerup_state: ?u1 = null,
+    init_state: ?u1 = null,
 };
 
 pub const ProductTerm = struct {
@@ -168,7 +168,7 @@ pub const Design = struct {
                 if (pa.drive) |drive| existing.drive = drive;
                 if (pa.bus_maintenance) |pull| existing.bus_maintenance = pull;
                 if (pa.slew_rate) |slew| existing.slew_rate = slew;
-                if (pa.powerup_state) |powerup| existing.powerup_state = powerup;
+                if (pa.init_state) |init_state| existing.init_state = init_state;
                 if (pa.power_guard_signal) |pg_enable| {
                     self.uses_power_guard = true;
                     existing.power_guard_signal = pg_enable;
@@ -224,7 +224,7 @@ pub const Design = struct {
                 if (na.glb) |glb| existing.glb = glb;
                 if (na.mc) |mc| existing.mc = mc;
                 if (na.input_register) |inreg| existing.input_register = inreg;
-                if (na.powerup_state) |powerup| existing.powerup_state = powerup;
+                if (na.init_state) |init_state| existing.init_state = init_state;
                 return;
             }
         }
@@ -573,7 +573,7 @@ pub const Design = struct {
             try writer.print("{s}=", .{ name });
             var first = true;
             for (self.pins.items) |pin_assignment| {
-                if (pin_assignment.powerup_state) |mc_state| {
+                if (pin_assignment.init_state) |mc_state| {
                     if (state == mc_state) {
                         if (first) {
                             first = false;
@@ -585,7 +585,7 @@ pub const Design = struct {
                 }
             }
             for (self.nodes.items) |node_assignment| {
-                if (node_assignment.powerup_state) |mc_state| {
+                if (node_assignment.init_state) |mc_state| {
                     if (state == mc_state) {
                         if (first) {
                             first = false;

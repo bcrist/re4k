@@ -66,7 +66,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
 
 pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
     try writer.expressionExpanded(@tagName(dev));
-    try writer.expressionExpanded("pt0_xor_sum");
+    try writer.expressionExpanded("pt0_xor");
 
     var default_disabled: ?u1 = null;
     var default_enabled: ?u1 = null;
@@ -112,11 +112,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             }
 
         } else {
-            try helper.err("Expected one xor fuse but found none!", .{}, dev, .{ .mcref = mcref });
+            try helper.err("Expected one pt0_xor fuse but found none!", .{}, dev, .{ .mcref = mcref });
         }
 
         while (diff_iter.next()) |fuse| {
-            try helper.err("Expected one xor fuse but found multiple: {}:{}", .{ fuse.row, fuse.col }, dev, .{ .mcref = mcref });
+            try helper.err("Expected one pt0_xor fuse but found multiple: {}:{}", .{ fuse.row, fuse.col }, dev, .{ .mcref = mcref });
         }
 
         try writer.close();

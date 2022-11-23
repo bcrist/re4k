@@ -95,10 +95,10 @@ var default_off: ?usize = null;
 var default_on: ?usize = null;
 
 pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    var oe_mux_rows = try helper.parseOEMuxRows(ta, pa, null);
+    var oe_src_rows = try parseOESourceRows(ta, pa, null);
 
     try writer.expressionExpanded(@tagName(dev));
-    try writer.expressionExpanded("pt4_oe");
+    try writer.expressionExpanded("pt4_output_enable");
 
     var iter = devices.pins.OutputIterator {
         .pins = dev.getPins(),
@@ -116,7 +116,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         diff.putRange(dev.getRoutingRange(), 0);
 
         // ignore rows that we already know are used for the OE mux in the I/O cell:
-        var oe_row_iter = oe_mux_rows.iterator(.{});
+        var oe_row_iter = oe_src_rows.iterator(.{});
         while (oe_row_iter.next()) |row| {
             diff.putRange(dev.getRowRange(@intCast(u16, row), @intCast(u16, row)), 0);
         }
@@ -173,4 +173,58 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     }
 
     try writer.done();
+}
+
+
+fn parseOESourceRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*DeviceType) !std.DynamicBitSet {
+    const input_file = helper.getInputFile("oe_source.sx") orelse return error.MissingOESourceInputFile;
+    const device = input_file.device;
+
+    var results = try std.DynamicBitSet.initEmpty(pa, device.getJedecHeight());
+
+    var stream = std.io.fixedBufferStream(input_file.contents);
+    var parser = sx.reader(ta, stream.reader());
+    defer parser.deinit();
+
+    parseOESourceRows0(&parser, &results) catch |e| switch (e) {
+        error.SExpressionSyntaxError => {
+            var ctx = try parser.getNextTokenContext();
+            try ctx.printForString(input_file.contents, std.io.getStdErr().writer(), 120);
+            return e;
+        },
+        else => return e,
+    };
+
+    if (out_device) |ptr| {
+        ptr.* = device;
+    }
+
+    return results;
+}
+
+fn parseOESourceRows0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), results: *std.DynamicBitSet) !void {
+    _ = try parser.requireAnyExpression(); // device name, we already know it
+    try parser.requireExpression("output_enable_source");
+
+    while (try helper.parsePin(parser, null)) {
+        while (try parser.expression("fuse")) {
+            var row = try parser.requireAnyInt(u16, 10);
+            _ = try parser.requireAnyInt(u16, 10);
+
+            if (try parser.expression("value")) {
+                try parser.ignoreRemainingExpression();
+            }
+
+            results.set(row);
+
+            try parser.requireClose(); // fuse
+        }
+        try parser.requireClose(); // pin
+    }
+    while (try parser.expression("value")) {
+        try parser.ignoreRemainingExpression();
+    }
+    try parser.requireClose(); // oe_source
+    try parser.requireClose(); // device
+    try parser.requireDone();
 }

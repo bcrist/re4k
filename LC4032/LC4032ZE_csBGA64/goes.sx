@@ -7,7 +7,7 @@
       (value 0 active_low)
       (value 1 active_high)
    )
-   (shared_ptoe_bus
+   (shared_pt_oe_bus
       (glb 0 (name A)
          (goe0 (fuse 73 171))
          (goe1 (fuse 74 171))

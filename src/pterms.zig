@@ -56,7 +56,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
         try design.nodeAssignment(.{
             .signal = signal_name,
             .glb = mcref.glb,
-            .powerup_state = 0,
+            .init_state = 0,
         });
         try design.addPT(.{}, d_name);
         try design.addPT(.{ "x0", "pt1" }, ar_name);
@@ -67,7 +67,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
         .signal = "out",
         .glb = mcref.glb,
         .mc = mcref.mc,
-        .powerup_state = 0,
+        .init_state = 0,
     });
     try design.addPT(.{}, "out.D");
     try design.addPT("pt1", "out.C");
@@ -178,7 +178,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         try writer.int(gi, 10);
         try writer.expression("row");
         try writer.int(gi * 2, 10);
-        try writer.string("non-inverted");
+        try writer.string("normal");
         try writer.close(); // row
         try writer.expression("row");
         try writer.int(gi * 2 + 1, 10);
@@ -298,23 +298,19 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
             try writer.expression("column");
             try writer.int(binit, 10);
-            try writer.string("Shared PT Init");
+            try writer.string("shared_pt_init");
             try writer.close();
 
             try writer.expression("column");
             try writer.int(bclk, 10);
-            try writer.string("Shared PT Clock");
+            try writer.string("shared_pt_clk");
             try writer.close();
 
             var boe = bclk + bclk - binit;
 
             try writer.expression("column");
             try writer.int(boe, 10);
-            if (dev.getFamily() == .zero_power_enhanced) {
-                try writer.string("Shared PT OE / BIE");
-            } else {
-                try writer.string("Shared PT OE");
-            }
+            try writer.string("shared_pt_enable");
             try writer.close();
 
             if (assigned_columns.isSet(binit)) {

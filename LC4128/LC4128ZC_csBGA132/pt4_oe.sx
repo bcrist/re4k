@@ -1,5 +1,5 @@
 (LC4128ZC_csBGA132
-   (pt4_oe
+   (pt4_output_enable
       (pin C7 (glb 0 (name A)) (mc 0) (oe 0) (fuse 84 578))
       (pin A6 (glb 0 (name A)) (mc 1) (fuse 84 579))
       (pin A3 (glb 0 (name A)) (mc 10) (fuse 84 628))

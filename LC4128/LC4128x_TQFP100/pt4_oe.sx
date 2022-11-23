@@ -1,5 +1,5 @@
 (LC4128x_TQFP100
-   (pt4_oe
+   (pt4_output_enable
       (pin 3 (glb 1 (name B)) (mc 0) (fuse 84 661))
       (pin 4 (glb 1 (name B)) (mc 2) (fuse 84 671))
       (pin 5 (glb 1 (name B)) (mc 4) (fuse 84 681))

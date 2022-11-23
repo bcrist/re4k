@@ -56,7 +56,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             const pp_value = results_pp.jedec.get(fuse);
             if (default_pp) |def| {
                 if (pp_value != def) {
-                    try helper.writeValue(writer, pp_value, "push-pull");
+                    try helper.writeValue(writer, pp_value, "push_pull");
                 }
             } else {
                 default_pp = pp_value;
@@ -65,7 +65,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             const od_value = results_od.jedec.get(fuse);
             if (default_od) |def| {
                 if (od_value != def) {
-                    try helper.writeValue(writer, od_value, "open-drain");
+                    try helper.writeValue(writer, od_value, "open_drain");
                 }
             } else {
                 default_od = od_value;
@@ -85,11 +85,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     }
 
     if (default_pp) |def| {
-        try helper.writeValue(writer, def, "push-pull");
+        try helper.writeValue(writer, def, "push_pull");
     }
 
     if (default_od) |def| {
-        try helper.writeValue(writer, def, "open-drain");
+        try helper.writeValue(writer, def, "open_drain");
     }
 
     try writer.done();

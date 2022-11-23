@@ -275,47 +275,6 @@ pub fn writeFuseOptValue(writer: anytype, fuse: Fuse, value: usize) !void {
     try writer.close();
 }
 
-pub fn parseClusterUsage(ta: std.mem.Allocator, glb: u8, report: []const u8, mc: u8) !std.StaticBitSet(16) {
-    var cluster_usage = std.StaticBitSet(16).initEmpty();
-    const header = try std.fmt.allocPrint(ta, "GLB_{s}_CLUSTER_TABLE", .{ devices.getGlbName(glb) });
-    if (extract(report, header, "<Note>")) |raw| {
-        var line_iter = std.mem.tokenize(u8, raw, "\r\n");
-        while (line_iter.next()) |line| {
-            if (line[0] != 'M') {
-                continue; // ignore remaining header/footer lines
-            }
-
-            var line_mc = try std.fmt.parseInt(u8, line[1..3], 10);
-            if (line_mc == mc) {
-                cluster_usage.setValue(0,  isClusterUsed(line[4]));
-                cluster_usage.setValue(1,  isClusterUsed(line[5]));
-                cluster_usage.setValue(2,  isClusterUsed(line[6]));
-                cluster_usage.setValue(3,  isClusterUsed(line[7]));
-                cluster_usage.setValue(4,  isClusterUsed(line[9]));
-                cluster_usage.setValue(5,  isClusterUsed(line[10]));
-                cluster_usage.setValue(6,  isClusterUsed(line[11]));
-                cluster_usage.setValue(7,  isClusterUsed(line[12]));
-                cluster_usage.setValue(8,  isClusterUsed(line[14]));
-                cluster_usage.setValue(9,  isClusterUsed(line[15]));
-                cluster_usage.setValue(10, isClusterUsed(line[16]));
-                cluster_usage.setValue(11, isClusterUsed(line[17]));
-                cluster_usage.setValue(12, isClusterUsed(line[19]));
-                cluster_usage.setValue(13, isClusterUsed(line[20]));
-                cluster_usage.setValue(14, isClusterUsed(line[21]));
-                cluster_usage.setValue(15, isClusterUsed(line[22]));
-            }
-        }
-    }
-    return cluster_usage;
-}
-
-fn isClusterUsed(report_value: u8) bool {
-    return switch (report_value) {
-        '0'...'5' => true,
-        else => false,
-    };
-}
-
 pub fn parseGRP(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*DeviceType) !std.AutoHashMap(Fuse, GlbInputSignal) {
     const input_file = getInputFile("grp.sx") orelse return error.MissingGRPInputFile;
     const device = input_file.device;
@@ -411,7 +370,7 @@ fn parseGRP0(
     try parser.requireDone();
 }
 
-fn parseGlb(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader)) !?u8 {
+pub fn parseGlb(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader)) !?u8 {
     if (try parser.expression("glb")) {
         var parsed_glb = try parser.requireAnyInt(u8, 10);
         if (try parser.expression("name")) {
@@ -422,7 +381,7 @@ fn parseGlb(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader)) !?u
         return null;
     }
 }
-fn requireGlb(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader)) !u8 {
+pub fn requireGlb(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader)) !u8 {
     try parser.requireExpression("glb");
     var parsed_glb = try parser.requireAnyInt(u8, 10);
     if (try parser.expression("name")) {
@@ -460,7 +419,7 @@ pub fn parseMCOptionsColumns(ta: std.mem.Allocator, pa: std.mem.Allocator, out_d
 
 fn parseMCOptionsColumns0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), device: DeviceType, results: *std.AutoHashMap(MacrocellRef, FuseRange)) !void {
     _ = try parser.requireAnyExpression(); // device name, we already know it
-    try parser.requireExpression("invert_sum");
+    try parser.requireExpression("invert");
 
     var options_range = device.getOptionsRange();
 
@@ -494,7 +453,7 @@ fn parseMCOptionsColumns0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8
 }
 
 pub fn parseORMRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*DeviceType) !std.DynamicBitSet {
-    const input_file = getInputFile("orm.sx") orelse return error.MissingORMInputFile;
+    const input_file = getInputFile("output_routing.sx") orelse return error.MissingORMInputFile;
     const device = input_file.device;
 
     var results = try std.DynamicBitSet.initEmpty(pa, device.getJedecHeight());
@@ -521,7 +480,7 @@ pub fn parseORMRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*
 
 fn parseORMRows0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), results: *std.DynamicBitSet) !void {
     _ = try parser.requireAnyExpression(); // device name, we already know it
-    try parser.requireExpression("output_routing_mux");
+    try parser.requireExpression("output_routing");
 
     while (try parsePin(parser, null)) {
         while (try parser.expression("fuse")) {
@@ -546,7 +505,7 @@ fn parseORMRows0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader)
     try parser.requireDone();
 }
 
-fn parsePin(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), out: ?*std.ArrayList(u8)) !bool {
+pub fn parsePin(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), out: ?*std.ArrayList(u8)) !bool {
     if (try parser.expression("pin")) {
         const pin_number = try parser.requireAnyString();
         if (out) |o| {
@@ -578,118 +537,6 @@ fn parsePin(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), out
     } else {
         return false;
     }
-}
-
-pub fn parseClusterSteeringRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*DeviceType) !std.DynamicBitSet {
-    const input_file = getInputFile("cluster_steering.sx") orelse return error.MissingClusterSteeringInputFile;
-    const device = input_file.device;
-
-    var results = try std.DynamicBitSet.initEmpty(pa, device.getJedecHeight());
-
-    var stream = std.io.fixedBufferStream(input_file.contents);
-    var parser = sx.reader(ta, stream.reader());
-    defer parser.deinit();
-
-    parseClusterSteeringRows0(&parser, &results) catch |e| switch (e) {
-        error.SExpressionSyntaxError => {
-            var ctx = try parser.getNextTokenContext();
-            try ctx.printForString(input_file.contents, std.io.getStdErr().writer(), 120);
-            return e;
-        },
-        else => return e,
-    };
-
-    if (out_device) |ptr| {
-        ptr.* = device;
-    }
-
-    return results;
-}
-
-fn parseClusterSteeringRows0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), results: *std.DynamicBitSet) !void {
-    _ = try parser.requireAnyExpression(); // device name, we already know it
-    try parser.requireExpression("cluster_steering");
-
-    while (try parseGlb(parser)) |_| {
-        while (try parser.expression("mc")) {
-            _ = try parser.requireAnyInt(u16, 10);
-
-            while (try parser.expression("fuse")) {
-                var row = try parser.requireAnyInt(u16, 10);
-                _ = try parser.requireAnyInt(u16, 10);
-
-                if (try parser.expression("value")) {
-                    try parser.ignoreRemainingExpression();
-                }
-
-                results.set(row);
-
-                try parser.requireClose(); // fuse
-            }
-
-            try parser.requireClose(); // mc
-        }
-        try parser.requireClose(); // glb
-    }
-    while (try parser.expression("value")) {
-        try parser.ignoreRemainingExpression();
-    }
-    try parser.requireClose(); // cluster_steering
-    try parser.requireClose(); // device
-    try parser.requireDone();
-}
-
-pub fn parseOEMuxRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*DeviceType) !std.DynamicBitSet {
-    const input_file = getInputFile("oe_mux.sx") orelse return error.MissingOEMuxInputFile;
-    const device = input_file.device;
-
-    var results = try std.DynamicBitSet.initEmpty(pa, device.getJedecHeight());
-
-    var stream = std.io.fixedBufferStream(input_file.contents);
-    var parser = sx.reader(ta, stream.reader());
-    defer parser.deinit();
-
-    parseOEMuxRows0(&parser, &results) catch |e| switch (e) {
-        error.SExpressionSyntaxError => {
-            var ctx = try parser.getNextTokenContext();
-            try ctx.printForString(input_file.contents, std.io.getStdErr().writer(), 120);
-            return e;
-        },
-        else => return e,
-    };
-
-    if (out_device) |ptr| {
-        ptr.* = device;
-    }
-
-    return results;
-}
-
-fn parseOEMuxRows0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), results: *std.DynamicBitSet) !void {
-    _ = try parser.requireAnyExpression(); // device name, we already know it
-    try parser.requireExpression("oe_mux");
-
-    while (try parsePin(parser, null)) {
-        while (try parser.expression("fuse")) {
-            var row = try parser.requireAnyInt(u16, 10);
-            _ = try parser.requireAnyInt(u16, 10);
-
-            if (try parser.expression("value")) {
-                try parser.ignoreRemainingExpression();
-            }
-
-            results.set(row);
-
-            try parser.requireClose(); // fuse
-        }
-        try parser.requireClose(); // pin
-    }
-    while (try parser.expression("value")) {
-        try parser.ignoreRemainingExpression();
-    }
-    try parser.requireClose(); // oe_mux
-    try parser.requireClose(); // device
-    try parser.requireDone();
 }
 
 pub fn parseSharedPTClockPolarityFuses(ta: std.mem.Allocator, pa: std.mem.Allocator, dev: DeviceType) ![]Fuse {
