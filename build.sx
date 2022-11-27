@@ -26,7 +26,7 @@
     (exe async_source)
     (exe clock_source)
     (exe ce_source)
-    (exe reg_type)
+    (exe mc_func)
     (exe init_state)
     (exe output_routing)
     (exe output_routing_mode)

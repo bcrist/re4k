@@ -46,6 +46,10 @@ rule invert
     command = zig-out/bin/invert.exe $out $in
 build $dev/invert.sx: invert
 
+rule mc_func
+    command = zig-out/bin/mc_func.exe $out $in
+build $dev/mc_func.sx: mc_func
+
 rule oe_source
     command = zig-out/bin/oe_source.exe $out $in
 build $dev/oe_source.sx: oe_source
@@ -73,10 +77,6 @@ build $dev/pterms.sx: pterms $dev\grp.sx
 rule pull
     command = zig-out/bin/pull.exe $out $in
 build $dev/pull.sx: pull
-
-rule reg_type
-    command = zig-out/bin/reg_type.exe $out $in
-build $dev/reg_type.sx: reg_type
 
 rule shared_pt_clk_polarity
     command = zig-out/bin/shared_pt_clk_polarity.exe $out $in
@@ -106,7 +106,7 @@ rule zerohold
     command = zig-out/bin/zerohold.exe $out $in
 build $dev/zerohold.sx: zerohold
 
-build LC4128\LC4128x_TQFP128.sx: combine $dev/async_source.sx $dev/bclk_polarity.sx $dev/ce_source.sx $dev/clock_source.sx $dev/cluster_routing.sx $dev/drive.sx $dev/goes.sx $dev/grp.sx $dev/init_source.sx $dev/init_state.sx $dev/invert.sx $dev/oe_source.sx $dev/output_routing.sx $dev/output_routing_mode.sx $dev/pt0_xor.sx $dev/pt4_oe.sx $dev/pterms.sx $dev/pull.sx $dev/reg_type.sx $dev/shared_pt_clk_polarity.sx $dev/shared_pt_init_polarity.sx $dev/slew.sx $dev/threshold.sx $dev/wide_routing.sx $dev/xor.sx $dev/zerohold.sx
+build LC4128\LC4128x_TQFP128.sx: combine $dev/async_source.sx $dev/bclk_polarity.sx $dev/ce_source.sx $dev/clock_source.sx $dev/cluster_routing.sx $dev/drive.sx $dev/goes.sx $dev/grp.sx $dev/init_source.sx $dev/init_state.sx $dev/invert.sx $dev/mc_func.sx $dev/oe_source.sx $dev/output_routing.sx $dev/output_routing_mode.sx $dev/pt0_xor.sx $dev/pt4_oe.sx $dev/pterms.sx $dev/pull.sx $dev/shared_pt_clk_polarity.sx $dev/shared_pt_init_polarity.sx $dev/slew.sx $dev/threshold.sx $dev/wide_routing.sx $dev/xor.sx $dev/zerohold.sx
 build build-LC4128x_TQFP128: phony LC4128\LC4128x_TQFP128.sx
 
 ## ######################### END OF GENERATED CODE ######################### ##

@@ -14,14 +14,7 @@ pub fn main() void {
     helper.main(0);
 }
 
-const MacrocellType = enum {
-    combinational,
-    latch,
-    t_ff,
-    d_ff,
-};
-
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: common.MacrocellRef, reg_type: MacrocellType) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: common.MacrocellRef, func: common.MacrocellFunction) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
     try design.nodeAssignment(.{
@@ -30,7 +23,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, m
         .mc = mcref.mc,
     });
 
-    switch (reg_type) {
+    switch (func) {
         .combinational => {
             try design.addPT("in", "out");
         },
@@ -49,30 +42,30 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, m
     }
 
     var results = try tc.runToolchain(design);
-    try helper.logResults("reg_type_glb{}_mc{}_{s}", .{ mcref.glb, mcref.mc, @tagName(reg_type) }, results);
+    try helper.logResults("mc_func_glb{}_mc{}_{s}", .{ mcref.glb, mcref.mc, @tagName(func) }, results);
     try results.checkTerm();
     return results;
 }
 
-var defaults = std.EnumMap(MacrocellType, usize) {};
+var defaults = std.EnumMap(common.MacrocellFunction, usize) {};
 
 pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
     try writer.expressionExpanded(@tagName(dev.device));
-    try writer.expressionExpanded("register_type");
+    try writer.expressionExpanded("macrocell_function");
 
     var mc_iter = helper.MacrocellIterator { .dev = dev };
     while (mc_iter.next()) |mcref| {
         try tc.cleanTempDir();
         helper.resetTemp();
 
-        var data = std.EnumMap(MacrocellType, JedecData) {};
-        for (std.enums.values(MacrocellType)) |reg_type| {
+        var data = std.EnumMap(common.MacrocellFunction, JedecData) {};
+        for (std.enums.values(common.MacrocellFunction)) |reg_type| {
             var results = try runToolchain(ta, tc, dev, mcref, reg_type);
             data.put(reg_type, results.jedec);
         }
 
         var diff = try JedecData.initEmpty(ta, dev.jedec_dimensions);
-        for (&[_]MacrocellType { .d_ff, .t_ff }) |reg_type| {
+        for (&[_]common.MacrocellFunction { .d_ff, .t_ff }) |reg_type| {
             diff.unionDiff(data.get(reg_type).?, data.get(.latch).?);
         }
 
@@ -85,13 +78,13 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
 
         try helper.writeMc(writer, mcref.mc);
 
-        var values = std.EnumMap(MacrocellType, usize) {};
+        var values = std.EnumMap(common.MacrocellFunction, usize) {};
         var bit_value: usize = 1;
         var diff_iter = diff.iterator(.{});
         while (diff_iter.next()) |fuse| {
             try helper.writeFuseOptValue(writer, fuse, bit_value);
 
-            for (std.enums.values(MacrocellType)) |reg_type| {
+            for (std.enums.values(common.MacrocellFunction)) |reg_type| {
                 if (data.get(reg_type).?.isSet(fuse)) {
                     values.put(reg_type, (values.get(reg_type) orelse 0) + bit_value);
                 }
@@ -101,10 +94,10 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         }
 
         if (diff.countSet() != 2) {
-            try helper.err("Expected two reg_type fuses but found {}!", .{ diff.countSet() }, dev, .{ .mcref = mcref });
+            try helper.err("Expected two macrocell function fuses but found {}!", .{ diff.countSet() }, dev, .{ .mcref = mcref });
         }
 
-        for (std.enums.values(MacrocellType)) |reg_type| {
+        for (std.enums.values(common.MacrocellFunction)) |reg_type| {
             const value = values.get(reg_type) orelse 0;
             if (defaults.get(reg_type)) |default| {
                 if (value != default) {
@@ -122,7 +115,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         }
     }
 
-    for (std.enums.values(MacrocellType)) |reg_type| {
+    for (std.enums.values(common.MacrocellFunction)) |reg_type| {
         if (defaults.get(reg_type)) |default| {
             try helper.writeValue(writer, default, reg_type);
         }

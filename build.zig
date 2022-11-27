@@ -239,6 +239,17 @@ pub fn build(b: *std.build.Builder) void {
         lc4064_test.install();
         _ = makeRunStep(b, lc4064_test, "lc4064_test", "run lc4064_test");
 
+        const mc_func = b.addExecutable("mc_func", "src/mc_func.zig");
+        mc_func.addPackage(common);
+        mc_func.addPackage(jed_file);
+        mc_func.addPackage(jedec);
+        mc_func.addPackage(sx);
+        mc_func.addPackage(temp_allocator);
+        mc_func.setTarget(target);
+        mc_func.setBuildMode(mode);
+        mc_func.install();
+        _ = makeRunStep(b, mc_func, "mc_func", "run mc_func");
+
         const oe_source = b.addExecutable("oe_source", "src/oe_source.zig");
         oe_source.addPackage(common);
         oe_source.addPackage(jed_file);
@@ -337,17 +348,6 @@ pub fn build(b: *std.build.Builder) void {
         pull.setBuildMode(mode);
         pull.install();
         _ = makeRunStep(b, pull, "pull", "run pull");
-
-        const reg_type = b.addExecutable("reg_type", "src/reg_type.zig");
-        reg_type.addPackage(common);
-        reg_type.addPackage(jed_file);
-        reg_type.addPackage(jedec);
-        reg_type.addPackage(sx);
-        reg_type.addPackage(temp_allocator);
-        reg_type.setTarget(target);
-        reg_type.setBuildMode(mode);
-        reg_type.install();
-        _ = makeRunStep(b, reg_type, "reg_type", "run reg_type");
 
         const shared_pt_clk_polarity = b.addExecutable("shared_pt_clk_polarity", "src/shared_pt_clk_polarity.zig");
         shared_pt_clk_polarity.addPackage(common);

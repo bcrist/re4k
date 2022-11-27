@@ -50,7 +50,7 @@ local jobs = {
     async_source            = {},
     clock_source            = {},
     ce_source               = {},
-    reg_type                = {},
+    mc_func                 = {},
     init_state              = {},
     output_routing          = {},
     output_routing_mode     = { device_predicate = non_ZE_only },
