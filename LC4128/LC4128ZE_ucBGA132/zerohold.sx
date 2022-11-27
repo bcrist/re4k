@@ -1,0 +1,7 @@
+(LC4128ZE_ucBGA132
+   (zero_hold_time
+      (fuse 87 101)
+      (value 1 disabled)
+      (value 0 enabled)
+   )
+)

@@ -2,11 +2,11 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const core = @import("core.zig");
-const jedec = @import("jedec.zig");
-const devices = @import("devices.zig");
+const common = @import("common");
+const jedec = @import("jedec");
+const device_info = @import("device_info.zig");
 const JedecData = jedec.JedecData;
-const DeviceType = devices.DeviceType;
+const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const Fuse = jedec.Fuse;
@@ -16,7 +16,7 @@ pub fn main() void {
     helper.main(1);
 }
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: core.MacrocellRef) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: common.MacrocellRef) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
     // Coercing the fitter to reliably place specific signals on the block init and block OE pterms is difficult.
@@ -33,18 +33,18 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
 
     try design.pinAssignment(.{
         .signal = "x0",
-        .pin_index = dev.getClockPin(0).?.pin_index,
+        .pin = dev.getClockPin(0).?.id,
     });
     try design.pinAssignment(.{
         .signal = "pt2",
-        .pin_index = dev.getClockPin(2).?.pin_index,
+        .pin = dev.getClockPin(2).?.id,
     });
     try design.pinAssignment(.{
         .signal = "pt1",
-        .pin_index = (devices.pins.OutputIterator {
-            .pins = dev.getPins(),
+        .pin = (helper.OutputIterator {
+            .pins = dev.all_pins,
             .single_glb = scratch_glb,
-        }).next().?.pin_index,
+        }).next().?.id,
     });
 
     var n: u8 = 0;
@@ -89,7 +89,7 @@ const RoutingType = enum {
     block_init,
 };
 
-fn parseJedecColumn(jed: JedecData, column: u16, device: DeviceType, glb: u8, gi_routing: std.AutoHashMap(Fuse, GlbInputSignal)) !RoutingType {
+fn parseJedecColumn(jed: JedecData, column: u16, dev: *const DeviceInfo, glb: u8, gi_routing: std.AutoHashMap(Fuse, GlbInputSignal)) !RoutingType {
     var routing = RoutingType.none;
 
     var row: u8 = 0;
@@ -101,7 +101,7 @@ fn parseJedecColumn(jed: JedecData, column: u16, device: DeviceType, glb: u8, gi
         var gi = row / 2;
 
         var gi_signal: ?GlbInputSignal = null;
-        var fuse_iter = device.getGIRange(glb, gi).iterator();
+        var fuse_iter = dev.getGIRange(glb, gi).iterator();
         var found_gi_fuse = false;
         while (fuse_iter.next()) |fuse| {
             if (!jed.isSet(fuse)) {
@@ -113,43 +113,39 @@ fn parseJedecColumn(jed: JedecData, column: u16, device: DeviceType, glb: u8, gi
         }
 
         if ((row & 1) == 1 and jed.isSet(Fuse.init(row - 1, column))) {
-            try helper.err("Expected PT fuses on even rows only, buf found fuse {}:{} {any}!", .{ row, column, gi_signal }, device, .{});
+            try helper.err("Expected PT fuses on even rows only, buf found fuse {}:{} {any}!", .{ row, column, gi_signal }, dev, .{});
         }
 
         if (gi_signal) |signal| {
             switch (signal) {
-                .pin => |pin_index| {
-                    switch (device.getPins()[pin_index]) {
-                        .clock_input => |clock_info| {
-                            switch (clock_info.clock_index) {
-                                0 => {
-                                    routing = switch (routing) {
-                                        .none => .x0,
-                                        .pt1 => .block_init,
-                                        .pt2 => .block_clk,
-                                        else => .unknown,
-                                    };
-                                },
-                                2 => {
-                                    routing = switch (routing) {
-                                        .none => .pt2,
-                                        .x0 => .block_clk,
-                                        else => .unknown,
-                                    };
-                                },
-                                else => {
-                                    routing = .unknown;
-                                }
-                            }
-                        },
-                        else => {
+                .pin => |id| switch (dev.getPin(id).?.func) {
+                    .clock => |clk_index| switch (clk_index) {
+                        0 => {
                             routing = switch (routing) {
-                                .none => .pt1,
-                                .x0 => .block_init,
+                                .none => .x0,
+                                .pt1 => .block_init,
+                                .pt2 => .block_clk,
                                 else => .unknown,
                             };
+                        },
+                        2 => {
+                            routing = switch (routing) {
+                                .none => .pt2,
+                                .x0 => .block_clk,
+                                else => .unknown,
+                            };
+                        },
+                        else => {
+                            routing = .unknown;
                         }
-                    }
+                    },
+                    else => {
+                        routing = switch (routing) {
+                            .none => .pt1,
+                            .x0 => .block_init,
+                            else => .unknown,
+                        };
+                    },
                 },
                 .fb => {
                     routing = .unknown;
@@ -164,13 +160,13 @@ fn parseJedecColumn(jed: JedecData, column: u16, device: DeviceType, glb: u8, gi
     return routing;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
     var gi_routing = try helper.parseGRP(ta, pa, null);
 
-    try writer.expressionExpanded(@tagName(dev));
+    try writer.expressionExpanded(@tagName(dev.device));
     try writer.expressionExpanded("product_terms");
 
-    var assigned_columns = try std.DynamicBitSet.initEmpty(pa, dev.getJedecWidth());
+    var assigned_columns = try std.DynamicBitSet.initEmpty(pa, dev.jedec_dimensions.width());
 
     var gi: u8 = 0;
     while (gi < 36) : (gi += 1) {
@@ -187,7 +183,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         try writer.close(); // gi
     }
 
-    var mc_iter = core.MacrocellIterator { .device = dev };
+    var mc_iter = helper.MacrocellIterator { .dev = dev };
     while (mc_iter.next()) |mcref| {
         try tc.cleanTempDir();
         helper.resetTemp();
@@ -203,7 +199,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
         results.jedec.putRange(dev.getOptionsRange(), 1);
 
-        var columns = try std.DynamicBitSet.initEmpty(ta, dev.getJedecWidth());
+        var columns = try std.DynamicBitSet.initEmpty(ta, dev.jedec_dimensions.width());
 
         var fuse_iter = results.jedec.iterator(.{ .kind = .unset });
         while (fuse_iter.next()) |fuse| {
@@ -212,7 +208,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
         {
             var glb: u8 = 0;
-            while (glb < dev.getNumGlbs()) : (glb += 1) {
+            while (glb < dev.num_glbs) : (glb += 1) {
                 var iter = dev.getGIRange(glb, 0).iterator();
                 while (iter.next()) |fuse| {
                     columns.unset(fuse.col);

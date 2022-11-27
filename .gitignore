@@ -29,6 +29,3 @@ LCIEdit.dum
 fp-info-cache
 *.kicad_*-bak
 *.bak
-
-# Old stuff
-.lc4032ze/

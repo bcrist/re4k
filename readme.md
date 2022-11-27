@@ -4,11 +4,15 @@ This repo contains reverse-engineered fusemaps for most of the commonly availabl
 
 Data is provided in text files containing machine and human readable S-Expressions describing the fuse locations that
 control each feature.  These are intended to be used to generate libraries so that CPLD configurations can be created
-using whatever programming language is desired.
+using whatever programming language is desired.  Existing libraries include:
+
+* [Zig-LC4k](https://github.com/bcrist/Zig-LC4k)
+
+If you build a library/bindings for another language, let me know so I can list it here!
 
 ## Device List
 
-|            |TQFP44|TQFP48|TQFP100|TQFP128|TQFP144|csBGA56|csBGA64|csBGA132|csBGA144|ucBGA64|ucBGA144|
+|            |TQFP44|TQFP48|TQFP100|TQFP128|TQFP144|csBGA56|csBGA64|csBGA132|csBGA144|ucBGA64|ucBGA132|
 |:-----------|:----:|:----:|:-----:|:-----:|:-----:|:-----:|:-----:|:------:|:------:|:-----:|:------:|
 |LC4032V/B/C | ✔️    | ✔️    |       |       |       |       |       |        |        |       |        |
 |LC4032ZC    |      | ✔️    |       |       |       | ✔️     |       |        |        |       |        |
@@ -42,7 +46,7 @@ Product Term: Up to 36 signals (or their complements) ANDed together.
 #### MC
 Macrocell: A single flip-flop or combinational logic "output".
 
-### MC Slice
+#### MC Slice
 Macrocell Slice: A 5-PT cluster, macrocell, routing logic, and I/O cell.  Each GLB contains 16 MC Slices, along with the 3 shared PTs, BCLK and GI configuration.
 
 #### ORM
@@ -84,15 +88,6 @@ fuses, and global configuration.  This area is logically much larger than necess
 program them to 0 will have no effect and they will always read back as 1.  Each macrocell slice is controlled mostly by fuses in one specific
 column, and pairs of macrocell slices are grouped together, so overall there will be 2 columns used, then 8 columns unused, then 2 more used
 columns, etc.
-
-# TODO
-* Bitstream configuration through zig
-* Bitstream decompilation
-* Hardware verification
-    * What happens if both GLB's PTOE/BIE are routed to the same GOE?  assuming they are summed, but should check with hardware.  I don't think the fitter will allow this config.
-    * Why are there two fuses to enable the OSCTIMER? what happens if only one is enabled?
-    * Can you use input register feedback on MCs that aren't connected to pins?
-    * What happens if you violate the one-cold rule for GIs fuses?
 
 
 ## Bus Termination Options
@@ -216,3 +211,18 @@ To be safe, it's probably best not to use the F8 input at all.
 Most designs probably aren't affected by this, and even with a misconfigured input threshold, a lot of designs will probably still work fine as
 long as the signal's not too noisy.  So it's not too surprising to me that a bug like this could exist in the fitter and never be discovered or
 fixed.
+
+### Fitter Report missing GI data
+For LC4064ZC_csBGA56, the second column (GIs 18-35) doesn't always show up in the fitter GI summary.  For some other devices, "input only" pins
+are incorrectly listed as sourced from a macrocell feedback signal.  e.g. for LC4128ZC_TQFP100, pin 12's source is listed as "mc B-11", but the
+GI mux fuse that's set is one of the ones corresponding to pin 16 in LC4128V_TQFP144; which is MC B14 and ORP B^11 in that device. So it seems
+the fitter is writing the I/O cell's ID in this case, rather than the actual pin number.
+
+# TODO
+* Hardware experiments
+    * Why are there two fuses to enable the OSCTIMER? what happens if only one is enabled? (or none, but divider/outputs are enabled)
+    * Do OSCTIMER outputs only replace the GRP feedback signals when enabled, or also the signal that goes to the ORM?
+    * Can you use input register feedback on MCs that aren't connected to pins? (e.g. LC4064x TQFP48)
+    * Can you use an input register MC with the ORM to have the register output directly on a different pin without going through the GRP?
+    * What happens if you violate the one-cold rule for GI fuses?
+    * What happens if you violate the one-cold rule for the PT OE internal bus?

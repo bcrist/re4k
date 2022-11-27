@@ -1,18 +1,18 @@
 const root = @import("root");
 const std = @import("std");
-const core = @import("core.zig");
+const common = @import("common");
 const sx = @import("sx");
-const jedec = @import("jedec.zig");
+const jedec = @import("jedec");
 const toolchain = @import("toolchain.zig");
-const devices = @import("devices.zig");
+const device_info = @import("device_info.zig");
 const TempAllocator = @import("temp_allocator");
-const DeviceType = devices.DeviceType;
+const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Fuse = jedec.Fuse;
 const FuseRange = jedec.FuseRange;
 const JedecData = jedec.JedecData;
 const GlbInputSignal = toolchain.GlbInputSignal;
-const MacrocellRef = core.MacrocellRef;
+const MacrocellRef = common.MacrocellRef;
 
 pub fn main() void {
     run() catch unreachable; //catch |e| {
@@ -34,7 +34,7 @@ fn run() !void {
     const out_dir_path = std.fs.path.dirname(out_path) orelse return error.InvalidOutputPath;
     const out_filename = std.fs.path.basename(out_path);
     const device_str = out_filename[0..out_filename.len - std.fs.path.extension(out_filename).len];
-    const device = DeviceType.parse(device_str) orelse return error.InvalidDevice;
+    const device_type = common.DeviceType.parse(device_str) orelse return error.InvalidDevice;
 
     var out_dir = try std.fs.cwd().makeOpenPath(out_dir_path, .{});
     defer out_dir.close();
@@ -45,15 +45,15 @@ fn run() !void {
     var writer = sx.writer(pa, atf.file.writer());
     defer writer.deinit();
 
-    try writer.expressionExpanded(@tagName(device));
+    try writer.expressionExpanded(@tagName(device_type));
 
-    var fuses = try device.initJedecZeroes(pa);
+    var fuses = try JedecData.initEmpty(pa, DeviceInfo.init(device_type).jedec_dimensions);
 
     while (args.next()) |in_path| {
         const in_dir_path = std.fs.path.dirname(in_path) orelse return error.InvalidInputPath;
         const in_device_str = std.fs.path.basename(in_dir_path);
-        const in_device = DeviceType.parse(in_device_str) orelse return error.InvalidDevice;
-        if (in_device != device) return error.WrongDevice;
+        const in_device_type = common.DeviceType.parse(in_device_str) orelse return error.InvalidDevice;
+        if (in_device_type != device_type) return error.WrongDevice;
 
         var f = try std.fs.cwd().openFile(in_path, .{});
         defer f.close();
@@ -61,7 +61,7 @@ fn run() !void {
         var reader = sx.reader(pa, f.reader());
         defer reader.deinit();
 
-        if (try reader.expression(@tagName(device))) {
+        if (try reader.expression(@tagName(device_type))) {
             var depth: i64 = 0;
             while (!try reader.done()) {
                 writer.setCompact(try reader.isCompact());

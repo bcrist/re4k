@@ -2,14 +2,16 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const jedec = @import("jedec.zig");
-const core = @import("core.zig");
-const devices = @import("devices.zig");
-const DeviceType = devices.DeviceType;
+const jedec = @import("jedec");
+const common = @import("common");
+const device_info = @import("device_info.zig");
+const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
 const Fuse = jedec.Fuse;
+const InputIterator = helper.InputIterator;
+const OutputIterator = helper.OutputIterator;
 
 pub fn main() void {
     helper.main(1);
@@ -20,47 +22,47 @@ const Polarity = enum {
     negative,
 };
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, oe0: Polarity, oe1: Polarity, use_goe_pins: bool) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, oe0: Polarity, oe1: Polarity, use_goe_pins: bool) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
     if (use_goe_pins) {
         try design.pinAssignment(.{
             .signal = "oe0",
-            .pin_index = dev.getOEPin(0).pin_index,
+            .pin = dev.oe_pins[0].id,
         });
         try design.pinAssignment(.{
             .signal = "oe1",
-            .pin_index = dev.getOEPin(1).pin_index,
+            .pin = dev.oe_pins[1].id,
         });
     } else {
-        var pin_iter = devices.pins.InputIterator {
-            .pins = dev.getPins(),
+        var pin_iter = InputIterator {
+            .pins = dev.all_pins,
             .exclude_glb = 0,
             .exclude_oes = true,
         };
         try design.pinAssignment(.{
             .signal = "oe0",
-            .pin_index = pin_iter.next().?.pin_index(),
+            .pin = pin_iter.next().?.id,
         });
         try design.pinAssignment(.{
             .signal = "oe1",
-            .pin_index = pin_iter.next().?.pin_index(),
+            .pin = pin_iter.next().?.id,
         });
     }
 
-    var pin_iter = devices.pins.OutputIterator {
-        .pins = dev.getPins(),
+    var pin_iter = OutputIterator {
+        .pins = dev.all_pins,
         .single_glb = 0,
         .exclude_oes = true,
     };
     var n: u1 = 0;
-    while (pin_iter.next()) |io| {
-        var oe_signal_name = try std.fmt.allocPrint(ta, "out{}.OE", .{ io.pin_index });
+    while (pin_iter.next()) |pin| {
+        var oe_signal_name = try std.fmt.allocPrint(ta, "out{s}.OE", .{ pin.id });
         const signal_name = oe_signal_name[0..oe_signal_name.len-3];
 
         try design.pinAssignment(.{
             .signal = signal_name,
-            .pin_index = io.pin_index,
+            .pin = pin.id,
         });
 
         try design.addPT(.{ "x1", "x2" }, signal_name);
@@ -95,10 +97,10 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, oe0: Pol
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
     const sptclk_polarity_fuses = try helper.parseSharedPTClockPolarityFuses(ta, pa, dev);
 
-    try writer.expressionExpanded(@tagName(dev));
+    try writer.expressionExpanded(@tagName(dev.device));
     try writer.expressionExpanded("goe_polarity");
 
     // Getting the fitter to output specific GOE configurations has proven extremely difficult.  In particular, it seems incapable of
@@ -147,7 +149,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     if (results_pos_neg.jedec.get(fuse) != 1) try helper.err("Expected OE0 fuse to be 1 for positive", .{}, dev, .{});
     if (results_neg_pos.jedec.get(fuse) != 0) try helper.err("Expected OE0 fuse to be 0 for negative", .{}, dev, .{});
     if (results_neg_neg.jedec.get(fuse) != 0) try helper.err("Expected OE0 fuse to be 0 for negative", .{}, dev, .{});
-    if (dev.getNumGlbs() < 4) {
+    if (dev.num_glbs < 4) {
         fuse = Fuse.init(fuse.row - 2, fuse.col);
     }
     try helper.writeFuse(writer, fuse);
@@ -160,7 +162,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     if (results_pos_neg.jedec.get(fuse) != 0) try helper.err("Expected OE1 fuse to be 0 for negative", .{}, dev, .{});
     if (results_neg_pos.jedec.get(fuse) != 1) try helper.err("Expected OE1 fuse to be 1 for positive", .{}, dev, .{});
     if (results_neg_neg.jedec.get(fuse) != 0) try helper.err("Expected OE1 fuse to be 0 for negative", .{}, dev, .{});
-    if (dev.getNumGlbs() < 4) {
+    if (dev.num_glbs < 4) {
         fuse = Fuse.init(fuse.row - 2, fuse.col);
     }
     try helper.writeFuse(writer, fuse);
@@ -169,7 +171,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     try writer.expression("goe2");
     iter = oe0_diff.iterator(.{});
     fuse = iter.next().?;
-    if (dev.getNumGlbs() >= 4) {
+    if (dev.num_glbs >= 4) {
         fuse = Fuse.init(fuse.row + 2, fuse.col);
     }
     try helper.writeFuse(writer, fuse);
@@ -178,7 +180,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     try writer.expression("goe3");
     iter = oe1_diff.iterator(.{});
     fuse = iter.next().?;
-    if (dev.getNumGlbs() >= 4) {
+    if (dev.num_glbs >= 4) {
         fuse = Fuse.init(fuse.row + 2, fuse.col);
     }
     try helper.writeFuse(writer, fuse);
@@ -190,7 +192,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     try writer.close(); // goe_polarity
 
 
-    if (dev.getNumGlbs() >= 4) {
+    if (dev.num_glbs >= 4) {
         try writer.expressionExpanded("goe_source");
 
         try writer.expression("goe0");
@@ -218,13 +220,13 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         try writer.expression("glb");
         try writer.int(glb, 10);
         try writer.expression("name");
-        try writer.string(devices.getGlbName(@intCast(u8, glb)));
+        try writer.string(device_info.getGlbName(@intCast(u8, glb)));
         try writer.close();
         writer.setCompact(false);
 
         const sptclk_fuse = sptclk_polarity_fuses[glb];
 
-        const bus_size = @min(4, dev.getNumGlbs());
+        const bus_size = @min(4, dev.num_glbs);
         var n: u8 = 0;
         while (n < bus_size) : (n += 1) {
             try writer.open();

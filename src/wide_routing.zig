@@ -3,10 +3,10 @@ const TempAllocator = @import("temp_allocator");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const jedec = @import("jedec.zig");
-const core = @import("core.zig");
-const devices = @import("devices.zig");
-const DeviceType = devices.DeviceType;
+const jedec = @import("jedec");
+const common = @import("common");
+const device_info = @import("device_info.zig");
+const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
@@ -16,7 +16,7 @@ pub fn main() void {
     helper.main(1);
 }
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: core.MacrocellRef, pts: u8, report_mcref: core.MacrocellRef) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: common.MacrocellRef, pts: u8, report_mcref: common.MacrocellRef) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
     try design.pinAssignment(.{ .signal = "x0" });
@@ -50,18 +50,18 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
     //var mc_columns = try helper.parseMCOptionsColumns(ta, pa, null);
     //var orm_rows = try helper.parseORMRows(ta, pa, null);
     var cluster_routing = try parseClusterRoutingRows(ta, pa, null);
 
-    try writer.expressionExpanded(@tagName(dev));
+    try writer.expressionExpanded(@tagName(dev.device));
     try writer.expressionExpanded("wide_routing");
 
     var default_narrow: ?u1 = null;
     var default_wide: ?u1 = null;
 
-    var mc_iter = core.MacrocellIterator { .device = dev };
+    var mc_iter = helper.MacrocellIterator { .dev = dev };
     while (mc_iter.next()) |mcref| {
         // note mcref is the macrocell that contains the wide routing switch we're testing.
         // when enabled, we'll be using mcref.mc + 4 as the primary output.
@@ -143,11 +143,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 }
 
 
-fn parseClusterRoutingRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*DeviceType) !std.DynamicBitSet {
+fn parseClusterRoutingRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*DeviceInfo) !std.DynamicBitSet {
     const input_file = helper.getInputFile("cluster_routing.sx") orelse return error.MissingClusterRoutingInputFile;
-    const device = input_file.device;
+    const dev = DeviceInfo.init(input_file.device_type);
 
-    var results = try std.DynamicBitSet.initEmpty(pa, device.getJedecHeight());
+    var results = try std.DynamicBitSet.initEmpty(pa, dev.jedec_dimensions.height());
 
     var stream = std.io.fixedBufferStream(input_file.contents);
     var parser = sx.reader(ta, stream.reader());
@@ -163,7 +163,7 @@ fn parseClusterRoutingRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_dev
     };
 
     if (out_device) |ptr| {
-        ptr.* = device;
+        ptr.* = dev;
     }
 
     return results;

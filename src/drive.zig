@@ -2,51 +2,50 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const core = @import("core.zig");
-const devices = @import("devices.zig");
-const jedec = @import("jedec.zig");
-const DeviceType = @import("devices.zig").DeviceType;
+const common = @import("common");
+const device_info = @import("device_info.zig");
+const jedec = @import("jedec");
+const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
+const OutputIterator = helper.OutputIterator;
 
 pub fn main() void {
     helper.main(0);
 }
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_index: u16, drive: core.DriveType) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: common.PinInfo, drive: common.DriveType) !toolchain.FitResults {
     var design = Design.init(ta, dev);
     try design.pinAssignment(.{
         .signal = "out",
-        .pin_index = pin_index,
+        .pin = pin.id,
         .drive = drive,
     });
     try design.addPT("in", "out");
 
     var results = try tc.runToolchain(design);
-    try helper.logResults("drive_pin_{s}", .{ dev.getPins()[pin_index].pin_number() }, results);
+    try helper.logResults("drive_pin_{s}", .{ pin.id }, results);
     try results.checkTerm();
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    try writer.expressionExpanded(@tagName(dev));
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+    try writer.expressionExpanded(@tagName(dev.device));
     try writer.expressionExpanded("drive_type");
 
     var default_pp: ?u1 = null;
     var default_od: ?u1 = null;
 
-    var pin_iter = devices.pins.OutputIterator { .pins = dev.getPins() };
-    while (pin_iter.next()) |io| {
+    var pin_iter = OutputIterator { .pins = dev.all_pins };
+    while (pin_iter.next()) |pin| {
         try tc.cleanTempDir();
         helper.resetTemp();
 
-        const results_pp = try runToolchain(ta, tc, dev, io.pin_index, .push_pull);
-        const results_od = try runToolchain(ta, tc, dev, io.pin_index, .open_drain);
+        const results_pp = try runToolchain(ta, tc, dev, pin, .push_pull);
+        const results_od = try runToolchain(ta, tc, dev, pin, .open_drain);
 
-        try helper.writePin(writer, io);
-        // try writer.expression("pin");
-        // try writer.string(io.pin_number);
+        try helper.writePin(writer, pin);
 
         var diff = try JedecData.initDiff(ta, results_pp.jedec, results_od.jedec);
         var diff_iter = diff.iterator(.{});
@@ -72,12 +71,12 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             }
 
         } else {
-            try helper.err("Expected one drive fuse but found none!", .{}, dev, .{ .pin_index = io.pin_index });
+            try helper.err("Expected one drive fuse but found none!", .{}, dev, .{ .pin = pin.id });
             return error.Think;
         }
 
         if (diff_iter.next()) |_| {
-            try helper.err("Expected one drive fuse but found multiple!", .{}, dev, .{ .pin_index = io.pin_index });
+            try helper.err("Expected one drive fuse but found multiple!", .{}, dev, .{ .pin = pin.id });
             return error.Think;
         }
 

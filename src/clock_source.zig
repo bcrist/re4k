@@ -2,11 +2,11 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const core = @import("core.zig");
-const jedec = @import("jedec.zig");
-const devices = @import("devices.zig");
+const common = @import("common");
+const jedec = @import("jedec");
+const device_info = @import("device_info.zig");
 const JedecData = jedec.JedecData;
-const DeviceType = devices.DeviceType;
+const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 
@@ -25,39 +25,39 @@ pub fn main() void {
     helper.main(0);
 }
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: core.MacrocellRef, src: ClockSource) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: common.MacrocellRef, src: ClockSource) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
+    const clocks = dev.clock_pins;
 
     const clk0: []const u8 = "clk0";
     try design.pinAssignment(.{
         .signal = clk0,
-        .pin_index = dev.getClockPin(0).?.pin_index,
+        .pin = clocks[0].id,
     });
 
     var clk1: []const u8 = "clk1";
-    if (dev.getClockPin(1)) |info| {
+    const clk2: []const u8 = "clk2";
+    var clk3: []const u8 = "clk3";
+    if (clocks.len >= 4) {
         try design.pinAssignment(.{
             .signal = clk1,
-            .pin_index = info.pin_index,
+            .pin = clocks[1].id,
         });
-    } else {
-        clk1 = "~clk0";
-    }
-
-    const clk2: []const u8 = "clk2";
-    try design.pinAssignment(.{
-        .signal = clk2,
-        .pin_index = dev.getClockPin(2).?.pin_index,
-    });
-
-    var clk3: []const u8 = "clk3";
-    if (dev.getClockPin(3)) |info| {
+        try design.pinAssignment(.{
+            .signal = clk2,
+            .pin = clocks[2].id,
+        });
         try design.pinAssignment(.{
             .signal = clk3,
-            .pin_index = info.pin_index,
+            .pin = clocks[3].id,
         });
     } else {
+        try design.pinAssignment(.{
+            .signal = clk2,
+            .pin = clocks[1].id,
+        });
+        clk1 = "~clk0";
         clk3 = "~clk2";
     }
 
@@ -134,11 +134,11 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
 
 var defaults = std.EnumMap(ClockSource, usize) {};
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    try writer.expressionExpanded(@tagName(dev));
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+    try writer.expressionExpanded(@tagName(dev.device));
     try writer.expressionExpanded("clock_source");
 
-    var mc_iter = core.MacrocellIterator { .device = dev };
+    var mc_iter = helper.MacrocellIterator { .dev = dev };
     while (mc_iter.next()) |mcref| {
         try tc.cleanTempDir();
         helper.resetTemp();
@@ -146,7 +146,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         var data = std.EnumMap(ClockSource, JedecData) {};
         var values = std.EnumMap(ClockSource, usize) {};
 
-        var diff = try dev.initJedecZeroes(ta);
+        var diff = try JedecData.initEmpty(ta, dev.jedec_dimensions);
 
         for (std.enums.values(ClockSource)) |src| {
             var results = try runToolchain(ta, tc, dev, mcref, src);

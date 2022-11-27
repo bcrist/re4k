@@ -32,10 +32,10 @@ H6,io,1,1,3,,
 F6,io,1,1,4,,
 H7,no_connect,,,,,
 G7,io,1,1,5,,
-C4,clk,0,0,,,0
-G4,clk,0,0,,,1
-H5,clk,1,1,,,2
-A4,clk,1,1,,,3
+C4,clock,0,0,,,0
+G4,clock,0,0,,,1
+H5,clock,1,1,,,2
+A4,clock,1,1,,,3
 B5,io,1,1,15,1,
 C5,no_connect,,,,,
 D8,no_connect,,,,,
@@ -59,7 +59,7 @@ B8,tdo,,,,,
 H8,tms,,,,,
 D5,vcc_core,,,,,
 E4,vcc_core,,,,,
-E3,vcco_bank_0,,,,,
+E3,vcco,0,,,,
 F4,no_connect,,,,,
 C6,no_connect,,,,,
-D6,vcco_bank_1,,,,,
+D6,vcco,1,,,,

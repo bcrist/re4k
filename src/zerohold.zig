@@ -2,9 +2,9 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const jedec = @import("jedec.zig");
-const devices = @import("devices.zig");
-const DeviceType = devices.DeviceType;
+const jedec = @import("jedec");
+const device_info = @import("device_info.zig");
+const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
@@ -13,7 +13,7 @@ pub fn main() void {
     helper.main(0);
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
     var design = Design.init(ta, dev);
     try design.addPT("in", "out");
     const results_without_zero_hold = try tc.runToolchain(design);
@@ -28,7 +28,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 
     var diff_iter = diff.iterator(.{});
     if (diff_iter.next()) |fuse| {
-        try writer.expressionExpanded(@tagName(dev));
+        try writer.expressionExpanded(@tagName(dev.device));
         try writer.expressionExpanded("zero_hold_time");
 
         try helper.writeFuse(writer, fuse);

@@ -2,11 +2,11 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const core = @import("core.zig");
-const jedec = @import("jedec.zig");
-const devices = @import("devices.zig");
+const common = @import("common");
+const jedec = @import("jedec");
+const device_info = @import("device_info.zig");
 const JedecData = jedec.JedecData;
-const DeviceType = devices.DeviceType;
+const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 
@@ -14,7 +14,7 @@ pub fn main() void {
     helper.main(0);
 }
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_index: u16, pull: core.BusMaintenanceType) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: common.PinInfo, pull: common.BusMaintenance) !toolchain.FitResults {
     var design = Design.init(ta, dev);
     try design.nodeAssignment(.{
         .signal = "out",
@@ -23,19 +23,19 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
     });
     try design.pinAssignment(.{
         .signal = "in",
-        .pin_index = pin_index,
+        .pin = pin.id,
         .bus_maintenance = pull,
     });
     try design.addPT("in", "out");
 
     var results = try tc.runToolchain(design);
-    try helper.logResults("pull_pin{s}_{s}", .{ dev.getPins()[pin_index].pin_number(), @tagName(pull) }, results);
+    try helper.logResults("pull_pin{s}_{s}", .{ pin.id, @tagName(pull) }, results);
     try results.checkTerm();
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    try writer.expressionExpanded(@tagName(dev));
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+    try writer.expressionExpanded(@tagName(dev.device));
     try writer.expressionExpanded("bus_maintenance");
 
     var default_val_float: ?usize = null;
@@ -43,18 +43,18 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     var default_val_pullup: ?usize = null;
     var default_val_keeper: ?usize = null;
 
-    var has_per_pin_config = dev.getFamily() == .zero_power_enhanced;
+    var has_per_pin_config = dev.family == .zero_power_enhanced;
 
-    var max_pin = if (has_per_pin_config) dev.getNumPins() else 1;
 
-    var float_diff = try dev.initJedecZeroes(pa);
+    var float_diff = try JedecData.initEmpty(pa, dev.jedec_dimensions);
 
-    var pin_index: u16 = 0;
+    var max_pin = if (has_per_pin_config) dev.all_pins.len else 1;
+    var pin_index: usize = 0;
     while (pin_index < max_pin) : (pin_index += 1) {
-        const pin_info = dev.getPins()[pin_index];
-        switch (pin_info) {
-            .input_output, .input, .clock_input => {},
-            .misc => {
+        const pin = dev.all_pins[pin_index];
+        switch (pin.func) {
+            .io, .io_oe0, .io_oe1, .input, .clock => {},
+            else => {
                 if (!has_per_pin_config) max_pin += 1;
                 continue;
             },
@@ -63,16 +63,16 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         try tc.cleanTempDir();
         helper.resetTemp();
 
-        const results_float = try runToolchain(ta, tc, dev, pin_index, .float);
-        const results_pulldown = try runToolchain(ta, tc, dev, pin_index, .pulldown);
-        const results_pullup = try runToolchain(ta, tc, dev, pin_index, .pullup);
-        const results_keeper = try runToolchain(ta, tc, dev, pin_index, .keeper);
+        const results_float = try runToolchain(ta, tc, dev, pin, .float);
+        const results_pulldown = try runToolchain(ta, tc, dev, pin, .pulldown);
+        const results_pullup = try runToolchain(ta, tc, dev, pin, .pullup);
+        const results_keeper = try runToolchain(ta, tc, dev, pin, .keeper);
 
         var diff = try JedecData.initDiff(ta, results_pullup.jedec, results_pulldown.jedec);
         diff.unionDiff(results_keeper.jedec, results_pulldown.jedec);
 
         if (has_per_pin_config) {
-            try helper.writePin(writer, pin_info);
+            try helper.writePin(writer, pin);
 
             diff.unionDiff(results_float.jedec, results_pulldown.jedec);
         } else {
@@ -81,7 +81,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             while (diff_iter.next()) |fuse| {
                 if (!diff.isSet(fuse)) {
                     if (results_float.jedec.isSet(fuse)) {
-                        try helper.err("Expected additional float fuse differences to be 0-valued fuses: {}:{}\n", .{ fuse.row, fuse.col }, dev, .{ .pin_index = pin_index });
+                        try helper.err("Expected additional float fuse differences to be 0-valued fuses: {}:{}\n", .{ fuse.row, fuse.col }, dev, .{ .pin = pin.id });
                     } else {
                         float_diff.put(fuse, 1);
                     }
@@ -116,33 +116,33 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         }
 
         if (diff.countSet() != 2) {
-            try helper.err("Expected 2 fuses to define bus maintenance options, but found {}!\n", .{ diff.countSet() }, dev, .{ .pin_index = pin_index });
+            try helper.err("Expected 2 fuses to define bus maintenance options, but found {}!\n", .{ diff.countSet() }, dev, .{ .pin = pin.id });
         }
 
         if (default_val_float) |val| {
             if (val != val_float) {
-                try helper.err("Expected same fuse patterns for all pins!", .{}, dev, .{ .pin_index = pin_index });
+                try helper.err("Expected same fuse patterns for all pins!", .{}, dev, .{ .pin = pin.id });
             }
         } else {
             default_val_float = val_float;
         }
         if (default_val_pulldown) |val| {
             if (val != val_pulldown) {
-                try helper.err("Expected same fuse patterns for all pins!", .{}, dev, .{ .pin_index = pin_index });
+                try helper.err("Expected same fuse patterns for all pins!", .{}, dev, .{ .pin = pin.id });
             }
         } else {
             default_val_pulldown = val_pulldown;
         }
         if (default_val_pullup) |val| {
             if (val != val_pullup) {
-                try helper.err("Expected same fuse patterns for all pins!", .{}, dev, .{ .pin_index = pin_index });
+                try helper.err("Expected same fuse patterns for all pins!", .{}, dev, .{ .pin = pin.id });
             }
         } else {
             default_val_pullup = val_pullup;
         }
         if (default_val_keeper) |val| {
             if (val != val_keeper) {
-                try helper.err("Expected same fuse patterns for all pins!", .{}, dev, .{ .pin_index = pin_index });
+                try helper.err("Expected same fuse patterns for all pins!", .{}, dev, .{ .pin = pin.id });
             }
         } else {
             default_val_keeper = val_keeper;

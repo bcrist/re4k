@@ -2,10 +2,11 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const jedec = @import("jedec.zig");
-const devices = @import("devices.zig");
+const common = @import("common");
+const jedec = @import("jedec");
+const device_info = @import("device_info.zig");
 const Fuse = jedec.Fuse;
-const DeviceType = devices.DeviceType;
+const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const GlbInputSignal = toolchain.GlbInputSignal;
@@ -16,12 +17,12 @@ pub fn main() void {
 }
 
 var report_number: usize = 0;
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_index: u16) !FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: []const u8) !FitResults {
     var design = Design.init(ta, dev);
 
     try design.pinAssignment( .{
         .signal = "in",
-        .pin_index = pin_index,
+        .pin = pin,
     });
     try design.nodeAssignment( .{
         .signal = "out",
@@ -37,104 +38,106 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
     return results;
 }
 
-fn getFuseToPinMap(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType) !std.AutoHashMapUnmanaged(Fuse, u16) {
+fn getFuseToPinMap(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo) !std.AutoHashMapUnmanaged(Fuse, []const u8) {
     // Route input-only pins for this device type, since we can't know which signals in the reference device they correspond to.
-    var fuse_to_pin_map = std.AutoHashMapUnmanaged(Fuse, u16) {};
+    var fuse_to_pin_map = std.AutoHashMapUnmanaged(Fuse, []const u8) {};
 
-    var iter = devices.pins.InputIterator { .pins = dev.getPins() };
-    while (iter.next()) |pin_info| {
-        switch (pin_info) {
-            .input => |info| {
-                try tc.cleanTempDir();
-                helper.resetTemp();
+    for (dev.input_pins) |pin| {
+        try tc.cleanTempDir();
+        helper.resetTemp();
 
-                // We could try to run the toolchain with multiple/all input signals routed simultaneously to speed things up,
-                // but then we'd have to rely on the GI mapping provided in the report to disambiguate which fuse corresponds
-                // to which signal.  And there are several fitter bugs that cause problems with that:
-                //    - For LC4064ZC_csBGA56; the second column (GIs 18-35) doesn't always show up.
-                //    - For some devices, "input only" pins are incorrectly listed as sourced from a macrocell feedback signal.
-                //      e.g. for LC4128ZC_TQFP100, pin 12's source is listed as "mc B-11", but the GI mux fuse that's set is
-                //      one of the ones corresponding to pin 16 in LC4128V_TQFP144; which is MC B14 and ORP B^11 in that device.
-                //      So it seems the fitter is writing the I/O cell's ID in this case, rather than the actual pin number.
-                // There's not that many input-only pins to test, so just doing them one at a time avoids these issues.
+        // We could try to run the toolchain with multiple/all input signals routed simultaneously to speed things up,
+        // but then we'd have to rely on the GI mapping provided in the report to disambiguate which fuse corresponds
+        // to which signal.  And there are several fitter bugs that cause problems with that:
+        //    - For LC4064ZC_csBGA56; the second column (GIs 18-35) doesn't always show up.
+        //    - For some devices, "input only" pins are incorrectly listed as sourced from a macrocell feedback signal.
+        //      e.g. for LC4128ZC_TQFP100, pin 12's source is listed as "mc B-11", but the GI mux fuse that's set is
+        //      one of the ones corresponding to pin 16 in LC4128V_TQFP144; which is MC B14 and ORP B^11 in that device.
+        //      So it seems the fitter is writing the I/O cell's ID in this case, rather than the actual pin number.
+        // There's not that many input-only pins to test, so just doing them one at a time avoids these issues.
 
-                var results = try runToolchain(ta, tc, dev, info.pin_index);
-                var fuses_set: usize = 0;
-                var gi: u8 = 0;
-                while (gi < 36) : (gi += 1) {
-                    var fuse_iter = dev.getGIRange(0, gi).iterator();
-                    while (fuse_iter.next()) |fuse| {
-                        if (!results.jedec.isSet(fuse)) {
-                            try fuse_to_pin_map.put(pa, fuse, info.pin_index);
-                            fuses_set += 1;
-                        }
-                    }
+        var results = try runToolchain(ta, tc, dev, pin.id);
+        var fuses_set: usize = 0;
+        var gi: u8 = 0;
+        while (gi < 36) : (gi += 1) {
+            var fuse_iter = dev.getGIRange(0, gi).iterator();
+            while (fuse_iter.next()) |fuse| {
+                if (!results.jedec.isSet(fuse)) {
+                    try fuse_to_pin_map.put(pa, fuse, pin.id);
+                    fuses_set += 1;
                 }
-
-                std.debug.assert(fuses_set == 1);
-            },
-            else => {},
+            }
         }
+
+        std.debug.assert(fuses_set == 1);
     }
 
     return fuse_to_pin_map;
 }
 
+const SignalRenaming = struct {
+    old: GlbInputSignal,
+    new: []const u8,
+};
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
+
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
     var fuse_to_pin_map = try getFuseToPinMap(ta, pa, tc, dev);
     try tc.cleanTempDir();
     helper.resetTemp();
 
-    var input_device: DeviceType = undefined;
-    var fuse_to_signal_map = try helper.parseGRP(ta, pa, &input_device);
-    std.debug.assert(input_device.getNumGlbs() == dev.getNumGlbs());
-    std.debug.assert(input_device.getJedecWidth() == dev.getJedecWidth());
-    std.debug.assert(input_device.getJedecHeight() == dev.getJedecHeight());
+    var input_dev: DeviceInfo = undefined;
+    var fuse_to_signal_map = try helper.parseGRP(ta, pa, &input_dev);
+    std.debug.assert(input_dev.num_glbs == dev.num_glbs);
+    std.debug.assert(input_dev.jedec_dimensions.eql(dev.jedec_dimensions));
 
-    var signal_to_pin_map = std.AutoHashMap(GlbInputSignal, u16).init(ta);
-    try signal_to_pin_map.ensureTotalCapacity(fuse_to_pin_map.count());
+    var renaming = try std.ArrayList(SignalRenaming).initCapacity(ta, fuse_to_pin_map.count());
 
-    var entry_iter = fuse_to_signal_map.iterator();
+    var entry_iter = fuse_to_pin_map.iterator();
     while (entry_iter.next()) |entry| {
-        if (fuse_to_pin_map.get(entry.key_ptr.*)) |new_pin_index| {
-            try signal_to_pin_map.put(entry.value_ptr.*, new_pin_index);
+        if (fuse_to_signal_map.get(entry.key_ptr.*)) |old| {
+            try renaming.append(.{
+                .old = old,
+                .new = entry.value_ptr.*,
+            });
         }
     }
 
-    const unused_pin: u16 = 65535;
-
     var signal_iter = fuse_to_signal_map.valueIterator();
     while (signal_iter.next()) |signal| {
-        if (signal_to_pin_map.get(signal.*)) |new_pin_index| {
-            signal.* = GlbInputSignal { .pin = new_pin_index };
+        for (renaming.items) |rename| {
+            if (rename.old.eql(signal.*)) {
+                signal.* = GlbInputSignal { .pin = rename.new };
+                break;
+            }
         } else switch (signal.*) {
             .fb => {},
-            .pin => |pin_index| {
-                var new_pin_index: u16 = unused_pin;
-                switch (input_device.getPins()[pin_index]) {
-                    .clock_input => |info| {
-                        if (dev.getClockPin(info.clock_index)) |new_info| {
-                            new_pin_index = new_info.pin_index;
+            .pin => |old_id| {
+                const old_pin = input_dev.getPin(old_id).?;
+                var new_id: []const u8 = "";
+                switch (old_pin.func) {
+                    .clock => |clk_index| {
+                        if (dev.getClockPin(clk_index)) |new_pin| {
+                            new_id = new_pin.id;
                         }
                     },
-                    .input_output => |info| {
-                        if (dev.getIOPin(info.glb, info.mc)) |new_info| {
-                            new_pin_index = new_info.pin_index;
+                    .io, .io_oe0, .io_oe1 => {
+                        if (dev.getIOPin(old_pin.mcRef().?)) |new_pin| {
+                            new_id = new_pin.id;
                         }
                     },
                     else => {},
                 }
-                signal.* = GlbInputSignal { .pin = new_pin_index };
+                signal.* = GlbInputSignal { .pin = new_id };
             },
         }
     }
 
-    try writer.expressionExpanded(@tagName(dev));
+    try writer.expressionExpanded(@tagName(dev.device));
     try writer.expressionExpanded("global_routing_pool");
 
     var glb: u8 = 0;
-    while (glb < dev.getNumGlbs()) : (glb += 1) {
+    while (glb < dev.num_glbs) : (glb += 1) {
         try helper.writeGlb(writer, glb);
 
         var gi: u8 = 0;
@@ -159,12 +162,12 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
                         try helper.writeMc(writer, mcref.mc);
                         try writer.close();
                     },
-                    .pin => |pin_index| {
-                        if (pin_index == unused_pin) {
+                    .pin => |id| {
+                        if (id.len == 0) {
                             try writer.expression("unused");
                             try writer.close(); // unused
                         } else {
-                            try helper.writePin(writer, dev.getPins()[pin_index]);
+                            try helper.writePin(writer, dev.getPin(id).?);
                             try writer.close(); // pin
                         }
                     },

@@ -1,0 +1,31 @@
+(LC4128ZE_ucBGA132
+   (osctimer
+      (enable
+         (fuse 91 98)
+         (value 0 enabled)
+         (value 1 disabled)
+      )
+      (enable
+         (fuse 92 98)
+         (value 0 enabled)
+         (value 1 disabled)
+      )
+      (timer_out
+         (fuse 93 99)
+         (value 0 enabled)
+         (value 1 disabled)
+      )
+      (osc_out
+         (fuse 93 100)
+         (value 0 enabled)
+         (value 1 disabled)
+      )
+      (timer_div
+         (fuse 92 99 (value 1))
+         (fuse 92 100 (value 2))
+         (value 0 div128)
+         (value 2 div1024)
+         (value 1 div1048576)
+      )
+   )
+)

@@ -2,12 +2,12 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const core = @import("core.zig");
-const jedec = @import("jedec.zig");
-const devices = @import("devices.zig");
+const common = @import("common");
+const jedec = @import("jedec");
+const device_info = @import("device_info.zig");
 const JedecData = jedec.JedecData;
 const Fuse = jedec.Fuse;
-const DeviceType = devices.DeviceType;
+const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const GlbInputSignal = toolchain.GlbInputSignal;
@@ -15,6 +15,8 @@ const GlbInputFitSignal = toolchain.GlbInputFitSignal;
 const FitResults = toolchain.FitResults;
 const GISet = toolchain.GISet;
 const GlbInputSet = toolchain.GlbInputSet;
+const MacrocellIterator = helper.MacrocellIterator;
+const InputIterator = helper.InputIterator;
 
 const max_routed_signals = 33;
 
@@ -23,7 +25,7 @@ pub fn main() void {
 }
 
 var report_number: usize = 0;
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, signals_to_test: GlbInputSet, all_signals: []const GlbInputFitSignal) !FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, signals_to_test: GlbInputSet, all_signals: []const GlbInputFitSignal) !FitResults {
     var design = Design.init(ta, dev);
 
     var temp_signal_names_storage = [_][]const u8 { "" } ** 36;
@@ -37,8 +39,8 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, signals_
         std.debug.assert(signal_names.len <= temp_signal_names_storage.len);
         signal_names[signal_names.len - 1] = signal.name;
         switch (signal.source) {
-            .fb  =>             try design.nodeAssignment(.{ .signal = signal.name }),
-            .pin => |pin_index| try design.pinAssignment( .{ .signal = signal.name, .pin_index = pin_index }),
+            .fb  =>      try design.nodeAssignment(.{ .signal = signal.name }),
+            .pin => |id| try design.pinAssignment( .{ .signal = signal.name, .pin = id }),
         }
     }
 
@@ -71,16 +73,14 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, signals_
     return results;
 }
 
-fn getAllSignals(pa: std.mem.Allocator, dev: DeviceType) ![]const GlbInputFitSignal {
+fn getAllSignals(pa: std.mem.Allocator, dev: *const DeviceInfo) ![]const GlbInputFitSignal {
     var all_signals = try std.ArrayListUnmanaged(GlbInputFitSignal).initCapacity(
-        pa, @as(usize, dev.getNumGlbs()) * dev.getNumMcsPerGlb()
-        + dev.getPins().len
-        - 10 // there are always 4 JTAG and at least 6 power pins
+        pa, dev.num_mcs + dev.all_pins.len - 10 // there are always 4 JTAG and at least 6 power pins
     );
 
-    var mc_iter = core.MacrocellIterator { .device = dev };
+    var mc_iter = MacrocellIterator { .dev = dev };
     while (mc_iter.next()) |mcref| {
-        const signal_name = try std.fmt.allocPrint(pa, "fb_{s}{}", .{ devices.getGlbName(mcref.glb), mcref.mc });
+        const signal_name = try std.fmt.allocPrint(pa, "fb_{s}{}", .{ device_info.getGlbName(mcref.glb), mcref.mc });
         all_signals.appendAssumeCapacity(.{
             .name = signal_name,
             .source = .{ .fb = .{
@@ -90,12 +90,12 @@ fn getAllSignals(pa: std.mem.Allocator, dev: DeviceType) ![]const GlbInputFitSig
         });
     }
 
-    var pin_iter = devices.pins.InputIterator { .pins = dev.getPins() };
-    while (pin_iter.next()) |info| {
-        const signal_name = try std.fmt.allocPrint(pa, "pin_{s}", .{ info.pin_number() });
+    var pin_iter = InputIterator { .pins = dev.all_pins };
+    while (pin_iter.next()) |pin| {
+        const signal_name = try std.fmt.allocPrint(pa, "pin_{s}", .{ pin.id });
         all_signals.appendAssumeCapacity(.{
             .name = signal_name,
-            .source = .{ .pin = info.pin_index() },
+            .source = .{ .pin = pin.id },
         });
     }
 
@@ -103,16 +103,16 @@ fn getAllSignals(pa: std.mem.Allocator, dev: DeviceType) ![]const GlbInputFitSig
 }
 
 const GlbData = struct {
-    device: DeviceType,
+    dev: *const DeviceInfo,
     glb: u8,
     fuse_bitmap: JedecData,
     fuse_map: std.AutoHashMap(Fuse, GlbInputSignal),
 
-    pub fn init(alloc: std.mem.Allocator, dev: DeviceType, glb: u8) !GlbData {
+    pub fn init(alloc: std.mem.Allocator, dev: *const DeviceInfo, glb: u8) !GlbData {
         return GlbData {
-            .device = dev,
+            .dev = dev,
             .glb = glb,
-            .fuse_bitmap = try dev.initJedecZeroes(alloc),
+            .fuse_bitmap = try JedecData.initEmpty(alloc, dev.jedec_dimensions),
             .fuse_map = std.AutoHashMap(Fuse, GlbInputSignal).init(alloc),
         };
     }
@@ -137,7 +137,7 @@ const GlbData = struct {
                 }
             };
 
-            var fuse_range = self.device.getGIRange(self.glb, @intCast(u8, gi));
+            var fuse_range = self.dev.getGIRange(self.glb, gi);
             std.debug.assert(fuse_range.count() == mux_size);
 
             var iter = fuse_range.iterator();
@@ -163,14 +163,14 @@ const TestData = struct {
     ta: std.mem.Allocator,
     tc: *Toolchain,
     rng: std.rand.Xoshiro256,
-    device: DeviceType,
+    dev: *const DeviceInfo,
     all_signals: []const GlbInputFitSignal,
     glbs: []GlbData,
     tested_input_sets: std.AutoHashMap(GlbInputSet, void),
     dead_branches: usize = 0,
 
-    pub fn init(ta: std.mem.Allocator, pa: std.mem.Allocator, gpa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType) !TestData {
-        var glbs = try pa.alloc(GlbData, dev.getNumGlbs());
+    pub fn init(ta: std.mem.Allocator, pa: std.mem.Allocator, gpa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo) !TestData {
+        var glbs = try pa.alloc(GlbData, dev.num_glbs);
         for (glbs) |*glb, i| {
             glb.* = try GlbData.init(gpa, dev, @intCast(u8, i));
         }
@@ -179,7 +179,7 @@ const TestData = struct {
             .ta = ta,
             .tc = tc,
             .rng = std.rand.Xoshiro256.init(@bitCast(u64, std.time.milliTimestamp())),
-            .device = dev,
+            .dev = dev,
             .all_signals = try getAllSignals(pa, dev),
             .glbs = glbs,
             .tested_input_sets = std.AutoHashMap(GlbInputSet, void).init(gpa),
@@ -205,13 +205,13 @@ const TestData = struct {
         try self.tc.cleanTempDir();
         helper.resetTemp();
 
-        var results = try runToolchain(self.ta, self.tc, self.device, signals_to_test, self.all_signals);
+        var results = try runToolchain(self.ta, self.tc, self.dev, signals_to_test, self.all_signals);
         var fuses_found: ?usize = null;
         for (self.glbs) |*glb| {
             var found = try glb.analyzeResults(results);
             if (fuses_found) |found_in_other_glb| {
                 if (found != found_in_other_glb) {
-                    try helper.err("Report {}: Expected to find {} fuses but found {}!", .{ report_number - 1, found_in_other_glb, found }, self.device, .{ .glb = glb.glb });
+                    try helper.err("Report {}: Expected to find {} fuses but found {}!", .{ report_number - 1, found_in_other_glb, found }, self.dev, .{ .glb = glb.glb });
                 }
                 fuses_found = @max(found_in_other_glb, found);
             } else {
@@ -230,13 +230,15 @@ const TestData = struct {
     }
 
     pub fn sortSignalsByLeastGIs(self: TestData, signals: []GlbInputFitSignal) !void {
-        var gi_counts = std.AutoHashMap(GlbInputSignal, usize).init(self.ta);
+        const GICountsMap = std.HashMap(GlbInputSignal, usize, GlbInputSignal.HashContext, 80);
+
+        var gi_counts = GICountsMap.init(self.ta);
         defer gi_counts.deinit();
 
         const all_gis = GISet.initFull();
         var gi_iter = all_gis.iterator();
         while (gi_iter.next()) |gi| {
-            var fuse_iter = self.device.getGIRange(0, @intCast(u8, gi)).iterator();
+            var fuse_iter = self.dev.getGIRange(0, gi).iterator();
             while (fuse_iter.next()) |fuse| {
                 if (self.glbs[0].fuse_map.get(fuse)) |signal| {
                     var result = try gi_counts.getOrPut(signal);
@@ -250,7 +252,7 @@ const TestData = struct {
         }
 
         const SortCtx = struct {
-            fn lessThan(context: *const std.AutoHashMap(GlbInputSignal, usize), lhs: GlbInputFitSignal, rhs: GlbInputFitSignal) bool {
+            fn lessThan(context: *const GICountsMap, lhs: GlbInputFitSignal, rhs: GlbInputFitSignal) bool {
                 var lhs_count: usize = context.get(lhs.source) orelse 0;
                 var rhs_count: usize = context.get(rhs.source) orelse 0;
                 return lhs_count < rhs_count;
@@ -263,10 +265,10 @@ const TestData = struct {
         var gis_containing_signal = GISet.initEmpty();
         var gi_iter = fromSet.iterator();
         while (gi_iter.next()) |gi| {
-            var fuse_iter = self.device.getGIRange(0, @intCast(u8, gi)).iterator();
+            var fuse_iter = self.dev.getGIRange(0, gi).iterator();
             while (fuse_iter.next()) |fuse| {
                 if (self.glbs[0].fuse_map.get(fuse)) |fuse_signal| {
-                    if (std.meta.eql(signal, fuse_signal)) {
+                    if (signal.eql(fuse_signal)) {
                         gis_containing_signal.add(gi);
                     }
                 }
@@ -279,7 +281,7 @@ const TestData = struct {
         var signals = GlbInputSet.initEmpty();
         var gi_iter = gis.iterator();
         while (gi_iter.next()) |gi| {
-            var fuse_iter = self.device.getGIRange(0, @intCast(u8, gi)).iterator();
+            var fuse_iter = self.dev.getGIRange(0, gi).iterator();
             while (fuse_iter.next()) |fuse| {
                 if (self.glbs[0].fuse_map.get(fuse)) |fuse_signal| {
                     signals.add(fuse_signal, self.all_signals);
@@ -338,8 +340,8 @@ const TestData = struct {
 };
 
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    try writer.expressionExpanded(@tagName(dev));
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+    try writer.expressionExpanded(@tagName(dev.device));
     try writer.expressionExpanded("global_routing_pool");
 
     var gpa = std.heap.GeneralPurposeAllocator(.{ .thread_safe = false }) {};
@@ -400,7 +402,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
                 if (gi != -1) {
                     try writer.close();
                 }
-                gi = fuse.row / 2;
+                gi = @intCast(i64, fuse.row / 2);
                 try writer.expression("gi");
                 try writer.int(gi, 10);
                 writer.setCompact(false);
@@ -419,8 +421,8 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
                         try helper.writeMc(writer, mcref.mc);
                         try writer.close(); // mc
                     },
-                    .pin => |pin_index| {
-                        try helper.writePin(writer, dev.getPins()[pin_index]);
+                    .pin => |id| {
+                        try helper.writePin(writer, dev.getPin(id).?);
                         try writer.close(); // pin
                     },
                 }

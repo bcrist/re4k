@@ -3,10 +3,10 @@ const TempAllocator = @import("temp_allocator");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const jedec = @import("jedec.zig");
-const core = @import("core.zig");
-const devices = @import("devices.zig");
-const DeviceType = devices.DeviceType;
+const jedec = @import("jedec");
+const common = @import("common");
+const device_info = @import("device_info.zig");
+const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
@@ -25,7 +25,7 @@ fn getMaxPTsWithoutWideRouting(mc: usize) u8 {
 }
 
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: core.MacrocellRef, pts: u8) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: common.MacrocellRef, pts: u8) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
     try design.pinAssignment(.{ .signal = "x0" });
@@ -76,11 +76,11 @@ const ClusterRoutingValue = struct {
 };
 const ClusterRoutingMap = std.AutoHashMap(ClusterRoutingKey, ClusterRoutingValue);
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
     var mc_columns = try helper.parseMCOptionsColumns(ta, pa, null);
     var orm_rows = try helper.parseORMRows(ta, pa, null);
 
-    try writer.expressionExpanded(@tagName(dev));
+    try writer.expressionExpanded(@tagName(dev.device));
     try writer.expressionExpanded("cluster_routing");
 
     var glb_arena = try TempAllocator.init(0x100_00000);
@@ -90,7 +90,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
     var default_values = std.EnumMap(ClusterRoutingMode, usize) {};
 
     var glb: u8 = 0;
-    while (glb < dev.getNumGlbs()) : (glb += 1) {
+    while (glb < dev.num_glbs) : (glb += 1) {
         glb_arena.reset();
 
         var routing_data = ClusterRoutingMap.init(ga);
@@ -99,7 +99,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         try helper.writeGlb(writer, glb);
 
         var mc: u8 = 0;
-        while (mc < 16) : (mc += 1) {
+        while (mc < dev.num_mcs_per_glb) : (mc += 1) {
             var pts: u8 = 5;
             while (pts <= getMaxPTsWithoutWideRouting(mc)) : (pts += 5) {
                 try tc.cleanTempDir();
@@ -214,8 +214,8 @@ fn checkRoutingData(routing_data: *ClusterRoutingMap, cluster_usage: std.StaticB
             result.value_ptr.mask.unionDiff(result.value_ptr.jedec, jed);
         } else {
             result.value_ptr.* = .{
-                .jedec = try jed.clone(routing_data.allocator),
-                .mask = try JedecData.initEmpty(routing_data.allocator, jed.width, jed.height),
+                .jedec = try jed.clone(routing_data.allocator, jed.extents),
+                .mask = try JedecData.initEmpty(routing_data.allocator, jed.extents),
             };
         }
     }
@@ -223,7 +223,7 @@ fn checkRoutingData(routing_data: *ClusterRoutingMap, cluster_usage: std.StaticB
 
 fn parseClusterUsage(ta: std.mem.Allocator, glb: u8, report: []const u8, mc: u8) !std.StaticBitSet(16) {
     var cluster_usage = std.StaticBitSet(16).initEmpty();
-    const header = try std.fmt.allocPrint(ta, "GLB_{s}_CLUSTER_TABLE", .{ devices.getGlbName(glb) });
+    const header = try std.fmt.allocPrint(ta, "GLB_{s}_CLUSTER_TABLE", .{ device_info.getGlbName(glb) });
     if (helper.extract(report, header, "<Note>")) |raw| {
         var line_iter = std.mem.tokenize(u8, raw, "\r\n");
         while (line_iter.next()) |line| {

@@ -2,20 +2,21 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const core = @import("core.zig");
-const jedec = @import("jedec.zig");
-const devices = @import("devices.zig");
+const common = @import("common");
+const jedec = @import("jedec");
+const device_info = @import("device_info.zig");
 const JedecData = jedec.JedecData;
 const FuseRange = jedec.FuseRange;
-const DeviceType = devices.DeviceType;
+const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
+const OutputIterator = helper.OutputIterator;
 
 pub fn main() void {
     helper.main(1);
 }
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin: devices.pins.InputOutputPinInfo, pt4_oe: bool) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: common.PinInfo, pt4_oe: bool) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
     try design.nodeAssignment(.{ .signal = "node0" });
@@ -24,10 +25,10 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin: dev
     try design.nodeAssignment(.{ .signal = "node3" });
     try design.nodeAssignment(.{ .signal = "node4" });
 
-    var mc_iter = core.MacrocellIterator { .device = dev };
+    var mc_iter = helper.MacrocellIterator { .dev = dev };
     var n: usize = 0;
     while (mc_iter.next()) |mcref| {
-        if (mcref.glb == pin.glb and mcref.mc != pin.mc) {
+        if (mcref.glb == pin.glb.? and mcref.mc != pin.mcRef().?.mc) {
             var data_name = try std.fmt.allocPrint(ta, "node{}.D", .{ n });
             var signal_name = data_name[0..data_name.len - 2];
             try design.nodeAssignment(.{
@@ -46,7 +47,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin: dev
 
     try design.pinAssignment(.{
         .signal = "out",
-        .pin_index = pin.pin_index,
+        .pin = pin.id,
     });
     try design.addPT("node0.Q", "out");
     try design.addPT("node1.Q", "out");
@@ -58,17 +59,17 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin: dev
         try design.addPT(.{ "node0.Q", "node1.Q", "node2.Q" }, "out");
     }
 
-    var iter = devices.pins.OutputIterator {
-        .pins = dev.getPins(),
+    var iter = OutputIterator {
+        .pins = dev.all_pins,
         .exclude_glb = pin.glb,
     };
     n = 0;
-    while (iter.next()) |io| {
+    while (iter.next()) |oe_pin| {
         var oe_signal_name = try std.fmt.allocPrint(ta, "temp_{}.OE", .{ n });
         var signal_name = oe_signal_name[0..oe_signal_name.len-3];
         try design.pinAssignment(.{
             .signal = signal_name,
-            .pin_index = io.pin_index,
+            .pin = oe_pin.id,
         });
 
         const oe = switch (n % 4) {
@@ -86,7 +87,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin: dev
     }
 
     var results = try tc.runToolchain(design);
-    try helper.logResults("pt4_oe_{s}_glb{}_mc{}_{}", .{ pin.pin_number, pin.glb, pin.mc, pt4_oe }, results);
+    try helper.logResults("pt4_oe_{s}_{}", .{ pin.id, pt4_oe }, results);
     try results.checkTerm();
     return results;
 }
@@ -94,21 +95,21 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin: dev
 var default_off: ?usize = null;
 var default_on: ?usize = null;
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
     var oe_src_rows = try parseOESourceRows(ta, pa, null);
 
-    try writer.expressionExpanded(@tagName(dev));
+    try writer.expressionExpanded(@tagName(dev.device));
     try writer.expressionExpanded("pt4_output_enable");
 
-    var iter = devices.pins.OutputIterator {
-        .pins = dev.getPins(),
+    var iter = OutputIterator {
+        .pins = dev.all_pins,
     };
-    while (iter.next()) |io| {
+    while (iter.next()) |pin| {
         try tc.cleanTempDir();
         helper.resetTemp();
 
-        const results_off = try runToolchain(ta, tc, dev, io, false);
-        const results_on = try runToolchain(ta, tc, dev, io, true);
+        const results_off = try runToolchain(ta, tc, dev, pin, false);
+        const results_on = try runToolchain(ta, tc, dev, pin, true);
 
         var diff = try JedecData.initDiff(ta, results_off.jedec, results_on.jedec);
 
@@ -121,7 +122,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
             diff.putRange(dev.getRowRange(@intCast(u16, row), @intCast(u16, row)), 0);
         }
 
-        try helper.writePin(writer, io);
+        try helper.writePin(writer, pin);
 
         var value_off: usize = 0;
         var value_on: usize = 0;
@@ -142,7 +143,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         }
 
         if (diff.countSet() != 1) {
-            try helper.err("Expected one pt4_oe fuse but found {}!", .{ diff.countSet() }, dev, .{ .pin_index = io.pin_index });
+            try helper.err("Expected one pt4_oe fuse but found {}!", .{ diff.countSet() }, dev, .{ .pin = pin.id });
         }
 
         if (default_off) |def| {
@@ -176,11 +177,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
 }
 
 
-fn parseOESourceRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*DeviceType) !std.DynamicBitSet {
+fn parseOESourceRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*DeviceInfo) !std.DynamicBitSet {
     const input_file = helper.getInputFile("oe_source.sx") orelse return error.MissingOESourceInputFile;
-    const device = input_file.device;
+    const dev = DeviceInfo.init(input_file.device_type);
 
-    var results = try std.DynamicBitSet.initEmpty(pa, device.getJedecHeight());
+    var results = try std.DynamicBitSet.initEmpty(pa, dev.jedec_dimensions.height());
 
     var stream = std.io.fixedBufferStream(input_file.contents);
     var parser = sx.reader(ta, stream.reader());
@@ -196,7 +197,7 @@ fn parseOESourceRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?
     };
 
     if (out_device) |ptr| {
-        ptr.* = device;
+        ptr.* = dev;
     }
 
     return results;

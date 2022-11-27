@@ -2,30 +2,31 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const core = @import("core.zig");
-const jedec = @import("jedec.zig");
-const devices = @import("devices.zig");
+const common = @import("common");
+const jedec = @import("jedec");
+const device_info = @import("device_info.zig");
 const JedecData = jedec.JedecData;
 const Fuse = jedec.Fuse;
-const DeviceType = devices.DeviceType;
+const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
+const LogicLevels = toolchain.LogicLevels;
 
 pub fn main() void {
     helper.main(0);
 }
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_index: u16, iostd: core.LogicLevels) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: common.PinInfo, iostd: LogicLevels) !toolchain.FitResults {
     var design = Design.init(ta, dev);
     try design.pinAssignment(.{
         .signal = "in",
-        .pin_index = pin_index,
+        .pin = pin.id,
         .iostd = iostd,
     });
     try design.addPT("in", "out");
 
     var results = try tc.runToolchain(design);
-    try helper.logResults("threshold_pin_{s}", .{ dev.getPins()[pin_index].pin_number() }, results);
+    try helper.logResults("threshold_pin_{s}", .{ pin.id }, results);
     try results.checkTerm();
     return results;
 }
@@ -33,44 +34,42 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
 var default_high: ?u1 = null;
 var default_low: ?u1 = null;
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    try writer.expressionExpanded(@tagName(dev));
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+    try writer.expressionExpanded(@tagName(dev.device));
     try writer.expressionExpanded("input_threshold");
 
-    var pin_iter = devices.pins.InputIterator { .pins = dev.getPins() };
-    while (pin_iter.next()) |pin_info| {
-        const pin_index = pin_info.pin_index();
-
+    var pin_iter = helper.InputIterator { .pins = dev.all_pins };
+    while (pin_iter.next()) |pin| {
         try tc.cleanTempDir();
         helper.resetTemp();
 
-        const results_high = try runToolchain(ta, tc, dev, pin_index, .LVCMOS33);
-        const results_low = try runToolchain(ta, tc, dev, pin_index, .LVCMOS15);
+        const results_high = try runToolchain(ta, tc, dev, pin, .LVCMOS33);
+        const results_low = try runToolchain(ta, tc, dev, pin, .LVCMOS15);
 
         const diff = try JedecData.initDiff(ta, results_high.jedec, results_low.jedec);
 
-        try helper.writePin(writer, pin_info);
+        try helper.writePin(writer, pin);
 
         var diff_iter = diff.iterator(.{});
         if (diff_iter.next()) |fuse| {
-            if (dev != .LC4064ZC_csBGA56 or pin_index != 24 or fuse.row != 99 or fuse.col != 159) {
+            if (dev.device != .LC4064ZC_csBGA56 or fuse.row != 99 or fuse.col != 159 or !std.mem.eql(u8, pin.id, "E1")) {
                 // workaround for fitter bug, see readme.md
                 try writeFuse(fuse, results_high.jedec, results_low.jedec, writer);
             }
-        } else if (dev == .LC4064ZC_csBGA56 and pin_index == 30) {
+        } else if (dev.device == .LC4064ZC_csBGA56 and std.mem.eql(u8, pin.id, "F8")) {
             // workaround for fitter bug, see readme.md
             try helper.writeFuse(writer, Fuse.init(99, 159));
         } else {
-            try helper.err("Expected one threshold fuse but found none!", .{}, dev, .{ .pin_index = pin_index });
+            try helper.err("Expected one threshold fuse but found none!", .{}, dev, .{ .pin = pin.id });
         }
 
-        if (dev == .LC4064ZC_csBGA56 and pin_index == 24) {
+        if (dev.device == .LC4064ZC_csBGA56 and std.mem.eql(u8, pin.id, "E1")) {
             // workaround for fitter bug, see readme.md
             _ = diff_iter.next();
         }
 
         if (diff_iter.next()) |fuse| {
-            try helper.err("Expected one threshold fuse but found multiple!", .{}, dev, .{ .pin_index = pin_index });
+            try helper.err("Expected one threshold fuse but found multiple!", .{}, dev, .{ .pin = pin.id });
             try writeFuse(fuse, results_high.jedec, results_low.jedec, writer);
 
             while (diff_iter.next()) |f| {

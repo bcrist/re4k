@@ -2,10 +2,10 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const core = @import("core.zig");
-const jedec = @import("jedec.zig");
-const devices = @import("devices.zig");
-const DeviceType = devices.DeviceType;
+const common = @import("common");
+const jedec = @import("jedec");
+const device_info = @import("device_info.zig");
+const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
@@ -14,16 +14,16 @@ pub fn main() void {
     helper.main(0);
 }
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_index: u16, offset: u3) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: common.PinInfo, offset: u3) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
     try design.pinAssignment(.{
         .signal = "in",
-        .pin_index = dev.getClockPin(0).?.pin_index,
+        .pin = dev.getClockPin(0).?.id,
     });
     try design.pinAssignment(.{
         .signal = "out",
-        .pin_index = pin_index,
+        .pin = pin.id,
     });
     // making the main output registered should prevent the use of the ORM bypass,
     // except in the case where offset == 0.
@@ -31,8 +31,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
     // (see output_routing_mode.zig)
     try design.addPT("in", "out.D");
 
-    const out_info = dev.getPins()[pin_index].input_output;
-    const out_mc = (out_info.mc + offset) & 0xF;
+    const out_mc = (pin.mcRef().?.mc + offset) & 0xF;
 
     var mc: u8 = 0;
     while (mc < 16) : (mc += 1) {
@@ -41,7 +40,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
             const signal = signal_d[0..signal_d.len-2];
             try design.nodeAssignment(.{
                 .signal = signal,
-                .glb = out_info.glb,
+                .glb = pin.glb.?,
                 .mc = mc,
             });
             try design.addPT("in", signal_d);
@@ -49,32 +48,28 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
     }
 
     var results = try tc.runToolchain(design);
-    try helper.logResults("orm_{s}_plus{}", .{ out_info.pin_number, offset }, results);
+    try helper.logResults("orm_{s}_plus{}", .{ pin.id, offset }, results);
     try results.checkTerm();
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    try writer.expressionExpanded(@tagName(dev));
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+    try writer.expressionExpanded(@tagName(dev.device));
     try writer.expressionExpanded("output_routing");
 
-    var pin_iter = devices.pins.OutputIterator {
-        .pins = dev.getPins(),
-    };
-
-    while (pin_iter.next()) |io| {
-
+    var pin_iter = helper.OutputIterator { .pins = dev.all_pins };
+    while (pin_iter.next()) |pin| {
         try tc.cleanTempDir();
         helper.resetTemp();
 
-        const results_1 = try runToolchain(ta, tc, dev, io.pin_index, 1);
-        const results_2 = try runToolchain(ta, tc, dev, io.pin_index, 2);
-        const results_4 = try runToolchain(ta, tc, dev, io.pin_index, 4);
+        const results_1 = try runToolchain(ta, tc, dev, pin, 1);
+        const results_2 = try runToolchain(ta, tc, dev, pin, 2);
+        const results_4 = try runToolchain(ta, tc, dev, pin, 4);
 
         var diff = try JedecData.initDiff(ta, results_1.jedec, results_2.jedec);
         diff.unionDiff(results_1.jedec, results_4.jedec);
 
-        try helper.writePin(writer, io);
+        try helper.writePin(writer, pin);
 
         var diff_iter = diff.iterator(.{});
         while (diff_iter.next()) |fuse| {
@@ -93,7 +88,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
                 1, 2, 4 => {},
                 else => {
                     try helper.err("Expected ORM fuse {}:{} to have a value of 1, 2, or 4, but found {}",
-                        .{ fuse.row, fuse.col, value }, dev, .{ .pin_index = io.pin_index });
+                        .{ fuse.row, fuse.col, value }, dev, .{ .pin = pin.id });
                 },
             }
 
@@ -101,7 +96,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         }
 
         if (diff.countSet() != 3) {
-            try helper.err("Expected exactly 3 ORM fuses but found {}!", .{ diff.countSet() }, dev, .{ .pin_index = io.pin_index });
+            try helper.err("Expected exactly 3 ORM fuses but found {}!", .{ diff.countSet() }, dev, .{ .pin = pin.id });
         }
 
         try writer.close();

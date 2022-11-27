@@ -1,5 +1,5 @@
 rule limp
-    command = limp-debug -qR $in
+    command = limp -qR $in
     generator = true
 
 build configure-LC4128: limp LC4128

@@ -1,10 +1,10 @@
 const std = @import("std");
 const toolchain = @import("toolchain.zig");
-const jedec = @import("jedec.zig");
-const core = @import("core.zig");
-const devices = @import("devices.zig");
+const jedec = @import("jedec");
+const common = @import("common");
+const device_info = @import("device_info.zig");
 const TempAllocator = @import("temp_allocator");
-const DeviceType = devices.DeviceType;
+const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
@@ -17,22 +17,22 @@ pub fn main() !void {
     var tc = try Toolchain.init(ta);
     defer tc.deinit(true);
 
-    const dev = DeviceType.LC4032ZE_TQFP48;
-    var design = Design.init(ta, dev);
+    const dev = DeviceInfo.init(.LC4032ZE_TQFP48);
+    var design = Design.init(ta, &dev);
 
-    try design.pinAssignment(.{ .signal = "d0", .pin_index = 22, });
-    try design.pinAssignment(.{ .signal = "d1", .pin_index = 23, });
-    try design.pinAssignment(.{ .signal = "d2", .pin_index = 25, });
-    try design.pinAssignment(.{ .signal = "d3", .pin_index = 26, });
-    try design.pinAssignment(.{ .signal = "d4", .pin_index = 27, });
-    try design.pinAssignment(.{ .signal = "d5", .pin_index = 30, });
-    try design.pinAssignment(.{ .signal = "d6", .pin_index = 31, });
-    try design.pinAssignment(.{ .signal = "d7", .pin_index = 32, });
+    try design.pinAssignment(.{ .signal = "d0", .pin = "23", });
+    try design.pinAssignment(.{ .signal = "d1", .pin = "24", });
+    try design.pinAssignment(.{ .signal = "d2", .pin = "26", });
+    try design.pinAssignment(.{ .signal = "d3", .pin = "27", });
+    try design.pinAssignment(.{ .signal = "d4", .pin = "28", });
+    try design.pinAssignment(.{ .signal = "d5", .pin = "31", });
+    try design.pinAssignment(.{ .signal = "d6", .pin = "32", });
+    try design.pinAssignment(.{ .signal = "d7", .pin = "33", });
 
-    try design.pinAssignment(.{ .signal = "s1", .pin_index = 18, });
-    try design.pinAssignment(.{ .signal = "s2", .pin_index = 19, });
-    try design.pinAssignment(.{ .signal = "s3", .pin_index = 20, });
-    try design.pinAssignment(.{ .signal = "s4", .pin_index = 21, });
+    try design.pinAssignment(.{ .signal = "s1", .pin = "19", });
+    try design.pinAssignment(.{ .signal = "s2", .pin = "20", });
+    try design.pinAssignment(.{ .signal = "s3", .pin = "21", });
+    try design.pinAssignment(.{ .signal = "s4", .pin = "22", });
 
     // counter bit 0
     try design.addPT("~d3.Q", "d3.D");

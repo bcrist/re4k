@@ -2,10 +2,10 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const jedec = @import("jedec.zig");
-const core = @import("core.zig");
-const devices = @import("devices.zig");
-const DeviceType = devices.DeviceType;
+const jedec = @import("jedec");
+const common = @import("common");
+const device_info = @import("device_info.zig");
+const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
@@ -21,24 +21,26 @@ const BClkMode = enum {
     both_inverted,
 };
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, glb: u8, mode01: BClkMode, mode23: BClkMode) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, glb: u8, mode01: BClkMode, mode23: BClkMode) !toolchain.FitResults {
     var design = Design.init(ta, dev);
+
+    const clocks = dev.clock_pins;
 
     try design.pinAssignment(.{
         .signal = "clk0",
-        .pin_index = dev.getClockPin(0).?.pin_index,
+        .pin = clocks[0].id,
     });
     try design.pinAssignment(.{
         .signal = "clk1",
-        .pin_index = dev.getClockPin(1).?.pin_index,
+        .pin = clocks[1].id,
     });
     try design.pinAssignment(.{
         .signal = "clk2",
-        .pin_index = dev.getClockPin(2).?.pin_index,
+        .pin = clocks[2].id,
     });
     try design.pinAssignment(.{
         .signal = "clk3",
-        .pin_index = dev.getClockPin(3).?.pin_index,
+        .pin = clocks[3].id,
     });
 
     try design.nodeAssignment(.{
@@ -108,14 +110,14 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, glb: u8,
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    try writer.expressionExpanded(@tagName(dev));
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+    try writer.expressionExpanded(@tagName(dev.device));
     try writer.expressionExpanded("bclk_polarity");
 
     var defaults = std.EnumMap(BClkMode, usize) {};
 
     var glb: u8 = 0;
-    while (glb < dev.getNumGlbs()) : (glb += 1) {
+    while (glb < dev.num_glbs) : (glb += 1) {
         try helper.writeGlb(writer, glb);
 
         var base_clk: usize = 0;

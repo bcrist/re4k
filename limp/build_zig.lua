@@ -46,6 +46,7 @@ function dir_visitor.exe (_, _, dir_path)
         safe_name = name:gsub("[^A-Za-z0-9_]", "_"),
         dir = dir_path,
         path = default_path,
+        link_libc = false,
     }
     while nil ~= parser:property(exe_visitor, executable) do end
     parser:require_close()
@@ -59,6 +60,11 @@ end
 
 function exe_visitor.runStep (_, _, executable)
     executable.runStep = parser:require_string()
+    parser:require_close()
+end
+
+function exe_visitor.linkLibC (_, _, executable)
+    executable.link_libc = true
     parser:require_close()
 end
 
@@ -179,8 +185,10 @@ local write_exe = template [[
 const `safe_name` = b.addExecutable("`name`", "`path`");`
 for dep in spairs(deps) do
     write(nl, safe_name, '.addPackage(', dep, ');')
+end
+if link_libc then
+    write(nl, safe_name, '.linkLibC();')
 end`
-`safe_name`.linkLibC();
 `safe_name`.setTarget(target);
 `safe_name`.setBuildMode(mode);
 `safe_name`.install();

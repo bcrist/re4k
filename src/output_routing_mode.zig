@@ -2,10 +2,10 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const jedec = @import("jedec.zig");
-const core = @import("core.zig");
-const devices = @import("devices.zig");
-const DeviceType = devices.DeviceType;
+const jedec = @import("jedec");
+const common = @import("common");
+const device_info = @import("device_info.zig");
+const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
@@ -21,7 +21,7 @@ const ORPMode = enum {
     orm_bypass,
 };
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_index: u16, bypass: ORPMode) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: common.PinInfo, bypass: ORPMode) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
     try design.pinAssignment(.{
@@ -37,14 +37,14 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
         .signal = "in4",
     });
 
-    var io = dev.getPins()[pin_index].input_output;
+    const pin_mc = pin.mcRef().?.mc;
 
     var mc: u8 = 0;
-    while (mc < io.mc) : (mc += 1) {
+    while (mc < pin_mc) : (mc += 1) {
         var signal_name = try std.fmt.allocPrint(ta, "dum{}", .{ mc });
         try design.nodeAssignment(.{
             .signal = signal_name,
-            .glb = io.glb,
+            .glb = pin.glb.?,
             .mc = mc,
         });
         try design.addPT(.{ "in", "in2" }, signal_name);
@@ -60,7 +60,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
     };
     try design.pinAssignment(.{
         .signal = "out",
-        .pin_index = pin_index,
+        .pin = pin.id,
         .fast_bypass = fast_bypass,
         .orm_bypass = (bypass == .orm_bypass),
     });
@@ -72,25 +72,25 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, pin_inde
     try design.addPT("in4", out_signal);
 
     var results = try tc.runToolchain(design);
-    try helper.logResults("bypass_pin{}_{s}", .{ pin_index, @tagName(bypass) }, results);
+    try helper.logResults("bypass_{s}_{s}", .{ pin.id, @tagName(bypass) }, results);
     try results.checkTerm();
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    try writer.expressionExpanded(@tagName(dev));
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+    try writer.expressionExpanded(@tagName(dev.device));
     try writer.expressionExpanded("output_routing_mode");
 
     var defaults = std.EnumMap(ORPMode, usize) {};
 
-    var pin_iter = devices.pins.OutputIterator { .pins = dev.getPins() };
-    while (pin_iter.next()) |io| {
+    var pin_iter = helper.OutputIterator { .pins = dev.all_pins };
+    while (pin_iter.next()) |pin| {
         try tc.cleanTempDir();
         helper.resetTemp();
 
         var jeds = std.EnumMap(ORPMode, JedecData) {};
         for (std.enums.values(ORPMode)) |mode| {
-            const results = try runToolchain(ta, tc, dev, io.pin_index, mode);
+            const results = try runToolchain(ta, tc, dev, pin, mode);
             jeds.put(mode, results.jedec);
         }
 
@@ -99,7 +99,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         var diff = try JedecData.initDiff(ta, jeds.get(.orm).?, jeds.get(.fast_bypass).?);
         diff.unionDiff(jeds.get(.orm).?, jeds.get(.orm_bypass).?);
 
-        try helper.writePin(writer, io);
+        try helper.writePin(writer, pin);
 
         var values = std.EnumMap(ORPMode, usize) {};
 
@@ -131,7 +131,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         }
 
         if (diff.countSet() != 2) {
-            try helper.err("Expected two bypass fuses but found {}!", .{ diff.countSet() }, dev, .{ .pin_index = io.pin_index });
+            try helper.err("Expected two bypass fuses but found {}!", .{ diff.countSet() }, dev, .{ .pin = pin.id });
         }
 
         try writer.close();

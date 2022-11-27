@@ -1,12 +1,12 @@
 const std = @import("std");
 const microbe = @import("microbe");
 const clock = microbe.clock;
-const LC4kCommand = @import("svf").JtagCommand;
-const DeviceType = @import("devices").DeviceType;
+const LC4kCommand = @import("svf_file").JtagCommand;
+const DeviceType = @import("common").DeviceType;
 
 const device = DeviceType.LC4064ZC_TQFP100;
-const width = device.getJedecWidth();
-const height = device.getJedecHeight();
+const width = device.get().jedec_dimensions.width();
+const height = device.get().jedec_dimensions.height();
 const RowDataType = std.meta.Int(.unsigned, width);
 
 pub const clocks = microbe.ClockConfig {

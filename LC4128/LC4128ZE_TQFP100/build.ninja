@@ -82,13 +82,13 @@ rule reg_type
     command = zig-out/bin/reg_type.exe $out $in
 build $dev/reg_type.sx: reg_type
 
-rule shared_pt_async_polarity
-    command = zig-out/bin/shared_pt_async_polarity.exe $out $in
-build $dev/shared_pt_async_polarity.sx: shared_pt_async_polarity $dev\shared_pt_clk_polarity.sx
-
 rule shared_pt_clk_polarity
     command = zig-out/bin/shared_pt_clk_polarity.exe $out $in
 build $dev/shared_pt_clk_polarity.sx: shared_pt_clk_polarity
+
+rule shared_pt_init_polarity
+    command = zig-out/bin/shared_pt_init_polarity.exe $out $in
+build $dev/shared_pt_init_polarity.sx: shared_pt_init_polarity $dev\shared_pt_clk_polarity.sx
 
 rule slew
     command = zig-out/bin/slew.exe $out $in
@@ -110,7 +110,7 @@ rule zerohold
     command = zig-out/bin/zerohold.exe $out $in
 build $dev/zerohold.sx: zerohold
 
-build LC4128\LC4128ZE_TQFP100.sx: combine $dev/async_source.sx $dev/bclk_polarity.sx $dev/ce_source.sx $dev/clock_source.sx $dev/cluster_routing.sx $dev/drive.sx $dev/goes.sx $dev/grp.sx $dev/init_source.sx $dev/init_state.sx $dev/invert.sx $dev/oe_source.sx $dev/osctimer.sx $dev/output_routing.sx $dev/power_guard.sx $dev/pt0_xor.sx $dev/pt4_oe.sx $dev/pterms.sx $dev/pull.sx $dev/reg_type.sx $dev/shared_pt_async_polarity.sx $dev/shared_pt_clk_polarity.sx $dev/slew.sx $dev/threshold.sx $dev/wide_routing.sx $dev/xor.sx $dev/zerohold.sx
+build LC4128\LC4128ZE_TQFP100.sx: combine $dev/async_source.sx $dev/bclk_polarity.sx $dev/ce_source.sx $dev/clock_source.sx $dev/cluster_routing.sx $dev/drive.sx $dev/goes.sx $dev/grp.sx $dev/init_source.sx $dev/init_state.sx $dev/invert.sx $dev/oe_source.sx $dev/osctimer.sx $dev/output_routing.sx $dev/power_guard.sx $dev/pt0_xor.sx $dev/pt4_oe.sx $dev/pterms.sx $dev/pull.sx $dev/reg_type.sx $dev/shared_pt_clk_polarity.sx $dev/shared_pt_init_polarity.sx $dev/slew.sx $dev/threshold.sx $dev/wide_routing.sx $dev/xor.sx $dev/zerohold.sx
 build build-LC4128ZE_TQFP100: phony LC4128\LC4128ZE_TQFP100.sx
 
 ## ######################### END OF GENERATED CODE ######################### ##

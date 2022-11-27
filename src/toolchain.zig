@@ -1,56 +1,33 @@
 const std = @import("std");
 const builtin = @import("builtin");
-const core = @import("core.zig");
-const jedec = @import("jedec.zig");
+const common = @import("common");
+const jedec = @import("jedec");
+const jed_file = @import("jed_file");
 const helper = @import("helper.zig");
-
-const devices = @import("devices.zig");
-const DeviceType = devices.DeviceType;
+const device_info = @import("device_info.zig");
+const DeviceInfo = device_info.DeviceInfo;
 const JedecData = jedec.JedecData;
-
-fn getDeviceFitterName(device: DeviceType) []const u8 {
-    return switch (device) {
-        .LC4032x_TQFP44    => "M4S_32_30",
-        .LC4032x_TQFP48    => "M4S_32_32",
-        .LC4032ZC_TQFP48   => "M4Z_32_32",
-        .LC4032ZC_csBGA56  => "M4Z_32_32S",
-        .LC4032ZE_TQFP48   => "M4E_32_32",
-        .LC4032ZE_csBGA64  => "M4E_32_32S",
-        .LC4064x_TQFP44    => "M4S_64_30",
-        .LC4064x_TQFP48    => "M4S_64_32",
-        .LC4064ZC_TQFP48   => "M4Z_64_32",
-        .LC4064ZE_TQFP48   => "M4E_64_32",
-        .LC4064ZC_csBGA56  => "M4Z_64_32S",
-        .LC4064ZE_csBGA64  => "M4E_64_48S",
-        .LC4064ZE_ucBGA64  => "M4E_64_48U",
-        .LC4064x_TQFP100   => "M4S_64_64",
-        .LC4064ZC_TQFP100  => "M4Z_64_64",
-        .LC4064ZE_TQFP100  => "M4E_64_64",
-        .LC4064ZC_csBGA132 => "M4Z_64_64S",
-        .LC4064ZE_csBGA144 => "M4E_64_64S",
-        .LC4128x_TQFP100   => "M4S_128_64",
-        .LC4128ZC_TQFP100  => "M4Z_128_64",
-        .LC4128ZE_TQFP100  => "M4E_128_64",
-        .LC4128x_TQFP128   => "M4S_128_92",
-        .LC4128V_TQFP144   => "M4S_128_96",
-        .LC4128ZC_csBGA132 => "M4Z_128_96S",
-        .LC4128ZE_TQFP144  => "M4E_128_96",
-        .LC4128ZE_csBGA144 => "M4E_128_96S",
-        .LC4128ZE_ucBGA144 => "M4E_128_96U",
-    };
-}
 
 pub const PinAssignment = struct {
     signal: []const u8,
-    pin_index: ?u16 = null,
-    iostd: ?core.LogicLevels = null,
-    drive: ?core.DriveType = null,
-    bus_maintenance: ?core.BusMaintenanceType = null,
-    slew_rate: ?core.SlewRate = null,
+    pin: ?[]const u8 = null,
+    iostd: ?LogicLevels = null,
+    drive: ?common.DriveType = null,
+    bus_maintenance: ?common.BusMaintenance = null,
+    slew_rate: ?common.SlewRate = null,
     power_guard_signal: ?[]const u8 = null,
     init_state: ?u1 = null,
     orm_bypass: ?bool = null,
     fast_bypass: ?bool = null,
+};
+
+pub const LogicLevels = enum {
+    PCI,
+    LVTTL,
+    LVCMOS15,
+    LVCMOS18,
+    LVCMOS25,
+    LVCMOS33,
 };
 
 pub const NodeAssignment = struct {
@@ -129,7 +106,7 @@ fn stringSort(ctx: void, a: []const u8, b: []const u8) bool {
 
 pub const Design = struct {
     alloc: std.mem.Allocator,
-    device: DeviceType,
+    dev: *const DeviceInfo,
     pins: std.ArrayListUnmanaged(PinAssignment),
     nodes: std.ArrayListUnmanaged(NodeAssignment),
     inputs: std.ArrayListUnmanaged([]const u8),
@@ -140,12 +117,12 @@ pub const Design = struct {
     parse_glb_inputs: bool,
     max_fit_time_ms: u32,
     uses_power_guard: bool,
-    osctimer_div: ?core.TimerDivisor,
+    osctimer_div: ?common.TimerDivisor,
 
-    pub fn init(alloc: std.mem.Allocator, device: DeviceType) Design {
+    pub fn init(alloc: std.mem.Allocator, dev: *const DeviceInfo) Design {
         return .{
             .alloc = alloc,
-            .device = device,
+            .dev = dev,
             .pins = .{},
             .nodes = .{},
             .inputs = .{},
@@ -163,7 +140,7 @@ pub const Design = struct {
     pub fn pinAssignment(self: *Design, pa: PinAssignment) !void {
         for (self.pins.items) |*existing| {
             if (std.mem.eql(u8, pa.signal, existing.signal)) {
-                if (pa.pin_index) |pin_index| existing.pin_index = pin_index;
+                if (pa.pin) |pin| existing.pin = pin;
                 if (pa.iostd) |iostd| existing.iostd = iostd;
                 if (pa.drive) |drive| existing.drive = drive;
                 if (pa.bus_maintenance) |pull| existing.bus_maintenance = pull;
@@ -370,7 +347,7 @@ pub const Design = struct {
         }
     }
 
-    pub fn oscillator(self: *Design, div: core.TimerDivisor) !void {
+    pub fn oscillator(self: *Design, div: common.TimerDivisor) !void {
         self.osctimer_div = div;
         try self.nodeAssignment(.{
             .signal = "OSC_disable",
@@ -387,16 +364,14 @@ pub const Design = struct {
     }
 
     pub fn writeLci(self: Design, writer: anytype) !void {
-        const device = self.device;
-        const macrocells = device.getNumMcs();
-        const series_suffix: []const u8 = switch (device.getFamily()) {
+        const series_suffix: []const u8 = switch (self.dev.family) {
             .low_power => "v",
             .zero_power => "c",
             .zero_power_enhanced => "e",
         };
 
         try writer.writeAll("[Revision]\n");
-        try writer.print("Parent = lc4k{}{s}.lci;\n", .{ macrocells, series_suffix });
+        try writer.print("Parent = lc4k{}{s}.lci;\n", .{ self.dev.num_mcs, series_suffix });
 
         try writer.writeAll("\n[Fitter Report Format]\n");
         try writer.writeAll("Detailed = yes;\n");
@@ -407,10 +382,10 @@ pub const Design = struct {
         try writer.writeAll("\n[Device]\n");
         try writer.writeAll("Family = lc4k;\n");
         try writer.writeAll("PartNumber = ");
-        try device.writePartNumber(writer, null, null, null);
+        try self.dev.writePartNumber(writer, null, null, null);
         try writer.writeAll(";\n");
-        try writer.print("Package = {s};\n", .{ device.getPackage().getName() });
-        try writer.print("PartType = {s}{s};\n", .{ device.getBasePartNumber(), device.getFamily().getPartNumberSuffix() });
+        try writer.print("Package = {s};\n", .{ self.dev.getPackageName() });
+        try writer.print("PartType = {s}{s};\n", .{ self.dev.getBasePartNumber(), self.dev.getPartNumberSuffix() });
         try writer.writeAll("Speed = -7.5;\n");
         try writer.writeAll("Operating_condition = COM;\n");
         try writer.writeAll("Status = Production;\n");
@@ -428,26 +403,26 @@ pub const Design = struct {
 
         try writer.writeAll("\n[Location Assignments]\n");
         for (self.pins.items) |pin_assignment| {
-            if (pin_assignment.pin_index) |pin_index| {
-                switch (device.getPins()[pin_index]) {
-                    .input_output => |info| {
-                        const glb_name = devices.getGlbName(info.glb);
-                        try writer.print("{s}=pin,{s},-,{s},{};\n", .{ pin_assignment.signal, info.pin_number, glb_name, info.mc });
+            if (pin_assignment.pin) |pin_name| {
+                if (self.dev.getPin(pin_name)) |pin| switch (pin.func) {
+                    .io, .io_oe0, .io_oe1 => |mc| {
+                        const glb_name = device_info.getGlbName(pin.glb.?);
+                        try writer.print("{s}=pin,{s},-,{s},{};\n", .{ pin_assignment.signal, pin.id, glb_name, mc });
                     },
-                    .input => |info| {
-                        try writer.print("{s}=pin,{s},-,-,-;\n", .{ pin_assignment.signal, info.pin_number });
+                    .input => {
+                        try writer.print("{s}=pin,{s},-,-,-;\n", .{ pin_assignment.signal, pin.id });
                     },
-                    .clock_input => |info| {
-                        try writer.print("{s}=pin,{s},-,-,-;\n", .{ pin_assignment.signal, info.pin_number });
+                    .clock => {
+                        try writer.print("{s}=pin,{s},-,-,-;\n", .{ pin_assignment.signal, pin.id });
                     },
                     else => return error.InvalidPinAssignment,
-                }
+                } else return error.InvalidPinAssignment;
             }
         }
 
         for (self.nodes.items) |node_assignment| {
             if (node_assignment.glb) |glb| {
-                const glb_name = devices.getGlbName(glb);
+                const glb_name = device_info.getGlbName(glb);
                 if (node_assignment.mc) |mc| {
                     try writer.print("{s}=node,-,-,{s},{};\n", .{ node_assignment.signal, glb_name, mc });
                 } else {
@@ -491,9 +466,9 @@ pub const Design = struct {
 
         try writer.writeAll("\n[Pullup]\n");
 
-        if (device.getFamily() == .zero_power_enhanced) {
+        if (self.dev.family == .zero_power_enhanced) {
             try writer.writeAll("Default=down;\n");
-            for ([_]core.BusMaintenanceType { .float, .pulldown, .pullup, .keeper }) |pull| {
+            for ([_]common.BusMaintenance { .float, .pulldown, .pullup, .keeper }) |pull| {
                 const tag = switch (pull) {
                     .float => "OFF",
                     .pulldown => "DOWN",
@@ -517,7 +492,7 @@ pub const Design = struct {
                 try writer.writeAll(";\n");
             }
         } else {
-            var default: ?core.BusMaintenanceType = null;
+            var default: ?common.BusMaintenance = null;
             for (self.pins.items) |pin_assignment| {
                 if (pin_assignment.bus_maintenance) |pin_pull| {
                     if (default) |default_pull| {
@@ -546,7 +521,7 @@ pub const Design = struct {
         try writer.writeAll("\n[Slewrate]\n");
         try writer.writeAll("Default=fast;\n");
 
-        for ([_]core.SlewRate { .slow, .fast }) |slew| {
+        for ([_]common.SlewRate { .slow, .fast }) |slew| {
             try writer.print("{s}=", .{ @tagName(slew) });
             var first = true;
             for (self.pins.items) |pin_assignment| {
@@ -622,7 +597,7 @@ pub const Design = struct {
             try writer.writeAll(";\n");
         }
 
-        if (device.getFamily() == .zero_power_enhanced) {
+        if (self.dev.family == .zero_power_enhanced) {
             if (self.osctimer_div) |divisor| {
                 try writer.writeAll("\n[OSCTIMER Assignments]\n");
                 try writer.writeAll("layer = OFF;\n");
@@ -742,8 +717,37 @@ pub const Design = struct {
 };
 
 pub const GlbInputSignal = union(enum) {
-    fb: core.MacrocellRef,
-    pin: u16,
+    fb: common.MacrocellRef,
+    pin: []const u8,
+
+    pub fn eql (a: GlbInputSignal, b: GlbInputSignal) bool {
+        return switch (a) {
+            .fb => |afb| switch (b) {
+                .fb => |bfb| std.meta.eql(afb, bfb),
+                .pin => false,
+            },
+            .pin => |aid| switch (b) {
+                .fb => false,
+                .pin => |bid| std.mem.eql(u8, aid, bid),
+            },
+        };
+    }
+
+    pub const HashContext = struct {
+        pub fn hash(_: HashContext, x: GlbInputSignal) u64 {
+            var h = std.hash.Wyhash.init(12345);
+            // We don't actually include the FB/pin distinction in the hash.
+            // The pin ID will be alphanumeric ASCII, and the FB will be two small bytes, which shouldn't overlap with ASCII.
+            switch (x) {
+                .fb => |mcref| h.update(std.mem.asBytes(&mcref)),
+                .pin => |id| h.update(id),
+            }
+            return h.final();
+        }
+        pub fn eql(_: HashContext, a: GlbInputSignal, b: GlbInputSignal) bool {
+            return a.eql(b);
+        }
+    };
 };
 
 pub const GlbInputFitSignal = struct {
@@ -828,7 +832,12 @@ pub const GlbInputSet = struct {
         if (indexOf(s, signals)) |i| {
             return self.raw.set(i);
         } else {
-            unreachable;
+            var buf: [1024]u8 = undefined;
+            const msg = switch (s) {
+                .fb => |mcref| std.fmt.bufPrint(&buf, "Can't add feedback signal {any}", .{ mcref }),
+                .pin => |id| std.fmt.bufPrint(&buf, "Can't add pin signal {s}", .{ id }),
+            } catch unreachable;
+            @panic(msg);
         }
     }
 
@@ -902,7 +911,7 @@ pub const GlbInputSet = struct {
 
     fn indexOf(signal: GlbInputSignal, signals: []const GlbInputFitSignal) ?usize {
         for (signals) |s, i| {
-            if (std.meta.eql(signal, s.source)) {
+            if (signal.eql(s.source)) {
                 return i;
             }
         }
@@ -920,7 +929,6 @@ pub const FitResults = struct {
     failed: bool,
     report: []const u8,
     jedec: JedecData,
-    //signals: []SignalFitData,
     glbs: []GlbFitData,
 
     pub fn checkTerm(self: FitResults) !void {
@@ -1003,7 +1011,7 @@ pub const Toolchain = struct {
             "C:\\ispLEVER_Classic2_1\\ispcpld\\bin\\lpf4k.exe",
             "-i", "test.tt4",
             "-lci", "test.lci",
-            "-d", getDeviceFitterName(design.device),
+            "-d", design.dev.getFitterName(),
             "-fmt", "PLA",
             //"-lca",
             //"-lca_mfb",
@@ -1031,13 +1039,15 @@ pub const Toolchain = struct {
             failed = true;
         }
 
+        const jedec_size = design.dev.jedec_dimensions;
+
         var report: []const u8 = "";
         var jed: JedecData = undefined;
         if (failed) {
-            jed = try design.device.initJedecBlank(self.alloc);
+            jed = try JedecData.initFull(self.alloc, jedec_size);
         } else {
             report = try self.readFile("test.rpt");
-            jed = try JedecData.parse(self.alloc, design.device.getJedecWidth(), design.device.getJedecHeight(), "test.jed", try self.readFile("test.jed"));
+            jed = (try jed_file.parse(self.alloc, jedec_size.width(), jedec_size.height(), try self.readFile("test.jed"))).data;
         }
 
         var results = FitResults {
@@ -1045,12 +1055,10 @@ pub const Toolchain = struct {
             .failed = failed,
             .report = report,
             .jedec = jed,
-            //.signals = &[_]SignalFitData{},
-            .glbs = try self.alloc.alloc(GlbFitData, design.device.getNumGlbs()),
+            .glbs = try self.alloc.alloc(GlbFitData, design.dev.num_glbs),
         };
 
         try self.parseFitterReport(design, &results);
-        // results.signals = signals.items;
         return results;
     }
 
@@ -1078,7 +1086,7 @@ pub const Toolchain = struct {
         return f.readToEndAlloc(self.alloc, 0x100000000);
     }
 
-    fn parseGlbInputFitSignal(out: *GlbFitData, raw: []const u8, dev: DeviceType) !void {
+    fn parseGlbInputFitSignal(out: *GlbFitData, raw: []const u8, dev: *const DeviceInfo) !void {
         const gi = try std.fmt.parseInt(u8, raw[0..2], 10);
         const raw_name = raw[13..29];
         var signal = std.mem.trim(u8, raw_name, " ");
@@ -1090,18 +1098,11 @@ pub const Toolchain = struct {
             const raw_source = raw[3..12];
 
             if (std.mem.eql(u8, raw_source[0..3], "pin")) {
-                const pin_number = std.mem.trim(u8, raw_source[3..], " ");
-                var pin_index: ?u16 = null;
-                for (dev.getPins()) |info| {
-                    if (std.mem.eql(u8, pin_number, info.pin_number())) {
-                        pin_index = info.pin_index();
-                        break;
-                    }
-                }
-                source = .{ .pin = pin_index.? };
+                const id = std.mem.trim(u8, raw_source[3..], " ");
+                source = .{ .pin = dev.getPin(id).?.id };
             } else {
                 const glb = raw_source[3] - 'A';
-                const mc = try std.fmt.parseInt(u8, std.mem.trim(u8, raw_source[5..], " "), 10);
+                const mc = try std.fmt.parseInt(common.MacrocellIndex, std.mem.trim(u8, raw_source[5..], " "), 10);
 
                 source = .{ .fb = .{
                     .glb = glb,
@@ -1117,12 +1118,10 @@ pub const Toolchain = struct {
     }
 
     fn parseFitterReport(self: *Toolchain, design: Design, results: *FitResults) !void {
-        const device = design.device;
-
         if (design.parse_glb_inputs) {
             var glb: u8 = 0;
-            while (glb < device.getNumGlbs()) : (glb += 1) {
-                const header = try std.fmt.allocPrint(self.alloc, "GLB_{s}_LOGIC_ARRAY_FANIN", .{ devices.getGlbName(glb) });
+            while (glb < design.dev.num_glbs) : (glb += 1) {
+                const header = try std.fmt.allocPrint(self.alloc, "GLB_{s}_LOGIC_ARRAY_FANIN", .{ device_info.getGlbName(glb) });
                 if (helper.extract(results.report, header, "------------------------------------------")) |raw| {
                     var fit_data = GlbFitData {
                         .glb = glb,
@@ -1135,9 +1134,9 @@ pub const Toolchain = struct {
                         }
 
                         if (line.len >= 36) {
-                            try parseGlbInputFitSignal(&fit_data, line[0..36], device);
+                            try parseGlbInputFitSignal(&fit_data, line[0..36], design.dev);
                             if (line.len >= 69) {
-                                try parseGlbInputFitSignal(&fit_data, line[40..], device);
+                                try parseGlbInputFitSignal(&fit_data, line[40..], design.dev);
                             }
                         }
                     }
@@ -1149,7 +1148,7 @@ pub const Toolchain = struct {
 
     pub fn cleanTempDir(self: *Toolchain) !void {
         var n: u8 = 0;
-        const max: u8 = 10;
+        const max: u8 = 20;
         while (n <= max) : (n += 1) {
             var retry = false;
             var iter = self.dir.iterate();
@@ -1167,7 +1166,7 @@ pub const Toolchain = struct {
             }
 
             if (retry) {
-                std.time.sleep(1000000);
+                std.time.sleep(10_000_000 * @as(u64, n));
             } else {
                 break;
             }

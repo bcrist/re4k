@@ -2,11 +2,11 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const core = @import("core.zig");
-const jedec = @import("jedec.zig");
-const devices = @import("devices.zig");
+const common = @import("common");
+const jedec = @import("jedec");
+const device_info = @import("device_info.zig");
 const JedecData = jedec.JedecData;
-const DeviceType = devices.DeviceType;
+const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 
@@ -21,7 +21,7 @@ pub fn main() void {
     helper.main(0);
 }
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: core.MacrocellRef, src: ClockEnableSource) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: common.MacrocellRef, src: ClockEnableSource) !toolchain.FitResults {
     var design = Design.init(ta, dev);
     var scratch_base: u8 = if (mcref.mc < 8) 8 else 1;
 
@@ -81,11 +81,11 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, mcref: c
 
 var defaults = std.EnumMap(ClockEnableSource, usize) {};
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    try writer.expressionExpanded(@tagName(dev));
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+    try writer.expressionExpanded(@tagName(dev.device));
     try writer.expressionExpanded("clock_enable_source");
 
-    var mc_iter = core.MacrocellIterator { .device = dev };
+    var mc_iter = helper.MacrocellIterator { .dev = dev };
     while (mc_iter.next()) |mcref| {
         try tc.cleanTempDir();
         helper.resetTemp();
@@ -93,7 +93,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         var data = std.EnumMap(ClockEnableSource, JedecData) {};
         var values = std.EnumMap(ClockEnableSource, usize) {};
 
-        var diff = try dev.initJedecZeroes(ta);
+        var diff = try JedecData.initEmpty(ta, dev.jedec_dimensions);
 
         for (std.enums.values(ClockEnableSource)) |src| {
             var results = try runToolchain(ta, tc, dev, mcref, src);

@@ -6,6 +6,12 @@
     (notest)
     (pkg sx)
 )
+(dir pkg/lc4k/src
+    (notest)
+    (pkg common)
+    (pkg jedec)
+    (pkg jed_file)
+)
 (dir src
     (exe grp)
     (exe convert-grp)

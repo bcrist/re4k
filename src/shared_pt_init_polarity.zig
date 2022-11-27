@@ -2,10 +2,10 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const jedec = @import("jedec.zig");
-const core = @import("core.zig");
-const devices = @import("devices.zig");
-const DeviceType = devices.DeviceType;
+const jedec = @import("jedec");
+const common = @import("common");
+const device_info = @import("device_info.zig");
+const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
@@ -15,10 +15,10 @@ pub fn main() void {
     helper.main(1);
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
     const sptclk_polarity_fuses = try helper.parseSharedPTClockPolarityFuses(ta, pa, dev);
 
-    try writer.expressionExpanded(@tagName(dev));
+    try writer.expressionExpanded(@tagName(dev.device));
     try writer.expressionExpanded("shared_pt_init_polarity");
 
     // The fitter seems to refuse to set this bit.  Attempting the same technique used for shared_pt_clk_polarity
@@ -42,12 +42,12 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: De
         try writer.expression("glb");
         try writer.int(glb, 10);
         try writer.expression("name");
-        try writer.string(devices.getGlbName(@intCast(u8, glb)));
+        try writer.string(device_info.getGlbName(@intCast(u8, glb)));
         try writer.close();
         writer.setCompact(false);
 
         const sptclk_fuse = sptclk_polarity_fuses[glb];
-        const sptoe_bus_size = @min(4, dev.getNumGlbs());
+        const sptoe_bus_size = @min(4, dev.num_glbs);
         try helper.writeFuse(writer, Fuse.init(sptclk_fuse.row + 1 + sptoe_bus_size, sptclk_fuse.col));
 
         try writer.close(); // glb

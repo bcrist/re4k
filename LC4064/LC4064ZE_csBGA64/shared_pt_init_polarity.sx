@@ -1,0 +1,18 @@
+(LC4064ZE_csBGA64
+   (shared_pt_init_polarity
+      (glb 0 (name A)
+         (fuse 77 355)
+      )
+      (glb 1 (name B)
+         (fuse 77 266)
+      )
+      (glb 2 (name C)
+         (fuse 77 177)
+      )
+      (glb 3 (name D)
+         (fuse 77 88)
+      )
+      (value 0 active_low)
+      (value 1 active_high)
+   )
+)

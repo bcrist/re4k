@@ -2,10 +2,10 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const jedec = @import("jedec.zig");
-const core = @import("core.zig");
-const devices = @import("devices.zig");
-const DeviceType = devices.DeviceType;
+const jedec = @import("jedec");
+const common = @import("common");
+const device_info = @import("device_info.zig");
+const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
@@ -19,21 +19,21 @@ const Polarity = enum {
     negative,
 };
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, glb: u8, polarity: Polarity) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, glb: u8, polarity: Polarity) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
-    var pin_iter = devices.pins.InputIterator {
-        .pins = dev.getPins(),
+    var pin_iter = helper.InputIterator {
+        .pins = dev.all_pins,
         .exclude_glb = glb,
         .exclude_clocks = true,
     };
     try design.pinAssignment(.{
         .signal = "sck1",
-        .pin_index = pin_iter.next().?.pin_index(),
+        .pin = pin_iter.next().?.id,
     });
     try design.pinAssignment(.{
         .signal = "sck2",
-        .pin_index = pin_iter.next().?.pin_index(),
+        .pin = pin_iter.next().?.id,
     });
 
     try design.nodeAssignment(.{
@@ -53,14 +53,14 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, glb: u8,
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    try writer.expressionExpanded(@tagName(dev));
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+    try writer.expressionExpanded(@tagName(dev.device));
     try writer.expressionExpanded("shared_pt_clk_polarity");
 
     var defaults = std.EnumMap(Polarity, usize) {};
 
     var glb: u8 = 0;
-    while (glb < dev.getNumGlbs()) : (glb += 1) {
+    while (glb < dev.num_glbs) : (glb += 1) {
         try helper.writeGlb(writer, glb);
 
         const positive_results = try runToolchain(ta, tc, dev, glb, .positive);

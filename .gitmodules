@@ -1,9 +1,12 @@
+[submodule "pkg/lc4k"]
+	path = pkg/lc4k
+	url = https://github.com/bcrist/Zig-LC4k
+[submodule "pkg/sx"]
+	path = pkg/sx
+	url = https://github.com/bcrist/Zig-SX
 [submodule "pkg/tempallocator"]
 	path = pkg/tempallocator
 	url = https://github.com/bcrist/Zig-TempAllocator
 [submodule "pkg/microbe"]
 	path = pkg/microbe
 	url = https://github.com/bcrist/microbe
-[submodule "pkg/sx"]
-	path = pkg/sx
-	url = https://github.com/bcrist/Zig-SX

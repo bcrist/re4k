@@ -2,10 +2,10 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const jedec = @import("jedec.zig");
-const core = @import("core.zig");
-const devices = @import("devices.zig");
-const DeviceType = devices.DeviceType;
+const jedec = @import("jedec");
+const common = @import("common");
+const device_info = @import("device_info.zig");
+const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
@@ -20,22 +20,22 @@ const Polarity = enum {
     negative,
 };
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, osc_out: bool, timer_out: bool, disable: bool, reset: bool, div: core.TimerDivisor, glb: u8) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, osc_out: bool, timer_out: bool, disable: bool, reset: bool, div: common.TimerDivisor, glb: u8) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
     if (osc_out or timer_out) {
         try design.oscillator(div);
     }
 
-    var pin_iter = devices.pins.OutputIterator {
-        .pins = dev.getPins(),
+    var pin_iter = helper.OutputIterator {
+        .pins = dev.all_pins,
         .single_glb = glb,
     };
 
     if (osc_out) {
         try design.pinAssignment(.{
             .signal = "out_osc",
-            .pin_index = pin_iter.next().?.pin_index,
+            .pin = pin_iter.next().?.id,
         });
         try design.addPT("OSC_out", "out_osc");
     } else {
@@ -45,7 +45,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, osc_out:
     if (timer_out) {
         try design.pinAssignment(.{
             .signal = "out_timer",
-            .pin_index = pin_iter.next().?.pin_index,
+            .pin = pin_iter.next().?.id,
         });
         try design.addPT("OSC_tout", "out_timer");
     } else {
@@ -55,7 +55,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, osc_out:
     if (disable) {
         try design.pinAssignment(.{
             .signal = "in_disable",
-            .pin_index = pin_iter.next().?.pin_index,
+            .pin = pin_iter.next().?.id,
         });
         try design.addPT("in_disable", "OSC_disable");
     } else {
@@ -65,7 +65,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, osc_out:
     if (reset) {
         try design.pinAssignment(.{
             .signal = "in_reset",
-            .pin_index = pin_iter.next().?.pin_index,
+            .pin = pin_iter.next().?.id,
         });
         try design.addPT("in_reset", "OSC_reset");
     } else {
@@ -78,8 +78,8 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, osc_out:
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: DeviceType, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    try writer.expressionExpanded(@tagName(dev));
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+    try writer.expressionExpanded(@tagName(dev.device));
     try writer.expressionExpanded("osctimer");
 
 

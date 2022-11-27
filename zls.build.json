@@ -2,7 +2,7 @@
     "build_options": [
         {
             "name": "firmware",
-            "value": null
+            "value": "lc4032ze"
         }
     ]
 }
