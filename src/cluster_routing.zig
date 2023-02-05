@@ -11,6 +11,8 @@ const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
 const Fuse = jedec.Fuse;
+const MacrocellRef = common.MacrocellRef;
+const getGlbName = common.getGlbName;
 
 pub fn main() void {
     helper.main(2);
@@ -25,7 +27,7 @@ fn getMaxPTsWithoutWideRouting(mc: usize) u8 {
 }
 
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: common.MacrocellRef, pts: u8) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: MacrocellRef, pts: u8) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
     try design.pinAssignment(.{ .signal = "x0" });
@@ -54,7 +56,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, m
     }
 
     var results = try tc.runToolchain(design);
-    try helper.logResults("cluster_routing_glb{}_mc{}_pts{}", .{ mcref.glb, mcref.mc, pts }, results);
+    try helper.logResults(dev.device, "cluster_routing_glb{}_mc{}_pts{}", .{ mcref.glb, mcref.mc, pts }, results);
     try results.checkTerm();
     return results;
 }
@@ -223,7 +225,7 @@ fn checkRoutingData(routing_data: *ClusterRoutingMap, cluster_usage: std.StaticB
 
 fn parseClusterUsage(ta: std.mem.Allocator, glb: u8, report: []const u8, mc: u8) !std.StaticBitSet(16) {
     var cluster_usage = std.StaticBitSet(16).initEmpty();
-    const header = try std.fmt.allocPrint(ta, "GLB_{s}_CLUSTER_TABLE", .{ device_info.getGlbName(glb) });
+    const header = try std.fmt.allocPrint(ta, "GLB_{s}_CLUSTER_TABLE", .{ getGlbName(glb) });
     if (helper.extract(report, header, "<Note>")) |raw| {
         var line_iter = std.mem.tokenize(u8, raw, "\r\n");
         while (line_iter.next()) |line| {

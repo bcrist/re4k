@@ -105,7 +105,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, g
     }
 
     var results = try tc.runToolchain(design);
-    try helper.logResults("bclk_polarity_glb{}_{s}_{s}", .{ glb, @tagName(mode01), @tagName(mode23) }, results);
+    try helper.logResults(dev.device, "bclk_polarity_glb{}_{s}_{s}", .{ glb, @tagName(mode01), @tagName(mode23) }, results);
     try results.checkTerm();
     return results;
 }

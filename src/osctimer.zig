@@ -73,7 +73,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, o
     }
 
     var results = try tc.runToolchain(design);
-    try helper.logResults("osctimer_{}_{}_{}_{}_{s}", .{ osc_out, timer_out, disable, reset, @tagName(div) }, results);
+    try helper.logResults(dev.device, "osctimer_{}_{}_{}_{}_{s}", .{ osc_out, timer_out, disable, reset, @tagName(div) }, results);
     try results.checkTerm();
     return results;
 }

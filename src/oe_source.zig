@@ -31,9 +31,9 @@ fn runToolchainOnOff(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceIn
 
     var results = try tc.runToolchain(design);
     if (off) {
-        try helper.logResults("off_{s}", .{ pin.id }, results);
+        try helper.logResults(dev.device, "off_{s}", .{ pin.id }, results);
     } else {
-        try helper.logResults("on_{s}", .{ pin.id }, results);
+        try helper.logResults(dev.device, "on_{s}", .{ pin.id }, results);
     }
     try results.checkTerm();
     return results;
@@ -59,6 +59,11 @@ fn getFirstInGLB(dev: *const DeviceInfo, glb: u8, exclude_mc: u8) !common.PinInf
         .single_glb = glb,
     };
     while (iter.next()) |pin| {
+        if (dev.device == .LC4064ZC_csBGA56) {
+            // These pins are connected to macrocells, but lpf4k thinks they're dedicated inputs, and won't allow them to be used as outputs.
+            if (std.mem.eql(u8, pin.id, "F8")) continue;
+            if (std.mem.eql(u8, pin.id, "E3")) continue;
+        }
         if (pin.mcRef()) |mcref| {
             if (mcref.mc != exclude_mc) {
                 return pin;
@@ -97,9 +102,9 @@ fn runToolchainGOE(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo
 
     var results = try tc.runToolchain(design);
     if (goe) {
-        try helper.logResults("goe.glb{}.mc{}", .{ glb, mc }, results);
+        try helper.logResults(dev.device, "goe.glb{}.mc{}", .{ glb, mc }, results);
     } else {
-        try helper.logResults("nogoe.glb{}.mc{}", .{ glb, mc }, results);
+        try helper.logResults(dev.device, "nogoe.glb{}.mc{}", .{ glb, mc }, results);
     }
     try results.checkTerm();
     return results;
@@ -233,7 +238,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, p
     }
 
     var results = try tc.runToolchain(design);
-    try helper.logResults("{s}.glb{}.mc{}", .{ @tagName(mode), glb, mc }, results);
+    try helper.logResults(dev.device, "{s}.glb{}.mc{}", .{ @tagName(mode), glb, mc }, results);
     try results.checkTerm();
     return results;
 }
@@ -244,6 +249,12 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
 
     var pin_iter = OutputIterator { .pins = dev.all_pins };
     while (pin_iter.next()) |pin| {
+        if (dev.device == .LC4064ZC_csBGA56) {
+            // These pins are connected to macrocells, but lpf4k thinks they're dedicated inputs, and won't allow them to be used as outputs.
+            if (std.mem.eql(u8, pin.id, "F8")) continue;
+            if (std.mem.eql(u8, pin.id, "E3")) continue;
+        }
+
         try tc.cleanTempDir();
         helper.resetTemp();
 

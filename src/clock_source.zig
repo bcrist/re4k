@@ -127,7 +127,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, m
     }
 
     var results = try tc.runToolchain(design);
-    try helper.logResults("clk_mux_glb{}_mc{}_{s}", .{ mcref.glb, mcref.mc, @tagName(src) }, results);
+    try helper.logResults(dev.device, "clk_mux_glb{}_mc{}_{s}", .{ mcref.glb, mcref.mc, @tagName(src) }, results);
     try results.checkTerm();
     return results;
 }

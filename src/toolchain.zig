@@ -406,7 +406,7 @@ pub const Design = struct {
             if (pin_assignment.pin) |pin_name| {
                 if (self.dev.getPin(pin_name)) |pin| switch (pin.func) {
                     .io, .io_oe0, .io_oe1 => |mc| {
-                        const glb_name = device_info.getGlbName(pin.glb.?);
+                        const glb_name = common.getGlbName(pin.glb.?);
                         try writer.print("{s}=pin,{s},-,{s},{};\n", .{ pin_assignment.signal, pin.id, glb_name, mc });
                     },
                     .input => {
@@ -422,7 +422,7 @@ pub const Design = struct {
 
         for (self.nodes.items) |node_assignment| {
             if (node_assignment.glb) |glb| {
-                const glb_name = device_info.getGlbName(glb);
+                const glb_name = common.getGlbName(glb);
                 if (node_assignment.mc) |mc| {
                     try writer.print("{s}=node,-,-,{s},{};\n", .{ node_assignment.signal, glb_name, mc });
                 } else {
@@ -601,7 +601,7 @@ pub const Design = struct {
             if (self.osctimer_div) |divisor| {
                 try writer.writeAll("\n[OSCTIMER Assignments]\n");
                 try writer.writeAll("layer = OFF;\n");
-                try writer.print("OSCTIMER = OSC_disable, OSC_reset, OSC_out, OSC_tout, {};\n", .{ @enumToInt(divisor) });
+                try writer.print("OSCTIMER = OSC_disable, OSC_reset, OSC_out, OSC_tout, {s};\n", .{ @tagName(divisor)[3..] });
             }
         } else {
             try writer.writeAll("\n[Fast Bypass]\n");
@@ -665,7 +665,7 @@ pub const Design = struct {
         try writer.writeAll("\n");
 
         if (self.osctimer_div) |divisor| {
-            try writer.print("#$ PROPERTY LATTICE OSCTIMER osc= OSC_disable, OSC_reset, OSC_out, OSC_tout, {};\n", .{ @enumToInt(divisor) });
+            try writer.print("#$ PROPERTY LATTICE OSCTIMER osc= OSC_disable, OSC_reset, OSC_out, OSC_tout, {s};\n", .{ @tagName(divisor)[3..] });
             try writer.writeAll("#$ EXTERNAL OSCTIMER 4 DYNOSCDIS'i' TIMERRES'i' OSCOUT'o' TIMEROUT'o'\n");
             try writer.writeAll("#$ INSTANCE osc OSCTIMER 4 OSC_disable OSC_reset OSC_out OSC_tout\n");
         }
@@ -799,7 +799,7 @@ pub const GISet = struct {
         while (skip > 0) : (skip -= 1) {
             _ = iter.next();
         }
-        return iter.next() orelse unreachable;
+        return iter.next().?;
     }
 
     pub fn iterator(self: *const GISet) Iterator {
@@ -863,7 +863,7 @@ pub const GlbInputSet = struct {
         while (skip > 0) : (skip -= 1) {
             _ = iter.next();
         }
-        return iter.next() orelse unreachable;
+        return iter.next().?;
     }
 
     pub fn removeRandom(self: *GlbInputSet, rnd: std.rand.Random, count_to_remove: usize) GlbInputSet {
@@ -1121,7 +1121,7 @@ pub const Toolchain = struct {
         if (design.parse_glb_inputs) {
             var glb: u8 = 0;
             while (glb < design.dev.num_glbs) : (glb += 1) {
-                const header = try std.fmt.allocPrint(self.alloc, "GLB_{s}_LOGIC_ARRAY_FANIN", .{ device_info.getGlbName(glb) });
+                const header = try std.fmt.allocPrint(self.alloc, "GLB_{s}_LOGIC_ARRAY_FANIN", .{ common.getGlbName(glb) });
                 if (helper.extract(results.report, header, "------------------------------------------")) |raw| {
                     var fit_data = GlbFitData {
                         .glb = glb,

@@ -219,6 +219,9 @@ GI mux fuse that's set is one of the ones corresponding to pin 16 in LC4128V_TQF
 the fitter is writing the I/O cell's ID in this case, rather than the actual pin number.
 
 # TODO
+* Refactor routing jobs to use common.ClusterRouting, common.WideRouting
+* Rename pull.zig/sx to bus_maintenance.zig/sx
+* power_guard.sx says "enabled" instead of "from_bie"
 * Hardware experiments
     * Why are there two fuses to enable the OSCTIMER? what happens if only one is enabled? (or none, but divider/outputs are enabled)
     * Do OSCTIMER outputs only replace the GRP feedback signals when enabled, or also the signal that goes to the ORM?
@@ -226,3 +229,4 @@ the fitter is writing the I/O cell's ID in this case, rather than the actual pin
     * Can you use an input register MC with the ORM to have the register output directly on a different pin without going through the GRP?
     * What happens if you violate the one-cold rule for GI fuses?
     * What happens if you violate the one-cold rule for the PT OE internal bus?
+    * When using fast 5-PT combinational path on non-ZE parts, can you use the register as a buried macrocell?

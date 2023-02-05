@@ -74,7 +74,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, m
     try design.addPT("pt2", "out.CE");
 
     var results = try tc.runToolchain(design);
-    try helper.logResults("pterms_glb{}_mc{}", .{ mcref.glb, mcref.mc }, results);
+    try helper.logResults(dev.device, "pterms_glb{}_mc{}", .{ mcref.glb, mcref.mc }, results);
     try results.checkTerm();
     return results;
 }

@@ -13,8 +13,11 @@ const Toolchain = toolchain.Toolchain;
 const Fuse = jedec.Fuse;
 const FuseRange = jedec.FuseRange;
 const GlbInputSignal = toolchain.GlbInputSignal;
+const GlbIndex = common.GlbIndex;
 const MacrocellRef = common.MacrocellRef;
+const MacrocellIndex = common.MacrocellIndex;
 const PinInfo = common.PinInfo;
+const getGlbName = common.getGlbName;
 
 var temp_alloc = TempAllocator {};
 
@@ -114,7 +117,7 @@ fn run(num_inputs: usize) !void {
 var report_dir: ?*std.fs.Dir = null;
 var jed_dir: ?*std.fs.Dir = null;
 
-pub fn logResults(comptime name_fmt: []const u8, name_args: anytype, results: toolchain.FitResults) !void {
+pub fn logResults(device_type: DeviceType, comptime name_fmt: []const u8, name_args: anytype, results: toolchain.FitResults) !void {
     if (report_dir) |dir| {
         const filename = try std.fmt.allocPrint(temp_alloc.allocator(), name_fmt ++ ".rpt", name_args);
         var f = try dir.createFile(filename, .{});
@@ -127,11 +130,11 @@ pub fn logResults(comptime name_fmt: []const u8, name_args: anytype, results: to
         var f = try dir.createFile(filename, .{});
         defer f.close();
 
-        const jed = jed_file.JedecFile {
+        const jed = jedec.JedecFile {
             .data = results.jedec,
         };
 
-        try jed_file.write(jed, temp_alloc.allocator(), f.writer(), .{ .one_char = '.' });
+        try jed_file.write(device_type, temp_alloc.allocator(), jed, f.writer(), .{ .one_char = '.' });
     }
     if (slow_mode) {
         try std.io.getStdOut().writer().writeAll("Press enter to continue...\n");
@@ -149,12 +152,12 @@ pub fn err(comptime fmt: []const u8, args: anytype, dev: *const DeviceInfo, cont
     const stderr = std.io.getStdErr().writer();
 
     if (context.mcref) |mcref| {
-        try stderr.print("{s} glb{} ({s}) mc{}: ", .{ @tagName(dev.device), mcref.glb, device_info.getGlbName(mcref.glb), mcref.mc });
+        try stderr.print("{s} glb{} ({s}) mc{}: ", .{ @tagName(dev.device), mcref.glb, getGlbName(mcref.glb), mcref.mc });
     } else if (context.glb) |glb| {
         if (context.mc) |mc| {
-            try stderr.print("{s} glb{} ({s}) mc{}: ", .{ @tagName(dev.device), glb, device_info.getGlbName(glb), mc });
+            try stderr.print("{s} glb{} ({s}) mc{}: ", .{ @tagName(dev.device), glb, getGlbName(glb), mc });
         } else {
-            try stderr.print("{s} glb{} ({s}): ", .{ @tagName(dev.device), glb, device_info.getGlbName(glb) });
+            try stderr.print("{s} glb{} ({s}): ", .{ @tagName(dev.device), glb, getGlbName(glb) });
         }
     } else if (context.pin) |id| {
         try stderr.print("{s} pin {s}: ", .{ @tagName(dev.device), id });
@@ -276,21 +279,21 @@ pub fn extract(src: []const u8, prefix: []const u8, suffix: []const u8) ?[]const
     return null;
 }
 
-pub fn writeGlb(writer: anytype, glb: common.GlbIndex) !void {
+pub fn writeGlb(writer: anytype, glb: GlbIndex) !void {
     try writer.expression("glb");
     try writer.int(glb, 10);
     try writer.expression("name");
-    try writer.string(device_info.getGlbName(glb));
+    try writer.string(getGlbName(glb));
     try writer.close();
     writer.setCompact(false);
 }
 
-pub fn writeMc(writer: anytype, mc: common.MacrocellIndex) !void {
+pub fn writeMc(writer: anytype, mc: MacrocellIndex) !void {
     try writer.expression("mc");
     try writer.int(mc, 10);
 }
 
-pub fn writePin(writer: anytype, pin_info: common.PinInfo) !void {
+pub fn writePin(writer: anytype, pin_info: PinInfo) !void {
     try writer.expression("pin");
     try writer.string(pin_info.id);
     switch (pin_info.func) {
@@ -381,7 +384,7 @@ pub fn parseGRP(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*Devi
     var results = std.AutoHashMap(Fuse, GlbInputSignal).init(pa);
     try results.ensureTotalCapacity(@intCast(u32, dev.getGIRange(0, 0).count() * 36 * dev.num_glbs));
 
-    var pin_number_to_info = std.StringHashMap(common.PinInfo).init(ta);
+    var pin_number_to_info = std.StringHashMap(PinInfo).init(ta);
     defer pin_number_to_info.deinit();
 
     try pin_number_to_info.ensureTotalCapacity(@intCast(u32, dev.all_pins.len));
@@ -413,7 +416,7 @@ fn parseGRP0(
     ta: std.mem.Allocator,
     parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader),
     dev: *const DeviceInfo,
-    pin_number_to_info: *const std.StringHashMap(common.PinInfo),
+    pin_number_to_info: *const std.StringHashMap(PinInfo),
     results: *std.AutoHashMap(Fuse, GlbInputSignal)
 ) !void {
     _ = try parser.requireAnyExpression(); // device name, we already know it
@@ -529,7 +532,7 @@ fn parseMCOptionsColumns0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8
         std.debug.assert(glb == parsed_glb);
 
         while (try parser.expression("mc")) {
-            var mc = try parser.requireAnyInt(common.MacrocellIndex, 10);
+            var mc = try parser.requireAnyInt(MacrocellIndex, 10);
 
             try parser.requireExpression("fuse");
             _ = try parser.requireAnyInt(usize, 10);

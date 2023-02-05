@@ -48,7 +48,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, g
     });
 
     var results = try tc.runToolchain(design);
-    try helper.logResults("shared_pt_clk_polarity_glb{}_{s}", .{ glb, @tagName(polarity) }, results);
+    try helper.logResults(dev.device, "shared_pt_clk_polarity_glb{}_{s}", .{ glb, @tagName(polarity) }, results);
     try results.checkTerm();
     return results;
 }

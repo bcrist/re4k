@@ -10,6 +10,7 @@ const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
 const Fuse = jedec.Fuse;
+const getGlbName = common.getGlbName;
 
 pub fn main() void {
     helper.main(1);
@@ -42,7 +43,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         try writer.expression("glb");
         try writer.int(glb, 10);
         try writer.expression("name");
-        try writer.string(device_info.getGlbName(@intCast(u8, glb)));
+        try writer.string(getGlbName(@intCast(u8, glb)));
         try writer.close();
         writer.setCompact(false);
 

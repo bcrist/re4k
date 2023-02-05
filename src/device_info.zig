@@ -238,7 +238,3 @@ pub const DeviceInfo = struct {
     }
 
 };
-
-pub fn getGlbName(glb: usize) []const u8 {
-    return "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[glb..glb+1];
-}

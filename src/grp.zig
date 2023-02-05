@@ -17,6 +17,7 @@ const GISet = toolchain.GISet;
 const GlbInputSet = toolchain.GlbInputSet;
 const MacrocellIterator = helper.MacrocellIterator;
 const InputIterator = helper.InputIterator;
+const getGlbName = common.getGlbName;
 
 const max_routed_signals = 33;
 
@@ -67,7 +68,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, s
     design.max_fit_time_ms = 500;
 
     var results = try tc.runToolchain(design);
-    try helper.logResults("grp_{}", .{ report_number }, results);
+    try helper.logResults(dev.device, "grp_{}", .{ report_number }, results);
     report_number += 1;
     //try results.checkTerm();
     return results;
@@ -80,7 +81,7 @@ fn getAllSignals(pa: std.mem.Allocator, dev: *const DeviceInfo) ![]const GlbInpu
 
     var mc_iter = MacrocellIterator { .dev = dev };
     while (mc_iter.next()) |mcref| {
-        const signal_name = try std.fmt.allocPrint(pa, "fb_{s}{}", .{ device_info.getGlbName(mcref.glb), mcref.mc });
+        const signal_name = try std.fmt.allocPrint(pa, "fb_{s}{}", .{ getGlbName(mcref.glb), mcref.mc });
         all_signals.appendAssumeCapacity(.{
             .name = signal_name,
             .source = .{ .fb = .{

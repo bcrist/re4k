@@ -26,7 +26,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, p
     try design.addPT("in", "out");
 
     var results = try tc.runToolchain(design);
-    try helper.logResults("threshold_pin_{s}", .{ pin.id }, results);
+    try helper.logResults(dev.device, "threshold_pin_{s}", .{ pin.id }, results);
     try results.checkTerm();
     return results;
 }

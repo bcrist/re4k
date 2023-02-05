@@ -24,7 +24,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, p
     try design.addPT("in", "out");
 
     var results = try tc.runToolchain(design);
-    try helper.logResults("slew_pin_{s}", .{ pin.id }, results);
+    try helper.logResults(dev.device, "slew_pin_{s}", .{ pin.id }, results);
     try results.checkTerm();
     return results;
 }
@@ -38,6 +38,12 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
 
     var pin_iter = helper.OutputIterator { .pins = dev.all_pins };
     while (pin_iter.next()) |pin| {
+        if (dev.device == .LC4064ZC_csBGA56) {
+            // These pins are connected to macrocells, but lpf4k thinks they're dedicated inputs, and won't allow them to be used as outputs.
+            if (std.mem.eql(u8, pin.id, "F8")) continue;
+            if (std.mem.eql(u8, pin.id, "E3")) continue;
+        }
+
         try tc.cleanTempDir();
         helper.resetTemp();
 

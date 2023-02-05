@@ -12,6 +12,7 @@ const JedecData = jedec.JedecData;
 const Fuse = jedec.Fuse;
 const InputIterator = helper.InputIterator;
 const OutputIterator = helper.OutputIterator;
+const getGlbName = common.getGlbName;
 
 pub fn main() void {
     helper.main(1);
@@ -57,6 +58,12 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, o
     };
     var n: u1 = 0;
     while (pin_iter.next()) |pin| {
+        if (dev.device == .LC4064ZC_csBGA56) {
+            // These pins are connected to macrocells, but lpf4k thinks they're dedicated inputs, and won't allow them to be used as outputs.
+            if (std.mem.eql(u8, pin.id, "F8")) continue;
+            if (std.mem.eql(u8, pin.id, "E3")) continue;
+        }
+
         var oe_signal_name = try std.fmt.allocPrint(ta, "out{s}.OE", .{ pin.id });
         const signal_name = oe_signal_name[0..oe_signal_name.len-3];
 
@@ -92,7 +99,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, o
     }
 
     var results = try tc.runToolchain(design);
-    try helper.logResults("goe_polarity_eoe0_{s}_eoe1_{s}", .{ @tagName(oe0), @tagName(oe1) }, results);
+    try helper.logResults(dev.device, "goe_polarity_eoe0_{s}_eoe1_{s}", .{ @tagName(oe0), @tagName(oe1) }, results);
     try results.checkTerm();
     return results;
 }
@@ -220,7 +227,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         try writer.expression("glb");
         try writer.int(glb, 10);
         try writer.expression("name");
-        try writer.string(device_info.getGlbName(@intCast(u8, glb)));
+        try writer.string(getGlbName(@intCast(u8, glb)));
         try writer.close();
         writer.setCompact(false);
 

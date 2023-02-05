@@ -65,6 +65,11 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, p
     };
     n = 0;
     while (iter.next()) |oe_pin| {
+        if (dev.device == .LC4064ZC_csBGA56) {
+            // These pins are connected to macrocells, but lpf4k thinks they're dedicated inputs, and won't allow them to be used as outputs.
+            if (std.mem.eql(u8, oe_pin.id, "F8")) continue;
+            if (std.mem.eql(u8, oe_pin.id, "E3")) continue;
+        }
         var oe_signal_name = try std.fmt.allocPrint(ta, "temp_{}.OE", .{ n });
         var signal_name = oe_signal_name[0..oe_signal_name.len-3];
         try design.pinAssignment(.{
@@ -87,7 +92,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, p
     }
 
     var results = try tc.runToolchain(design);
-    try helper.logResults("pt4_oe_{s}_{}", .{ pin.id, pt4_oe }, results);
+    try helper.logResults(dev.device, "pt4_oe_{s}_{}", .{ pin.id, pt4_oe }, results);
     try results.checkTerm();
     return results;
 }
@@ -105,6 +110,12 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         .pins = dev.all_pins,
     };
     while (iter.next()) |pin| {
+        if (dev.device == .LC4064ZC_csBGA56) {
+            // These pins are connected to macrocells, but lpf4k thinks they're dedicated inputs, and won't allow them to be used as outputs.
+            if (std.mem.eql(u8, pin.id, "F8")) continue;
+            if (std.mem.eql(u8, pin.id, "E3")) continue;
+        }
+
         try tc.cleanTempDir();
         helper.resetTemp();
 

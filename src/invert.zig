@@ -32,7 +32,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, m
     }
 
     var results = try tc.runToolchain(design);
-    try helper.logResults("invert_glb{}_mc{}_{}", .{ mcref.glb, mcref.mc, invert }, results);
+    try helper.logResults(dev.device, "invert_glb{}_mc{}_{}", .{ mcref.glb, mcref.mc, invert }, results);
     try results.checkTerm();
     return results;
 }

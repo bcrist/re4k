@@ -61,7 +61,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, p
     }
 
     var results = try tc.runToolchain(design);
-    try helper.logResults("power_guard_pin_{s}_{}", .{ pin.id, pg_enabled }, results);
+    try helper.logResults(dev.device, "power_guard_pin_{s}_{}", .{ pin.id, pg_enabled }, results);
     try results.checkTerm();
     return results;
 }

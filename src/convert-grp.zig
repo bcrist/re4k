@@ -32,7 +32,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, p
     try design.addPT("in", "out");
 
     var results = try tc.runToolchain(design);
-    try helper.logResults("convert_grp_{}", .{ report_number }, results);
+    try helper.logResults(dev.device, "convert_grp_{}", .{ report_number }, results);
     report_number += 1;
     try results.checkTerm();
     return results;
