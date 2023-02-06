@@ -10,6 +10,10 @@ rule bclk_polarity
     command = zig-out/bin/bclk_polarity.exe $out $in
 build $dev/bclk_polarity.sx: bclk_polarity
 
+rule bus_maintenance
+    command = zig-out/bin/bus_maintenance.exe $out $in
+build $dev/bus_maintenance.sx: bus_maintenance
+
 rule ce_source
     command = zig-out/bin/ce_source.exe $out $in
 build $dev/ce_source.sx: ce_source
@@ -78,10 +82,6 @@ rule pterms
     command = zig-out/bin/pterms.exe $out $in
 build $dev/pterms.sx: pterms $dev\grp.sx
 
-rule pull
-    command = zig-out/bin/pull.exe $out $in
-build $dev/pull.sx: pull
-
 rule shared_pt_clk_polarity
     command = zig-out/bin/shared_pt_clk_polarity.exe $out $in
 build $dev/shared_pt_clk_polarity.sx: shared_pt_clk_polarity
@@ -110,7 +110,7 @@ rule zerohold
     command = zig-out/bin/zerohold.exe $out $in
 build $dev/zerohold.sx: zerohold
 
-build LC4064\LC4064ZE_csBGA144.sx: combine $dev/async_source.sx $dev/bclk_polarity.sx $dev/ce_source.sx $dev/clock_source.sx $dev/cluster_routing.sx $dev/drive.sx $dev/goes.sx $dev/grp.sx $dev/init_source.sx $dev/init_state.sx $dev/invert.sx $dev/mc_func.sx $dev/oe_source.sx $dev/osctimer.sx $dev/output_routing.sx $dev/power_guard.sx $dev/pt0_xor.sx $dev/pt4_oe.sx $dev/pterms.sx $dev/pull.sx $dev/shared_pt_clk_polarity.sx $dev/shared_pt_init_polarity.sx $dev/slew.sx $dev/threshold.sx $dev/wide_routing.sx $dev/xor.sx $dev/zerohold.sx
+build LC4064\LC4064ZE_csBGA144.sx: combine $dev/async_source.sx $dev/bclk_polarity.sx $dev/bus_maintenance.sx $dev/ce_source.sx $dev/clock_source.sx $dev/cluster_routing.sx $dev/drive.sx $dev/goes.sx $dev/grp.sx $dev/init_source.sx $dev/init_state.sx $dev/invert.sx $dev/mc_func.sx $dev/oe_source.sx $dev/osctimer.sx $dev/output_routing.sx $dev/power_guard.sx $dev/pt0_xor.sx $dev/pt4_oe.sx $dev/pterms.sx $dev/shared_pt_clk_polarity.sx $dev/shared_pt_init_polarity.sx $dev/slew.sx $dev/threshold.sx $dev/wide_routing.sx $dev/xor.sx $dev/zerohold.sx
 build build-LC4064ZE_csBGA144: phony LC4064\LC4064ZE_csBGA144.sx
 
 ## ######################### END OF GENERATED CODE ######################### ##

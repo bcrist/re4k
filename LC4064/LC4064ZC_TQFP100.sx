@@ -97,6 +97,14 @@
       (value 1 first_complemented)
       (value 0 both_inverted)
    )
+   (bus_maintenance
+      (fuse 85 355 (value 1))
+      (fuse 86 355 (value 2))
+      (value 3 pullup)
+      (value 2 keeper)
+      (value 1 float)
+      (value 0 pulldown)
+   )
    (clock_enable_source
       (glb 0 (name A)
          (mc 0 (fuse 86 277) (fuse 87 277 (value 2)))
@@ -3652,14 +3660,6 @@
          (column 87 shared_pt_clk)
          (column 88 shared_pt_enable)
       )
-   )
-   (bus_maintenance
-      (fuse 85 355 (value 1))
-      (fuse 86 355 (value 2))
-      (value 3 pullup)
-      (value 2 keeper)
-      (value 1 float)
-      (value 0 pulldown)
    )
    (shared_pt_clk_polarity
       (glb 0 (name A)

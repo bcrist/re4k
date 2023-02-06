@@ -85,6 +85,17 @@ pub fn build(b: *std.build.Builder) void {
         bclk_polarity.install();
         _ = makeRunStep(b, bclk_polarity, "bclk_polarity", "run bclk_polarity");
 
+        const bus_maintenance = b.addExecutable("bus_maintenance", "src/bus_maintenance.zig");
+        bus_maintenance.addPackage(common);
+        bus_maintenance.addPackage(jed_file);
+        bus_maintenance.addPackage(jedec);
+        bus_maintenance.addPackage(sx);
+        bus_maintenance.addPackage(temp_allocator);
+        bus_maintenance.setTarget(target);
+        bus_maintenance.setBuildMode(mode);
+        bus_maintenance.install();
+        _ = makeRunStep(b, bus_maintenance, "bus_maintenance", "run bus_maintenance");
+
         const ce_source = b.addExecutable("ce_source", "src/ce_source.zig");
         ce_source.addPackage(common);
         ce_source.addPackage(jed_file);
@@ -337,17 +348,6 @@ pub fn build(b: *std.build.Builder) void {
         pterms.setBuildMode(mode);
         pterms.install();
         _ = makeRunStep(b, pterms, "pterms", "run pterms");
-
-        const pull = b.addExecutable("pull", "src/pull.zig");
-        pull.addPackage(common);
-        pull.addPackage(jed_file);
-        pull.addPackage(jedec);
-        pull.addPackage(sx);
-        pull.addPackage(temp_allocator);
-        pull.setTarget(target);
-        pull.setBuildMode(mode);
-        pull.install();
-        _ = makeRunStep(b, pull, "pull", "run pull");
 
         const shared_pt_clk_polarity = b.addExecutable("shared_pt_clk_polarity", "src/shared_pt_clk_polarity.zig");
         shared_pt_clk_polarity.addPackage(common);

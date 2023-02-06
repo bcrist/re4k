@@ -94,6 +94,20 @@
       )
       (value 1 first_complemented)
    )
+   (bus_maintenance
+      (fuse 85 351 (value 1))
+      (fuse 86 351 (value 2))
+      (value 3 pullup)
+      (value 2 keeper)
+      (value 1 float)
+      (value 0 pulldown)
+   )
+   (bus_maintenance_extra
+      (fuse 89 40)
+      (fuse 89 216)
+      (value 0 float)
+      (value 1 other)
+   )
    (clock_enable_source
       (glb 0 (name A)
          (mc 0 (fuse 86 273) (fuse 87 273 (value 2)))
@@ -3183,20 +3197,6 @@
          (column 86 shared_pt_clk)
          (column 87 shared_pt_enable)
       )
-   )
-   (bus_maintenance
-      (fuse 85 351 (value 1))
-      (fuse 86 351 (value 2))
-      (value 3 pullup)
-      (value 2 keeper)
-      (value 1 float)
-      (value 0 pulldown)
-   )
-   (bus_maintenance_extra
-      (fuse 89 40)
-      (fuse 89 216)
-      (value 0 float)
-      (value 1 other)
    )
    (shared_pt_clk_polarity
       (glb 0 (name A)

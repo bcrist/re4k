@@ -279,7 +279,6 @@ So it seems the fitter is writing the I/O cell's ID in this case, rather than th
 
 # TODO
 * Refactor routing jobs to use common.ClusterRouting, common.WideRouting
-* Rename pull.zig/sx to bus_maintenance.zig/sx
 * power_guard.sx says "enabled" instead of "from_bie"
 * Hardware experiments
     * Why are there two fuses to enable the OSCTIMER? what happens if only one is enabled? (or none, but divider/outputs are enabled)
