@@ -3017,7 +3017,7 @@
       (pin H6 (glb 2 (name C)) (mc 4) (fuse 99 117))
       (pin H7 (glb 2 (name C)) (mc 5) (fuse 99 122))
       (pin H8 (glb 2 (name C)) (mc 6) (fuse 99 127))
-      (value 0 enabled)
+      (value 0 from_bie)
       (value 1 disabled)
    )
    (pt0_xor

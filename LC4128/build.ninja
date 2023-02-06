@@ -9,3 +9,65 @@ subninja LC4128/LC4128ZE_ucBGA132/build.ninja
 subninja LC4128/LC4128ZE_csBGA144/build.ninja
 
 build build-LC4128: phony build-LC4128x_TQFP100 build-LC4128x_TQFP128 build-LC4128V_TQFP144 build-LC4128ZC_TQFP100 build-LC4128ZC_csBGA132 build-LC4128ZE_TQFP100 build-LC4128ZE_TQFP144 build-LC4128ZE_ucBGA132 build-LC4128ZE_csBGA144
+
+##!! include('build_ninja','LC4128') !! 60 ##
+## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
+build clean-async_source-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\async_source.sx LC4128\LC4128ZC_TQFP100\async_source.sx LC4128\LC4128ZC_csBGA132\async_source.sx LC4128\LC4128ZE_TQFP100\async_source.sx LC4128\LC4128ZE_TQFP144\async_source.sx LC4128\LC4128ZE_csBGA144\async_source.sx LC4128\LC4128ZE_ucBGA132\async_source.sx LC4128\LC4128x_TQFP100\async_source.sx LC4128\LC4128x_TQFP128\async_source.sx
+build clean-bclk_polarity-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\bclk_polarity.sx LC4128\LC4128ZC_TQFP100\bclk_polarity.sx LC4128\LC4128ZC_csBGA132\bclk_polarity.sx LC4128\LC4128ZE_TQFP100\bclk_polarity.sx LC4128\LC4128ZE_TQFP144\bclk_polarity.sx LC4128\LC4128ZE_csBGA144\bclk_polarity.sx LC4128\LC4128ZE_ucBGA132\bclk_polarity.sx LC4128\LC4128x_TQFP100\bclk_polarity.sx LC4128\LC4128x_TQFP128\bclk_polarity.sx
+build clean-bus_maintenance-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\bus_maintenance.sx LC4128\LC4128ZC_TQFP100\bus_maintenance.sx LC4128\LC4128ZC_csBGA132\bus_maintenance.sx LC4128\LC4128ZE_TQFP100\bus_maintenance.sx LC4128\LC4128ZE_TQFP144\bus_maintenance.sx LC4128\LC4128ZE_csBGA144\bus_maintenance.sx LC4128\LC4128ZE_ucBGA132\bus_maintenance.sx LC4128\LC4128x_TQFP100\bus_maintenance.sx LC4128\LC4128x_TQFP128\bus_maintenance.sx
+build clean-ce_source-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\ce_source.sx LC4128\LC4128ZC_TQFP100\ce_source.sx LC4128\LC4128ZC_csBGA132\ce_source.sx LC4128\LC4128ZE_TQFP100\ce_source.sx LC4128\LC4128ZE_TQFP144\ce_source.sx LC4128\LC4128ZE_csBGA144\ce_source.sx LC4128\LC4128ZE_ucBGA132\ce_source.sx LC4128\LC4128x_TQFP100\ce_source.sx LC4128\LC4128x_TQFP128\ce_source.sx
+build clean-clock_source-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\clock_source.sx LC4128\LC4128ZC_TQFP100\clock_source.sx LC4128\LC4128ZC_csBGA132\clock_source.sx LC4128\LC4128ZE_TQFP100\clock_source.sx LC4128\LC4128ZE_TQFP144\clock_source.sx LC4128\LC4128ZE_csBGA144\clock_source.sx LC4128\LC4128ZE_ucBGA132\clock_source.sx LC4128\LC4128x_TQFP100\clock_source.sx LC4128\LC4128x_TQFP128\clock_source.sx
+build clean-cluster_routing-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\cluster_routing.sx LC4128\LC4128ZC_TQFP100\cluster_routing.sx LC4128\LC4128ZC_csBGA132\cluster_routing.sx LC4128\LC4128ZE_TQFP100\cluster_routing.sx LC4128\LC4128ZE_TQFP144\cluster_routing.sx LC4128\LC4128ZE_csBGA144\cluster_routing.sx LC4128\LC4128ZE_ucBGA132\cluster_routing.sx LC4128\LC4128x_TQFP100\cluster_routing.sx LC4128\LC4128x_TQFP128\cluster_routing.sx
+build clean-drive-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\drive.sx LC4128\LC4128ZC_TQFP100\drive.sx LC4128\LC4128ZC_csBGA132\drive.sx LC4128\LC4128ZE_TQFP100\drive.sx LC4128\LC4128ZE_TQFP144\drive.sx LC4128\LC4128ZE_csBGA144\drive.sx LC4128\LC4128ZE_ucBGA132\drive.sx LC4128\LC4128x_TQFP100\drive.sx LC4128\LC4128x_TQFP128\drive.sx
+build clean-goes-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\goes.sx LC4128\LC4128ZC_TQFP100\goes.sx LC4128\LC4128ZC_csBGA132\goes.sx LC4128\LC4128ZE_TQFP100\goes.sx LC4128\LC4128ZE_TQFP144\goes.sx LC4128\LC4128ZE_csBGA144\goes.sx LC4128\LC4128ZE_ucBGA132\goes.sx LC4128\LC4128x_TQFP100\goes.sx LC4128\LC4128x_TQFP128\goes.sx
+build clean-grp-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\grp.sx LC4128\LC4128ZC_TQFP100\grp.sx LC4128\LC4128ZC_csBGA132\grp.sx LC4128\LC4128ZE_TQFP100\grp.sx LC4128\LC4128ZE_TQFP144\grp.sx LC4128\LC4128ZE_csBGA144\grp.sx LC4128\LC4128ZE_ucBGA132\grp.sx LC4128\LC4128x_TQFP100\grp.sx LC4128\LC4128x_TQFP128\grp.sx
+build clean-init_source-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\init_source.sx LC4128\LC4128ZC_TQFP100\init_source.sx LC4128\LC4128ZC_csBGA132\init_source.sx LC4128\LC4128ZE_TQFP100\init_source.sx LC4128\LC4128ZE_TQFP144\init_source.sx LC4128\LC4128ZE_csBGA144\init_source.sx LC4128\LC4128ZE_ucBGA132\init_source.sx LC4128\LC4128x_TQFP100\init_source.sx LC4128\LC4128x_TQFP128\init_source.sx
+build clean-init_state-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\init_state.sx LC4128\LC4128ZC_TQFP100\init_state.sx LC4128\LC4128ZC_csBGA132\init_state.sx LC4128\LC4128ZE_TQFP100\init_state.sx LC4128\LC4128ZE_TQFP144\init_state.sx LC4128\LC4128ZE_csBGA144\init_state.sx LC4128\LC4128ZE_ucBGA132\init_state.sx LC4128\LC4128x_TQFP100\init_state.sx LC4128\LC4128x_TQFP128\init_state.sx
+build clean-invert-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\invert.sx LC4128\LC4128ZC_TQFP100\invert.sx LC4128\LC4128ZC_csBGA132\invert.sx LC4128\LC4128ZE_TQFP100\invert.sx LC4128\LC4128ZE_TQFP144\invert.sx LC4128\LC4128ZE_csBGA144\invert.sx LC4128\LC4128ZE_ucBGA132\invert.sx LC4128\LC4128x_TQFP100\invert.sx LC4128\LC4128x_TQFP128\invert.sx
+build clean-mc_func-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\mc_func.sx LC4128\LC4128ZC_TQFP100\mc_func.sx LC4128\LC4128ZC_csBGA132\mc_func.sx LC4128\LC4128ZE_TQFP100\mc_func.sx LC4128\LC4128ZE_TQFP144\mc_func.sx LC4128\LC4128ZE_csBGA144\mc_func.sx LC4128\LC4128ZE_ucBGA132\mc_func.sx LC4128\LC4128x_TQFP100\mc_func.sx LC4128\LC4128x_TQFP128\mc_func.sx
+build clean-oe_source-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\oe_source.sx LC4128\LC4128ZC_TQFP100\oe_source.sx LC4128\LC4128ZC_csBGA132\oe_source.sx LC4128\LC4128ZE_TQFP100\oe_source.sx LC4128\LC4128ZE_TQFP144\oe_source.sx LC4128\LC4128ZE_csBGA144\oe_source.sx LC4128\LC4128ZE_ucBGA132\oe_source.sx LC4128\LC4128x_TQFP100\oe_source.sx LC4128\LC4128x_TQFP128\oe_source.sx
+build clean-osctimer-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\osctimer.sx LC4128\LC4128ZC_TQFP100\osctimer.sx LC4128\LC4128ZC_csBGA132\osctimer.sx LC4128\LC4128ZE_TQFP100\osctimer.sx LC4128\LC4128ZE_TQFP144\osctimer.sx LC4128\LC4128ZE_csBGA144\osctimer.sx LC4128\LC4128ZE_ucBGA132\osctimer.sx LC4128\LC4128x_TQFP100\osctimer.sx LC4128\LC4128x_TQFP128\osctimer.sx
+build clean-output_routing-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\output_routing.sx LC4128\LC4128ZC_TQFP100\output_routing.sx LC4128\LC4128ZC_csBGA132\output_routing.sx LC4128\LC4128ZE_TQFP100\output_routing.sx LC4128\LC4128ZE_TQFP144\output_routing.sx LC4128\LC4128ZE_csBGA144\output_routing.sx LC4128\LC4128ZE_ucBGA132\output_routing.sx LC4128\LC4128x_TQFP100\output_routing.sx LC4128\LC4128x_TQFP128\output_routing.sx
+build clean-output_routing_mode-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\output_routing_mode.sx LC4128\LC4128ZC_TQFP100\output_routing_mode.sx LC4128\LC4128ZC_csBGA132\output_routing_mode.sx LC4128\LC4128ZE_TQFP100\output_routing_mode.sx LC4128\LC4128ZE_TQFP144\output_routing_mode.sx LC4128\LC4128ZE_csBGA144\output_routing_mode.sx LC4128\LC4128ZE_ucBGA132\output_routing_mode.sx LC4128\LC4128x_TQFP100\output_routing_mode.sx LC4128\LC4128x_TQFP128\output_routing_mode.sx
+build clean-power_guard-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\power_guard.sx LC4128\LC4128ZC_TQFP100\power_guard.sx LC4128\LC4128ZC_csBGA132\power_guard.sx LC4128\LC4128ZE_TQFP100\power_guard.sx LC4128\LC4128ZE_TQFP144\power_guard.sx LC4128\LC4128ZE_csBGA144\power_guard.sx LC4128\LC4128ZE_ucBGA132\power_guard.sx LC4128\LC4128x_TQFP100\power_guard.sx LC4128\LC4128x_TQFP128\power_guard.sx
+build clean-pt0_xor-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\pt0_xor.sx LC4128\LC4128ZC_TQFP100\pt0_xor.sx LC4128\LC4128ZC_csBGA132\pt0_xor.sx LC4128\LC4128ZE_TQFP100\pt0_xor.sx LC4128\LC4128ZE_TQFP144\pt0_xor.sx LC4128\LC4128ZE_csBGA144\pt0_xor.sx LC4128\LC4128ZE_ucBGA132\pt0_xor.sx LC4128\LC4128x_TQFP100\pt0_xor.sx LC4128\LC4128x_TQFP128\pt0_xor.sx
+build clean-pt4_oe-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\pt4_oe.sx LC4128\LC4128ZC_TQFP100\pt4_oe.sx LC4128\LC4128ZC_csBGA132\pt4_oe.sx LC4128\LC4128ZE_TQFP100\pt4_oe.sx LC4128\LC4128ZE_TQFP144\pt4_oe.sx LC4128\LC4128ZE_csBGA144\pt4_oe.sx LC4128\LC4128ZE_ucBGA132\pt4_oe.sx LC4128\LC4128x_TQFP100\pt4_oe.sx LC4128\LC4128x_TQFP128\pt4_oe.sx
+build clean-pterms-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\pterms.sx LC4128\LC4128ZC_TQFP100\pterms.sx LC4128\LC4128ZC_csBGA132\pterms.sx LC4128\LC4128ZE_TQFP100\pterms.sx LC4128\LC4128ZE_TQFP144\pterms.sx LC4128\LC4128ZE_csBGA144\pterms.sx LC4128\LC4128ZE_ucBGA132\pterms.sx LC4128\LC4128x_TQFP100\pterms.sx LC4128\LC4128x_TQFP128\pterms.sx
+build clean-shared_pt_clk_polarity-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\shared_pt_clk_polarity.sx LC4128\LC4128ZC_TQFP100\shared_pt_clk_polarity.sx LC4128\LC4128ZC_csBGA132\shared_pt_clk_polarity.sx LC4128\LC4128ZE_TQFP100\shared_pt_clk_polarity.sx LC4128\LC4128ZE_TQFP144\shared_pt_clk_polarity.sx LC4128\LC4128ZE_csBGA144\shared_pt_clk_polarity.sx LC4128\LC4128ZE_ucBGA132\shared_pt_clk_polarity.sx LC4128\LC4128x_TQFP100\shared_pt_clk_polarity.sx LC4128\LC4128x_TQFP128\shared_pt_clk_polarity.sx
+build clean-shared_pt_init_polarity-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\shared_pt_init_polarity.sx LC4128\LC4128ZC_TQFP100\shared_pt_init_polarity.sx LC4128\LC4128ZC_csBGA132\shared_pt_init_polarity.sx LC4128\LC4128ZE_TQFP100\shared_pt_init_polarity.sx LC4128\LC4128ZE_TQFP144\shared_pt_init_polarity.sx LC4128\LC4128ZE_csBGA144\shared_pt_init_polarity.sx LC4128\LC4128ZE_ucBGA132\shared_pt_init_polarity.sx LC4128\LC4128x_TQFP100\shared_pt_init_polarity.sx LC4128\LC4128x_TQFP128\shared_pt_init_polarity.sx
+build clean-slew-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\slew.sx LC4128\LC4128ZC_TQFP100\slew.sx LC4128\LC4128ZC_csBGA132\slew.sx LC4128\LC4128ZE_TQFP100\slew.sx LC4128\LC4128ZE_TQFP144\slew.sx LC4128\LC4128ZE_csBGA144\slew.sx LC4128\LC4128ZE_ucBGA132\slew.sx LC4128\LC4128x_TQFP100\slew.sx LC4128\LC4128x_TQFP128\slew.sx
+build clean-threshold-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\threshold.sx LC4128\LC4128ZC_TQFP100\threshold.sx LC4128\LC4128ZC_csBGA132\threshold.sx LC4128\LC4128ZE_TQFP100\threshold.sx LC4128\LC4128ZE_TQFP144\threshold.sx LC4128\LC4128ZE_csBGA144\threshold.sx LC4128\LC4128ZE_ucBGA132\threshold.sx LC4128\LC4128x_TQFP100\threshold.sx LC4128\LC4128x_TQFP128\threshold.sx
+build clean-wide_routing-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\wide_routing.sx LC4128\LC4128ZC_TQFP100\wide_routing.sx LC4128\LC4128ZC_csBGA132\wide_routing.sx LC4128\LC4128ZE_TQFP100\wide_routing.sx LC4128\LC4128ZE_TQFP144\wide_routing.sx LC4128\LC4128ZE_csBGA144\wide_routing.sx LC4128\LC4128ZE_ucBGA132\wide_routing.sx LC4128\LC4128x_TQFP100\wide_routing.sx LC4128\LC4128x_TQFP128\wide_routing.sx
+build clean-xor-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\xor.sx LC4128\LC4128ZC_TQFP100\xor.sx LC4128\LC4128ZC_csBGA132\xor.sx LC4128\LC4128ZE_TQFP100\xor.sx LC4128\LC4128ZE_TQFP144\xor.sx LC4128\LC4128ZE_csBGA144\xor.sx LC4128\LC4128ZE_ucBGA132\xor.sx LC4128\LC4128x_TQFP100\xor.sx LC4128\LC4128x_TQFP128\xor.sx
+build clean-zerohold-LC4128: clean
+    what = LC4128\LC4128V_TQFP144\zerohold.sx LC4128\LC4128ZC_TQFP100\zerohold.sx LC4128\LC4128ZC_csBGA132\zerohold.sx LC4128\LC4128ZE_TQFP100\zerohold.sx LC4128\LC4128ZE_TQFP144\zerohold.sx LC4128\LC4128ZE_csBGA144\zerohold.sx LC4128\LC4128ZE_ucBGA132\zerohold.sx LC4128\LC4128x_TQFP100\zerohold.sx LC4128\LC4128x_TQFP128\zerohold.sx
+
+## ######################### END OF GENERATED CODE ######################### ##
+

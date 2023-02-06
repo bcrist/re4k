@@ -110,7 +110,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
     }
 
     if (default_enabled) |def| {
-        try helper.writeValue(writer, def, "enabled");
+        try helper.writeValue(writer, def, "from_bie");
     }
 
     if (default_disabled) |def| {
@@ -128,7 +128,7 @@ fn writeFuse(fuse: Fuse, results_enabled: JedecData, results_disabled: JedecData
     const enabled_value = results_enabled.get(fuse);
     if (default_enabled) |def| {
         if (enabled_value != def) {
-            try helper.writeValue(writer, enabled_value, "enabled");
+            try helper.writeValue(writer, enabled_value, "from_bie");
         }
     } else {
         default_enabled = enabled_value;

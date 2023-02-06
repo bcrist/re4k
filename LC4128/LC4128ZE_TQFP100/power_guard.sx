@@ -74,7 +74,7 @@
       (pin 98 (glb 0 (name A)) (mc 10) (fuse 99 626))
       (pin 99 (glb 0 (name A)) (mc 12) (fuse 99 636))
       (pin 100 (glb 0 (name A)) (mc 14) (fuse 99 646))
-      (value 0 enabled)
+      (value 0 from_bie)
       (value 1 disabled)
    )
 )

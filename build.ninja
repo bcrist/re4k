@@ -1,17 +1,51 @@
 rule limp
     command = limp -qR $in
     generator = true
+rule combine
+    command = zig-out/bin/combine.exe $out $in
+rule clean
+    command = rm -f $what
 
 build configure-LC4128: limp LC4128
 build configure-LC4064: limp LC4064
 build configure-LC4032: limp LC4032
 build configure: phony configure-LC4128 configure-LC4064 configure-LC4032
 
-rule combine
-    command = zig-out/bin/combine.exe $out $in
-
 subninja LC4128/build.ninja
 subninja LC4064/build.ninja
 subninja LC4032/build.ninja
 
 default build-LC4128 build-LC4064 build-LC4032
+
+##!! include 'build_ninja' !! 32 ##
+## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
+build clean-async_source: phony clean-async_source-LC4032 clean-async_source-LC4064 clean-async_source-LC4128
+build clean-bclk_polarity: phony clean-bclk_polarity-LC4032 clean-bclk_polarity-LC4064 clean-bclk_polarity-LC4128
+build clean-bus_maintenance: phony clean-bus_maintenance-LC4032 clean-bus_maintenance-LC4064 clean-bus_maintenance-LC4128
+build clean-ce_source: phony clean-ce_source-LC4032 clean-ce_source-LC4064 clean-ce_source-LC4128
+build clean-clock_source: phony clean-clock_source-LC4032 clean-clock_source-LC4064 clean-clock_source-LC4128
+build clean-cluster_routing: phony clean-cluster_routing-LC4032 clean-cluster_routing-LC4064 clean-cluster_routing-LC4128
+build clean-drive: phony clean-drive-LC4032 clean-drive-LC4064 clean-drive-LC4128
+build clean-goes: phony clean-goes-LC4032 clean-goes-LC4064 clean-goes-LC4128
+build clean-grp: phony clean-grp-LC4032 clean-grp-LC4064 clean-grp-LC4128
+build clean-init_source: phony clean-init_source-LC4032 clean-init_source-LC4064 clean-init_source-LC4128
+build clean-init_state: phony clean-init_state-LC4032 clean-init_state-LC4064 clean-init_state-LC4128
+build clean-invert: phony clean-invert-LC4032 clean-invert-LC4064 clean-invert-LC4128
+build clean-mc_func: phony clean-mc_func-LC4032 clean-mc_func-LC4064 clean-mc_func-LC4128
+build clean-oe_source: phony clean-oe_source-LC4032 clean-oe_source-LC4064 clean-oe_source-LC4128
+build clean-osctimer: phony clean-osctimer-LC4032 clean-osctimer-LC4064 clean-osctimer-LC4128
+build clean-output_routing: phony clean-output_routing-LC4032 clean-output_routing-LC4064 clean-output_routing-LC4128
+build clean-output_routing_mode: phony clean-output_routing_mode-LC4032 clean-output_routing_mode-LC4064 clean-output_routing_mode-LC4128
+build clean-power_guard: phony clean-power_guard-LC4032 clean-power_guard-LC4064 clean-power_guard-LC4128
+build clean-pt0_xor: phony clean-pt0_xor-LC4032 clean-pt0_xor-LC4064 clean-pt0_xor-LC4128
+build clean-pt4_oe: phony clean-pt4_oe-LC4032 clean-pt4_oe-LC4064 clean-pt4_oe-LC4128
+build clean-pterms: phony clean-pterms-LC4032 clean-pterms-LC4064 clean-pterms-LC4128
+build clean-shared_pt_clk_polarity: phony clean-shared_pt_clk_polarity-LC4032 clean-shared_pt_clk_polarity-LC4064 clean-shared_pt_clk_polarity-LC4128
+build clean-shared_pt_init_polarity: phony clean-shared_pt_init_polarity-LC4032 clean-shared_pt_init_polarity-LC4064 clean-shared_pt_init_polarity-LC4128
+build clean-slew: phony clean-slew-LC4032 clean-slew-LC4064 clean-slew-LC4128
+build clean-threshold: phony clean-threshold-LC4032 clean-threshold-LC4064 clean-threshold-LC4128
+build clean-wide_routing: phony clean-wide_routing-LC4032 clean-wide_routing-LC4064 clean-wide_routing-LC4128
+build clean-xor: phony clean-xor-LC4032 clean-xor-LC4064 clean-xor-LC4128
+build clean-zerohold: phony clean-zerohold-LC4032 clean-zerohold-LC4064 clean-zerohold-LC4128
+
+## ######################### END OF GENERATED CODE ######################### ##

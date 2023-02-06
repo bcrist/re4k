@@ -3109,7 +3109,7 @@
       (pin 98 (glb 0 (name A)) (mc 5) (fuse 99 300))
       (pin 99 (glb 0 (name A)) (mc 6) (fuse 99 305))
       (pin 100 (glb 0 (name A)) (mc 7) (fuse 99 310))
-      (value 0 enabled)
+      (value 0 from_bie)
       (value 1 disabled)
    )
    (pt0_xor

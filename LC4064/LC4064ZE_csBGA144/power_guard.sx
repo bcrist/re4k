@@ -74,7 +74,7 @@
       (pin M7 (glb 2 (name C)) (mc 1) (fuse 99 102))
       (pin M9 (glb 2 (name C)) (mc 4) (fuse 99 117))
       (pin M10 (glb 2 (name C)) (mc 7) (fuse 99 132))
-      (value 0 enabled)
+      (value 0 from_bie)
       (value 1 disabled)
    )
 )

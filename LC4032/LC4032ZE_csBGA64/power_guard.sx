@@ -36,7 +36,7 @@
       (pin H4 (glb 0 (name A)) (mc 15) (fuse 99 167))
       (pin H5 (clk 2) (glb 1 (name B)) (fuse 89 168))
       (pin H6 (glb 1 (name B)) (mc 3) (fuse 99 21))
-      (value 0 enabled)
+      (value 0 from_bie)
       (value 1 disabled)
    )
 )

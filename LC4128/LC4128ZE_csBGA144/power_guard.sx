@@ -100,7 +100,7 @@
       (pin M8 (glb 4 (name E)) (mc 6) (fuse 99 236))
       (pin M9 (glb 4 (name E)) (mc 8) (fuse 99 246))
       (pin M10 (glb 4 (name E)) (mc 12) (fuse 99 266))
-      (value 0 enabled)
+      (value 0 from_bie)
       (value 1 disabled)
    )
 )

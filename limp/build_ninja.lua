@@ -1,5 +1,4 @@
 local device = ...
-local device_base = device:sub(1, 6)
 
 local function ZE_only (device) 
     return nil ~= device:find('ZE_', 1, true)
@@ -74,67 +73,106 @@ local jobs = {
     osctimer                = { device_predicate = ZE_only },
 }
 
-writeln('dev = ', fs.compose_path(device_base, device), nl)
+if device == nil then
+    local devices = {}
+    for device in pairs(jobs.grp.device_map) do
+        devices[device:sub(1, 6)] = true
+    end
 
-for job, config in spairs(jobs) do
-    local cmd = job
-    local deps = {}
-    for _, dep in ipairs(config) do
-        if type(dep) == 'table' then
-            dep = dep[device]
+    for job in spairs(jobs) do
+        write('build clean-', job, ': phony')
+        for device_base in spairs(devices) do
+            write(' clean-', job, '-', device_base)
         end
-        if dep ~= nil then
-            if string.find(dep, '[\\/]') == nil then
-                dep = fs.compose_path('$dev', dep)
+        nl()
+    end
+
+elseif #device == 6 then
+    local device_base = device
+
+    local devices = {}
+    for device, mapped_device in pairs(jobs.grp.device_map) do
+        devices[device] = true
+        devices[mapped_device] = true
+    end
+
+    for job in spairs(jobs) do
+        write('build clean-', job, '-', device_base, ': clean', nl, '    what =')
+        for device in spairs(devices) do
+            if device:sub(1, 6) == device_base then
+                write(' ', fs.compose_path(device_base, device, job), '.sx')
             end
-            deps[#deps+1] = dep
-        end
-    end
-    if config.device_map then
-        local other_dev = config.device_map[device]
-        if other_dev then
-            cmd = 'convert-' .. job
-            deps[#deps+1] = fs.compose_path(other_dev:sub(1, 6), other_dev, job)
-        elseif other_dev == false then
-            cmd = nil
-        end
-    end
-    if config.device_predicate then
-        if not config.device_predicate(device) then
-            cmd = nil
-        end
-    end
-    if cmd then
-        writeln('rule ', cmd)
-        writeln('    command = zig-out/bin/', cmd, '.exe $out $in')
-        write('build $dev/', job, '.sx: ', cmd)
-        for _, dep in ipairs(deps) do
-            write(' ', dep, '.sx')
         end
         nl()
-        nl()
     end
-end
 
-local combined = fs.compose_path(device_base, device .. '.sx')
-write('build ', combined, ': combine')
+else
+    local device_base = device:sub(1, 6)
 
-for job, config in spairs(jobs) do
-    if config.device_map then
-        local other_dev = config.device_map[device]
-        if other_dev == false then
-            job = nil
+    writeln('dev = ', fs.compose_path(device_base, device), nl)
+
+    for job, config in spairs(jobs) do
+        local cmd = job
+        local deps = {}
+        for _, dep in ipairs(config) do
+            if type(dep) == 'table' then
+                dep = dep[device]
+            end
+            if dep ~= nil then
+                if string.find(dep, '[\\/]') == nil then
+                    dep = fs.compose_path('$dev', dep)
+                end
+                deps[#deps+1] = dep
+            end
+        end
+        if config.device_map then
+            local other_dev = config.device_map[device]
+            if other_dev then
+                cmd = 'convert-' .. job
+                deps[#deps+1] = fs.compose_path(other_dev:sub(1, 6), other_dev, job)
+            elseif other_dev == false then
+                cmd = nil
+            end
+        end
+        if config.device_predicate then
+            if not config.device_predicate(device) then
+                cmd = nil
+            end
+        end
+        if cmd then
+            writeln('rule ', cmd)
+            writeln('    command = zig-out/bin/', cmd, '.exe $out $in')
+            write('build $dev/', job, '.sx: ', cmd)
+            for _, dep in ipairs(deps) do
+                write(' ', dep, '.sx')
+            end
+            nl()
+            nl()
         end
     end
-    if config.device_predicate then
-        if not config.device_predicate(device) then
-            job = nil
+
+    local combined = fs.compose_path(device_base, device .. '.sx')
+    write('build ', combined, ': combine')
+
+    for job, config in spairs(jobs) do
+        if config.device_map then
+            local other_dev = config.device_map[device]
+            if other_dev == false then
+                job = nil
+            end
+        end
+        if config.device_predicate then
+            if not config.device_predicate(device) then
+                job = nil
+            end
+        end
+        if job then
+            write(' $dev/', job, '.sx')
         end
     end
-    if job then
-        write(' $dev/', job, '.sx')
-    end
-end
-nl()
+    nl()
 
-writeln('build build-', device, ': phony ', combined)
+    writeln('build build-', device, ': phony ', combined)
+
+end
+
