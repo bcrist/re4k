@@ -92,16 +92,31 @@ elseif #device == 6 then
 
     local devices = {}
     for device, mapped_device in pairs(jobs.grp.device_map) do
-        devices[device] = true
-        devices[mapped_device] = true
+        if device:sub(1, 6) == device_base then
+            devices[device] = true
+        end
+        if mapped_device:sub(1, 6) == device_base then
+            devices[mapped_device] = true
+        end
     end
+
+    for device in spairs(devices) do
+        write 'subninja '
+        writeln(fs.compose_path(device_base, device, 'build.ninja'))
+    end
+    nl()
+
+    write('build build-', device_base, ': phony')
+    for device in spairs(devices) do
+        write(' build-', device)
+    end
+    nl()
+    nl()
 
     for job in spairs(jobs) do
         write('build clean-', job, '-', device_base, ': clean', nl, '    what =')
         for device in spairs(devices) do
-            if device:sub(1, 6) == device_base then
-                write(' ', fs.compose_path(device_base, device, job), '.sx')
-            end
+            write(' ', fs.compose_path(device_base, device, job), '.sx')
         end
         nl()
     end

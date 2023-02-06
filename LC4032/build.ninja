@@ -1,14 +1,14 @@
-subninja LC4032/LC4032x_TQFP44/build.ninja
-subninja LC4032/LC4032x_TQFP48/build.ninja
-subninja LC4032/LC4032ZC_TQFP48/build.ninja
-subninja LC4032/LC4032ZC_csBGA56/build.ninja
-subninja LC4032/LC4032ZE_TQFP48/build.ninja
-subninja LC4032/LC4032ZE_csBGA64/build.ninja
-
-build build-LC4032: phony build-LC4032x_TQFP44 build-LC4032x_TQFP48 build-LC4032ZC_TQFP48 build-LC4032ZC_csBGA56 build-LC4032ZE_TQFP48 build-LC4032ZE_csBGA64
-
-##!! include('build_ninja','LC4032') !! 60 ##
+##!! include('build_ninja','LC4032') !! 69 ##
 ## ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ##
+subninja LC4032\LC4032ZC_TQFP48\build.ninja
+subninja LC4032\LC4032ZC_csBGA56\build.ninja
+subninja LC4032\LC4032ZE_TQFP48\build.ninja
+subninja LC4032\LC4032ZE_csBGA64\build.ninja
+subninja LC4032\LC4032x_TQFP44\build.ninja
+subninja LC4032\LC4032x_TQFP48\build.ninja
+
+build build-LC4032: phony build-LC4032ZC_TQFP48 build-LC4032ZC_csBGA56 build-LC4032ZE_TQFP48 build-LC4032ZE_csBGA64 build-LC4032x_TQFP44 build-LC4032x_TQFP48
+
 build clean-async_source-LC4032: clean
     what = LC4032\LC4032ZC_TQFP48\async_source.sx LC4032\LC4032ZC_csBGA56\async_source.sx LC4032\LC4032ZE_TQFP48\async_source.sx LC4032\LC4032ZE_csBGA64\async_source.sx LC4032\LC4032x_TQFP44\async_source.sx LC4032\LC4032x_TQFP48\async_source.sx
 build clean-bclk_polarity-LC4032: clean
