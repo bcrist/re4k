@@ -45,18 +45,18 @@ local jobs = {
     cluster_routing         = { 'invert', 'output_routing' },
     wide_routing            = { 'cluster_routing' },
     invert                  = {},
-    xor                     = {},
+    xor                     = {{ LC4064ZC_csBGA56 = fs.compose_path('LC4064', 'LC4064ZC_TQFP100', 'xor') }},
     init_source             = {},
     async_source            = {},
     clock_source            = {},
     ce_source               = {},
     mc_func                 = {},
     init_state              = {},
-    output_routing          = {},
-    output_routing_mode     = { device_predicate = non_ZE_only },
-    oe_source               = {},
-    slew                    = {},
-    drive                   = {},
+    output_routing_mode     = { device_predicate = non_ZE_only, { LC4064ZC_csBGA56 = fs.compose_path('LC4064', 'LC4064ZC_TQFP100', 'output_routing_mode') }},
+    output_routing          = {{ LC4064ZC_csBGA56 = fs.compose_path('LC4064', 'LC4064ZC_TQFP100', 'output_routing')}},
+    oe_source               = {{ LC4064ZC_csBGA56 = fs.compose_path('LC4064', 'LC4064ZC_TQFP100', 'oe_source') }},
+    slew                    = {{ LC4064ZC_csBGA56 = fs.compose_path('LC4064', 'LC4064ZC_TQFP100', 'slew') }},
+    drive                   = {{ LC4064ZC_csBGA56 = fs.compose_path('LC4064', 'LC4064ZC_TQFP100', 'drive') }},
     pull                    = {},
     threshold               = {},
     power_guard             = { device_predicate = ZE_only },
@@ -78,14 +78,23 @@ writeln('dev = ', fs.compose_path(device_base, device), nl)
 
 for job, config in spairs(jobs) do
     local cmd = job
-    local deps = config
-    local dep_dev = '$dev'
+    local deps = {}
+    for _, dep in ipairs(config) do
+        if type(dep) == 'table' then
+            dep = dep[device]
+        end
+        if dep ~= nil then
+            if string.find(dep, '[\\/]') == nil then
+                dep = fs.compose_path('$dev', dep)
+            end
+            deps[#deps+1] = dep
+        end
+    end
     if config.device_map then
         local other_dev = config.device_map[device]
         if other_dev then
             cmd = 'convert-' .. job
-            deps = { job }
-            dep_dev = fs.compose_path(other_dev:sub(1, 6), other_dev)
+            deps[#deps+1] = fs.compose_path(other_dev:sub(1, 6), other_dev, job)
         elseif other_dev == false then
             cmd = nil
         end
@@ -100,7 +109,7 @@ for job, config in spairs(jobs) do
         writeln('    command = zig-out/bin/', cmd, '.exe $out $in')
         write('build $dev/', job, '.sx: ', cmd)
         for _, dep in ipairs(deps) do
-            write(' ', fs.compose_path(dep_dev, dep), '.sx')
+            write(' ', dep, '.sx')
         end
         nl()
         nl()

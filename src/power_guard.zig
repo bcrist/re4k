@@ -13,7 +13,7 @@ const Design = toolchain.Design;
 const InputIterator = helper.InputIterator;
 
 pub fn main() void {
-    helper.main(0);
+    helper.main();
 }
 
 fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: common.PinInfo, pg_enabled: bool) !toolchain.FitResults {

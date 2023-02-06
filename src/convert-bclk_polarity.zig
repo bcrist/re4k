@@ -12,7 +12,7 @@ const JedecData = jedec.JedecData;
 const Fuse = jedec.Fuse;
 
 pub fn main() void {
-    helper.main(1);
+    helper.main();
 }
 
 pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {

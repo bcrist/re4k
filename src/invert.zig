@@ -11,7 +11,7 @@ const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
 
 pub fn main() void {
-    helper.main(0);
+    helper.main();
 }
 
 fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: common.MacrocellRef, invert: bool) !toolchain.FitResults {

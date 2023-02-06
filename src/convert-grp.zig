@@ -13,7 +13,7 @@ const GlbInputSignal = toolchain.GlbInputSignal;
 const FitResults = toolchain.FitResults;
 
 pub fn main() void {
-    helper.main(1);
+    helper.main();
 }
 
 var report_number: usize = 0;

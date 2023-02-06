@@ -22,7 +22,7 @@ const getGlbName = common.getGlbName;
 const max_routed_signals = 33;
 
 pub fn main() void {
-    helper.main(0);
+    helper.main();
 }
 
 var report_number: usize = 0;

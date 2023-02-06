@@ -24,7 +24,7 @@ build $dev/cluster_routing.sx: cluster_routing $dev\invert.sx $dev\output_routin
 
 rule drive
     command = zig-out/bin/drive.exe $out $in
-build $dev/drive.sx: drive
+build $dev/drive.sx: drive LC4064\LC4064ZC_TQFP100\drive.sx
 
 rule goes
     command = zig-out/bin/goes.exe $out $in
@@ -52,15 +52,15 @@ build $dev/mc_func.sx: mc_func
 
 rule oe_source
     command = zig-out/bin/oe_source.exe $out $in
-build $dev/oe_source.sx: oe_source
+build $dev/oe_source.sx: oe_source LC4064\LC4064ZC_TQFP100\oe_source.sx
 
 rule output_routing
     command = zig-out/bin/output_routing.exe $out $in
-build $dev/output_routing.sx: output_routing
+build $dev/output_routing.sx: output_routing LC4064\LC4064ZC_TQFP100\output_routing.sx
 
 rule output_routing_mode
     command = zig-out/bin/output_routing_mode.exe $out $in
-build $dev/output_routing_mode.sx: output_routing_mode
+build $dev/output_routing_mode.sx: output_routing_mode LC4064\LC4064ZC_TQFP100\output_routing_mode.sx
 
 rule pt0_xor
     command = zig-out/bin/pt0_xor.exe $out $in
@@ -88,7 +88,7 @@ build $dev/shared_pt_init_polarity.sx: shared_pt_init_polarity $dev\shared_pt_cl
 
 rule slew
     command = zig-out/bin/slew.exe $out $in
-build $dev/slew.sx: slew
+build $dev/slew.sx: slew LC4064\LC4064ZC_TQFP100\slew.sx
 
 rule threshold
     command = zig-out/bin/threshold.exe $out $in
@@ -100,7 +100,7 @@ build $dev/wide_routing.sx: wide_routing $dev\cluster_routing.sx
 
 rule xor
     command = zig-out/bin/xor.exe $out $in
-build $dev/xor.sx: xor
+build $dev/xor.sx: xor LC4064\LC4064ZC_TQFP100\xor.sx
 
 rule zerohold
     command = zig-out/bin/zerohold.exe $out $in

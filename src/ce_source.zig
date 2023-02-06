@@ -18,7 +18,7 @@ const ClockEnableSource = enum {
 };
 
 pub fn main() void {
-    helper.main(0);
+    helper.main();
 }
 
 fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: common.MacrocellRef, src: ClockEnableSource) !toolchain.FitResults {

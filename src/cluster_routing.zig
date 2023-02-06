@@ -15,7 +15,7 @@ const MacrocellRef = common.MacrocellRef;
 const getGlbName = common.getGlbName;
 
 pub fn main() void {
-    helper.main(2);
+    helper.main();
 }
 
 fn getMaxPTsWithoutWideRouting(mc: usize) u8 {

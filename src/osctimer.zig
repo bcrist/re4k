@@ -12,7 +12,7 @@ const JedecData = jedec.JedecData;
 const Fuse = jedec.Fuse;
 
 pub fn main() void {
-    helper.main(0);
+    helper.main();
 }
 
 const Polarity = enum {

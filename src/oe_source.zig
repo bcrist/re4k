@@ -12,9 +12,10 @@ const PinInfo = common.PinInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const OutputIterator = helper.OutputIterator;
+const MacrocellRef = common.MacrocellRef;
 
 pub fn main() void {
-    helper.main(0);
+    helper.main();
 }
 
 fn runToolchainOnOff(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: PinInfo, off: bool) !toolchain.FitResults {
@@ -244,15 +245,33 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, p
 }
 
 pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+    var maybe_fallback_fuses: ?std.AutoHashMap(MacrocellRef, []const helper.FuseAndValue) = null;
+    if (helper.getInputFile("oe_source.sx")) |_| {
+        maybe_fallback_fuses = try helper.parseFusesForOutputPins(ta, pa, "oe_source.sx", "output_enable_source", null);
+    }
+
     try writer.expressionExpanded(@tagName(dev.device));
     try writer.expressionExpanded("output_enable_source");
 
     var pin_iter = OutputIterator { .pins = dev.all_pins };
     while (pin_iter.next()) |pin| {
-        if (dev.device == .LC4064ZC_csBGA56) {
-            // These pins are connected to macrocells, but lpf4k thinks they're dedicated inputs, and won't allow them to be used as outputs.
-            if (std.mem.eql(u8, pin.id, "F8")) continue;
-            if (std.mem.eql(u8, pin.id, "E3")) continue;
+        if (maybe_fallback_fuses) |fallback_fuses| {
+            if (std.mem.eql(u8, pin.id, "F8") or std.mem.eql(u8, pin.id, "E3")) {
+                // These pins are connected to macrocells, but lpf4k thinks they're dedicated inputs, and won't allow them to be used as outputs.
+                const mcref = MacrocellRef.init(pin.glb.?, switch (pin.func) {
+                    .io, .io_oe0, .io_oe1 => |mc| mc,
+                    else => unreachable,
+                });
+
+                if (fallback_fuses.get(mcref)) |fuses| {
+                    try helper.writePin(writer, pin);
+                    for (fuses) |fuse_and_value| {
+                        try helper.writeFuseOptValue(writer, fuse_and_value.fuse, fuse_and_value.value);
+                    }
+                    try writer.close();
+                    continue;
+                }
+            }
         }
 
         try tc.cleanTempDir();
@@ -290,7 +309,6 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
     // For now I'm just assuming the OE mux inputs have the same ordering on all devices/families.
     // It's incredibly difficult to coax the fitter into placing a particular OE line.  It's mostly
     // doable on the 4032, which only has two shared PTOEs, but larger devices have up to 4 per GLB
-    // TODO figure out a way to reliably test permutations of OE mux for all devices
     try helper.writeValue(writer, 0, .goe0);
     try helper.writeValue(writer, 1, .goe1);
     try helper.writeValue(writer, 2, .goe2);
@@ -301,6 +319,4 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
     try helper.writeValue(writer, 7, .input_only);
 
     try writer.done();
-
-    _ = pa;
 }

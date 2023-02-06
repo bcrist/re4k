@@ -11,7 +11,7 @@ const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
 
 pub fn main() void {
-    helper.main(0);
+    helper.main();
 }
 
 const BClkMode = enum {

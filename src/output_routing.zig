@@ -9,9 +9,10 @@ const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
+const MacrocellRef = common.MacrocellRef;
 
 pub fn main() void {
-    helper.main(0);
+    helper.main();
 }
 
 fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: common.PinInfo, offset: u3) !toolchain.FitResults {
@@ -54,15 +55,33 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, p
 }
 
 pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+    var maybe_fallback_fuses: ?std.AutoHashMap(MacrocellRef, []const helper.FuseAndValue) = null;
+    if (helper.getInputFile("output_routing.sx")) |_| {
+        maybe_fallback_fuses = try helper.parseFusesForOutputPins(ta, pa, "output_routing.sx", "output_routing", null);
+    }
+
     try writer.expressionExpanded(@tagName(dev.device));
     try writer.expressionExpanded("output_routing");
 
     var pin_iter = helper.OutputIterator { .pins = dev.all_pins };
     while (pin_iter.next()) |pin| {
-        if (dev.device == .LC4064ZC_csBGA56) {
-            // These pins are connected to macrocells, but lpf4k thinks they're dedicated inputs, and won't allow them to be used as outputs.
-            if (std.mem.eql(u8, pin.id, "F8")) continue;
-            if (std.mem.eql(u8, pin.id, "E3")) continue;
+        if (maybe_fallback_fuses) |fallback_fuses| {
+            if (std.mem.eql(u8, pin.id, "F8") or std.mem.eql(u8, pin.id, "E3")) {
+                // These pins are connected to macrocells, but lpf4k thinks they're dedicated inputs, and won't allow them to be used as outputs.
+                const mcref = MacrocellRef.init(pin.glb.?, switch (pin.func) {
+                    .io, .io_oe0, .io_oe1 => |mc| mc,
+                    else => unreachable,
+                });
+
+                if (fallback_fuses.get(mcref)) |fuses| {
+                    try helper.writePin(writer, pin);
+                    for (fuses) |fuse_and_value| {
+                        try helper.writeFuseOptValue(writer, fuse_and_value.fuse, fuse_and_value.value);
+                    }
+                    try writer.close();
+                    continue;
+                }
+            }
         }
 
         try tc.cleanTempDir();
@@ -118,6 +137,4 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
     try helper.writeValue(writer, 7, "from_mc_plus_7");
 
     try writer.done();
-
-    _ = pa;
 }

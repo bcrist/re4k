@@ -15,7 +15,7 @@ const OutputIterator = helper.OutputIterator;
 const getGlbName = common.getGlbName;
 
 pub fn main() void {
-    helper.main(1);
+    helper.main();
 }
 
 const Polarity = enum {

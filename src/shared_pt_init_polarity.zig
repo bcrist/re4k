@@ -13,7 +13,7 @@ const Fuse = jedec.Fuse;
 const getGlbName = common.getGlbName;
 
 pub fn main() void {
-    helper.main(1);
+    helper.main();
 }
 
 pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {

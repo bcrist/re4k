@@ -13,7 +13,7 @@ const JedecData = jedec.JedecData;
 const Fuse = jedec.Fuse;
 
 pub fn main() void {
-    helper.main(1);
+    helper.main();
 }
 
 fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: common.MacrocellRef, pts: u8, report_mcref: common.MacrocellRef) !toolchain.FitResults {

@@ -13,7 +13,7 @@ const Fuse = jedec.Fuse;
 const GlbInputSignal = toolchain.GlbInputSignal;
 
 pub fn main() void {
-    helper.main(1);
+    helper.main();
 }
 
 fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: common.MacrocellRef) !toolchain.FitResults {

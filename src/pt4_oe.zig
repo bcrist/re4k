@@ -11,12 +11,14 @@ const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const OutputIterator = helper.OutputIterator;
+const MacrocellRef = common.MacrocellRef;
+const PinInfo = common.PinInfo;
 
 pub fn main() void {
-    helper.main(1);
+    helper.main();
 }
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: common.PinInfo, pt4_oe: bool) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: MacrocellRef, pt4_oe: bool) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
     try design.nodeAssignment(.{ .signal = "node0" });
@@ -27,27 +29,26 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, p
 
     var mc_iter = helper.MacrocellIterator { .dev = dev };
     var n: usize = 0;
-    while (mc_iter.next()) |mcref| {
-        if (mcref.glb == pin.glb.? and mcref.mc != pin.mcRef().?.mc) {
+    while (mc_iter.next()) |other_mcref| {
+        if (other_mcref.glb == mcref.glb and other_mcref.mc != mcref.mc) {
             var data_name = try std.fmt.allocPrint(ta, "node{}.D", .{ n });
             var signal_name = data_name[0..data_name.len - 2];
             try design.nodeAssignment(.{
                 .signal = signal_name,
-                .glb = mcref.glb,
-                .mc = mcref.mc,
+                .glb = other_mcref.glb,
+                .mc = other_mcref.mc,
             });
             try design.addPT("node0.Q", data_name);
             try design.addPT("node1.Q", data_name);
             try design.addPT("node2.Q", data_name);
             try design.addPT("node3.Q", data_name);
-            try design.addPT("node4.Q", data_name);
+            try design.addPT(.{ "node0.Q", "node1.Q", "node2.Q" }, data_name);
             n += 1;
         }
     }
 
     try design.pinAssignment(.{
         .signal = "out",
-        .pin = pin.id,
     });
     try design.addPT("node0.Q", "out");
     try design.addPT("node1.Q", "out");
@@ -61,7 +62,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, p
 
     var iter = OutputIterator {
         .pins = dev.all_pins,
-        .exclude_glb = pin.glb,
+        .exclude_glb = mcref.glb,
     };
     n = 0;
     while (iter.next()) |oe_pin| {
@@ -92,7 +93,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, p
     }
 
     var results = try tc.runToolchain(design);
-    try helper.logResults(dev.device, "pt4_oe_{s}_{}", .{ pin.id, pt4_oe }, results);
+    try helper.logResults(dev.device, "pt4_oe_glb{}_mc{}_{}", .{ mcref.glb, mcref.mc, pt4_oe }, results);
     try results.checkTerm();
     return results;
 }
@@ -106,26 +107,22 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
     try writer.expressionExpanded(@tagName(dev.device));
     try writer.expressionExpanded("pt4_output_enable");
 
-    var iter = OutputIterator {
-        .pins = dev.all_pins,
-    };
-    while (iter.next()) |pin| {
-        if (dev.device == .LC4064ZC_csBGA56) {
-            // These pins are connected to macrocells, but lpf4k thinks they're dedicated inputs, and won't allow them to be used as outputs.
-            if (std.mem.eql(u8, pin.id, "F8")) continue;
-            if (std.mem.eql(u8, pin.id, "E3")) continue;
+    var mc_iter = helper.MacrocellIterator { .dev = dev };
+    while (mc_iter.next()) |mcref| {
+        if (mcref.mc == 0) {
+            try helper.writeGlb(writer, mcref.glb);
         }
 
         try tc.cleanTempDir();
         helper.resetTemp();
 
-        const results_off = try runToolchain(ta, tc, dev, pin, false);
-        const results_on = try runToolchain(ta, tc, dev, pin, true);
+        const results_off = try runToolchain(ta, tc, dev, mcref, false);
+        const results_on = try runToolchain(ta, tc, dev, mcref, true);
 
         var diff = try JedecData.initDiff(ta, results_off.jedec, results_on.jedec);
 
         // ignore differences in PTs and GLB routing
-        diff.putRange(dev.getRoutingRange(), 0);
+        //diff.putRange(dev.getRoutingRange(), 0);
 
         // ignore rows that we already know are used for the OE mux in the I/O cell:
         var oe_row_iter = oe_src_rows.iterator(.{});
@@ -133,7 +130,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
             diff.putRange(dev.getRowRange(@intCast(u16, row), @intCast(u16, row)), 0);
         }
 
-        try helper.writePin(writer, pin);
+        try helper.writeMc(writer, mcref.mc);
 
         var value_off: usize = 0;
         var value_on: usize = 0;
@@ -154,7 +151,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         }
 
         if (diff.countSet() != 1) {
-            try helper.err("Expected one pt4_oe fuse but found {}!", .{ diff.countSet() }, dev, .{ .pin = pin.id });
+            try helper.err("Expected one pt4_oe fuse but found {}!", .{ diff.countSet() }, dev, .{ .mcref = mcref });
         }
 
         if (default_off) |def| {
@@ -174,6 +171,10 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         }
 
         try writer.close();
+
+        if (mcref.mc == 15) {
+            try writer.close(); // glb
+        }
     }
 
     if (default_off) |def| {
