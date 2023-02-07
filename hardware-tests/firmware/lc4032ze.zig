@@ -1,7 +1,8 @@
 const std = @import("std");
 const microbe = @import("microbe");
 const clock = microbe.clock;
-const LC4kCommand = @import("svf_file").JtagCommand;
+const svf_file = @import("svf_file");
+const LC4kCommand = svf_file.JtagCommand;
 const DeviceType = @import("common").DeviceType;
 
 const device = DeviceType.LC4032ZE_TQFP48;
@@ -122,11 +123,11 @@ fn readChip() !void {
     const writer = uart.writer();
 
     const idcode = doCommand(.IDCODE, u32, 0xFFFF_FFFF);
-    if (idcode != 0x01806043) {
+    if (idcode != svf_file.getIDCode(device.get())) {
         return error.BadIDCode;
     }
 
-    _ = doCommand(.SAMPLE_PRELOAD, u68, 0);
+    _ = doCommand(.SAMPLE_PRELOAD, std.meta.Int(.unsigned, svf_file.getBoundaryScanLength(device.get())), 0);
     doCommand(.ISC_ENABLE, void, {});
 
     try writer.writeByte(0x2);
@@ -148,12 +149,12 @@ fn verifyInternal() !void {
     const writer = uart.writer();
 
     _ = doCommand(.ISC_ADDRESS_SHIFT, u100, 0x8000000000000000000000000);
-    doCommand(.ISC_READ_INCR, void, {});
+    doCommand(.ISC_READ, void, {});
 
     var row: u16 = 0;
     var base_fuse: u32 = 0;
     while (row < height) : (row += 1) {
-        idleForCommand(.ISC_READ_INCR);
+        idleForCommand(.ISC_READ);
         var data = jtag.tap(0).data(RowDataType, 0, .idle);
 
         try writer.print("L{:0>6} ", .{ base_fuse });
@@ -280,6 +281,11 @@ fn parseJedec(data: *JedecParseData) !void {
 }
 
 fn prepWriteChip() !void {
+    doCommand(.ISC_DISABLE, void, {});
+    doCommand(.BYPASS, void, {});
+    doCommand(.IDCODE, void, {});
+    doCommand(.ISC_DISABLE, void, {});
+
     RTS.modifyInline(1);
     try uart.writer().writeAll("Ready to receive JEDEC file; send ETX or backtick when finished.\r\n");
     RTS.modifyInline(0);
@@ -298,23 +304,21 @@ fn writeChip() !void {
     RTS.modifyInline(1);
 
     const idcode = doCommand(.IDCODE, u32, 0xFFFF_FFFF);
-    if (idcode != 0x01806043) {
+    if (idcode != svf_file.getIDCode(device.get())) {
         return error.BadIDCode;
     }
 
-    _ = doCommand(.SAMPLE_PRELOAD, u68, 0);
+    _ = doCommand(.SAMPLE_PRELOAD, std.meta.Int(.unsigned, svf_file.getBoundaryScanLength(device.get())), 0);
     doCommand(.ISC_ENABLE, void, {});
     doCommand(.ISC_ERASE, void, {});
-    doCommand(.DISCHARGE, void, {});
+    doCommand(.ISC_DISCHARGE, void, {});
     doCommand(.ISC_ADDRESS_INIT, void, {});
-    doCommand(.ISC_PROGRAM_INCR, void, {});
+    doCommand(.ISC_PROGRAM, void, {});
 
     var row: u16 = 0;
     while (row < height) : (row += 1) {
         _ = jtag.tap(0).data(RowDataType, data.row_data, .idle);
-        idleForCommand(.ISC_PROGRAM_INCR);
-
-        //try uart.writer().print("Wrote row {}: {X}\r\n", .{ row, data.row_data });
+        idleForCommand(.ISC_PROGRAM);
 
         RTS.modifyInline(0);
         data.bits_left_in_row = width;
@@ -333,14 +337,15 @@ fn writeChip() !void {
     }
     doCommand(.ISC_PROGRAM_DONE, void, {});
     doCommand(.ISC_PROGRAM_DONE, void, {}); // not sure if this is necessary but the lattice SVFs do this twice...?
-    reset();
-}
 
-fn reset() void {
     doCommand(.ISC_DISABLE, void, {});
     doCommand(.BYPASS, void, {});
     doCommand(.IDCODE, void, {});
     doCommand(.ISC_DISABLE, void, {});
+    reset();
+}
+
+fn reset() void {
     jtag.changeState(.reset);
     jtag.changeState(.idle);
 }
@@ -354,7 +359,7 @@ noinline fn doCommand(comptime command: LC4kCommand, comptime T: type, value: T)
     const result = if (T == void) {} else tap.data(T, value, .DR_pause);
 
     switch (command) {
-        .ISC_PROGRAM_INCR, .ISC_READ_INCR => {},
+        .ISC_PROGRAM, .ISC_READ => {},
         else => idleForCommand(command),
     }
 
@@ -362,12 +367,10 @@ noinline fn doCommand(comptime command: LC4kCommand, comptime T: type, value: T)
 }
 
 fn idleForCommand(comptime command: LC4kCommand) void {
-    jtag.changeState(.idle);
-    const num_clocks = comptime (
-        command.getDelayClocks() + 
-        @TypeOf(jtag).max_frequency_hz * command.getDelayMillis() / 1000
-    );
-    if (num_clocks > 0) {
-        jtag.idle(num_clocks);
+    const delay = comptime command.getDelay();
+    if (delay.min_ms > 0) {
+        _ = jtag.idleUntil(clock.current_tick.plus(.{ .ms = delay.min_ms }), delay.min_clocks);
+    } else {
+        jtag.idle(delay.min_clocks);
     }
 }
