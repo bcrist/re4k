@@ -166,26 +166,37 @@ This also means the setup time is increased as well.
 This is controlled by a single fuse that affects the entire chip.
 Registers whose data comes from product term logic are not affected by this fuse.
 
-## GOE Numbering Conventions
+## Global Output Enables
 All devices have 4 global OE signals.  The polarity of these signals can be configured globally, and their source depends on the device.
 
-For LC4032 devices:
+Sources for LC4032 devices:
 
 * GOE0: Shared PT OE bus bit 0
 * GOE1: Shared PT OE bus bit 1
 * GOE2: A0 input buffer
 * GOE3: B15 input buffer
 
-For other devices:
+Sources for other devices:
 
 * GOE0: Selectable; either shared PT OE bus bit 0, or specific input buffer noted in datasheet
 * GOE1: Selectable; either shared PT OE bus bit 1, or specific input buffer noted in datasheet
 * GOE2: Shared PT OE bus bit 2
 * GOE3: Shared PT OE bus bit 3
 
-The shared PT OE bus is a set of 2 or 4 signals (depending on the device type, as above)
+### Shared PT OE Bus
+The shared PT OE bus is a set of 2 or 4 (depending on the device type, as above) global signals
 where each bit can be connected to any of the GLBs' shared enable PT
 (note this is shared with the power guard feature on ZE devices).
+
+If multiple GLBs are configured to drive the same PT OE bus line,
+it will behave as if only the first (lowest numbered) GLB were used.
+It might have been convenient if they had summed the PTs in this case,
+but alas, for some reason they didn't.
+
+If no GLBs are configured to drive a PT OE bus line,
+it is pulled high (if the polarity fuse is 1) or low (if the polarity fuse is 0).
+There's really no reason to utilize this though, since each output cell can be
+configured for "always output" or "always high impedance" without using any GOE signal.
 
 # Fitter Bugs & Uncertainties
 
@@ -285,5 +296,4 @@ So it seems the fitter is writing the I/O cell's ID in this case, rather than th
     * Can you use input register feedback on MCs that aren't connected to pins? (e.g. LC4064x TQFP48)
     * Can you use an input register MC with the ORM to have the register output directly on a different pin without going through the GRP?
     * What happens if you violate the one-cold rule for GI fuses?
-    * What happens if you violate the one-cold rule for the PT OE internal bus?
     * When using fast 5-PT combinational path on non-ZE parts, can you use the register as a buried macrocell?
