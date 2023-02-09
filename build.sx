@@ -45,7 +45,4 @@
     (exe osctimer)
 
     (exe combine)
-
-    (exe lc4032_test)
-    (exe lc4064_test)
 )

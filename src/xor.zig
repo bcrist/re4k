@@ -126,7 +126,6 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         try writer.close();
     }
 
-    // TODO verify that these match the JEDEC data
     try helper.writeValue(writer, 1, "pt0_or_constant");
     try helper.writeValue(writer, 0, "input_buffer");
 

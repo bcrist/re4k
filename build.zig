@@ -40,7 +40,7 @@ pub fn build(b: *std.build.Builder) void {
             flash_step.dependOn(&flash.step);
         },
     } else {
-        //[[!! include 'build_zig' !! 387 ]]
+        //[[!! include 'build_zig' !! 365 ]]
         //[[ ################# !! GENERATED CODE -- DO NOT MODIFY !! ################# ]]
         const common = Pkg {
             .name = "common",
@@ -227,28 +227,6 @@ pub fn build(b: *std.build.Builder) void {
         invert.setBuildMode(mode);
         invert.install();
         _ = makeRunStep(b, invert, "invert", "run invert");
-
-        const lc4032_test = b.addExecutable("lc4032_test", "src/lc4032_test.zig");
-        lc4032_test.addPackage(common);
-        lc4032_test.addPackage(jed_file);
-        lc4032_test.addPackage(jedec);
-        lc4032_test.addPackage(sx);
-        lc4032_test.addPackage(temp_allocator);
-        lc4032_test.setTarget(target);
-        lc4032_test.setBuildMode(mode);
-        lc4032_test.install();
-        _ = makeRunStep(b, lc4032_test, "lc4032_test", "run lc4032_test");
-
-        const lc4064_test = b.addExecutable("lc4064_test", "src/lc4064_test.zig");
-        lc4064_test.addPackage(common);
-        lc4064_test.addPackage(jed_file);
-        lc4064_test.addPackage(jedec);
-        lc4064_test.addPackage(sx);
-        lc4064_test.addPackage(temp_allocator);
-        lc4064_test.setTarget(target);
-        lc4064_test.setBuildMode(mode);
-        lc4064_test.install();
-        _ = makeRunStep(b, lc4064_test, "lc4064_test", "run lc4064_test");
 
         const mc_func = b.addExecutable("mc_func", "src/mc_func.zig");
         mc_func.addPackage(common);
