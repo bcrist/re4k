@@ -92,7 +92,7 @@ build $dev/slew.sx: slew LC4064\LC4064ZC_TQFP100\slew.sx
 
 rule threshold
     command = zig-out/bin/threshold.exe $out $in
-build $dev/threshold.sx: threshold
+build $dev/threshold.sx: threshold LC4064\LC4064ZC_TQFP100\threshold.sx
 
 rule wide_routing
     command = zig-out/bin/wide_routing.exe $out $in

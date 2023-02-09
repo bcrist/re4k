@@ -57,7 +57,7 @@ local jobs = {
     slew                    = {{ LC4064ZC_csBGA56 = fs.compose_path('LC4064', 'LC4064ZC_TQFP100', 'slew') }},
     drive                   = {{ LC4064ZC_csBGA56 = fs.compose_path('LC4064', 'LC4064ZC_TQFP100', 'drive') }},
     bus_maintenance         = {},
-    threshold               = {},
+    threshold               = {{ LC4064ZC_csBGA56 = fs.compose_path('LC4064', 'LC4064ZC_TQFP100', 'threshold') }},
     power_guard             = { device_predicate = ZE_only },
     goes                    = { 'shared_pt_clk_polarity' },
     bclk_polarity           = { device_map = {

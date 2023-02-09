@@ -11,6 +11,7 @@ const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const LogicLevels = toolchain.LogicLevels;
+const MacrocellRef = common.MacrocellRef;
 
 pub fn main() void {
     helper.main();
@@ -35,6 +36,19 @@ var default_high: ?u1 = null;
 var default_low: ?u1 = null;
 
 pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+    var maybe_fallback_output_fuse_map: ?std.AutoHashMap(MacrocellRef, []const helper.FuseAndValue) = null;
+    var fallback_output_fuse_data = try JedecData.initEmpty(pa, dev.jedec_dimensions);
+    if (helper.getInputFile("threshold.sx")) |_| {
+        const map = try helper.parseFusesForOutputPins(ta, pa, "threshold.sx", "input_threshold", null);
+        var iter = map.iterator();
+        while (iter.next()) |fuses| {
+            for (fuses.value_ptr.*) |fuseAndValue| {
+                fallback_output_fuse_data.put(fuseAndValue.fuse, 1);
+            }
+        }
+        maybe_fallback_output_fuse_map = map;
+    }
+
     try writer.expressionExpanded(@tagName(dev.device));
     try writer.expressionExpanded("input_threshold");
 
@@ -51,30 +65,50 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         try helper.writePin(writer, pin);
 
         var diff_iter = diff.iterator(.{});
-        if (diff_iter.next()) |fuse| {
-            if (dev.device != .LC4064ZC_csBGA56 or fuse.row != 99 or fuse.col != 159 or !std.mem.eql(u8, pin.id, "E1")) {
-                // workaround for fitter bug, see readme.md
-                try writeFuse(fuse, results_high.jedec, results_low.jedec, writer);
+        if (diff_iter.next()) |fuse1| {
+            if (diff_iter.next()) |fuse2| {
+                const fuse1_is_macrocell = fallback_output_fuse_data.isSet(fuse1);
+                const fuse2_is_macrocell = fallback_output_fuse_data.isSet(fuse2);
+
+                if (fuse1_is_macrocell and !fuse2_is_macrocell) {
+                    try writeFuse(fuse2, results_high.jedec, results_low.jedec, writer);
+                    while (diff_iter.next()) |f| {
+                        try helper.err("Expected one threshold fuse but found multiple!", .{}, dev, .{ .pin = pin.id });
+                        try writeFuse(f, results_high.jedec, results_low.jedec, writer);
+                    }
+                } else if (fuse2_is_macrocell and !fuse1_is_macrocell) {
+                    try writeFuse(fuse1, results_high.jedec, results_low.jedec, writer);
+                    while (diff_iter.next()) |f| {
+                        try helper.err("Expected one threshold fuse but found multiple!", .{}, dev, .{ .pin = pin.id });
+                        try writeFuse(f, results_high.jedec, results_low.jedec, writer);
+                    }
+                } else {
+                    try helper.err("Expected one threshold fuse but found multiple!", .{}, dev, .{ .pin = pin.id });
+                    try writeFuse(fuse1, results_high.jedec, results_low.jedec, writer);
+                    try writeFuse(fuse2, results_high.jedec, results_low.jedec, writer);
+
+                    while (diff_iter.next()) |f| {
+                        try writeFuse(f, results_high.jedec, results_low.jedec, writer);
+                    }
+                }
+            } else {
+                try writeFuse(fuse1, results_high.jedec, results_low.jedec, writer);
             }
-        } else if (dev.device == .LC4064ZC_csBGA56 and std.mem.eql(u8, pin.id, "F8")) {
-            // workaround for fitter bug, see readme.md
-            try helper.writeFuse(writer, Fuse.init(99, 159));
+        } else if (maybe_fallback_output_fuse_map) |fallback| {
+            if (pin.mcRef()) |mcref| {
+                if (fallback.get(mcref)) |fuses| {
+                    for (fuses) |fuseAndValue| {
+                        // workaround for fitter bug, see readme.md
+                        try helper.writeFuse(writer, fuseAndValue.fuse);
+                    }
+                } else {
+                    try helper.err("Expected one threshold fuse but found none!", .{}, dev, .{ .pin = pin.id });
+                }
+            } else {
+                try helper.err("Expected one threshold fuse but found none!", .{}, dev, .{ .pin = pin.id });
+            }
         } else {
             try helper.err("Expected one threshold fuse but found none!", .{}, dev, .{ .pin = pin.id });
-        }
-
-        if (dev.device == .LC4064ZC_csBGA56 and std.mem.eql(u8, pin.id, "E1")) {
-            // workaround for fitter bug, see readme.md
-            _ = diff_iter.next();
-        }
-
-        if (diff_iter.next()) |fuse| {
-            try helper.err("Expected one threshold fuse but found multiple!", .{}, dev, .{ .pin = pin.id });
-            try writeFuse(fuse, results_high.jedec, results_low.jedec, writer);
-
-            while (diff_iter.next()) |f| {
-                try writeFuse(f, results_high.jedec, results_low.jedec, writer);
-            }
         }
 
         try writer.close();
@@ -89,8 +123,6 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
     }
 
     try writer.done();
-
-    _ = pa;
 }
 
 fn writeFuse(fuse: Fuse, results_high: JedecData, results_low: JedecData, writer: anytype) !void {
