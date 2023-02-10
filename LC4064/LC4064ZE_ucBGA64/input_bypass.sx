@@ -1,5 +1,5 @@
 (LC4064ZE_ucBGA64
-   (xor
+   (macrocell_data
       (pin A2 (glb 0 (name A)) (mc 6) (fuse 85 307))
       (pin A3 (glb 0 (name A)) (mc 4) (fuse 85 297))
       (pin A4 (glb 0 (name A)) (mc 0) (oe 0) (fuse 85 277))
@@ -48,7 +48,7 @@
       (pin H6 (glb 2 (name C)) (mc 4) (fuse 85 119))
       (pin H7 (glb 2 (name C)) (mc 5) (fuse 85 120))
       (pin H8 (glb 2 (name C)) (mc 6) (fuse 85 129))
-      (value 1 pt0_or_constant)
-      (value 0 input_buffer)
+      (value 1 normal)
+      (value 0 input_bypass)
    )
 )

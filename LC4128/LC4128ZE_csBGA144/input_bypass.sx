@@ -1,5 +1,5 @@
 (LC4128ZE_csBGA144
-   (xor
+   (macrocell_data
       (pin A3 (glb 0 (name A)) (mc 12) (fuse 85 638))
       (pin A4 (glb 0 (name A)) (mc 8) (fuse 85 618))
       (pin A5 (glb 0 (name A)) (mc 6) (fuse 85 608))
@@ -96,7 +96,7 @@
       (pin M8 (glb 4 (name E)) (mc 6) (fuse 85 238))
       (pin M9 (glb 4 (name E)) (mc 8) (fuse 85 248))
       (pin M10 (glb 4 (name E)) (mc 12) (fuse 85 268))
-      (value 1 pt0_or_constant)
-      (value 0 input_buffer)
+      (value 1 normal)
+      (value 0 input_bypass)
    )
 )

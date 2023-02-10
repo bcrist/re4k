@@ -1,5 +1,5 @@
 (LC4128x_TQFP128
-   (xor
+   (macrocell_data
       (pin 4 (glb 1 (name B)) (mc 0) (fuse 85 661))
       (pin 5 (glb 1 (name B)) (mc 1) (fuse 85 662))
       (pin 6 (glb 1 (name B)) (mc 2) (fuse 85 671))
@@ -92,7 +92,7 @@
       (pin 126 (glb 0 (name A)) (mc 10) (fuse 85 628))
       (pin 127 (glb 0 (name A)) (mc 12) (fuse 85 638))
       (pin 128 (glb 0 (name A)) (mc 14) (fuse 85 648))
-      (value 1 pt0_or_constant)
-      (value 0 input_buffer)
+      (value 1 normal)
+      (value 0 input_bypass)
    )
 )

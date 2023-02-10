@@ -1,5 +1,5 @@
-(LC4064ZE_TQFP48
-   (xor
+(LC4064ZC_TQFP48
+   (macrocell_data
       (pin 2 (glb 0 (name A)) (mc 8) (fuse 85 317))
       (pin 3 (glb 0 (name A)) (mc 10) (fuse 85 327))
       (pin 4 (glb 0 (name A)) (mc 11) (fuse 85 328))
@@ -32,7 +32,7 @@
       (pin 46 (glb 0 (name A)) (mc 2) (fuse 85 287))
       (pin 47 (glb 0 (name A)) (mc 4) (fuse 85 297))
       (pin 48 (glb 0 (name A)) (mc 6) (fuse 85 307))
-      (value 1 pt0_or_constant)
-      (value 0 input_buffer)
+      (value 1 normal)
+      (value 0 input_bypass)
    )
 )

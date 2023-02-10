@@ -217,6 +217,17 @@ pub fn build(b: *std.build.Builder) void {
         init_state.install();
         _ = makeRunStep(b, init_state, "init_state", "run init_state");
 
+        const input_bypass = b.addExecutable("input_bypass", "src/input_bypass.zig");
+        input_bypass.addPackage(common);
+        input_bypass.addPackage(jed_file);
+        input_bypass.addPackage(jedec);
+        input_bypass.addPackage(sx);
+        input_bypass.addPackage(temp_allocator);
+        input_bypass.setTarget(target);
+        input_bypass.setBuildMode(mode);
+        input_bypass.install();
+        _ = makeRunStep(b, input_bypass, "input_bypass", "run input_bypass");
+
         const invert = b.addExecutable("invert", "src/invert.zig");
         invert.addPackage(common);
         invert.addPackage(jed_file);
@@ -381,17 +392,6 @@ pub fn build(b: *std.build.Builder) void {
         wide_routing.setBuildMode(mode);
         wide_routing.install();
         _ = makeRunStep(b, wide_routing, "wide_routing", "run wide_routing");
-
-        const xor = b.addExecutable("xor", "src/xor.zig");
-        xor.addPackage(common);
-        xor.addPackage(jed_file);
-        xor.addPackage(jedec);
-        xor.addPackage(sx);
-        xor.addPackage(temp_allocator);
-        xor.setTarget(target);
-        xor.setBuildMode(mode);
-        xor.install();
-        _ = makeRunStep(b, xor, "xor", "run xor");
 
         const zerohold = b.addExecutable("zerohold", "src/zerohold.zig");
         zerohold.addPackage(common);

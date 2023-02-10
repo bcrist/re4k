@@ -1,5 +1,5 @@
 (LC4032x_TQFP44
-   (xor
+   (macrocell_data
       (pin 2 (glb 0 (name A)) (mc 5) (fuse 85 114))
       (pin 3 (glb 0 (name A)) (mc 6) (fuse 85 123))
       (pin 4 (glb 0 (name A)) (mc 7) (fuse 85 124))
@@ -30,7 +30,7 @@
       (pin 42 (glb 0 (name A)) (mc 2) (fuse 85 103))
       (pin 43 (glb 0 (name A)) (mc 3) (fuse 85 104))
       (pin 44 (glb 0 (name A)) (mc 4) (fuse 85 113))
-      (value 1 pt0_or_constant)
-      (value 0 input_buffer)
+      (value 1 normal)
+      (value 0 input_bypass)
    )
 )

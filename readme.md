@@ -29,61 +29,24 @@ LC4256 and larger devices are not supported at this time.
 Automotive (LA4xxx) variants likely use the same fusemaps as their LC counterparts, but that's just conjecture.
 Please don't use this project for any automotive or other safety-critical application.
 
-## Jargon
-
-#### GLB
-Generic Logic Block: A group of 36 GIs, 83 PTs, 16 MCs, and the other logic associated with them.  Each device contains two or more GLBs.
-
-#### GRP
-Global Routing Pool: the set of all signals that can be used as inputs to a GLB.  This includes all I/O cell pins, feedback from all MCs, dedicated clock pins, and (in some devices) dedicated input pins.
-
-#### GI
-Generic Input: One of 36 signals per GLB which can be used in that GLB's product terms.
-
-#### PT
-Product Term: Up to 36 signals (or their complements) ANDed together.
-
-#### MC
-Macrocell: A single flip-flop or combinational logic "output".
-
-#### MC Slice
-Macrocell Slice: A 5-PT cluster, macrocell, routing logic, and I/O cell.  Each GLB contains 16 MC Slices, along with the 3 shared PTs, BCLK and GI configuration.
-
-#### ORM
-Output Routing Multiplexer: Allows macrocells and their associated OE product term to be shunted to a different nearby pin.
-
-#### BCLK
-Block Clock: Each GLB ("Block") can independently configure the polarity of the dedicated clock inputs.
-
-#### BIE
-Block Input Enable: For ZE-family devices, inputs can be dynamically masked to reduce power consumption.
-
-#### GOE
-Global Output Enable: Up to four signals which can come from specific input pins, or from the BIE shared PTs.
-
-#### CE
-Clock Enable
-
-#### LE
-Latch Enable
-
-#### AS
-Asynchronous (pre)Set
-
-#### AR
-Asynchronous Reset/clear
-
+## Introduction
+Please read through the Lattice datasheet for your device if you have not.
+Generally I have tried to use the same terminology for things as is used there.
+You can also reference the glossary at the end of this document if you are unsure of what an acronym or term means.
+You can find PDF and KiCAD format schematics showing the structure of each type of device in the `schematics` directory.
 
 ## General Fusemap Layout
-
 All LC4k devices have a logical layout of fuses into a 2D grid with either 100 or 95 rows,
 and a variable number of columns, depending on the number of GLBs in the device.
 The JEDEC files list these fuses one row after another,
 and when programming the device via JTAG each row is delivered in a separate SDR transaction.
 
-The first 72 rows contain mostly product term fuses,
-with one column for each product term in the device.
-These rows also contain extra columns for the GI routing fuses (at least 3 columns per GLB).
+Each GLB uses a chunk of at least 86 columns,
+and the GLBs are laid out side-by-side,
+however they are not generally ordered from left to right
+(the block for GLB "A" is not necessarily to the left of the block for GLB "B").
+
+The first 72 rows contain PT and GI routing fuses.
 This part of the fusemap is densely packed;
 every single logical fuse corresponds to a bit of FLASH memory and controls the behavior of the device.
 
@@ -98,13 +61,180 @@ half of the fuses are shifted over to the adjacent macrocell's column,
 reducing the total number of rows needed.
 
 Each GLB has a few bits of block configuration which are placed in the "borders" to the left and right of the macrocell slice columns.
-This includes fuses for configuring block clock source/polarity, shared PT polarity, and routing of the shared PT enable to the GOE bus.
+This includes fuses for configuring block clock source/polarity, shared PT polarity, routing of the shared PT enable to the GOE bus, etc.
 
 Finally, global configuration is typically placed in a small, vaguely ring-shaped structure at the right edge of one of the GLB regions.
 This includes configuration of input-only pins, GOE polarity, and oscillator/timer (in ZE devices).
 
-## Bus Termination Options
-2 fuses allow selection of one of four bus termination options:
+## S-Expression Files
+The reverse-engineered fusemap for each device consists of a set of s-expression files in `LC4xxx/LC4xxx*_*/.sx`.
+There is also a combined file `LC4xxx/LC4xxx*_*.sx` which contains the data from all of the individual files.
+The meaning of the data in each particular file is explained below.
+If the syntax of any of the files is confusing to you after reading its corresponding section,
+please open an issue so I can try to document it better.
+
+### `grp.sx` `(global_routing_pool)`
+Each GLB has 36 GI "slots" which (along with their complements) are used as inputs to the product terms in that GLB.
+Each GI can be selected from a fixed set of signals in the global routing pool.
+The options are different for each GI "slot" in the GLB,
+but every GLB in the device uses the same options for the same GI slot.
+The number of options for each slot depends on the device type
+(devices with more GLBs have more GRP signals,
+therefore in order to have multiple possible routings for each signal,
+each GLB must have more possible options).
+
+For devices that have an even number of GI options,
+the option fuses are stored at the very left side of the GLB block,
+using `N/2` columns (where `N` is the number of options).
+A "one-cold" encoding is used here; i.e. there is one fuse for each option,
+and only one fuse should be programmed to 0 for each GI.
+
+For devices that have an odd number of GI options, the GLBs are organized into pairs,
+and each pair shares the same columns of GI routing fuses.  The first row contains fuses
+for one of the GLBs, and the second row contains fuses for the other.
+
+### `pterms.sx` `(product_terms)`
+Within the first 72 rows, each column
+(with the exception of the columns used for GI routing above)
+represents a single product term.
+Every pair of rows corresponds to a single GI slot,
+with the first row representing the non-inverted GI signal,
+and the second row representing the inverted version of the same signal.
+
+Programming a fuse within a product term to 0 means the corresponding signal must be asserted
+in order for the product term to output `true`.
+Another way to think of this is that the fuse value is OR-ed with the signal, and the result is
+passed into the product term's AND gate.
+Therefore if no PT fuses are set to 0, the PT will always yield `true`.
+If both fuses are set to 0 for any GI, the PT will always yield `false`.
+When the lpf4k fitter wants to make a PT `false`,
+it sets all the fuses for the first dozen or so rowss to 0.
+It's not clear why they chose to set just those.
+It may be that setting just one pair to 0 might create static hazards
+if the GI mapped to that slot changes.
+But in that case wouldn't it be best to set all GI pairs to zeroes?
+In testing, that does seem to work as expected,
+so that's what I'd recommend doing.
+My best guess is that this could be a holdover from older device families
+that used sense amplifiers instead of fully CMOS logic.
+Setting all fuses to 0 might cause higher power usage in such devices.
+
+Product terms are grouped into clusters of 5,
+with one cluster associated with each macrocell.
+Additionally, there are 3 extra product terms per GLB,
+which may be used for specific purposes,
+but are shared amongst all macrocells in the GLB.
+These PTs are always in the last 3 columns of the GLB's block.
+
+### `cluster_routing.sx` `(cluster_routing)`
+Each product term can optionally be used for a special purpose related to that macrocell (see below),
+or they can be summed (OR-ed) together and fed into the macrocell's logic input.
+
+Since a logic equation simplified to a sum-of-products often requires more than 5 product terms,
+a cluster can either keep it's sum for itself,
+or it can "donate" it to one of up to three nearby macrocells.
+Each cluster then creates a second sum from any intermediate sums that were routed to that cluster.
+A cluster can receive a "donation" (or multiple) even if it is not "keeping" it's own original sum.
+Therefore this second sum can represent up to 20 product terms, all with a constant propagation delay.
+Some specific clusters have a maximum of < 20 PTs:
+
+* The cluster for MC 0 can only receive a sum from cluster 1 or cluster 2, so including itself it has a maximum of 15 PTs.
+* The cluster for MC 14 can only receive a sum from cluster 13 or cluster 15, so including itself it has a maximum of 15 PTs.
+* The cluster for MC 15 can only receive a sum from cluster 14, so including itself it has a maximum of 10 PTs.
+
+A cluster sum can only be routed to one other cluster;
+it can't be duplicated and sent to multiple neighboring clusters.
+
+### `wide_routing.sx` `(wide_routing)`
+In cases where a very large number of product terms are needed,
+but very few outputs are needed,
+the output of the second sum above can be redirected to the cluster at index `(N+4)%16`
+(where `N` is the current cluster index).
+This is referred to in the datasheets as "SuperWIDE(tm)" steering logic.
+
+Note that this differs from `cluster_routing` in several ways:
+
+* It "wraps around", so cluster 15 can be routed to cluster 3.
+* It can be "chained" such that any macrocell in the GLB can potentially use every PT cluster, if no other MCs in the GLB need a cluster.
+* Using this feature increases the maximum propagation delay (but not equally; PTs that go through the wide routing will be slower than those in the final cluster's 20-PT group).
+
+When a macrocell's cluster is routed away to another cluster,
+the macrocell sees a constant low (false) value as its logic input.
+
+### `input_bypass.sx` `(macrocell_data)`
+A macrocell register's data/toggle input may be configured to come directly from the macrocell's input pad,
+instead of having to travel through the GRP, PTs, cluster routing, etc.
+This provides a reduced minimum setup time.
+
+Technically this feature can also be used when the macrocell is configured for combinational logic,
+but there's not much point in doing so,
+since that just makes the macrocell feedback signal the same as the input buffer signal.
+You could use an ORM offset to create a tri-state line driver where the input and output are both pins,
+and the OE signal is controlled by the CPLD logic.
+This would yield the fastest possible propagation delay across the line driver,
+but if propagation delay is that critical,
+you'd probably be better off just outputting the OE signal and using an external tri-state buffer or bus switch.
+
+### `zerohold.sx` `(zero_hold_time)`
+When a macrocell is configured as an input register,
+an extra delay can be added to bring the minimum hold time down to 0.
+This also means the setup time is increased.
+This is controlled by a single fuse that affects the entire chip.
+Registers whose data comes from product term logic are not affected by this fuse,
+because the internal propagation delays mean that no hold time is required anyway.
+
+### `pt0_xor.sx` `(pt0_xor)`
+Each macrocell contains an XOR gate.
+The output of the XOR gate goes to the data/toggle input of the macrocell's register,
+and optionally to the macrocell feedback/ORM input (when the MC is in combinational mode).
+
+One of the inputs to the XOR gate is always the logic input from the PT cluster router.
+
+The second input of the XOR gate can be either a constant value,
+or the result of the macrocell's first product term, PT0.
+When it is sourced from PT0, that product term is removed from its cluster sum.
+When PT0 is not redirected, a logic 0 is fed to the XOR (optionally inverted; see below).
+
+Note that the datasheets' macrocell schematic (fig. 5)
+depicts the input register mux feeding into one of the XOR inputs,
+however when testing real devices,
+we see that the XOR gate is bypassed completely when the `input_register` fuse is cleared.
+This implies that the input register mux is actually located after the XOR output.
+This makes sense, since the idea of the input register is to make the setup time as short as possible.
+
+### `invert.sx` `(invert)`
+The second input of the XOR gate can be inverted using this fuse.
+When sourced from PT0, this means PT0 can be thought as a 36-input OR gate
+instead of a 36-input AND gate (via a De Morgan transformation;
+you must also use the complement of each PT0 input of course).
+
+When the inverter is enabled, but the XOR is not sourced from PT0,
+the second XOR input becomes a constant high,
+so the logic sum from the PT cluster router is inverted.
+Again, one way to think of this is that you can use the macrocell as a product-of-sums
+instead of a sum-of-products.
+
+
+### `async_source.sx`
+### `bclk_polarity.sx`
+### `ce_source.sx`
+### `clock_source.sx`
+### `drive.sx`
+### `goes.sx`
+### `init_source.sx`
+### `init_state.sx`
+### `mc_func.sx`
+### `oe_source.sx`
+### `output_routing_mode.sx`
+### `output_routing.sx`
+### `pt4_oe.sx`
+### `shared_pt_clk_polarity.sx`
+### `shared_pt_init_polarity.sx`
+### `slew.sx`
+### `threshold.sx`
+
+### `bus_maintenance.sx` `(bus_maintenance)`
+2 fuses allow selection of one of four input termination options:
     * pull up
     * pull down
     * bus-hold
@@ -159,12 +289,7 @@ One fuse per output controls the slew rate for that driver.
 SLOW should generally be used for any long traces or inter-board connections.
 FAST can be used for short traces where transmission line effects are unlikely.
 
-## Zero Hold Time
-When a macrocell is configured as an input register,
-an extra delay can be added to bring `tHOLD` down to 0.
-This also means the setup time is increased as well.
-This is controlled by a single fuse that affects the entire chip.
-Registers whose data comes from product term logic are not affected by this fuse.
+
 
 ## Global Output Enables
 All devices have 4 global OE signals.  The polarity of these signals can be configured globally, and their source depends on the device.
@@ -287,6 +412,51 @@ e.g. for `LC4128ZC_TQFP100`, pin 12's source is listed as "mc B-11",
 but the GI mux fuse that's set is one of the ones corresponding to pin 16 in `LC4128V_TQFP144`;
 which is MC B14 and ORP B^11 in that device.
 So it seems the fitter is writing the I/O cell's ID in this case, rather than the actual pin number.
+
+## Glossary
+
+#### GLB
+Generic Logic Block: A group of 36 GIs, 83 PTs, 16 MCs, and the other logic associated with them.  Each device contains two or more GLBs.
+
+#### GRP
+Global Routing Pool: the set of all signals that can be used as inputs to a GLB.  This includes all I/O cell pins, feedback from all MCs, dedicated clock pins, and (in some devices) dedicated input pins.
+
+#### GI
+Generic Input: One of 36 signals per GLB which can be used in that GLB's product terms.
+
+#### PT
+Product Term: Up to 36 signals (or their complements) ANDed together.
+
+#### MC
+Macrocell: A single flip-flop or combinational logic "output".
+
+#### MC Slice
+Macrocell Slice: A 5-PT cluster, macrocell, routing logic, and I/O cell.  Each GLB contains 16 MC Slices, along with the 3 shared PTs, BCLK and GI configuration.
+
+#### ORM
+Output Routing Multiplexer: Allows macrocells and their associated OE product term to be shunted to a different nearby pin.
+
+#### BCLK
+Block Clock: Each GLB ("Block") can independently configure the polarity of the dedicated clock inputs.
+
+#### BIE
+Block Input Enable: For ZE-family devices, inputs can be dynamically masked to reduce power consumption.
+
+#### GOE
+Global Output Enable: Up to four signals which can come from specific input pins, or from the BIE shared PTs.
+
+#### CE
+Clock Enable
+
+#### LE
+Latch Enable
+
+#### AS
+Asynchronous (pre)Set
+
+#### AR
+Asynchronous Reset/clear
+
 
 # TODO
 * Refactor routing jobs to use common.ClusterRouting, common.WideRouting

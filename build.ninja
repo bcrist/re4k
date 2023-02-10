@@ -30,6 +30,7 @@ build clean-goes: phony clean-goes-LC4032 clean-goes-LC4064 clean-goes-LC4128
 build clean-grp: phony clean-grp-LC4032 clean-grp-LC4064 clean-grp-LC4128
 build clean-init_source: phony clean-init_source-LC4032 clean-init_source-LC4064 clean-init_source-LC4128
 build clean-init_state: phony clean-init_state-LC4032 clean-init_state-LC4064 clean-init_state-LC4128
+build clean-input_bypass: phony clean-input_bypass-LC4032 clean-input_bypass-LC4064 clean-input_bypass-LC4128
 build clean-invert: phony clean-invert-LC4032 clean-invert-LC4064 clean-invert-LC4128
 build clean-mc_func: phony clean-mc_func-LC4032 clean-mc_func-LC4064 clean-mc_func-LC4128
 build clean-oe_source: phony clean-oe_source-LC4032 clean-oe_source-LC4064 clean-oe_source-LC4128
@@ -45,7 +46,6 @@ build clean-shared_pt_init_polarity: phony clean-shared_pt_init_polarity-LC4032 
 build clean-slew: phony clean-slew-LC4032 clean-slew-LC4064 clean-slew-LC4128
 build clean-threshold: phony clean-threshold-LC4032 clean-threshold-LC4064 clean-threshold-LC4128
 build clean-wide_routing: phony clean-wide_routing-LC4032 clean-wide_routing-LC4064 clean-wide_routing-LC4128
-build clean-xor: phony clean-xor-LC4032 clean-xor-LC4064 clean-xor-LC4128
 build clean-zerohold: phony clean-zerohold-LC4032 clean-zerohold-LC4064 clean-zerohold-LC4128
 
 ## ######################### END OF GENERATED CODE ######################### ##

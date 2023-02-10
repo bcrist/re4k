@@ -1,5 +1,5 @@
 (LC4064ZC_csBGA56
-   (xor
+   (macrocell_data
       (pin A1 (glb 0 (name A)) (mc 6) (fuse 85 307))
       (pin A2 (glb 0 (name A)) (mc 4) (fuse 85 297))
       (pin A3 (glb 0 (name A)) (mc 2) (fuse 85 287))
@@ -34,7 +34,7 @@
       (pin K8 (glb 2 (name C)) (mc 2) (fuse 85 109))
       (pin K9 (glb 2 (name C)) (mc 4) (fuse 85 119))
       (pin K10 (glb 2 (name C)) (mc 6) (fuse 85 129))
-      (value 1 pt0_or_constant)
-      (value 0 input_buffer)
+      (value 1 normal)
+      (value 0 input_bypass)
    )
 )

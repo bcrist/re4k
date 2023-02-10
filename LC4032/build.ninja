@@ -31,6 +31,8 @@ build clean-init_source-LC4032: clean
     what = LC4032\LC4032ZC_TQFP48\init_source.sx LC4032\LC4032ZC_csBGA56\init_source.sx LC4032\LC4032ZE_TQFP48\init_source.sx LC4032\LC4032ZE_csBGA64\init_source.sx LC4032\LC4032x_TQFP44\init_source.sx LC4032\LC4032x_TQFP48\init_source.sx
 build clean-init_state-LC4032: clean
     what = LC4032\LC4032ZC_TQFP48\init_state.sx LC4032\LC4032ZC_csBGA56\init_state.sx LC4032\LC4032ZE_TQFP48\init_state.sx LC4032\LC4032ZE_csBGA64\init_state.sx LC4032\LC4032x_TQFP44\init_state.sx LC4032\LC4032x_TQFP48\init_state.sx
+build clean-input_bypass-LC4032: clean
+    what = LC4032\LC4032ZC_TQFP48\input_bypass.sx LC4032\LC4032ZC_csBGA56\input_bypass.sx LC4032\LC4032ZE_TQFP48\input_bypass.sx LC4032\LC4032ZE_csBGA64\input_bypass.sx LC4032\LC4032x_TQFP44\input_bypass.sx LC4032\LC4032x_TQFP48\input_bypass.sx
 build clean-invert-LC4032: clean
     what = LC4032\LC4032ZC_TQFP48\invert.sx LC4032\LC4032ZC_csBGA56\invert.sx LC4032\LC4032ZE_TQFP48\invert.sx LC4032\LC4032ZE_csBGA64\invert.sx LC4032\LC4032x_TQFP44\invert.sx LC4032\LC4032x_TQFP48\invert.sx
 build clean-mc_func-LC4032: clean
@@ -61,8 +63,6 @@ build clean-threshold-LC4032: clean
     what = LC4032\LC4032ZC_TQFP48\threshold.sx LC4032\LC4032ZC_csBGA56\threshold.sx LC4032\LC4032ZE_TQFP48\threshold.sx LC4032\LC4032ZE_csBGA64\threshold.sx LC4032\LC4032x_TQFP44\threshold.sx LC4032\LC4032x_TQFP48\threshold.sx
 build clean-wide_routing-LC4032: clean
     what = LC4032\LC4032ZC_TQFP48\wide_routing.sx LC4032\LC4032ZC_csBGA56\wide_routing.sx LC4032\LC4032ZE_TQFP48\wide_routing.sx LC4032\LC4032ZE_csBGA64\wide_routing.sx LC4032\LC4032x_TQFP44\wide_routing.sx LC4032\LC4032x_TQFP48\wide_routing.sx
-build clean-xor-LC4032: clean
-    what = LC4032\LC4032ZC_TQFP48\xor.sx LC4032\LC4032ZC_csBGA56\xor.sx LC4032\LC4032ZE_TQFP48\xor.sx LC4032\LC4032ZE_csBGA64\xor.sx LC4032\LC4032x_TQFP44\xor.sx LC4032\LC4032x_TQFP48\xor.sx
 build clean-zerohold-LC4032: clean
     what = LC4032\LC4032ZC_TQFP48\zerohold.sx LC4032\LC4032ZC_csBGA56\zerohold.sx LC4032\LC4032ZE_TQFP48\zerohold.sx LC4032\LC4032ZE_csBGA64\zerohold.sx LC4032\LC4032x_TQFP44\zerohold.sx LC4032\LC4032x_TQFP48\zerohold.sx
 

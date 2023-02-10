@@ -69,12 +69,12 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, p
 
 pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
     var maybe_fallback_fuses: ?std.AutoHashMap(MacrocellRef, []const helper.FuseAndValue) = null;
-    if (helper.getInputFile("xor.sx")) |_| {
-        maybe_fallback_fuses = try helper.parseFusesForOutputPins(ta, pa, "xor.sx", "xor", null);
+    if (helper.getInputFile("input_bypass.sx")) |_| {
+        maybe_fallback_fuses = try helper.parseFusesForOutputPins(ta, pa, "input_bypass.sx", "macrocell_data", null);
     }
 
     try writer.expressionExpanded(@tagName(dev.device));
-    try writer.expressionExpanded("xor");
+    try writer.expressionExpanded("macrocell_data");
 
     var pin_iter = helper.OutputIterator { .pins = dev.all_pins };
     while (pin_iter.next()) |pin| {
@@ -126,8 +126,8 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         try writer.close();
     }
 
-    try helper.writeValue(writer, 1, "pt0_or_constant");
-    try helper.writeValue(writer, 0, "input_buffer");
+    try helper.writeValue(writer, 1, "normal");
+    try helper.writeValue(writer, 0, "input_bypass");
 
     try writer.done();
 }

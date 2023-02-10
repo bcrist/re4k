@@ -1,5 +1,5 @@
 (LC4128ZC_csBGA132
-   (xor
+   (macrocell_data
       (pin A1 (glb 0 (name A)) (mc 14) (fuse 85 648))
       (pin A2 (glb 0 (name A)) (mc 13) (fuse 85 639))
       (pin A3 (glb 0 (name A)) (mc 10) (fuse 85 628))
@@ -96,7 +96,7 @@
       (pin P12 (glb 4 (name E)) (mc 10) (fuse 85 258))
       (pin P13 (glb 4 (name E)) (mc 13) (fuse 85 269))
       (pin P14 (glb 4 (name E)) (mc 14) (fuse 85 278))
-      (value 1 pt0_or_constant)
-      (value 0 input_buffer)
+      (value 1 normal)
+      (value 0 input_bypass)
    )
 )

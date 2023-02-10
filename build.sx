@@ -21,7 +21,7 @@
     (exe cluster_routing)
     (exe wide_routing)
     (exe invert)
-    (exe xor)
+    (exe input_bypass)
     (exe init_source)
     (exe async_source)
     (exe clock_source)

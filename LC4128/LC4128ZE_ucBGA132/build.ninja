@@ -46,6 +46,10 @@ rule init_state
     command = zig-out/bin/init_state.exe $out $in
 build $dev/init_state.sx: init_state
 
+rule input_bypass
+    command = zig-out/bin/input_bypass.exe $out $in
+build $dev/input_bypass.sx: input_bypass
+
 rule invert
     command = zig-out/bin/invert.exe $out $in
 build $dev/invert.sx: invert
@@ -102,15 +106,11 @@ rule wide_routing
     command = zig-out/bin/wide_routing.exe $out $in
 build $dev/wide_routing.sx: wide_routing $dev\cluster_routing.sx
 
-rule xor
-    command = zig-out/bin/xor.exe $out $in
-build $dev/xor.sx: xor
-
 rule zerohold
     command = zig-out/bin/zerohold.exe $out $in
 build $dev/zerohold.sx: zerohold
 
-build LC4128\LC4128ZE_ucBGA132.sx: combine $dev/async_source.sx $dev/bclk_polarity.sx $dev/bus_maintenance.sx $dev/ce_source.sx $dev/clock_source.sx $dev/cluster_routing.sx $dev/drive.sx $dev/goes.sx $dev/grp.sx $dev/init_source.sx $dev/init_state.sx $dev/invert.sx $dev/mc_func.sx $dev/oe_source.sx $dev/osctimer.sx $dev/output_routing.sx $dev/power_guard.sx $dev/pt0_xor.sx $dev/pt4_oe.sx $dev/pterms.sx $dev/shared_pt_clk_polarity.sx $dev/shared_pt_init_polarity.sx $dev/slew.sx $dev/threshold.sx $dev/wide_routing.sx $dev/xor.sx $dev/zerohold.sx
+build LC4128\LC4128ZE_ucBGA132.sx: combine $dev/async_source.sx $dev/bclk_polarity.sx $dev/bus_maintenance.sx $dev/ce_source.sx $dev/clock_source.sx $dev/cluster_routing.sx $dev/drive.sx $dev/goes.sx $dev/grp.sx $dev/init_source.sx $dev/init_state.sx $dev/input_bypass.sx $dev/invert.sx $dev/mc_func.sx $dev/oe_source.sx $dev/osctimer.sx $dev/output_routing.sx $dev/power_guard.sx $dev/pt0_xor.sx $dev/pt4_oe.sx $dev/pterms.sx $dev/shared_pt_clk_polarity.sx $dev/shared_pt_init_polarity.sx $dev/slew.sx $dev/threshold.sx $dev/wide_routing.sx $dev/zerohold.sx
 build build-LC4128ZE_ucBGA132: phony LC4128\LC4128ZE_ucBGA132.sx
 
 ## ######################### END OF GENERATED CODE ######################### ##

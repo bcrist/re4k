@@ -44,7 +44,7 @@ local jobs = {
     cluster_routing         = { 'invert', 'output_routing' },
     wide_routing            = { 'cluster_routing' },
     invert                  = {},
-    xor                     = {{ LC4064ZC_csBGA56 = fs.compose_path('LC4064', 'LC4064ZC_TQFP100', 'xor') }},
+    input_bypass            = {{ LC4064ZC_csBGA56 = fs.compose_path('LC4064', 'LC4064ZC_TQFP100', 'input_bypass') }},
     init_source             = {},
     async_source            = {},
     clock_source            = {},
