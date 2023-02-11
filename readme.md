@@ -214,44 +214,218 @@ so the logic sum from the PT cluster router is inverted.
 Again, one way to think of this is that you can use the macrocell as a product-of-sums
 instead of a sum-of-products.
 
+### `mc_func.sx` `(macrocell_function)`
+Each macrocell can implement one of four fundamental circuits:
 
-### `async_source.sx`
-### `bclk_polarity.sx`
-### `ce_source.sx`
-### `clock_source.sx`
-### `drive.sx`
-### `goes.sx`
-### `init_source.sx`
-### `init_state.sx`
-### `mc_func.sx`
-### `oe_source.sx`
-### `output_routing_mode.sx`
-### `output_routing.sx`
-### `pt4_oe.sx`
-### `shared_pt_clk_polarity.sx`
-### `shared_pt_init_polarity.sx`
-### `slew.sx`
-### `threshold.sx`
+* Purely combinational logic
+* Transparent latch
+* D flip-flop
+* T flip-flop
 
-### `bus_maintenance.sx` `(bus_maintenance)`
-2 fuses allow selection of one of four input termination options:
-    * pull up
-    * pull down
-    * bus-hold
-    * floating/high-Z
-In ZE family devices, this can be configured separately for each input pin.
-In other families, there is only a single set of fuses which apply to the entire device.
+The latter 3 all act as single bit storage elements,
+and thus have some extra configuration that is irrelevant for combinational macrocells:
 
-### Bus Termination on non-ZE families with buried I/O cells
-On certain non-ZE devices, setting all of the bus maintenance options off (i.e. floating inputs)
-causes the fitter to toggle additional fuses beyond the two global bus maintenance fuses.
-This only happens on devices where the die has I/O cells that aren't bonded to any package pin. (e.g. TQFP-44 packages)
-Normally, these extra I/O cells are left as inputs,
-but if inputs are allowed to float, this could cause excessive power usage,
-so the fitter turns them into outputs by setting the appropriate OE mux fuses.
-These fuses are documented in the `pull.sx` files within the `bus_maintenance_extra` section, if the device requires them.
+* Clock source
+* Clock enable source
+* Power-up initialization
+* Asynchronous set/reset
 
-## Input Threshold
+These features are described below.
+
+### `clock_source.sx` `(clock_source)`
+When a macrocell is used as a register,
+it needs a clock signal, which can be one of eight options:
+
+* Four block clock signals (see below)
+* The GLB's shared clock PT
+* The macrocell's PT1
+* The macrocell's PT1, inverted
+* A constant low/false
+
+When it is sourced from PT1, that product term is removed from its cluster sum.
+
+When the macrocell is configured as a D or T flip flop, the clock triggers on the rising edge.
+If if the source can be inverted, it effectively flips it to trigger on the falling edge.
+
+When configured as a latch, it will be transparent when the clock signal is high,
+and latched when the clock signal is low.
+
+### `bclk_polarity.sx` `(bclk_polarity)`
+The four BCLK clock selection options come from dedicated input pins
+(usually four, but some devices only have two).
+Using these avoids the need to use macrocell PTs or the GLB's shared clock PT for the clock.
+The polarity of these clocks can be configured independently for each GLB.
+It is configured in fixed pairs,
+where each BCLK can be either the non-inverted version of one of the clocks,
+or the inverted version of the _other_ clock.
+So you can have both clocks non-inverted, both clocks inverted,
+or a complementary pair of either clock.
+
+### `ce_source.sx` `(clock_enable_source)`
+The clock enable inhibits the updating of the register contents when it is high.
+It has no effect when the macrocell is configured for combinational logic.
+
+For transparent latches, it works effectively as if the clock were ANDed with the CE;
+as long as both are high, the latch is in transparent mode;
+if either goes low, it latches the current value.
+
+For D and T flip flops, this means as long as the CE is low during the triggering edge,
+there will be no change that cycle.
+This is not the same as simply ANDing the CE with the clock signal;
+the CE does not need to remain low for the entire duration that the clock is high.
+
+There are four possible sources for the CE signal:
+
+* The macrocell's PT2
+* The macrocell's PT2, inverted
+* The GLB's shared clock PT
+* A constant high/true
+
+The shared clock PT is the same one that's used as an option for the clock,
+and within a GLB, the same PT can be used as a clock for some MCs and a CE for others.
+
+When it is sourced from PT2, that product term is removed from its cluster sum.
+Note that PT2 can also be used for an async set/reset signal (see below).
+
+### `shared_pt_clk_polarity.sx` `(shared_pt_clk_polarity)`
+Each GLB's shared clock PT can optionally be inverted.
+This affects all usages within the GLB, both as a clock and a clock enable.
+
+### `init_state.sx` `(init_state)`
+When a macrocell is configured as a register,
+its initial state at power-up can be configured.
+This configuration can be selected independently for each macrocell.
+
+### `init_source.sx` `(init_source)`
+When a macrocell is configured as a register,
+an signal can be used to asynchronously set or reset the register to its power-up state.
+While this signal remains high, the macrocell is forced into its power-up state.
+
+There are only two options for the source of this signal:
+
+* The macrocell's PT3
+* The GLB's shared init PT
+
+This means that if the GLB's shared init PT is not a constant false,
+any registers in that GLB that _don't_ want to use a reset signal must use PT3 as a constant false instead.
+
+It PT3 is used as the source, that product term is removed from its cluster sum.
+
+### `shared_pt_init_polarity.sx` `(shared_pt_init_polarity)`
+Each GLB's shared initialization PT can optionally be inverted.
+
+### `async_source.sx` `(async_source)`
+An optional second asynchronous set/reset signal can be sourced from PT2.
+While the signal remains high, the macrocell is forced into the complement of its power-up state.
+
+Note also that PT2 can also be used as a source for the CE signal,
+and while it is possible to simultaneously use it for both,
+generally you wouldn't be able to use the same PT logic for both,
+so this generally you'd use it for one or the other.
+
+When PT2 is used as an async set/reset, that product term is removed from its cluster sum.
+
+### `pt4_oe.sx` `(pt4_output_enable)`
+When this fuse is programmed,
+PT4 is removed from the macrocell's cluster sum,
+and instead routed to the ORM.
+From there it can be selected as an output enable signal for this macrocell's output,
+or certain nearby macrocells (see below).
+
+When not used, the OE signal presented to the ORM is a constant false.
+
+### `output_routing.sx` `(output_routing)`
+Normally a macrocell slice's I/O cell will output the signal produced by it's corresponding macrocell,
+however there is a built-in "output routing multiplexer" (ORM)
+that allows limited redirection to take the output signal
+from a macrocell offset of up to +7 instead.
+
+Note that this offset wraps around as well, so the I/O for MC 15 can be selected from MC 0-6 as well.
+
+The PT4 OE signal (if used) is also routed from the same MC.
+
+### `output_routing_mode.sx` `(output_routing_mode)`
+For non-ZE family devices, the ORM can be bypassed, which slightly decreases the output delay.
+Additionally, the entire macrocell logic block can be bypassed if only a combinational logic output is needed,
+with a maximum of 5 PTs.
+There are several options available:
+
+* Output the normal signal selected by the ORM
+* Bypass the ORM and always output the feedback signal from this macrocell, regardless of the ORM configuration
+* Output this cluster's 5-PT sum
+* Output this cluster's 5-PT sum, inverted
+
+None of these options affect the routing of the PT4 OE signal;
+it always goes through the ORM routing.
+
+When one of the 5-PT sum options is used,
+the PT cluster is still routed using the normal cluster routing rules as well,
+unlike when individual PTs are redirected for a special use.
+It's possible to still use the buried macrocell,
+but you have to be careful to isolate the original 5-PT cluster sum, e.g.
+
+* Route it to another cluster
+* Route another always true cluster in and use PT0 for a single PT macrocell
+* Use the buried macrocell as an input register
+
+### `oe_source.sx` `(output_enable_source)`
+Each I/O cell's output driver is active when its output enable signal is high.
+The OE signal can be selected from one of 8 sources:
+
+* One of 4 global output enables
+* The PT4 output enable signal from the ORM
+* The PT4 output enable signal from the ORM, inverted
+* A constant high (output only)
+* A constant low (input only)
+
+### `goes.sx` `(goe_polarity)`
+All devices have 4 global OE signals.
+The polarity of these signals can be configured globally,
+and their source depends on the device.
+
+Sources for LC4032 devices:
+
+* GOE0: Shared PT OE bus bit 0
+* GOE1: Shared PT OE bus bit 1
+* GOE2: A0 input buffer
+* GOE3: B15 input buffer
+
+Sources for other devices:
+
+* GOE0: Selectable; either shared PT OE bus bit 0, or specific input buffer noted in datasheet
+* GOE1: Selectable; either shared PT OE bus bit 1, or specific input buffer noted in datasheet
+* GOE2: Shared PT OE bus bit 2
+* GOE3: Shared PT OE bus bit 3
+
+### `goes.sx` `(shared_pt_oe_bus)`
+The shared PT OE bus is a set of 2 or 4 (depending on the device type, as above) global signals
+where each bit can be connected to any of the GLBs' shared enable PT
+(note this is shared with the power guard feature on ZE devices).
+
+If multiple GLBs are configured to drive the same PT OE bus line,
+it will behave as if only the first (lowest numbered) GLB were used.
+It might have been convenient if they had summed the PTs in this case,
+but alas, for some reason they didn't.
+
+If no GLBs are configured to drive a PT OE bus line,
+it is pulled high (if the polarity fuse is 1) or low (if the polarity fuse is 0).
+There's really no reason to utilize this though, since each output cell can be
+configured for "always output" or "always high impedance" without using any GOE signal.
+
+### `drive.sx` `(drive_type)`
+One fuse per output controls whether the output is open-drain or push-pull.
+
+Open-drain can also be emulated by outputing a constant low and using OE to enable or disable it,
+but that places a lot of limitation on how much logic can be done in the macrocell;
+only a single PT can be routed to the OE signal.
+
+### `slew.sx` `(slew_rate)`
+One fuse per output controls the slew rate for that driver.
+According to the datasheet,
+using the slow slew rate adds approximately 1ns to the output buffer propagation delay,
+which means rise and fall times are likely about twice as long as normal.
+
+### `threshold.sx` `(input_threshold)`
 The Lattice fitter allows each input signal's voltage standard to be selected from around a half dozen choices, including:
 * 1.8V LVCMOS
 * 2.5V LVCMOS
@@ -277,51 +451,37 @@ as opposed to using V<sub>CCO</sub> or an internal fixed voltage reference.
 | low            | 0.28&times;V<sub>CC</sub> | 0.36&times;V<sub>CC</sub> | 0.5&times;V<sub>CC</sub>    | 0.5&times;V<sub>CC</sub> |
 | high           | 0.4&times;V<sub>CC</sub>  | 0.5&times;V<sub>CC</sub>  | 0.73&times;V<sub>CC</sub>   | 0.68&times;V<sub>CC</sub> (falling edge)<br>0.79&times;V<sub>CC</sub> (rising edge) |
 
-## Drive Type
-One fuse per output controls whether the output is open-drain or push-pull.
+### `bus_maintenance.sx` `(bus_maintenance)`
+2 fuses allow selection of one of four input termination options:
+    * pull up
+    * pull down
+    * bus-hold
+    * floating/high-Z
+In ZE family devices, this can be configured separately for each input pin.
+In other families, there is only a single set of fuses which apply to the entire device.
 
-Open-drain can also be emulated by outputing a constant low and using OE to enable or disable it,
-but that places a lot of limitation on how much logic can be done in the macrocell;
-only a single PT can be routed to the OE signal.
+### `bus_maintenance.sx` `(bus_maintenance_extra)`
+On certain non-ZE devices,
+setting bus maintenance to floating causes the fitter to toggle additional fuses
+beyond the two global bus maintenance fuses.
+This only happens on devices where the die has I/O cells that aren't bonded to any package pin. (e.g. TQFP-44 packages)
+Normally, these extra I/O cells are left as inputs,
+but if inputs are allowed to float, this could cause excessive power usage,
+so the fitter turns them into outputs by setting the appropriate OE mux fuses.
 
-## Slew Rate
-One fuse per output controls the slew rate for that driver.
-SLOW should generally be used for any long traces or inter-board connections.
-FAST can be used for short traces where transmission line effects are unlikely.
+### `power_guard.sx` `(power_guard)`
+In ZE-family devices, input signals can be "masked"
+so that high frequency signals don't propagate very far through the chip when not needed.
+This can reduce dynamic power consumption.
+Normally, power guard is disabled when the GLB's shared enable PT is high.
+Power guard can also be permanently disabled for individual inputs using a fuse defined here.
+That may be necessary if you need to use the shared enable PT for a GOE.
 
+### `osctimer.sx` `(osctimer)`
+ZE-family devices contain a low-accuracy 5 MHz oscillator,
+and a divider that can drop it down to lower frequencies.
+When enabled, these signals replace the macrocell feedback signals for specific macrocells.
 
-
-## Global Output Enables
-All devices have 4 global OE signals.  The polarity of these signals can be configured globally, and their source depends on the device.
-
-Sources for LC4032 devices:
-
-* GOE0: Shared PT OE bus bit 0
-* GOE1: Shared PT OE bus bit 1
-* GOE2: A0 input buffer
-* GOE3: B15 input buffer
-
-Sources for other devices:
-
-* GOE0: Selectable; either shared PT OE bus bit 0, or specific input buffer noted in datasheet
-* GOE1: Selectable; either shared PT OE bus bit 1, or specific input buffer noted in datasheet
-* GOE2: Shared PT OE bus bit 2
-* GOE3: Shared PT OE bus bit 3
-
-### Shared PT OE Bus
-The shared PT OE bus is a set of 2 or 4 (depending on the device type, as above) global signals
-where each bit can be connected to any of the GLBs' shared enable PT
-(note this is shared with the power guard feature on ZE devices).
-
-If multiple GLBs are configured to drive the same PT OE bus line,
-it will behave as if only the first (lowest numbered) GLB were used.
-It might have been convenient if they had summed the PTs in this case,
-but alas, for some reason they didn't.
-
-If no GLBs are configured to drive a PT OE bus line,
-it is pulled high (if the polarity fuse is 1) or low (if the polarity fuse is 0).
-There's really no reason to utilize this though, since each output cell can be
-configured for "always output" or "always high impedance" without using any GOE signal.
 
 # Fitter Bugs & Uncertainties
 
@@ -464,6 +624,4 @@ Asynchronous Reset/clear
     * Why are there two fuses to enable the OSCTIMER? what happens if only one is enabled? (or none, but divider/outputs are enabled)
     * Do OSCTIMER outputs only replace the GRP feedback signals when enabled, or also the signal that goes to the ORM?
     * Can you use input register feedback on MCs that aren't connected to pins? (e.g. LC4064x TQFP48)
-    * Can you use an input register MC with the ORM to have the register output directly on a different pin without going through the GRP?
     * What happens if you violate the one-cold rule for GI fuses?
-    * When using fast 5-PT combinational path on non-ZE parts, can you use the register as a buried macrocell?
