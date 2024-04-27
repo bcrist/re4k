@@ -1,0 +1,31 @@
+.{
+    .name = "Zig-LC4k",
+    .version = "0.1.0",
+    .minimum_zig_version = "0.12.0",
+    .paths = .{
+        "LC4032",
+        "LC4064",
+        "LC4128",
+        "src",
+        "build.zig",
+        "build.zig.zon",
+    },
+    .dependencies = .{
+        .@"Zig-LC4k" = .{
+            .url = "git+https://github.com/bcrist/Zig-LC4k#4045d3601c8a403404ee0a36d6a6b8cc3afe6be5",
+            .hash = "12202884feffa70704a9e80dd59f558a6b35b56d1dbb530b3819fc9b8baac7cc7ef1",
+        },
+        .@"Zig-TempAllocator" = .{
+            .url = "git+https://github.com/bcrist/Zig-TempAllocator#ba52f51d8692e59f533ff05954007096669dec81",
+            .hash = "12207e7d78892ee60eeb80dc6c8f798a9e6cdc396c8fcc668ed4bffbd2863330ea18",
+        },
+        .@"Zig-SX" = .{
+            .url = "git+https://github.com/bcrist/Zig-SX#9c1b77d59a5347e0add1985fc6f0f86f24bc910d",
+            .hash = "12205397e7aa63fc68fde226686ee465571c21696e1d960472bbcfa9772e70de419e",
+        },
+        .limp = .{
+            .url = "git+https://github.com/bcrist/limp#87c594ae89a563c3ebfc11083ef99958c18c9427",
+            .hash = "1220cbd621c2d8d9b96a9e93d3cf726bb853aaec711a9cf176aab29186c310ae5a1d",
+        },
+    },
+}

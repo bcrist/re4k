@@ -2,8 +2,8 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const common = @import("common");
-const jedec = @import("jedec");
+const lc4k = @import("lc4k");
+const jedec = lc4k.jedec;
 const device_info = @import("device_info.zig");
 const JedecData = jedec.JedecData;
 const Fuse = jedec.Fuse;
@@ -11,13 +11,13 @@ const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const LogicLevels = toolchain.LogicLevels;
-const MacrocellRef = common.MacrocellRef;
+const MacrocellRef = lc4k.MacrocellRef;
 
 pub fn main() void {
     helper.main();
 }
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: common.PinInfo, iostd: LogicLevels) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: lc4k.PinInfo, iostd: LogicLevels) !toolchain.FitResults {
     var design = Design.init(ta, dev);
     try design.pinAssignment(.{
         .signal = "in",
@@ -35,7 +35,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, p
 var default_high: ?u1 = null;
 var default_low: ?u1 = null;
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer) !void {
     var maybe_fallback_output_fuse_map: ?std.AutoHashMap(MacrocellRef, []const helper.FuseAndValue) = null;
     var fallback_output_fuse_data = try JedecData.initEmpty(pa, dev.jedec_dimensions);
     if (helper.getInputFile("threshold.sx")) |_| {
@@ -49,8 +49,8 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         maybe_fallback_output_fuse_map = map;
     }
 
-    try writer.expressionExpanded(@tagName(dev.device));
-    try writer.expressionExpanded("input_threshold");
+    try writer.expression_expanded(@tagName(dev.device));
+    try writer.expression_expanded("input_threshold");
 
     var pin_iter = helper.InputIterator { .pins = dev.all_pins };
     while (pin_iter.next()) |pin| {
@@ -125,7 +125,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
     try writer.done();
 }
 
-fn writeFuse(fuse: Fuse, results_high: JedecData, results_low: JedecData, writer: anytype) !void {
+fn writeFuse(fuse: Fuse, results_high: JedecData, results_low: JedecData, writer: *sx.Writer) !void {
     try helper.writeFuse(writer, fuse);
 
     const high_value = results_high.get(fuse);

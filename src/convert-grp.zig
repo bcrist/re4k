@@ -2,8 +2,8 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const common = @import("common");
-const jedec = @import("jedec");
+const lc4k = @import("lc4k");
+const jedec = lc4k.jedec;
 const device_info = @import("device_info.zig");
 const Fuse = jedec.Fuse;
 const DeviceInfo = device_info.DeviceInfo;
@@ -81,7 +81,7 @@ const SignalRenaming = struct {
 };
 
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer) !void {
     var fuse_to_pin_map = try getFuseToPinMap(ta, pa, tc, dev);
     try tc.cleanTempDir();
     helper.resetTemp();
@@ -133,8 +133,8 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         }
     }
 
-    try writer.expressionExpanded(@tagName(dev.device));
-    try writer.expressionExpanded("global_routing_pool");
+    try writer.expression_expanded(@tagName(dev.device));
+    try writer.expression_expanded("global_routing_pool");
 
     var glb: u8 = 0;
     while (glb < dev.num_glbs) : (glb += 1) {
@@ -144,11 +144,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         while (gi < 36) : (gi += 1) {
             try writer.expression("gi");
             try writer.int(gi, 10);
-            writer.setCompact(false);
+            writer.set_compact(false);
 
             var fuse_iter = dev.getGIRange(glb, gi).iterator();
             while (fuse_iter.next()) |fuse| {
-                var signal = fuse_to_signal_map.get(fuse).?;
+                const signal = fuse_to_signal_map.get(fuse).?;
 
                 try writer.expression("fuse");
                 try writer.int(fuse.row, 10);
@@ -157,7 +157,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
                 switch (signal) {
                     .fb => |mcref| {
                         try helper.writeGlb(writer, mcref.glb);
-                        writer.setCompact(true);
+                        writer.set_compact(true);
                         try writer.close();
                         try helper.writeMc(writer, mcref.mc);
                         try writer.close();

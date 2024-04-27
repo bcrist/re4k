@@ -1,11 +1,11 @@
 const std = @import("std");
-const common = @import("common");
-const jedec = @import("jedec");
+const lc4k = @import("lc4k");
+const jedec = lc4k.jedec;
 
-const DeviceType = common.DeviceType;
-const DeviceFamily = common.DeviceFamily;
-const DevicePackage = common.DevicePackage;
-const PinInfo = common.PinInfo;
+const DeviceType = lc4k.DeviceType;
+const DeviceFamily = lc4k.DeviceFamily;
+const DevicePackage = lc4k.DevicePackage;
+const PinInfo = lc4k.PinInfo;
 const JedecData = jedec.JedecData;
 const FuseRange = jedec.FuseRange;
 const Fuse = jedec.Fuse;
@@ -217,7 +217,7 @@ pub const DeviceInfo = struct {
         return null;
     }
 
-    pub fn getIOPin(self: DeviceInfo, mcref: common.MacrocellRef) ?PinInfo {
+    pub fn getIOPin(self: DeviceInfo, mcref: lc4k.MacrocellRef) ?PinInfo {
         for (self.all_pins) |pin| {
             switch (pin.func) {
                 .io, .io_oe0, .io_oe1 => |mc| if (pin.glb.? == mcref.glb and mc == mcref.mc) return pin,
@@ -227,7 +227,7 @@ pub const DeviceInfo = struct {
         return null;
     }
 
-    pub fn getClockPin(self: DeviceInfo, clk_index: common.ClockIndex) ?PinInfo {
+    pub fn getClockPin(self: DeviceInfo, clk_index: lc4k.ClockIndex) ?PinInfo {
         for (self.clock_pins) |pin| {
             switch (pin.func) {
                 .clock => |i| if (clk_index == i) return pin,

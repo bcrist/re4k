@@ -2,20 +2,20 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const common = @import("common");
-const jedec = @import("jedec");
+const lc4k = @import("lc4k");
+const jedec = lc4k.jedec;
 const device_info = @import("device_info.zig");
 const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
-const MacrocellRef = common.MacrocellRef;
+const MacrocellRef = lc4k.MacrocellRef;
 
 pub fn main() void {
     helper.main();
 }
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: common.PinInfo, offset: u3) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: lc4k.PinInfo, offset: u3) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
     try design.pinAssignment(.{
@@ -54,14 +54,14 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, p
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer) !void {
     var maybe_fallback_fuses: ?std.AutoHashMap(MacrocellRef, []const helper.FuseAndValue) = null;
     if (helper.getInputFile("output_routing.sx")) |_| {
         maybe_fallback_fuses = try helper.parseFusesForOutputPins(ta, pa, "output_routing.sx", "output_routing", null);
     }
 
-    try writer.expressionExpanded(@tagName(dev.device));
-    try writer.expressionExpanded("output_routing");
+    try writer.expression_expanded(@tagName(dev.device));
+    try writer.expression_expanded("output_routing");
 
     var pin_iter = helper.OutputIterator { .pins = dev.all_pins };
     while (pin_iter.next()) |pin| {

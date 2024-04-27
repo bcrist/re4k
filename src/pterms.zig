@@ -2,8 +2,8 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const common = @import("common");
-const jedec = @import("jedec");
+const lc4k = @import("lc4k");
+const jedec = lc4k.jedec;
 const device_info = @import("device_info.zig");
 const JedecData = jedec.JedecData;
 const DeviceInfo = device_info.DeviceInfo;
@@ -16,7 +16,7 @@ pub fn main() void {
     helper.main();
 }
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: common.MacrocellRef) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: lc4k.MacrocellRef) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
     // Coercing the fitter to reliably place specific signals on the block init and block OE pterms is difficult.
@@ -29,7 +29,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, m
     // Once we have the columns for PT1 and PT2, we can extrapolate the other 3, based on the assumption that they're
     // always laid out consecutively (which is true for the devices I've tested manually).
 
-    var scratch_glb: u8 = if (mcref.glb == 0) 1 else 0;
+    const scratch_glb: u8 = if (mcref.glb == 0) 1 else 0;
 
     try design.pinAssignment(.{
         .signal = "x0",
@@ -39,20 +39,23 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, m
         .signal = "pt2",
         .pin = dev.getClockPin(2).?.id,
     });
+
+    var iter: helper.OutputIterator = .{
+        .pins = dev.all_pins,
+        .single_glb = scratch_glb,
+    };
+
     try design.pinAssignment(.{
         .signal = "pt1",
-        .pin = (helper.OutputIterator {
-            .pins = dev.all_pins,
-            .single_glb = scratch_glb,
-        }).next().?.id,
+        .pin = iter.next().?.id,
     });
 
     var n: u8 = 0;
     while (n < 4) : (n += 1) {
-        var signal_name = try std.fmt.allocPrint(ta, "dum{}", .{ n });
-        var d_name = try std.fmt.allocPrint(ta, "dum{}.D", .{ n });
-        var c_name = try std.fmt.allocPrint(ta, "dum{}.C", .{ n });
-        var ar_name = try std.fmt.allocPrint(ta, "dum{}.AR", .{ n });
+        const signal_name = try std.fmt.allocPrint(ta, "dum{}", .{ n });
+        const d_name = try std.fmt.allocPrint(ta, "dum{}.D", .{ n });
+        const c_name = try std.fmt.allocPrint(ta, "dum{}.C", .{ n });
+        const ar_name = try std.fmt.allocPrint(ta, "dum{}.AR", .{ n });
         try design.nodeAssignment(.{
             .signal = signal_name,
             .glb = mcref.glb,
@@ -98,7 +101,7 @@ fn parseJedecColumn(jed: JedecData, column: u16, dev: *const DeviceInfo, glb: u8
             continue;
         }
 
-        var gi = row / 2;
+        const gi = row / 2;
 
         var gi_signal: ?GlbInputSignal = null;
         var fuse_iter = dev.getGIRange(glb, gi).iterator();
@@ -160,11 +163,11 @@ fn parseJedecColumn(jed: JedecData, column: u16, dev: *const DeviceInfo, glb: u8
     return routing;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    var gi_routing = try helper.parseGRP(ta, pa, null);
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer) !void {
+    const gi_routing = try helper.parseGRP(ta, pa, null);
 
-    try writer.expressionExpanded(@tagName(dev.device));
-    try writer.expressionExpanded("product_terms");
+    try writer.expression_expanded(@tagName(dev.device));
+    try writer.expression_expanded("product_terms");
 
     var assigned_columns = try std.DynamicBitSet.initEmpty(pa, dev.jedec_dimensions.width());
 
@@ -193,7 +196,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         }
 
         try helper.writeMc(writer, mcref.mc);
-        writer.setCompact(false);
+        writer.set_compact(false);
 
         var results = try runToolchain(ta, tc, dev, mcref);
 
@@ -220,20 +223,20 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
 
         var col_iter = columns.iterator(.{});
         while (col_iter.next()) |column| {
-            column_routing.put(try parseJedecColumn(results.jedec, @intCast(u16, column), dev, mcref.glb, gi_routing), @intCast(u16, column));
+            column_routing.put(try parseJedecColumn(results.jedec, @intCast(column), dev, mcref.glb, gi_routing), @intCast(column));
         }
 
-        var pt1 = column_routing.get(.pt1) orelse return error.PT1NotFound;
-        var pt2 = column_routing.get(.pt2) orelse return error.PT2NotFound;
+        const pt1 = column_routing.get(.pt1) orelse return error.PT1NotFound;
+        const pt2 = column_routing.get(.pt2) orelse return error.PT2NotFound;
 
-        var dc = @as(i32, pt2) - pt1;
+        const dc = @as(i32, pt2) - pt1;
         if (dc != 1 and dc != -1) {
             try helper.err("Expected PT1 and PT2 columns to be adjacent, but found {} and {}", .{ pt1, pt2 }, dev, .{ .mcref = mcref });
         }
 
-        var pt0 = @intCast(u16, pt1 - dc);
-        var pt3 = @intCast(u16, pt2 + dc);
-        var pt4 = @intCast(u16, pt3 + dc);
+        const pt0: u16 = @intCast(pt1 - dc);
+        const pt3: u16 = @intCast(pt2 + dc);
+        const pt4: u16 = @intCast(pt3 + dc);
 
         if (assigned_columns.isSet(pt0)) {
             try helper.err("Column {} assigned to multiple functions!", .{ pt0 }, dev, .{ .mcref = mcref });
@@ -289,8 +292,8 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         try writer.close(); // mc
 
         if (mcref.mc == 15) {
-            var binit = column_routing.get(.block_init) orelse return error.BlockInitNotFound;
-            var bclk = column_routing.get(.block_clk) orelse return error.BlockClkNotFound;
+            const binit = column_routing.get(.block_init) orelse return error.BlockInitNotFound;
+            const bclk = column_routing.get(.block_clk) orelse return error.BlockClkNotFound;
 
             try writer.expression("column");
             try writer.int(binit, 10);
@@ -302,7 +305,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
             try writer.string("shared_pt_clk");
             try writer.close();
 
-            var boe = bclk + bclk - binit;
+            const boe = bclk + bclk - binit;
 
             try writer.expression("column");
             try writer.int(boe, 10);

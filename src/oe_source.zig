@@ -2,17 +2,17 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const common = @import("common");
-const jedec = @import("jedec");
+const lc4k = @import("lc4k");
+const jedec = lc4k.jedec;
 const device_info = @import("device_info.zig");
 const JedecData = jedec.JedecData;
 const Fuse = jedec.Fuse;
 const DeviceInfo = device_info.DeviceInfo;
-const PinInfo = common.PinInfo;
+const PinInfo = lc4k.PinInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const OutputIterator = helper.OutputIterator;
-const MacrocellRef = common.MacrocellRef;
+const MacrocellRef = lc4k.MacrocellRef;
 
 pub fn main() void {
     helper.main();
@@ -40,7 +40,7 @@ fn runToolchainOnOff(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceIn
     return results;
 }
 
-fn getFirstNonOE(dev: *const DeviceInfo, exclude_glb: u8) !common.PinInfo {
+fn getFirstNonOE(dev: *const DeviceInfo, exclude_glb: u8) !lc4k.PinInfo {
     var iter = OutputIterator {
         .pins = dev.all_pins,
         .exclude_oes = true,
@@ -54,7 +54,7 @@ fn getFirstNonOE(dev: *const DeviceInfo, exclude_glb: u8) !common.PinInfo {
     }
 }
 
-fn getFirstInGLB(dev: *const DeviceInfo, glb: u8, exclude_mc: u8) !common.PinInfo {
+fn getFirstInGLB(dev: *const DeviceInfo, glb: u8, exclude_mc: u8) !lc4k.PinInfo {
     var iter = OutputIterator {
         .pins = dev.all_pins,
         .single_glb = glb,
@@ -111,7 +111,7 @@ fn runToolchainGOE(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo
     return results;
 }
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: PinInfo, mode: common.OutputEnableMode) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: PinInfo, mode: lc4k.OutputEnableMode) !toolchain.FitResults {
     var design = Design.init(ta, dev);
     try design.pinAssignment(.{
         .signal = "out",
@@ -244,14 +244,14 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, p
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer) !void {
     var maybe_fallback_fuses: ?std.AutoHashMap(MacrocellRef, []const helper.FuseAndValue) = null;
     if (helper.getInputFile("oe_source.sx")) |_| {
         maybe_fallback_fuses = try helper.parseFusesForOutputPins(ta, pa, "oe_source.sx", "output_enable_source", null);
     }
 
-    try writer.expressionExpanded(@tagName(dev.device));
-    try writer.expressionExpanded("output_enable_source");
+    try writer.expression_expanded(@tagName(dev.device));
+    try writer.expression_expanded("output_enable_source");
 
     var pin_iter = OutputIterator { .pins = dev.all_pins };
     while (pin_iter.next()) |pin| {

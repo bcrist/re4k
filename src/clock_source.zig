@@ -2,8 +2,8 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const common = @import("common");
-const jedec = @import("jedec");
+const lc4k = @import("lc4k");
+const jedec = lc4k.jedec;
 const device_info = @import("device_info.zig");
 const JedecData = jedec.JedecData;
 const DeviceInfo = device_info.DeviceInfo;
@@ -25,7 +25,7 @@ pub fn main() void {
     helper.main();
 }
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: common.MacrocellRef, src: ClockSource) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: lc4k.MacrocellRef, src: ClockSource) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
     const clocks = dev.clock_pins;
@@ -134,9 +134,9 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, m
 
 var defaults = std.EnumMap(ClockSource, usize) {};
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    try writer.expressionExpanded(@tagName(dev.device));
-    try writer.expressionExpanded("clock_source");
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer) !void {
+    try writer.expression_expanded(@tagName(dev.device));
+    try writer.expression_expanded("clock_source");
 
     var mc_iter = helper.MacrocellIterator { .dev = dev };
     while (mc_iter.next()) |mcref| {
@@ -149,7 +149,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         var diff = try JedecData.initEmpty(ta, dev.jedec_dimensions);
 
         for (std.enums.values(ClockSource)) |src| {
-            var results = try runToolchain(ta, tc, dev, mcref, src);
+            const results = try runToolchain(ta, tc, dev, mcref, src);
             data.put(src, results.jedec);
         }
 

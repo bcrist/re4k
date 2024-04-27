@@ -2,8 +2,8 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const common = @import("common");
-const jedec = @import("jedec");
+const lc4k = @import("lc4k");
+const jedec = lc4k.jedec;
 const device_info = @import("device_info.zig");
 const JedecData = jedec.JedecData;
 const FuseRange = jedec.FuseRange;
@@ -11,8 +11,8 @@ const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const OutputIterator = helper.OutputIterator;
-const MacrocellRef = common.MacrocellRef;
-const PinInfo = common.PinInfo;
+const MacrocellRef = lc4k.MacrocellRef;
+const PinInfo = lc4k.PinInfo;
 
 pub fn main() void {
     helper.main();
@@ -32,7 +32,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, m
     while (mc_iter.next()) |other_mcref| {
         if (other_mcref.glb == mcref.glb and other_mcref.mc != mcref.mc) {
             var data_name = try std.fmt.allocPrint(ta, "node{}.D", .{ n });
-            var signal_name = data_name[0..data_name.len - 2];
+            const signal_name = data_name[0..data_name.len - 2];
             try design.nodeAssignment(.{
                 .signal = signal_name,
                 .glb = other_mcref.glb,
@@ -72,7 +72,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, m
             if (std.mem.eql(u8, oe_pin.id, "E3")) continue;
         }
         var oe_signal_name = try std.fmt.allocPrint(ta, "temp_{}.OE", .{ n });
-        var signal_name = oe_signal_name[0..oe_signal_name.len-3];
+        const signal_name = oe_signal_name[0..oe_signal_name.len-3];
         try design.pinAssignment(.{
             .signal = signal_name,
             .pin = oe_pin.id,
@@ -101,11 +101,11 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, m
 var default_off: ?usize = null;
 var default_on: ?usize = null;
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer) !void {
     var oe_src_rows = try parseOESourceRows(ta, pa, null);
 
-    try writer.expressionExpanded(@tagName(dev.device));
-    try writer.expressionExpanded("pt4_output_enable");
+    try writer.expression_expanded(@tagName(dev.device));
+    try writer.expression_expanded("pt4_output_enable");
 
     var mc_iter = helper.MacrocellIterator { .dev = dev };
     while (mc_iter.next()) |mcref| {
@@ -127,7 +127,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         // ignore rows that we already know are used for the OE mux in the I/O cell:
         var oe_row_iter = oe_src_rows.iterator(.{});
         while (oe_row_iter.next()) |row| {
-            diff.putRange(dev.getRowRange(@intCast(u16, row), @intCast(u16, row)), 0);
+            diff.putRange(dev.getRowRange(@intCast(row), @intCast(row)), 0);
         }
 
         try helper.writeMc(writer, mcref.mc);
@@ -196,13 +196,14 @@ fn parseOESourceRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?
     var results = try std.DynamicBitSet.initEmpty(pa, dev.jedec_dimensions.height());
 
     var stream = std.io.fixedBufferStream(input_file.contents);
-    var parser = sx.reader(ta, stream.reader());
+    const reader = stream.reader();
+    var parser = sx.reader(ta, reader.any());
     defer parser.deinit();
 
     parseOESourceRows0(&parser, &results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
-            var ctx = try parser.getNextTokenContext();
-            try ctx.printForString(input_file.contents, std.io.getStdErr().writer(), 120);
+            var ctx = try parser.token_context();
+            try ctx.print_for_string(input_file.contents, std.io.getStdErr().writer(), 120);
             return e;
         },
         else => return e,
@@ -215,29 +216,29 @@ fn parseOESourceRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?
     return results;
 }
 
-fn parseOESourceRows0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), results: *std.DynamicBitSet) !void {
-    _ = try parser.requireAnyExpression(); // device name, we already know it
-    try parser.requireExpression("output_enable_source");
+fn parseOESourceRows0(parser: *sx.Reader, results: *std.DynamicBitSet) !void {
+    _ = try parser.require_any_expression(); // device name, we already know it
+    try parser.require_expression("output_enable_source");
 
     while (try helper.parsePin(parser, null)) {
         while (try parser.expression("fuse")) {
-            var row = try parser.requireAnyInt(u16, 10);
-            _ = try parser.requireAnyInt(u16, 10);
+            const row = try parser.require_any_int(u16, 10);
+            _ = try parser.require_any_int(u16, 10);
 
             if (try parser.expression("value")) {
-                try parser.ignoreRemainingExpression();
+                try parser.ignore_remaining_expression();
             }
 
             results.set(row);
 
-            try parser.requireClose(); // fuse
+            try parser.require_close(); // fuse
         }
-        try parser.requireClose(); // pin
+        try parser.require_close(); // pin
     }
     while (try parser.expression("value")) {
-        try parser.ignoreRemainingExpression();
+        try parser.ignore_remaining_expression();
     }
-    try parser.requireClose(); // oe_source
-    try parser.requireClose(); // device
-    try parser.requireDone();
+    try parser.require_close(); // oe_source
+    try parser.require_close(); // device
+    try parser.require_done();
 }

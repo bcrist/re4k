@@ -2,8 +2,8 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const jedec = @import("jedec");
-const common = @import("common");
+const jedec = lc4k.jedec;
+const lc4k = @import("lc4k");
 const device_info = @import("device_info.zig");
 const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
@@ -14,7 +14,7 @@ pub fn main() void {
     helper.main();
 }
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: common.MacrocellRef, xor: bool) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: lc4k.MacrocellRef, xor: bool) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
     try design.pinAssignment(.{
@@ -35,7 +35,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, m
 
     var mc: u8 = 0;
     while (mc < mcref.mc) : (mc += 1) {
-        var signal_name = try std.fmt.allocPrint(ta, "dum{}", .{ mc });
+        const signal_name = try std.fmt.allocPrint(ta, "dum{}", .{ mc });
         try design.nodeAssignment(.{
             .signal = signal_name,
             .glb = mcref.glb,
@@ -64,9 +64,9 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, m
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    try writer.expressionExpanded(@tagName(dev.device));
-    try writer.expressionExpanded("pt0_xor");
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer) !void {
+    try writer.expression_expanded(@tagName(dev.device));
+    try writer.expression_expanded("pt0_xor");
 
     var default_disabled: ?u1 = null;
     var default_enabled: ?u1 = null;

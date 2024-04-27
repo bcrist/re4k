@@ -2,8 +2,8 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const common = @import("common");
-const jedec = @import("jedec");
+const lc4k = @import("lc4k");
+const jedec = lc4k.jedec;
 const device_info = @import("device_info.zig");
 const JedecData = jedec.JedecData;
 const DeviceInfo = device_info.DeviceInfo;
@@ -14,7 +14,7 @@ pub fn main() void {
     helper.main();
 }
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: common.PinInfo, pull: common.BusMaintenance) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: lc4k.PinInfo, pull: lc4k.BusMaintenance) !toolchain.FitResults {
     var design = Design.init(ta, dev);
     try design.nodeAssignment(.{
         .signal = "out",
@@ -34,17 +34,16 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, p
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    try writer.expressionExpanded(@tagName(dev.device));
-    try writer.expressionExpanded("bus_maintenance");
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer) !void {
+    try writer.expression_expanded(@tagName(dev.device));
+    try writer.expression_expanded("bus_maintenance");
 
     var default_val_float: ?usize = null;
     var default_val_pulldown: ?usize = null;
     var default_val_pullup: ?usize = null;
     var default_val_keeper: ?usize = null;
 
-    var has_per_pin_config = dev.family == .zero_power_enhanced;
-
+    const has_per_pin_config = dev.family == .zero_power_enhanced;
 
     var float_diff = try JedecData.initEmpty(pa, dev.jedec_dimensions);
 
@@ -172,7 +171,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         // If the device doesn't have per-pin bus maintenance, and the maintenance is set to float,
         // those extra I/O cells should be configured as outputs to avoid excessive power usage.
         // The remaining fuses in float_diff should do that.
-        try writer.expressionExpanded("bus_maintenance_extra");
+        try writer.expression_expanded("bus_maintenance_extra");
         var diff_iter = float_diff.iterator(.{});
         while (diff_iter.next()) |fuse| {
             try helper.writeFuse(writer, fuse);

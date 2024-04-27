@@ -2,8 +2,8 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const common = @import("common");
-const jedec = @import("jedec");
+const lc4k = @import("lc4k");
+const jedec = lc4k.jedec;
 const device_info = @import("device_info.zig");
 
 const Fuse = jedec.Fuse;
@@ -16,7 +16,7 @@ pub fn main() void {
     helper.main();
 }
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: common.MacrocellRef, init_state: u1) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: lc4k.MacrocellRef, init_state: u1) !toolchain.FitResults {
     var design = Design.init(ta, dev);
     try design.nodeAssignment(.{
         .signal = "out",
@@ -35,9 +35,9 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, m
 var default_set: ?u1 = null;
 var default_reset: ?u1 = null;
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    try writer.expressionExpanded(@tagName(dev.device));
-    try writer.expressionExpanded("init_state");
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer) !void {
+    try writer.expression_expanded(@tagName(dev.device));
+    try writer.expression_expanded("init_state");
 
     var mc_iter = helper.MacrocellIterator { .dev = dev };
     while (mc_iter.next()) |mcref| {
@@ -91,7 +91,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
     _ = pa;
 }
 
-fn writeFuse(fuse: Fuse, results_reset: JedecData, results_set: JedecData, writer: anytype) !void {
+fn writeFuse(fuse: Fuse, results_reset: JedecData, results_set: JedecData, writer: *sx.Writer) !void {
     try helper.writeFuse(writer, fuse);
 
     const value_reset = results_reset.get(fuse);

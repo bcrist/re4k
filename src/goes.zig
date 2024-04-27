@@ -2,8 +2,8 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const jedec = @import("jedec");
-const common = @import("common");
+const jedec = lc4k.jedec;
+const lc4k = @import("lc4k");
 const device_info = @import("device_info.zig");
 const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
@@ -12,7 +12,7 @@ const JedecData = jedec.JedecData;
 const Fuse = jedec.Fuse;
 const InputIterator = helper.InputIterator;
 const OutputIterator = helper.OutputIterator;
-const getGlbName = common.getGlbName;
+const getGlbName = lc4k.getGlbName;
 
 pub fn main() void {
     helper.main();
@@ -104,11 +104,11 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, o
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer) !void {
     const sptclk_polarity_fuses = try helper.parseSharedPTClockPolarityFuses(ta, pa, dev);
 
-    try writer.expressionExpanded(@tagName(dev.device));
-    try writer.expressionExpanded("goe_polarity");
+    try writer.expression_expanded(@tagName(dev.device));
+    try writer.expression_expanded("goe_polarity");
 
     // Getting the fitter to output specific GOE configurations has proven extremely difficult.  In particular, it seems incapable of
     // routing more than 2 GOEs simultaneously for some reason, even though it should be easily possible to do 4.  So most of what we're
@@ -200,7 +200,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
 
 
     if (dev.num_glbs >= 4) {
-        try writer.expressionExpanded("goe_source");
+        try writer.expression_expanded("goe_source");
 
         try writer.expression("goe0");
         iter = oe0_diff.iterator(.{});
@@ -220,16 +220,16 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         try writer.close(); // goe_source
     }
 
-    try writer.expressionExpanded("shared_pt_oe_bus");
+    try writer.expression_expanded("shared_pt_oe_bus");
 
     var glb: usize = 0;
     while (glb < sptclk_polarity_fuses.len) : (glb += 1) {
         try writer.expression("glb");
         try writer.int(glb, 10);
         try writer.expression("name");
-        try writer.string(getGlbName(@intCast(u8, glb)));
+        try writer.string(getGlbName(@intCast(glb)));
         try writer.close();
-        writer.setCompact(false);
+        writer.set_compact(false);
 
         const sptclk_fuse = sptclk_polarity_fuses[glb];
 
@@ -237,7 +237,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         var n: u8 = 0;
         while (n < bus_size) : (n += 1) {
             try writer.open();
-            try writer.printValue("goe{}", .{ n });
+            try writer.print_value("goe{}", .{ n });
             try helper.writeFuse(writer, Fuse.init(sptclk_fuse.row + 1 + n, sptclk_fuse.col));
             try writer.close();
         }

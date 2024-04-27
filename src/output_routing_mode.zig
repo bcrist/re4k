@@ -2,14 +2,14 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const jedec = @import("jedec");
-const common = @import("common");
+const jedec = lc4k.jedec;
+const lc4k = @import("lc4k");
 const device_info = @import("device_info.zig");
 const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
-const MacrocellRef = common.MacrocellRef;
+const MacrocellRef = lc4k.MacrocellRef;
 
 pub fn main() void {
     helper.main();
@@ -22,7 +22,7 @@ const ORPMode = enum {
     orm_bypass,
 };
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: common.PinInfo, bypass: ORPMode) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: lc4k.PinInfo, bypass: ORPMode) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
     try design.pinAssignment(.{
@@ -42,7 +42,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, p
 
     var mc: u8 = 0;
     while (mc < pin_mc) : (mc += 1) {
-        var signal_name = try std.fmt.allocPrint(ta, "dum{}", .{ mc });
+        const signal_name = try std.fmt.allocPrint(ta, "dum{}", .{ mc });
         try design.nodeAssignment(.{
             .signal = signal_name,
             .glb = pin.glb.?,
@@ -55,7 +55,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, p
         try design.addPT(.{ "in2", "in4" }, signal_name);
     }
 
-    var fast_bypass = switch (bypass) {
+    const fast_bypass = switch (bypass) {
         .fast_bypass, .fast_bypass_inverted => true,
         else => false,
     };
@@ -66,7 +66,7 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, p
         .orm_bypass = (bypass == .orm_bypass),
     });
 
-    var out_signal = if (bypass == .fast_bypass_inverted) "out.-" else "out";
+    const out_signal = if (bypass == .fast_bypass_inverted) "out.-" else "out";
     try design.addPT("in", out_signal);
     try design.addPT("in2", out_signal);
     try design.addPT("in3", out_signal);
@@ -78,14 +78,14 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, p
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer) !void {
     var maybe_fallback_fuses: ?std.AutoHashMap(MacrocellRef, []const helper.FuseAndValue) = null;
     if (helper.getInputFile("output_routing_mode.sx")) |_| {
         maybe_fallback_fuses = try helper.parseFusesForOutputPins(ta, pa, "output_routing_mode.sx", "output_routing_mode", null);
     }
 
-    try writer.expressionExpanded(@tagName(dev.device));
-    try writer.expressionExpanded("output_routing_mode");
+    try writer.expression_expanded(@tagName(dev.device));
+    try writer.expression_expanded("output_routing_mode");
 
     var defaults = std.EnumMap(ORPMode, usize) {};
 
@@ -145,7 +145,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         }
 
         for (std.enums.values(ORPMode)) |mode| {
-            var val = values.get(mode) orelse 0;
+            const val = values.get(mode) orelse 0;
             if (defaults.get(mode)) |def| {
                 if (def != val) {
 

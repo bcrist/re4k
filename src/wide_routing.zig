@@ -1,10 +1,10 @@
 const std = @import("std");
-const TempAllocator = @import("temp_allocator");
+const Temp_Allocator = @import("temp_allocator");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const jedec = @import("jedec");
-const common = @import("common");
+const jedec = lc4k.jedec;
+const lc4k = @import("lc4k");
 const device_info = @import("device_info.zig");
 const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
@@ -16,7 +16,7 @@ pub fn main() void {
     helper.main();
 }
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: common.MacrocellRef, pts: u8, report_mcref: common.MacrocellRef) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, mcref: lc4k.MacrocellRef, pts: u8, report_mcref: lc4k.MacrocellRef) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
     try design.pinAssignment(.{ .signal = "x0" });
@@ -50,13 +50,13 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, m
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer) !void {
     //var mc_columns = try helper.parseMCOptionsColumns(ta, pa, null);
     //var orm_rows = try helper.parseORMRows(ta, pa, null);
     var cluster_routing = try parseClusterRoutingRows(ta, pa, null);
 
-    try writer.expressionExpanded(@tagName(dev.device));
-    try writer.expressionExpanded("wide_routing");
+    try writer.expression_expanded(@tagName(dev.device));
+    try writer.expression_expanded("wide_routing");
 
     var default_narrow: ?u1 = null;
     var default_wide: ?u1 = null;
@@ -77,7 +77,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         try helper.writeMc(writer, mcref.mc);
 
         var wide_mcref = mcref;
-        wide_mcref.mc = @truncate(u4, mcref.mc +% 4);
+        wide_mcref.mc = @as(u4, @truncate(mcref.mc +% 4));
 
         var narrow_pts: u8 = 5;
         if (wide_mcref.mc > 0) narrow_pts += 5;
@@ -150,13 +150,14 @@ fn parseClusterRoutingRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_dev
     var results = try std.DynamicBitSet.initEmpty(pa, dev.jedec_dimensions.height());
 
     var stream = std.io.fixedBufferStream(input_file.contents);
-    var parser = sx.reader(ta, stream.reader());
+    const reader = stream.reader();
+    var parser = sx.reader(ta, reader.any());
     defer parser.deinit();
 
     parseClusterRoutingRows0(&parser, &results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
-            var ctx = try parser.getNextTokenContext();
-            try ctx.printForString(input_file.contents, std.io.getStdErr().writer(), 120);
+            var ctx = try parser.token_context();
+            try ctx.print_for_string(input_file.contents, std.io.getStdErr().writer(), 120);
             return e;
         },
         else => return e,
@@ -169,35 +170,35 @@ fn parseClusterRoutingRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_dev
     return results;
 }
 
-fn parseClusterRoutingRows0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), results: *std.DynamicBitSet) !void {
-    _ = try parser.requireAnyExpression(); // device name, we already know it
-    try parser.requireExpression("cluster_routing");
+fn parseClusterRoutingRows0(parser: *sx.Reader, results: *std.DynamicBitSet) !void {
+    _ = try parser.require_any_expression(); // device name, we already know it
+    try parser.require_expression("cluster_routing");
 
     while (try helper.parseGlb(parser)) |_| {
         while (try parser.expression("mc")) {
-            _ = try parser.requireAnyInt(u16, 10);
+            _ = try parser.require_any_int(u16, 10);
 
             while (try parser.expression("fuse")) {
-                var row = try parser.requireAnyInt(u16, 10);
-                _ = try parser.requireAnyInt(u16, 10);
+                const row = try parser.require_any_int(u16, 10);
+                _ = try parser.require_any_int(u16, 10);
 
                 if (try parser.expression("value")) {
-                    try parser.ignoreRemainingExpression();
+                    try parser.ignore_remaining_expression();
                 }
 
                 results.set(row);
 
-                try parser.requireClose(); // fuse
+                try parser.require_close(); // fuse
             }
 
-            try parser.requireClose(); // mc
+            try parser.require_close(); // mc
         }
-        try parser.requireClose(); // glb
+        try parser.require_close(); // glb
     }
     while (try parser.expression("value")) {
-        try parser.ignoreRemainingExpression();
+        try parser.ignore_remaining_expression();
     }
-    try parser.requireClose(); // cluster_routing
-    try parser.requireClose(); // device
-    try parser.requireDone();
+    try parser.require_close(); // cluster_routing
+    try parser.require_close(); // device
+    try parser.require_done();
 }

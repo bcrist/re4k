@@ -1,18 +1,18 @@
 const root = @import("root");
 const std = @import("std");
-const common = @import("common");
+const lc4k = @import("lc4k");
 const sx = @import("sx");
-const jedec = @import("jedec");
+const jedec = lc4k.jedec;
 const toolchain = @import("toolchain.zig");
 const device_info = @import("device_info.zig");
-const TempAllocator = @import("temp_allocator");
+const Temp_Allocator = @import("temp_allocator");
 const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Fuse = jedec.Fuse;
 const FuseRange = jedec.FuseRange;
 const JedecData = jedec.JedecData;
 const GlbInputSignal = toolchain.GlbInputSignal;
-const MacrocellRef = common.MacrocellRef;
+const MacrocellRef = lc4k.MacrocellRef;
 
 pub fn main() void {
     run() catch unreachable; //catch |e| {
@@ -25,16 +25,16 @@ fn run() !void {
     var perm_alloc = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     defer perm_alloc.deinit();
 
-    var pa = perm_alloc.allocator();
+    const pa = perm_alloc.allocator();
 
     var args = try std.process.ArgIterator.initWithAllocator(pa);
-    _ = args.next() orelse std.os.exit(255);
+    _ = args.next() orelse std.process.exit(255);
 
     const out_path = args.next() orelse return error.NeedOutputPath;
     const out_dir_path = std.fs.path.dirname(out_path) orelse return error.InvalidOutputPath;
     const out_filename = std.fs.path.basename(out_path);
     const device_str = out_filename[0..out_filename.len - std.fs.path.extension(out_filename).len];
-    const device_type = common.DeviceType.parse(device_str) orelse return error.InvalidDevice;
+    const device_type = lc4k.DeviceType.parse(device_str) orelse return error.InvalidDevice;
 
     var out_dir = try std.fs.cwd().makeOpenPath(out_dir_path, .{});
     defer out_dir.close();
@@ -42,36 +42,40 @@ fn run() !void {
     var atf = try out_dir.atomicFile(out_filename, .{});
     defer atf.deinit();
 
-    var writer = sx.writer(pa, atf.file.writer());
-    defer writer.deinit();
+    const writer = atf.file.writer();
 
-    try writer.expressionExpanded(@tagName(device_type));
+    var sx_writer = sx.writer(pa, writer.any());
+    defer sx_writer.deinit();
+
+    try sx_writer.expression_expanded(@tagName(device_type));
 
     var fuses = try JedecData.initEmpty(pa, DeviceInfo.init(device_type).jedec_dimensions);
 
     while (args.next()) |in_path| {
         const in_dir_path = std.fs.path.dirname(in_path) orelse return error.InvalidInputPath;
         const in_device_str = std.fs.path.basename(in_dir_path);
-        const in_device_type = common.DeviceType.parse(in_device_str) orelse return error.InvalidDevice;
+        const in_device_type = lc4k.DeviceType.parse(in_device_str) orelse return error.InvalidDevice;
         if (in_device_type != device_type) return error.WrongDevice;
 
         var f = try std.fs.cwd().openFile(in_path, .{});
         defer f.close();
 
-        var reader = sx.reader(pa, f.reader());
-        defer reader.deinit();
+        const reader = f.reader();
 
-        if (try reader.expression(@tagName(device_type))) {
+        var parser = sx.reader(pa, reader.any());
+        defer parser.deinit();
+
+        if (try parser.expression(@tagName(device_type))) {
             var depth: i64 = 0;
-            while (!try reader.done()) {
-                writer.setCompact(try reader.isCompact());
-                if (try reader.expression("fuse")) {
-                    try writer.expression("fuse");
+            while (!try parser.done()) {
+                sx_writer.set_compact(try parser.is_compact());
+                if (try parser.expression("fuse")) {
+                    try sx_writer.expression("fuse");
                     depth += 1;
-                    if (try reader.anyInt(u16, 10)) |row| {
-                        try writer.int(row, 10);
-                        if (try reader.anyInt(u16, 10)) |col| {
-                            try writer.int(col, 10);
+                    if (try parser.any_int(u16, 10)) |row| {
+                        try sx_writer.int(row, 10);
+                        if (try parser.any_int(u16, 10)) |col| {
+                            try sx_writer.int(col, 10);
 
                             const fuse = Fuse.init(row, col);
 
@@ -82,25 +86,25 @@ fn run() !void {
                             fuses.put(fuse, 1);
                         }
                     }
-                } else if (try reader.close()) {
+                } else if (try parser.close()) {
                     if (depth == 0) break else {
-                        try writer.close();
+                        try sx_writer.close();
                         depth -= 1;
                     }
-                } else if (try reader.open()) {
-                    try writer.open();
+                } else if (try parser.open()) {
+                    try sx_writer.open();
                     depth += 1;
-                } else if (try reader.anyString()) |str| {
-                    try writer.string(str);
+                } else if (try parser.any_string()) |str| {
+                    try sx_writer.string(str);
                 } else unreachable;
             }
             while (depth > 0) {
-                try writer.close();
+                try sx_writer.close();
             }
         } else return error.InvalidInputFile;
     }
 
-    try writer.done();
+    try sx_writer.done();
 
     try atf.finish();
 }

@@ -1,25 +1,23 @@
 const root = @import("root");
 const std = @import("std");
+const Temp_Allocator = @import("Temp_Allocator");
 const sx = @import("sx");
-const common = @import("common");
-const jedec = @import("jedec");
-const jed_file = @import("jed_file");
+const lc4k = @import("lc4k");
 const toolchain = @import("toolchain.zig");
 const device_info = @import("device_info.zig");
-const TempAllocator = @import("temp_allocator");
-const DeviceType = common.DeviceType;
+const DeviceType = lc4k.DeviceType;
 const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
-const Fuse = jedec.Fuse;
-const FuseRange = jedec.FuseRange;
+const Fuse = lc4k.jedec.Fuse;
+const FuseRange = lc4k.jedec.FuseRange;
 const GlbInputSignal = toolchain.GlbInputSignal;
-const GlbIndex = common.GlbIndex;
-const MacrocellRef = common.MacrocellRef;
-const MacrocellIndex = common.MacrocellIndex;
-const PinInfo = common.PinInfo;
-const getGlbName = common.getGlbName;
+const GlbIndex = lc4k.GlbIndex;
+const MacrocellRef = lc4k.MacrocellRef;
+const MacrocellIndex = lc4k.MacrocellIndex;
+const PinInfo = lc4k.PinInfo;
+const getGlbName = lc4k.getGlbName;
 
-var temp_alloc = TempAllocator {};
+var temp_alloc = Temp_Allocator {};
 
 pub fn main() void {
     run() catch unreachable; //catch |e| {
@@ -29,7 +27,7 @@ pub fn main() void {
 }
 
 pub fn resetTemp() void {
-    temp_alloc.reset();
+    temp_alloc.reset(.{});
 }
 
 pub const InputFileData = struct {
@@ -52,17 +50,17 @@ pub fn getInputFile(filename: []const u8) ?InputFileData {
 var slow_mode = false;
 
 fn run() !void {
-    temp_alloc = try TempAllocator.init(0x1000_00000);
+    temp_alloc = try Temp_Allocator.init(0x1000_00000);
     defer temp_alloc.deinit();
 
     var perm_alloc = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     defer perm_alloc.deinit();
 
-    var ta = temp_alloc.allocator();
-    var pa = perm_alloc.allocator();
+    const ta = temp_alloc.allocator();
+    const pa = perm_alloc.allocator();
 
     var args = try std.process.ArgIterator.initWithAllocator(pa);
-    _ = args.next() orelse std.os.exit(255);
+    _ = args.next() orelse std.process.exit(255);
 
     const out_path = args.next() orelse return error.NeedOutputPath;
     const out_dir_path = std.fs.path.dirname(out_path) orelse return error.InvalidOutputPath;
@@ -89,7 +87,7 @@ fn run() !void {
             const in_device_str = std.fs.path.basename(in_dir_path);
             const in_device_type = DeviceType.parse(in_device_str) orelse return error.InvalidDevice;
 
-            var contents = try std.fs.cwd().readFileAlloc(pa, arg, 100_000_000);
+            const contents = try std.fs.cwd().readFileAlloc(pa, arg, 100_000_000);
             try input_files.put(pa, in_filename, .{
                 .contents = contents,
                 .filename = in_filename,
@@ -101,7 +99,8 @@ fn run() !void {
     var atf = try out_dir.atomicFile(out_filename, .{});
     defer atf.deinit();
 
-    var sx_writer = sx.writer(pa, atf.file.writer());
+    const writer = atf.file.writer();
+    var sx_writer = sx.writer(pa, writer.any());
     defer sx_writer.deinit();
 
     var tc = try Toolchain.init(ta);
@@ -136,11 +135,11 @@ pub fn logResults(device_type: DeviceType, comptime name_fmt: []const u8, name_a
         var f = try dir.createFile(filename, .{});
         defer f.close();
 
-        const jed = jedec.JedecFile {
+        const jed = lc4k.jedec.JedecFile {
             .data = results.jedec,
         };
 
-        try jed_file.write(device_type, temp_alloc.allocator(), jed, f.writer(), .{ .one_char = '.' });
+        try lc4k.jed_file.write(device_type, temp_alloc.allocator(), jed, f.writer(), .{ .one_char = '.' });
     }
     if (slow_mode) {
         try std.io.getStdOut().writer().writeAll("Press enter to continue...\n");
@@ -285,21 +284,21 @@ pub fn extract(src: []const u8, prefix: []const u8, suffix: []const u8) ?[]const
     return null;
 }
 
-pub fn writeGlb(writer: anytype, glb: GlbIndex) !void {
+pub fn writeGlb(writer: *sx.Writer, glb: GlbIndex) !void {
     try writer.expression("glb");
     try writer.int(glb, 10);
     try writer.expression("name");
     try writer.string(getGlbName(glb));
     try writer.close();
-    writer.setCompact(false);
+    writer.set_compact(false);
 }
 
-pub fn writeMc(writer: anytype, mc: MacrocellIndex) !void {
+pub fn writeMc(writer: *sx.Writer, mc: MacrocellIndex) !void {
     try writer.expression("mc");
     try writer.int(mc, 10);
 }
 
-pub fn writePin(writer: anytype, pin_info: PinInfo) !void {
+pub fn writePin(writer: *sx.Writer, pin_info: PinInfo) !void {
     try writer.expression("pin");
     try writer.string(pin_info.id);
     switch (pin_info.func) {
@@ -308,12 +307,12 @@ pub fn writePin(writer: anytype, pin_info: PinInfo) !void {
             try writer.string("input");
             try writer.close();
             try writeGlb(writer, pin_info.glb.?);
-            writer.setCompact(true);
+            writer.set_compact(true);
             try writer.close();
         },
         .io, .io_oe0, .io_oe1 => |mc| {
             try writeGlb(writer, pin_info.glb.?);
-            writer.setCompact(true);
+            writer.set_compact(true);
             try writer.close();
             try writeMc(writer, mc);
             try writer.close();
@@ -332,7 +331,7 @@ pub fn writePin(writer: anytype, pin_info: PinInfo) !void {
             try writer.int(clk_index, 10);
             try writer.close();
             try writeGlb(writer, pin_info.glb.?);
-            writer.setCompact(true);
+            writer.set_compact(true);
             try writer.close();
         },
         else => {
@@ -343,7 +342,7 @@ pub fn writePin(writer: anytype, pin_info: PinInfo) !void {
     }
 }
 
-pub fn writeValue(writer: anytype, value: usize, desc: anytype) !void {
+pub fn writeValue(writer: *sx.Writer, value: usize, desc: anytype) !void {
     try writer.expression("value");
     try writer.int(value, 10);
     switch (@typeInfo(@TypeOf(desc))) {
@@ -354,14 +353,14 @@ pub fn writeValue(writer: anytype, value: usize, desc: anytype) !void {
     try writer.close();
 }
 
-pub fn writeFuse(writer: anytype, fuse: Fuse) !void {
+pub fn writeFuse(writer: *sx.Writer, fuse: Fuse) !void {
     try writer.expression("fuse");
     try writer.int(fuse.row, 10);
     try writer.int(fuse.col, 10);
     try writer.close();
 }
 
-pub fn writeFuseValue(writer: anytype, fuse: Fuse, value: usize) !void {
+pub fn writeFuseValue(writer: *sx.Writer, fuse: Fuse, value: usize) !void {
     try writer.expression("fuse");
     try writer.int(fuse.row, 10);
     try writer.int(fuse.col, 10);
@@ -371,7 +370,7 @@ pub fn writeFuseValue(writer: anytype, fuse: Fuse, value: usize) !void {
     try writer.close();
 }
 
-pub fn writeFuseOptValue(writer: anytype, fuse: Fuse, value: usize) !void {
+pub fn writeFuseOptValue(writer: *sx.Writer, fuse: Fuse, value: usize) !void {
     try writer.expression("fuse");
     try writer.int(fuse.row, 10);
     try writer.int(fuse.col, 10);
@@ -388,24 +387,25 @@ pub fn parseGRP(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*Devi
     const dev = DeviceInfo.init(input_file.device_type);
 
     var results = std.AutoHashMap(Fuse, GlbInputSignal).init(pa);
-    try results.ensureTotalCapacity(@intCast(u32, dev.getGIRange(0, 0).count() * 36 * dev.num_glbs));
+    try results.ensureTotalCapacity(@intCast(dev.getGIRange(0, 0).count() * 36 * dev.num_glbs));
 
     var pin_number_to_info = std.StringHashMap(PinInfo).init(ta);
     defer pin_number_to_info.deinit();
 
-    try pin_number_to_info.ensureTotalCapacity(@intCast(u32, dev.all_pins.len));
+    try pin_number_to_info.ensureTotalCapacity(@intCast(dev.all_pins.len));
     for (dev.all_pins) |pin| {
         try pin_number_to_info.put(pin.id, pin);
     }
 
     var stream = std.io.fixedBufferStream(input_file.contents);
-    var parser = sx.reader(ta, stream.reader());
+    const reader = stream.reader();
+    var parser = sx.reader(ta, reader.any());
     defer parser.deinit();
 
     parseGRP0(ta, &parser, &dev, &pin_number_to_info, &results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
-            var ctx = try parser.getNextTokenContext();
-            try ctx.printForString(input_file.contents, std.io.getStdErr().writer(), 120);
+            var ctx = try parser.token_context();
+            try ctx.print_for_string(input_file.contents, std.io.getStdErr().writer(), 120);
             return e;
         },
         else => return e,
@@ -420,28 +420,28 @@ pub fn parseGRP(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*Devi
 
 fn parseGRP0(
     ta: std.mem.Allocator,
-    parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader),
+    parser: *sx.Reader,
     dev: *const DeviceInfo,
     pin_number_to_info: *const std.StringHashMap(PinInfo),
     results: *std.AutoHashMap(Fuse, GlbInputSignal)
 ) !void {
-    _ = try parser.requireAnyExpression(); // device name, we already know it
-    try parser.requireExpression("global_routing_pool");
+    _ = try parser.require_any_expression(); // device name, we already know it
+    try parser.require_expression("global_routing_pool");
 
     var temp = std.ArrayList(u8).init(ta);
 
     var glb: u8 = 0;
     while (glb < dev.num_glbs) : (glb += 1) {
-        var parsed_glb = try requireGlb(parser);
+        const parsed_glb = try requireGlb(parser);
         std.debug.assert(glb == parsed_glb);
 
         while (try parser.expression("gi")) {
-            _ = try parser.requireAnyInt(usize, 10);
+            _ = try parser.require_any_int(usize, 10);
 
             while (try parser.expression("fuse")) {
-                var row = try parser.requireAnyInt(u16, 10);
-                var col = try parser.requireAnyInt(u16, 10);
-                var fuse = Fuse.init(row, col);
+                const row = try parser.require_any_int(u16, 10);
+                const col = try parser.require_any_int(u16, 10);
+                const fuse = Fuse.init(row, col);
 
                 if (try parsePin(parser, &temp)) {
                     if (pin_number_to_info.get(temp.items)) |pin| {
@@ -451,13 +451,13 @@ fn parseGRP0(
                     } else {
                         try std.io.getStdErr().writer().print("Failed to lookup pin number: {s}\n", .{ temp.items });
                     }
-                    try parser.requireClose(); // pin
+                    try parser.require_close(); // pin
                 } else if (try parseGlb(parser)) |fuse_glb| {
-                    try parser.requireClose(); // glb
+                    try parser.require_close(); // glb
 
-                    try parser.requireExpression("mc");
-                    var fuse_mc = try parser.requireAnyInt(u8, 10);
-                    try parser.requireClose(); // mc
+                    try parser.require_expression("mc");
+                    const fuse_mc = try parser.require_any_int(u8, 10);
+                    try parser.require_close(); // mc
 
                     try results.put(fuse, .{
                         .fb = .{
@@ -466,35 +466,35 @@ fn parseGRP0(
                         },
                     });
                 } else if (try parser.expression("unused")) {
-                    try parser.ignoreRemainingExpression();
+                    try parser.ignore_remaining_expression();
                 }
-                try parser.requireClose(); // fuse
+                try parser.require_close(); // fuse
             }
-            try parser.requireClose(); // gi
+            try parser.require_close(); // gi
         }
-        try parser.requireClose(); // glb
+        try parser.require_close(); // glb
     }
-    try parser.requireClose(); // global_routing_pool
-    try parser.requireClose(); // device
-    try parser.requireDone();
+    try parser.require_close(); // global_routing_pool
+    try parser.require_close(); // device
+    try parser.require_done();
 }
 
-pub fn parseGlb(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader)) !?common.GlbIndex {
+pub fn parseGlb(parser: *sx.Reader) !?lc4k.GlbIndex {
     if (try parser.expression("glb")) {
-        var parsed_glb = try parser.requireAnyInt(u8, 10);
+        const parsed_glb = try parser.require_any_int(u8, 10);
         if (try parser.expression("name")) {
-            try parser.ignoreRemainingExpression();
+            try parser.ignore_remaining_expression();
         }
         return parsed_glb;
     } else {
         return null;
     }
 }
-pub fn requireGlb(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader)) !common.GlbIndex {
-    try parser.requireExpression("glb");
-    var parsed_glb = try parser.requireAnyInt(u8, 10);
+pub fn requireGlb(parser: *sx.Reader) !lc4k.GlbIndex {
+    try parser.require_expression("glb");
+    const parsed_glb = try parser.require_any_int(u8, 10);
     if (try parser.expression("name")) {
-        try parser.ignoreRemainingExpression();
+        try parser.ignore_remaining_expression();
     }
     return parsed_glb;
 }
@@ -504,18 +504,18 @@ pub const FuseAndValue = struct {
     value: usize,
 };
 
-pub fn parseFuseAndValue(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader)) !?FuseAndValue {
+pub fn parseFuseAndValue(parser: *sx.Reader) !?FuseAndValue {
     if (try parser.expression("fuse")) {
-        const row = try parser.requireAnyInt(u16, 10);
-        const col = try parser.requireAnyInt(u16, 10);
+        const row = try parser.require_any_int(u16, 10);
+        const col = try parser.require_any_int(u16, 10);
 
         var value: usize = 1;
         if (try parser.expression("value")) {
-            value = try parser.requireAnyInt(usize, 10);
-            try parser.requireClose();
+            value = try parser.require_any_int(usize, 10);
+            try parser.require_close();
         }
 
-        try parser.requireClose(); // fuse
+        try parser.require_close(); // fuse
 
         return FuseAndValue {
             .fuse = Fuse.init(row, col),
@@ -524,7 +524,7 @@ pub fn parseFuseAndValue(parser: *sx.Reader(std.io.FixedBufferStream([]const u8)
     } else return null;
 }
 
-pub fn parseFusesAndValues(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), alloc: std.mem.Allocator) ![]FuseAndValue {
+pub fn parseFusesAndValues(parser: *sx.Reader, alloc: std.mem.Allocator) ![]FuseAndValue {
     var temp: [32]FuseAndValue = undefined;
     var num_fuses: usize = 0;
 
@@ -547,13 +547,14 @@ pub fn parseFusesForOutputPins(ta: std.mem.Allocator, pa: std.mem.Allocator, inp
     var results = std.AutoHashMap(MacrocellRef, []const FuseAndValue).init(pa);
 
     var stream = std.io.fixedBufferStream(input_file.contents);
-    var parser = sx.reader(ta, stream.reader());
+    const reader = stream.reader();
+    var parser = sx.reader(ta, reader.any());
     defer parser.deinit();
 
     parseFusesForOutputPins0(&parser, section_name, &results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
-            var ctx = try parser.getNextTokenContext();
-            try ctx.printForString(input_file.contents, std.io.getStdErr().writer(), 120);
+            var ctx = try parser.token_context();
+            try ctx.print_for_string(input_file.contents, std.io.getStdErr().writer(), 120);
             return e;
         },
         else => return e,
@@ -566,36 +567,36 @@ pub fn parseFusesForOutputPins(ta: std.mem.Allocator, pa: std.mem.Allocator, inp
     return results;
 }
 
-fn parseFusesForOutputPins0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), section_name: []const u8, results: *std.AutoHashMap(MacrocellRef, []const FuseAndValue)) !void {
-    _ = try parser.requireAnyExpression(); // device name, we already know it
-    try parser.requireExpression(section_name);
+fn parseFusesForOutputPins0(parser: *sx.Reader, section_name: []const u8, results: *std.AutoHashMap(MacrocellRef, []const FuseAndValue)) !void {
+    _ = try parser.require_any_expression(); // device name, we already know it
+    try parser.require_expression(section_name);
 
     while (try parser.expression("pin")) {
         var maybe_mcref: ?MacrocellRef = null;
 
-        _ = try parser.requireAnyString();
+        _ = try parser.require_any_string();
 
         if (try parser.expression("info")) {
-            try parser.ignoreRemainingExpression();
+            try parser.ignore_remaining_expression();
         }
 
         if (try parser.expression("clk")) {
-            try parser.ignoreRemainingExpression();
+            try parser.ignore_remaining_expression();
         }
 
         if (try parseGlb(parser)) |glb| {
-            try parser.requireClose();
+            try parser.require_close();
 
             if (try parser.expression("mc")) {
-                const mc = try parser.requireAnyInt(common.MacrocellIndex, 10);
-                try parser.requireClose();
+                const mc = try parser.require_any_int(lc4k.MacrocellIndex, 10);
+                try parser.require_close();
 
                 maybe_mcref = MacrocellRef.init(glb, mc);
             }
         }
 
         if (try parser.expression("oe")) {
-            try parser.ignoreRemainingExpression();
+            try parser.ignore_remaining_expression();
         }
 
         const data = try parseFusesAndValues(parser, results.allocator);
@@ -607,14 +608,14 @@ fn parseFusesForOutputPins0(parser: *sx.Reader(std.io.FixedBufferStream([]const 
             results.allocator.free(data);
         }
 
-        try parser.requireClose(); // pin
+        try parser.require_close(); // pin
     }
     while (try parser.expression("value")) {
-        try parser.ignoreRemainingExpression();
+        try parser.ignore_remaining_expression();
     }
-    try parser.requireClose(); // section
-    try parser.requireClose(); // device
-    try parser.requireDone();
+    try parser.require_close(); // section
+    try parser.require_close(); // device
+    try parser.require_done();
 }
 
 pub fn parseFusesForMacrocells(ta: std.mem.Allocator, pa: std.mem.Allocator, input_filename: []const u8, section_name: []const u8, out_device: ?*DeviceInfo) !std.AutoHashMap(MacrocellRef, []const FuseAndValue) {
@@ -629,8 +630,8 @@ pub fn parseFusesForMacrocells(ta: std.mem.Allocator, pa: std.mem.Allocator, inp
 
     parseFusesForMacrocells0(&parser, section_name, &results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
-            var ctx = try parser.getNextTokenContext();
-            try ctx.printForString(input_file.contents, std.io.getStdErr().writer(), 120);
+            var ctx = try parser.token_context();
+            try ctx.print_for_string(input_file.contents, std.io.getStdErr().writer(), 120);
             return e;
         },
         else => return e,
@@ -643,13 +644,13 @@ pub fn parseFusesForMacrocells(ta: std.mem.Allocator, pa: std.mem.Allocator, inp
     return results;
 }
 
-fn parseFusesForMacrocells0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), section_name: []const u8, results: *std.AutoHashMap(MacrocellRef, []const FuseAndValue)) !void {
-    _ = try parser.requireAnyExpression(); // device name, we already know it
-    try parser.requireExpression(section_name);
+fn parseFusesForMacrocells0(parser: *sx.Reader, section_name: []const u8, results: *std.AutoHashMap(MacrocellRef, []const FuseAndValue)) !void {
+    _ = try parser.require_any_expression(); // device name, we already know it
+    try parser.require_expression(section_name);
 
     while (try parseGlb(parser)) |glb| {
         if (try parser.expression("mc")) {
-            const mc = try parser.requireAnyInt(common.MacrocellIndex, 10);
+            const mc = try parser.require_any_int(lc4k.MacrocellIndex, 10);
             const mcref = MacrocellRef.init(glb, mc);
 
             const data = try parseFusesAndValues(parser, results.allocator);
@@ -657,16 +658,16 @@ fn parseFusesForMacrocells0(parser: *sx.Reader(std.io.FixedBufferStream([]const 
                 results.allocator.free(data);
             } else try results.put(mcref, data);
 
-            try parser.requireClose(); // mc
+            try parser.require_close(); // mc
         }
-        try parser.requireClose(); // glb
+        try parser.require_close(); // glb
     }
     while (try parser.expression("value")) {
-        try parser.ignoreRemainingExpression();
+        try parser.ignore_remaining_expression();
     }
-    try parser.requireClose(); // section
-    try parser.requireClose(); // device
-    try parser.requireDone();
+    try parser.require_close(); // section
+    try parser.require_close(); // device
+    try parser.require_done();
 }
 
 pub fn parseMCOptionsColumns(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*DeviceInfo) !std.AutoHashMap(MacrocellRef, FuseRange) {
@@ -674,16 +675,17 @@ pub fn parseMCOptionsColumns(ta: std.mem.Allocator, pa: std.mem.Allocator, out_d
     const dev = DeviceInfo.init(input_file.device_type);
 
     var results = std.AutoHashMap(MacrocellRef, FuseRange).init(pa);
-    try results.ensureTotalCapacity(@intCast(u32, dev.num_mcs));
+    try results.ensureTotalCapacity(@intCast(dev.num_mcs));
 
     var stream = std.io.fixedBufferStream(input_file.contents);
-    var parser = sx.reader(ta, stream.reader());
+    const reader = stream.reader();
+    var parser = sx.reader(ta, reader.any());
     defer parser.deinit();
 
     parseMCOptionsColumns0(&parser, &dev, &results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
-            var ctx = try parser.getNextTokenContext();
-            try ctx.printForString(input_file.contents, std.io.getStdErr().writer(), 120);
+            var ctx = try parser.token_context();
+            try ctx.print_for_string(input_file.contents, std.io.getStdErr().writer(), 120);
             return e;
         },
         else => return e,
@@ -696,39 +698,39 @@ pub fn parseMCOptionsColumns(ta: std.mem.Allocator, pa: std.mem.Allocator, out_d
     return results;
 }
 
-fn parseMCOptionsColumns0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), dev: *const DeviceInfo, results: *std.AutoHashMap(MacrocellRef, FuseRange)) !void {
-    _ = try parser.requireAnyExpression(); // device name, we already know it
-    try parser.requireExpression("invert");
+fn parseMCOptionsColumns0(parser: *sx.Reader, dev: *const DeviceInfo, results: *std.AutoHashMap(MacrocellRef, FuseRange)) !void {
+    _ = try parser.require_any_expression(); // device name, we already know it
+    try parser.require_expression("invert");
 
-    var options_range = dev.getOptionsRange();
+    const options_range = dev.getOptionsRange();
 
     var glb: u8 = 0;
     while (glb < dev.num_glbs) : (glb += 1) {
-        var parsed_glb = try requireGlb(parser);
+        const parsed_glb = try requireGlb(parser);
         std.debug.assert(glb == parsed_glb);
 
         while (try parser.expression("mc")) {
-            var mc = try parser.requireAnyInt(MacrocellIndex, 10);
+            const mc = try parser.require_any_int(MacrocellIndex, 10);
 
-            try parser.requireExpression("fuse");
-            _ = try parser.requireAnyInt(usize, 10);
-            var col = try parser.requireAnyInt(usize, 10);
+            try parser.require_expression("fuse");
+            _ = try parser.require_any_int(usize, 10);
+            const col = try parser.require_any_int(usize, 10);
 
             var col_range = dev.getColumnRange(col, col);
-            var opt_range = col_range.intersection(options_range);
+            const opt_range = col_range.intersection(options_range);
             try results.put(.{ .glb = glb, .mc = mc }, opt_range);
 
-            try parser.requireClose(); // fuse
-            try parser.requireClose(); // mc
+            try parser.require_close(); // fuse
+            try parser.require_close(); // mc
         }
-        try parser.requireClose(); // glb
+        try parser.require_close(); // glb
     }
     while (try parser.expression("value")) {
-        try parser.ignoreRemainingExpression();
+        try parser.ignore_remaining_expression();
     }
-    try parser.requireClose(); // invert_sum
-    try parser.requireClose(); // device
-    try parser.requireDone();
+    try parser.require_close(); // invert_sum
+    try parser.require_close(); // device
+    try parser.require_done();
 }
 
 pub fn parseORMRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*DeviceInfo) !std.DynamicBitSet {
@@ -738,13 +740,14 @@ pub fn parseORMRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*
     var results = try std.DynamicBitSet.initEmpty(pa, dev.jedec_dimensions.height());
 
     var stream = std.io.fixedBufferStream(input_file.contents);
-    var parser = sx.reader(ta, stream.reader());
+    const reader = stream.reader();
+    var parser = sx.reader(ta, reader.any());
     defer parser.deinit();
 
     parseORMRows0(&parser, &results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
-            var ctx = try parser.getNextTokenContext();
-            try ctx.printForString(input_file.contents, std.io.getStdErr().writer(), 120);
+            var ctx = try parser.token_context();
+            try ctx.print_for_string(input_file.contents, std.io.getStdErr().writer(), 120);
             return e;
         },
         else => return e,
@@ -757,59 +760,59 @@ pub fn parseORMRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*
     return results;
 }
 
-fn parseORMRows0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), results: *std.DynamicBitSet) !void {
-    _ = try parser.requireAnyExpression(); // device name, we already know it
-    try parser.requireExpression("output_routing");
+fn parseORMRows0(parser: *sx.Reader, results: *std.DynamicBitSet) !void {
+    _ = try parser.require_any_expression(); // device name, we already know it
+    try parser.require_expression("output_routing");
 
     while (try parsePin(parser, null)) {
         while (try parser.expression("fuse")) {
-            var row = try parser.requireAnyInt(u16, 10);
-            _ = try parser.requireAnyInt(u16, 10);
+            const row = try parser.require_any_int(u16, 10);
+            _ = try parser.require_any_int(u16, 10);
 
             if (try parser.expression("value")) {
-                try parser.ignoreRemainingExpression();
+                try parser.ignore_remaining_expression();
             }
 
             results.set(row);
 
-            try parser.requireClose(); // fuse
+            try parser.require_close(); // fuse
         }
-        try parser.requireClose(); // pin
+        try parser.require_close(); // pin
     }
     while (try parser.expression("value")) {
-        try parser.ignoreRemainingExpression();
+        try parser.ignore_remaining_expression();
     }
-    try parser.requireClose(); // invert_sum
-    try parser.requireClose(); // device
-    try parser.requireDone();
+    try parser.require_close(); // invert_sum
+    try parser.require_close(); // device
+    try parser.require_done();
 }
 
-pub fn parsePin(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), out: ?*std.ArrayList(u8)) !bool {
+pub fn parsePin(parser: *sx.Reader, out: ?*std.ArrayList(u8)) !bool {
     if (try parser.expression("pin")) {
-        const pin_id = try parser.requireAnyString();
+        const pin_id = try parser.require_any_string();
         if (out) |o| {
             o.clearRetainingCapacity();
             try o.appendSlice(pin_id);
         }
 
         if (try parser.expression("info")) {
-            try parser.ignoreRemainingExpression();
+            try parser.ignore_remaining_expression();
         }
 
         if (try parser.expression("clk")) {
-            try parser.ignoreRemainingExpression();
+            try parser.ignore_remaining_expression();
         }
 
         if (try parser.expression("glb")) {
-            try parser.ignoreRemainingExpression();
+            try parser.ignore_remaining_expression();
         }
 
         if (try parser.expression("mc")) {
-            try parser.ignoreRemainingExpression();
+            try parser.ignore_remaining_expression();
         }
 
         if (try parser.expression("oe")) {
-            try parser.ignoreRemainingExpression();
+            try parser.ignore_remaining_expression();
         }
 
         return true;
@@ -822,16 +825,17 @@ pub fn parseSharedPTClockPolarityFuses(ta: std.mem.Allocator, pa: std.mem.Alloca
     const input_file = getInputFile("shared_pt_clk_polarity.sx") orelse return error.MissingSharedPtClkPolarityInputFile;
     if (input_file.device_type != dev.device) return error.InputFileDeviceMismatch;
 
-    var results = try pa.alloc(Fuse, dev.num_glbs);
+    const results = try pa.alloc(Fuse, dev.num_glbs);
 
     var stream = std.io.fixedBufferStream(input_file.contents);
-    var parser = sx.reader(ta, stream.reader());
+    const reader = stream.reader();
+    var parser = sx.reader(ta, reader.any());
     defer parser.deinit();
 
     parseSharedPTClockPolarityFuses0(&parser, results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
-            var ctx = try parser.getNextTokenContext();
-            try ctx.printForString(input_file.contents, std.io.getStdErr().writer(), 120);
+            var ctx = try parser.token_context();
+            try ctx.print_for_string(input_file.contents, std.io.getStdErr().writer(), 120);
             return e;
         },
         else => return e,
@@ -840,23 +844,23 @@ pub fn parseSharedPTClockPolarityFuses(ta: std.mem.Allocator, pa: std.mem.Alloca
     return results;
 }
 
-fn parseSharedPTClockPolarityFuses0(parser: *sx.Reader(std.io.FixedBufferStream([]const u8).Reader), results: []Fuse) !void {
-    _ = try parser.requireAnyExpression(); // device name, we already know it
-    try parser.requireExpression("shared_pt_clk_polarity");
+fn parseSharedPTClockPolarityFuses0(parser: *sx.Reader, results: []Fuse) !void {
+    _ = try parser.require_any_expression(); // device name, we already know it
+    try parser.require_expression("shared_pt_clk_polarity");
 
     while (try parseGlb(parser)) |glb| {
-        try parser.requireExpression("fuse");
-        var row = try parser.requireAnyInt(u16, 10);
-        var col = try parser.requireAnyInt(u16, 10);
+        try parser.require_expression("fuse");
+        const row = try parser.require_any_int(u16, 10);
+        const col = try parser.require_any_int(u16, 10);
         results[glb] = Fuse.init(row, col);
-        try parser.requireClose(); // fuse
+        try parser.require_close(); // fuse
 
-        try parser.requireClose(); // glb
+        try parser.require_close(); // glb
     }
     while (try parser.expression("value")) {
-        try parser.ignoreRemainingExpression();
+        try parser.ignore_remaining_expression();
     }
-    try parser.requireClose(); // shared_pt_clk_polarity
-    try parser.requireClose(); // device
-    try parser.requireDone();
+    try parser.require_close(); // shared_pt_clk_polarity
+    try parser.require_close(); // device
+    try parser.require_done();
 }

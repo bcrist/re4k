@@ -1,18 +1,18 @@
 const std = @import("std");
-const TempAllocator = @import("temp_allocator");
+const Temp_Allocator = @import("Temp_Allocator");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const jedec = @import("jedec");
-const common = @import("common");
+const jedec = lc4k.jedec;
+const lc4k = @import("lc4k");
 const device_info = @import("device_info.zig");
 const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
 const Fuse = jedec.Fuse;
-const MacrocellRef = common.MacrocellRef;
-const getGlbName = common.getGlbName;
+const MacrocellRef = lc4k.MacrocellRef;
+const getGlbName = lc4k.getGlbName;
 
 pub fn main() void {
     helper.main();
@@ -78,22 +78,22 @@ const ClusterRoutingValue = struct {
 };
 const ClusterRoutingMap = std.AutoHashMap(ClusterRoutingKey, ClusterRoutingValue);
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer) !void {
     var mc_columns = try helper.parseMCOptionsColumns(ta, pa, null);
     var orm_rows = try helper.parseORMRows(ta, pa, null);
 
-    try writer.expressionExpanded(@tagName(dev.device));
-    try writer.expressionExpanded("cluster_routing");
+    try writer.expression_expanded(@tagName(dev.device));
+    try writer.expression_expanded("cluster_routing");
 
-    var glb_arena = try TempAllocator.init(0x100_00000);
+    var glb_arena = try Temp_Allocator.init(0x100_00000);
     defer glb_arena.deinit();
-    var ga = glb_arena.allocator();
+    const ga = glb_arena.allocator();
 
     var default_values = std.EnumMap(ClusterRoutingMode, usize) {};
 
     var glb: u8 = 0;
     while (glb < dev.num_glbs) : (glb += 1) {
-        glb_arena.reset();
+        glb_arena.reset(.{});
 
         var routing_data = ClusterRoutingMap.init(ga);
         try routing_data.ensureTotalCapacity(80);
@@ -124,7 +124,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         while (mc < 16) : (mc += 1) {
             try helper.writeMc(writer, mc);
 
-            var column = mc_columns.get(.{ .glb = glb, .mc = mc }).?.min.col;
+            const column = mc_columns.get(.{ .glb = glb, .mc = mc }).?.min.col;
 
             var rows = std.StaticBitSet(100).initEmpty();
             var diff_base = routing_data.get(.{ .mc = mc, .mode = .to_mc }).?.jedec;
@@ -148,7 +148,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
             var bit_value: usize = 1;
             var row_iter = rows.iterator(.{});
             while (row_iter.next()) |row| {
-                var fuse = Fuse.init(@intCast(u16, row), column);
+                const fuse = Fuse.init(@intCast(row), column);
                 try helper.writeFuseOptValue(writer, fuse, bit_value);
 
                 for (std.enums.values(ClusterRoutingMode)) |mode| {
@@ -176,7 +176,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
             }
 
             if (!all_defaults) {
-                writer.setCompact(false);
+                writer.set_compact(false);
                 val_iter = values.iterator();
                 while (val_iter.next()) |entry| {
                     try helper.writeValue(writer, entry.value.*, entry.key);
@@ -197,7 +197,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
 }
 
 fn checkRoutingData(routing_data: *ClusterRoutingMap, cluster_usage: std.StaticBitSet(16), jed: JedecData, mc: i16, mode: ClusterRoutingMode) !void {
-    var cluster = switch (mode) {
+    const cluster = switch (mode) {
         .to_mc_minus_two => mc + 2,
         .to_mc_minus_one => mc + 1,
         .to_mc => mc,
@@ -206,11 +206,11 @@ fn checkRoutingData(routing_data: *ClusterRoutingMap, cluster_usage: std.StaticB
     if (cluster < 0 or cluster > 15) {
         return;
     }
-    var key = ClusterRoutingKey {
-        .mc = @intCast(u8, cluster),
+    const key = ClusterRoutingKey {
+        .mc = @intCast(cluster),
         .mode = mode,
     };
-    if (cluster_usage.isSet(@intCast(usize, cluster))) {
+    if (cluster_usage.isSet(@intCast(cluster))) {
         var result = try routing_data.getOrPut(key);
         if (result.found_existing) {
             result.value_ptr.mask.unionDiff(result.value_ptr.jedec, jed);
@@ -233,7 +233,7 @@ fn parseClusterUsage(ta: std.mem.Allocator, glb: u8, report: []const u8, mc: u8)
                 continue; // ignore remaining header/footer lines
             }
 
-            var line_mc = try std.fmt.parseInt(u8, line[1..3], 10);
+            const line_mc = try std.fmt.parseInt(u8, line[1..3], 10);
             if (line_mc == mc) {
                 cluster_usage.setValue(0,  isClusterUsed(line[4]));
                 cluster_usage.setValue(1,  isClusterUsed(line[5]));

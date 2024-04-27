@@ -2,25 +2,25 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const jedec = @import("jedec");
-const common = @import("common");
+const jedec = lc4k.jedec;
+const lc4k = @import("lc4k");
 const device_info = @import("device_info.zig");
 const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const JedecData = jedec.JedecData;
 const Fuse = jedec.Fuse;
-const getGlbName = common.getGlbName;
+const getGlbName = lc4k.getGlbName;
 
 pub fn main() void {
     helper.main();
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer) !void {
     const sptclk_polarity_fuses = try helper.parseSharedPTClockPolarityFuses(ta, pa, dev);
 
-    try writer.expressionExpanded(@tagName(dev.device));
-    try writer.expressionExpanded("shared_pt_init_polarity");
+    try writer.expression_expanded(@tagName(dev.device));
+    try writer.expression_expanded("shared_pt_init_polarity");
 
     // The fitter seems to refuse to set this bit.  Attempting the same technique used for shared_pt_clk_polarity
     // (using out.AR- instead of out.AR) causes the fitter to say:
@@ -43,9 +43,9 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         try writer.expression("glb");
         try writer.int(glb, 10);
         try writer.expression("name");
-        try writer.string(getGlbName(@intCast(u8, glb)));
+        try writer.string(getGlbName(@intCast(glb)));
         try writer.close();
-        writer.setCompact(false);
+        writer.set_compact(false);
 
         const sptclk_fuse = sptclk_polarity_fuses[glb];
         const sptoe_bus_size = @min(4, dev.num_glbs);

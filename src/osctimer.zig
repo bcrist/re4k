@@ -2,8 +2,8 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const jedec = @import("jedec");
-const common = @import("common");
+const jedec = lc4k.jedec;
+const lc4k = @import("lc4k");
 const device_info = @import("device_info.zig");
 const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
@@ -20,7 +20,7 @@ const Polarity = enum {
     negative,
 };
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, osc_out: bool, timer_out: bool, disable: bool, reset: bool, div: common.TimerDivisor, glb: u8) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, osc_out: bool, timer_out: bool, disable: bool, reset: bool, div: lc4k.TimerDivisor, glb: u8) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
     if (osc_out or timer_out) {
@@ -78,9 +78,9 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, o
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    try writer.expressionExpanded(@tagName(dev.device));
-    try writer.expressionExpanded("osctimer");
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer) !void {
+    try writer.expression_expanded(@tagName(dev.device));
+    try writer.expression_expanded("osctimer");
 
 
     {
@@ -117,7 +117,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
             const both = results_both.jedec.get(fuse);
             const none = results_none.jedec.get(fuse);
             if (osc == timer and osc == both and both != none) {
-                try writer.expressionExpanded("enable");
+                try writer.expression_expanded("enable");
                 try helper.writeFuse(writer, fuse);
                 try helper.writeValue(writer, both, "enabled");
                 try helper.writeValue(writer, none, "disabled");
@@ -134,7 +134,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
                     try helper.err("Expected 1 fuse for osc_out, but found multiple!\n", .{}, dev, .{});
                 }
                 found_osc_out = true;
-                try writer.expressionExpanded("osc_out");
+                try writer.expression_expanded("osc_out");
                 try helper.writeFuse(writer, fuse);
                 try helper.writeValue(writer, results_osc.jedec.get(fuse), "enabled");
                 try helper.writeValue(writer, results_timer.jedec.get(fuse), "disabled");
@@ -146,7 +146,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
                     try helper.err("Expected 1 fuse for timer_out, but found multiple!\n", .{}, dev, .{});
                 }
                 found_timer_out = true;
-                try writer.expressionExpanded("timer_out");
+                try writer.expression_expanded("timer_out");
                 try helper.writeFuse(writer, fuse);
                 try helper.writeValue(writer, results_timer.jedec.get(fuse), "enabled");
                 try helper.writeValue(writer, results_osc.jedec.get(fuse), "disabled");
@@ -163,7 +163,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
     }
 
     {
-        try writer.expressionExpanded("timer_div");
+        try writer.expression_expanded("timer_div");
 
         const results_div128 = try runToolchain(ta, tc, dev, true, true, false, false, .div128, 0);
         const results_div1024 = try runToolchain(ta, tc, dev, true, true, false, false, .div1024, 0);

@@ -2,8 +2,8 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const common = @import("common");
-const jedec = @import("jedec");
+const lc4k = @import("lc4k");
+const jedec = lc4k.jedec;
 const device_info = @import("device_info.zig");
 const JedecData = jedec.JedecData;
 const Fuse = jedec.Fuse;
@@ -16,7 +16,7 @@ pub fn main() void {
     helper.main();
 }
 
-fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: common.PinInfo, pg_enabled: bool) !toolchain.FitResults {
+fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, pin: lc4k.PinInfo, pg_enabled: bool) !toolchain.FitResults {
     var design = Design.init(ta, dev);
 
     try design.nodeAssignment(.{
@@ -69,9 +69,9 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, p
 var default_enabled: ?u1 = null;
 var default_disabled: ?u1 = null;
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    try writer.expressionExpanded(@tagName(dev.device));
-    try writer.expressionExpanded("power_guard");
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer) !void {
+    try writer.expression_expanded(@tagName(dev.device));
+    try writer.expression_expanded("power_guard");
 
     var pin_iter = InputIterator { .pins = dev.all_pins };
     while (pin_iter.next()) |pin| {
@@ -122,7 +122,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
     _ = pa;
 }
 
-fn writeFuse(fuse: Fuse, results_enabled: JedecData, results_disabled: JedecData, writer: anytype) !void {
+fn writeFuse(fuse: Fuse, results_enabled: JedecData, results_disabled: JedecData, writer: *sx.Writer) !void {
     try helper.writeFuse(writer, fuse);
 
     const enabled_value = results_enabled.get(fuse);

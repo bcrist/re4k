@@ -1,8 +1,8 @@
 const std = @import("std");
 const builtin = @import("builtin");
-const common = @import("common");
-const jedec = @import("jedec");
-const jed_file = @import("jed_file");
+const lc4k = @import("lc4k");
+const jedec = lc4k.jedec;
+const jed_file = lc4k.jed_file;
 const helper = @import("helper.zig");
 const device_info = @import("device_info.zig");
 const DeviceInfo = device_info.DeviceInfo;
@@ -12,9 +12,9 @@ pub const PinAssignment = struct {
     signal: []const u8,
     pin: ?[]const u8 = null,
     iostd: ?LogicLevels = null,
-    drive: ?common.DriveType = null,
-    bus_maintenance: ?common.BusMaintenance = null,
-    slew_rate: ?common.SlewRate = null,
+    drive: ?lc4k.DriveType = null,
+    bus_maintenance: ?lc4k.BusMaintenance = null,
+    slew_rate: ?lc4k.SlewRate = null,
     power_guard_signal: ?[]const u8 = null,
     init_state: ?u1 = null,
     orm_bypass: ?bool = null,
@@ -46,7 +46,7 @@ pub const ProductTerm = struct {
         if (self.inputs.items.len != other_inputs.len) {
             return false;
         }
-        for (self.inputs.items) |input, i| {
+        for (self.inputs.items, 0..) |input, i| {
             if (!std.mem.eql(u8, input, other_inputs[i])) {
                 return false;
             }
@@ -117,7 +117,7 @@ pub const Design = struct {
     parse_glb_inputs: bool,
     max_fit_time_ms: u32,
     uses_power_guard: bool,
-    osctimer_div: ?common.TimerDivisor,
+    osctimer_div: ?lc4k.TimerDivisor,
 
     pub fn init(alloc: std.mem.Allocator, dev: *const DeviceInfo) Design {
         return .{
@@ -235,7 +235,7 @@ pub const Design = struct {
     }
 
     pub fn addInput(self: *Design, signal: []const u8) !void {
-        var sig = if (signal[0] == '~') signal[1..] else signal;
+        const sig = if (signal[0] == '~') signal[1..] else signal;
 
         for (self.inputs.items) |input| {
             if (std.mem.eql(u8, input, sig)) {
@@ -294,7 +294,7 @@ pub const Design = struct {
             try self.addInput(input);
         }
 
-        std.sort.sort([]const u8, pt_inputs.items, {}, stringSort);
+        std.sort.pdq([]const u8, pt_inputs.items, {}, stringSort);
 
         var pt: *ProductTerm = blk: {
             for (self.pts.items) |*pt| {
@@ -304,7 +304,7 @@ pub const Design = struct {
                 }
             }
 
-            var new_pt = try self.pts.addOne(self.alloc);
+            const new_pt = try self.pts.addOne(self.alloc);
             new_pt.* = .{
                 .inputs = pt_inputs.moveToUnmanaged(),
                 .outputs = .{},
@@ -347,7 +347,7 @@ pub const Design = struct {
         }
     }
 
-    pub fn oscillator(self: *Design, div: common.TimerDivisor) !void {
+    pub fn oscillator(self: *Design, div: lc4k.TimerDivisor) !void {
         self.osctimer_div = div;
         try self.nodeAssignment(.{
             .signal = "OSC_disable",
@@ -395,10 +395,10 @@ pub const Design = struct {
         try writer.writeAll("Spread_Placement=No;\n");
         try writer.writeAll("Routing_Attempts=2;\n");
 
-        var zerohold = if (self.zero_hold_time) "yes" else "no";
+        const zerohold = if (self.zero_hold_time) "yes" else "no";
         try writer.print("Zero_hold_time={s};\n", .{ zerohold });
 
-        var adjust_inputs = if (self.adjust_input_assignments) "on" else "off";
+        const adjust_inputs = if (self.adjust_input_assignments) "on" else "off";
         try writer.print("Adjust_input_assignments={s};\n", .{ adjust_inputs });
 
         try writer.writeAll("\n[Location Assignments]\n");
@@ -406,7 +406,7 @@ pub const Design = struct {
             if (pin_assignment.pin) |pin_name| {
                 if (self.dev.getPin(pin_name)) |pin| switch (pin.func) {
                     .io, .io_oe0, .io_oe1 => |mc| {
-                        const glb_name = common.getGlbName(pin.glb.?);
+                        const glb_name = lc4k.getGlbName(pin.glb.?);
                         try writer.print("{s}=pin,{s},-,{s},{};\n", .{ pin_assignment.signal, pin.id, glb_name, mc });
                     },
                     .input => {
@@ -422,7 +422,7 @@ pub const Design = struct {
 
         for (self.nodes.items) |node_assignment| {
             if (node_assignment.glb) |glb| {
-                const glb_name = common.getGlbName(glb);
+                const glb_name = lc4k.getGlbName(glb);
                 if (node_assignment.mc) |mc| {
                     try writer.print("{s}=node,-,-,{s},{};\n", .{ node_assignment.signal, glb_name, mc });
                 } else {
@@ -468,7 +468,7 @@ pub const Design = struct {
 
         if (self.dev.family == .zero_power_enhanced) {
             try writer.writeAll("Default=down;\n");
-            for ([_]common.BusMaintenance { .float, .pulldown, .pullup, .keeper }) |pull| {
+            for ([_]lc4k.BusMaintenance { .float, .pulldown, .pullup, .keeper }) |pull| {
                 const tag = switch (pull) {
                     .float => "OFF",
                     .pulldown => "DOWN",
@@ -492,7 +492,7 @@ pub const Design = struct {
                 try writer.writeAll(";\n");
             }
         } else {
-            var default: ?common.BusMaintenance = null;
+            var default: ?lc4k.BusMaintenance = null;
             for (self.pins.items) |pin_assignment| {
                 if (pin_assignment.bus_maintenance) |pin_pull| {
                     if (default) |default_pull| {
@@ -521,7 +521,7 @@ pub const Design = struct {
         try writer.writeAll("\n[Slewrate]\n");
         try writer.writeAll("Default=fast;\n");
 
-        for ([_]common.SlewRate { .slow, .fast }) |slew| {
+        for ([_]lc4k.SlewRate { .slow, .fast }) |slew| {
             try writer.print("{s}=", .{ @tagName(slew) });
             var first = true;
             for (self.pins.items) |pin_assignment| {
@@ -717,7 +717,7 @@ pub const Design = struct {
 };
 
 pub const GlbInputSignal = union(enum) {
-    fb: common.MacrocellRef,
+    fb: lc4k.MacrocellRef,
     pin: []const u8,
 
     pub fn eql (a: GlbInputSignal, b: GlbInputSignal) bool {
@@ -870,7 +870,7 @@ pub const GlbInputSet = struct {
         var removed = GlbInputSet.initEmpty();
         var n: usize = 0;
         while (n < count_to_remove) : (n += 1) {
-            var to_remove = self.pickRandomRaw(rnd);
+            const to_remove = self.pickRandomRaw(rnd);
             removed.raw.set(to_remove);
             self.raw.unset(to_remove);
         }
@@ -910,7 +910,7 @@ pub const GlbInputSet = struct {
     };
 
     fn indexOf(signal: GlbInputSignal, signals: []const GlbInputFitSignal) ?usize {
-        for (signals) |s, i| {
+        for (signals, 0..) |s, i| {
             if (signal.eql(s.source)) {
                 return i;
             }
@@ -962,19 +962,19 @@ pub const FitResults = struct {
 pub const Toolchain = struct {
 
     alloc: std.mem.Allocator,
-    dir: std.fs.IterableDir,
+    dir: std.fs.Dir,
 
     pub fn init(allocator: std.mem.Allocator) !Toolchain {
         var parent_dir = try std.fs.cwd().makeOpenPath("temp", .{});
-        try std.os.chdir("temp");
+        try std.posix.chdir("temp");
 
         var random_bytes: [6]u8 = undefined;
         std.crypto.random.bytes(&random_bytes);
         var sub_path: [8]u8 = undefined;
         _ = std.fs.base64_encoder.encode(&sub_path, &random_bytes);
 
-        var dir = try parent_dir.makeOpenPathIterable(&sub_path, .{});
-        try std.os.chdir(&sub_path);
+        const dir = try parent_dir.makeOpenPath(&sub_path, .{ .iterate = true });
+        try std.posix.chdir(&sub_path);
 
         return Toolchain {
             .alloc = allocator,
@@ -1030,7 +1030,7 @@ pub const Toolchain = struct {
 
         //var signals = try std.ArrayList(SignalFitData).initCapacity(self.alloc, 32);
 
-        var log = try self.readFile("test.log");
+        const log = try self.readFile("test.log");
 
         var failed = !std.meta.eql(term, std.ChildProcess.Term { .Exited = 0 });
 
@@ -1064,15 +1064,15 @@ pub const Toolchain = struct {
 
     fn waitForChild(child: *std.ChildProcess, timeout_ms: u32) !std.ChildProcess.Term {
         if (timeout_ms > 0) {
-            std.os.windows.WaitForSingleObjectEx(child.handle, timeout_ms, false) catch {};
-            std.os.windows.TerminateProcess(child.handle, 1) catch |err| switch (err) {
+            std.os.windows.WaitForSingleObjectEx(child.id, timeout_ms, false) catch {};
+            std.os.windows.TerminateProcess(child.id, 1) catch |err| switch (err) {
                 error.PermissionDenied => {
                     // Usually when TerminateProcess triggers a ACCESS_DENIED error, it
                     // indicates that the process has already exited, but there may be
                     // some rare edge cases where our process handle no longer has the
                     // PROCESS_TERMINATE access right, so let's do another check to make
                     // sure the process is really no longer running:
-                    std.os.windows.WaitForSingleObjectEx(child.handle, 0, false) catch return err;
+                    std.os.windows.WaitForSingleObjectEx(child.id, 0, false) catch return err;
                 },
                 else => return err,
             };
@@ -1089,7 +1089,7 @@ pub const Toolchain = struct {
     fn parseGlbInputFitSignal(out: *GlbFitData, raw: []const u8, dev: *const DeviceInfo) !void {
         const gi = try std.fmt.parseInt(u8, raw[0..2], 10);
         const raw_name = raw[13..29];
-        var signal = std.mem.trim(u8, raw_name, " ");
+        const signal = std.mem.trim(u8, raw_name, " ");
 
         if (signal.len == 0 or std.mem.eql(u8, signal, "...")) {
             out.inputs[gi] = null;
@@ -1102,7 +1102,7 @@ pub const Toolchain = struct {
                 source = .{ .pin = dev.getPin(id).?.id };
             } else {
                 const glb = raw_source[3] - 'A';
-                const mc = try std.fmt.parseInt(common.MacrocellIndex, std.mem.trim(u8, raw_source[5..], " "), 10);
+                const mc = try std.fmt.parseInt(lc4k.MacrocellIndex, std.mem.trim(u8, raw_source[5..], " "), 10);
 
                 source = .{ .fb = .{
                     .glb = glb,
@@ -1121,7 +1121,7 @@ pub const Toolchain = struct {
         if (design.parse_glb_inputs) {
             var glb: u8 = 0;
             while (glb < design.dev.num_glbs) : (glb += 1) {
-                const header = try std.fmt.allocPrint(self.alloc, "GLB_{s}_LOGIC_ARRAY_FANIN", .{ common.getGlbName(glb) });
+                const header = try std.fmt.allocPrint(self.alloc, "GLB_{s}_LOGIC_ARRAY_FANIN", .{ lc4k.getGlbName(glb) });
                 if (helper.extract(results.report, header, "------------------------------------------")) |raw| {
                     var fit_data = GlbFitData {
                         .glb = glb,
@@ -1153,7 +1153,7 @@ pub const Toolchain = struct {
             var retry = false;
             var iter = self.dir.iterate();
             while (try iter.next()) |entry| {
-                self.dir.dir.deleteFile(entry.name) catch |err| switch (err) {
+                self.dir.deleteFile(entry.name) catch |err| switch (err) {
                     error.FileBusy => {
                         if (n < max) {
                             retry = true;

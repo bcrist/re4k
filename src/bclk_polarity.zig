@@ -2,8 +2,8 @@ const std = @import("std");
 const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const sx = @import("sx");
-const jedec = @import("jedec");
-const common = @import("common");
+const jedec = lc4k.jedec;
+const lc4k = @import("lc4k");
 const device_info = @import("device_info.zig");
 const DeviceInfo = device_info.DeviceInfo;
 const Toolchain = toolchain.Toolchain;
@@ -110,9 +110,9 @@ fn runToolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, g
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer(std.fs.File.Writer)) !void {
-    try writer.expressionExpanded(@tagName(dev.device));
-    try writer.expressionExpanded("bclk_polarity");
+pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const DeviceInfo, writer: *sx.Writer) !void {
+    try writer.expression_expanded(@tagName(dev.device));
+    try writer.expression_expanded("bclk_polarity");
 
     var defaults = std.EnumMap(BClkMode, usize) {};
 
@@ -131,7 +131,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
 
             var jeds = std.EnumMap(BClkMode, JedecData) {};
             for (std.enums.values(BClkMode)) |mode| {
-                var results = try if (base_clk == 0) runToolchain(ta, tc, dev, glb, mode, .both_non_inverted) else runToolchain(ta, tc, dev, glb, .both_non_inverted, mode);
+                const results = try if (base_clk == 0) runToolchain(ta, tc, dev, glb, mode, .both_non_inverted) else runToolchain(ta, tc, dev, glb, .both_non_inverted, mode);
                 jeds.put(mode, results.jedec);
             }
 
@@ -162,7 +162,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
             }
 
             for (std.enums.values(BClkMode)) |mode| {
-                var val: usize = values.get(mode) orelse 0;
+                const val: usize = values.get(mode) orelse 0;
                 if (defaults.get(mode)) |def| {
                     if (def != val) {
                         try helper.err("Expected all glbs and clock pairs to share the same bit patterns!", .{}, dev, .{ .glb = glb });
