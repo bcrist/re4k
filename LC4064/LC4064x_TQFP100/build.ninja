@@ -3,107 +3,107 @@
 dev = LC4064\LC4064x_TQFP100
 
 rule async_source
-    command = zig-out/bin/async_source.exe $out $in
+    command = generate/zig-out/bin/async_source.exe $out $in
 build $dev/async_source.sx: async_source
 
 rule bclk_polarity
-    command = zig-out/bin/bclk_polarity.exe $out $in
+    command = generate/zig-out/bin/bclk_polarity.exe $out $in
 build $dev/bclk_polarity.sx: bclk_polarity
 
 rule bus_maintenance
-    command = zig-out/bin/bus_maintenance.exe $out $in
+    command = generate/zig-out/bin/bus_maintenance.exe $out $in
 build $dev/bus_maintenance.sx: bus_maintenance
 
 rule ce_source
-    command = zig-out/bin/ce_source.exe $out $in
+    command = generate/zig-out/bin/ce_source.exe $out $in
 build $dev/ce_source.sx: ce_source
 
 rule clock_source
-    command = zig-out/bin/clock_source.exe $out $in
+    command = generate/zig-out/bin/clock_source.exe $out $in
 build $dev/clock_source.sx: clock_source
 
 rule cluster_routing
-    command = zig-out/bin/cluster_routing.exe $out $in
+    command = generate/zig-out/bin/cluster_routing.exe $out $in
 build $dev/cluster_routing.sx: cluster_routing $dev\invert.sx $dev\output_routing.sx
 
 rule drive
-    command = zig-out/bin/drive.exe $out $in
+    command = generate/zig-out/bin/drive.exe $out $in
 build $dev/drive.sx: drive
 
 rule goes
-    command = zig-out/bin/goes.exe $out $in
+    command = generate/zig-out/bin/goes.exe $out $in
 build $dev/goes.sx: goes $dev\shared_pt_clk_polarity.sx
 
 rule grp
-    command = zig-out/bin/grp.exe $out $in
+    command = generate/zig-out/bin/grp.exe $out $in
 build $dev/grp.sx: grp
 
 rule init_source
-    command = zig-out/bin/init_source.exe $out $in
+    command = generate/zig-out/bin/init_source.exe $out $in
 build $dev/init_source.sx: init_source
 
 rule init_state
-    command = zig-out/bin/init_state.exe $out $in
+    command = generate/zig-out/bin/init_state.exe $out $in
 build $dev/init_state.sx: init_state
 
 rule input_bypass
-    command = zig-out/bin/input_bypass.exe $out $in
+    command = generate/zig-out/bin/input_bypass.exe $out $in
 build $dev/input_bypass.sx: input_bypass
 
 rule invert
-    command = zig-out/bin/invert.exe $out $in
+    command = generate/zig-out/bin/invert.exe $out $in
 build $dev/invert.sx: invert
 
 rule mc_func
-    command = zig-out/bin/mc_func.exe $out $in
+    command = generate/zig-out/bin/mc_func.exe $out $in
 build $dev/mc_func.sx: mc_func
 
 rule oe_source
-    command = zig-out/bin/oe_source.exe $out $in
+    command = generate/zig-out/bin/oe_source.exe $out $in
 build $dev/oe_source.sx: oe_source
 
 rule output_routing
-    command = zig-out/bin/output_routing.exe $out $in
+    command = generate/zig-out/bin/output_routing.exe $out $in
 build $dev/output_routing.sx: output_routing
 
 rule output_routing_mode
-    command = zig-out/bin/output_routing_mode.exe $out $in
+    command = generate/zig-out/bin/output_routing_mode.exe $out $in
 build $dev/output_routing_mode.sx: output_routing_mode
 
 rule pt0_xor
-    command = zig-out/bin/pt0_xor.exe $out $in
+    command = generate/zig-out/bin/pt0_xor.exe $out $in
 build $dev/pt0_xor.sx: pt0_xor
 
 rule pt4_oe
-    command = zig-out/bin/pt4_oe.exe $out $in
+    command = generate/zig-out/bin/pt4_oe.exe $out $in
 build $dev/pt4_oe.sx: pt4_oe $dev\oe_source.sx
 
 rule pterms
-    command = zig-out/bin/pterms.exe $out $in
+    command = generate/zig-out/bin/pterms.exe $out $in
 build $dev/pterms.sx: pterms $dev\grp.sx
 
 rule shared_pt_clk_polarity
-    command = zig-out/bin/shared_pt_clk_polarity.exe $out $in
+    command = generate/zig-out/bin/shared_pt_clk_polarity.exe $out $in
 build $dev/shared_pt_clk_polarity.sx: shared_pt_clk_polarity
 
 rule shared_pt_init_polarity
-    command = zig-out/bin/shared_pt_init_polarity.exe $out $in
+    command = generate/zig-out/bin/shared_pt_init_polarity.exe $out $in
 build $dev/shared_pt_init_polarity.sx: shared_pt_init_polarity $dev\shared_pt_clk_polarity.sx
 
 rule slew
-    command = zig-out/bin/slew.exe $out $in
+    command = generate/zig-out/bin/slew.exe $out $in
 build $dev/slew.sx: slew
 
 rule threshold
-    command = zig-out/bin/threshold.exe $out $in
+    command = generate/zig-out/bin/threshold.exe $out $in
 build $dev/threshold.sx: threshold
 
 rule wide_routing
-    command = zig-out/bin/wide_routing.exe $out $in
+    command = generate/zig-out/bin/wide_routing.exe $out $in
 build $dev/wide_routing.sx: wide_routing $dev\cluster_routing.sx
 
 rule zerohold
-    command = zig-out/bin/zerohold.exe $out $in
+    command = generate/zig-out/bin/zerohold.exe $out $in
 build $dev/zerohold.sx: zerohold
 
 build LC4064\LC4064x_TQFP100.sx: combine $dev/async_source.sx $dev/bclk_polarity.sx $dev/bus_maintenance.sx $dev/ce_source.sx $dev/clock_source.sx $dev/cluster_routing.sx $dev/drive.sx $dev/goes.sx $dev/grp.sx $dev/init_source.sx $dev/init_state.sx $dev/input_bypass.sx $dev/invert.sx $dev/mc_func.sx $dev/oe_source.sx $dev/output_routing.sx $dev/output_routing_mode.sx $dev/pt0_xor.sx $dev/pt4_oe.sx $dev/pterms.sx $dev/shared_pt_clk_polarity.sx $dev/shared_pt_init_polarity.sx $dev/slew.sx $dev/threshold.sx $dev/wide_routing.sx $dev/zerohold.sx

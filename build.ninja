@@ -2,7 +2,7 @@ rule limp
     command = limp -qR $in
     generator = true
 rule combine
-    command = zig-out/bin/combine.exe $out $in
+    command = generate/zig-out/bin/combine.exe $out $in
 rule clean
     command = rm -f $what
 

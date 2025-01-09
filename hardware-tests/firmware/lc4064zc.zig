@@ -3,9 +3,9 @@ const microbe = @import("microbe");
 const clock = microbe.clock;
 const svf_file = @import("svf_file");
 const LC4kCommand = svf_file.JtagCommand;
-const DeviceType = @import("common").DeviceType;
+const Device_Type = @import("common").Device_Type;
 
-const device = DeviceType.LC4064ZC_TQFP100;
+const device = Device_Type.LC4064ZC_TQFP100;
 const width = device.get().jedec_dimensions.width();
 const height = device.get().jedec_dimensions.height();
 const RowDataType = std.meta.Int(.unsigned, width);
@@ -58,7 +58,7 @@ var jtag: microbe.jtag.Adapter(.{
 // respond to CTS instantly on the next byte.
 const RTS = microbe.Bus("RTS", .{ .PA12 }, .{ .mode = .output });
 
-pub fn log(comptime message_level: std.log.Level, comptime scope: @Type(.EnumLiteral), comptime format: []const u8, args: anytype) void {
+pub fn log(comptime message_level: std.log.Level, comptime scope: @Type(.enum_literal), comptime format: []const u8, args: anytype) void {
     const rts = RTS.get();
     RTS.modifyInline(1);
     uart.writer().print("\r\n{s}: {s}: ", .{ @tagName(message_level), @tagName(scope) }) catch {};

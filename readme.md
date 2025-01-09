@@ -600,7 +600,7 @@ Output Routing Multiplexer: Allows macrocells and their associated OE product te
 Block Clock: Each GLB ("Block") can independently configure the polarity of the dedicated clock inputs.
 
 #### BIE
-Block Input Enable: For ZE-family devices, inputs can be dynamically masked to reduce power consumption.
+Block Input Enable: For ZE-family devices, inputs can be dynamically masked to reduce dynamic power consumption.
 
 #### GOE
 Global Output Enable: Up to four signals which can come from specific input pins, or from the BIE shared PTs.
@@ -617,6 +617,14 @@ Asynchronous (pre)Set
 #### AR
 Asynchronous Reset/clear
 
+## Reproduction Steps
+
+In case you want to try to add other devices, or just want to reproduce the .sx files that are committed here, you can follow these build steps:
+
+1. Make sure ispLEVER Classic 2.1 is installed at `C:\ispLEVER_Classic2_1` and that you have a valid license.  In particular, `C:\ispLEVER_Classic2_1\ispcpld\bin\lpf4k.exe` needs to work, but nothing else is used.
+2. Make sure Zig is installed and run `zig build` from the `generate/` directory.
+3. (optional) Make sure LIMP is installed and run `limp -R .` from the root directory.  This will regenerate the ninja makefiles.
+4. Make sure ninja is installed and run `ninja` from the root of the repo.
 
 # TODO
 * Refactor routing jobs to use common.ClusterRouting, common.WideRouting

@@ -1,16 +1,12 @@
 temp/
 
-# Zig
-**/zig-cache/
-**/zig-out/
+.zig-cache/
+zig-out/
 
-# VS
-**/.vscode/
+.vscode/
 
-# Ninja
 .ninja_log
 
-# Lattice
 *.jed
 *.ppn
 *.rpt
@@ -23,8 +19,7 @@ temp/
 *_pin.csv
 LCIEdit.dum
 
-# Kicad
-**/gerbers/
+gerbers/
 *-backups/
 fp-info-cache
 *.kicad_*-bak

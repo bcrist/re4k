@@ -156,7 +156,7 @@ else
         end
         if cmd then
             writeln('rule ', cmd)
-            writeln('    command = zig-out/bin/', cmd, '.exe $out $in')
+            writeln('    command = generate/zig-out/bin/', cmd, '.exe $out $in')
             write('build $dev/', job, '.sx: ', cmd)
             for _, dep in ipairs(deps) do
                 write(' ', dep, '.sx')
