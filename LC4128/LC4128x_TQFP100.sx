@@ -9374,8 +9374,8 @@
          (mc 14 (fuse 88 93))
          (mc 15 (fuse 88 94))
       )
-      (value 1 to_mc)
-      (value 0 to_mc_plus_4)
+      (value 1 self)
+      (value 0 self_plus_four)
    )
    (zero_hold_time
       (fuse 87 101)

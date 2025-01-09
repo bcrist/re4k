@@ -98,7 +98,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
                 const narrow_value = results_narrow.jedec.get(fuse);
                 if (default_narrow) |def| {
                     if (narrow_value != def) {
-                        try helper.write_value(writer, narrow_value, "to_mc");
+                        try helper.write_value(writer, narrow_value, @tagName(lc4k.Wide_Routing.self));
                     }
                 } else {
                     default_narrow = narrow_value;
@@ -107,7 +107,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
                 const wide_value = results_wide.jedec.get(fuse);
                 if (default_wide) |def| {
                     if (wide_value != def) {
-                        try helper.write_value(writer, wide_value, "to_mc_plus_4");
+                        try helper.write_value(writer, wide_value, @tagName(lc4k.Wide_Routing.self_plus_four));
                     }
                 } else {
                     default_wide = wide_value;
@@ -129,11 +129,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
     }
 
     if (default_narrow) |def| {
-        try helper.write_value(writer, def, "to_mc");
+        try helper.write_value(writer, def, @tagName(lc4k.Wide_Routing.self));
     }
 
     if (default_wide) |def| {
-        try helper.write_value(writer, def, "to_mc_plus_4");
+        try helper.write_value(writer, def, @tagName(lc4k.Wide_Routing.self_plus_four));
     }
 
     try writer.done();
