@@ -58,16 +58,9 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
     return results;
 }
 
-const Cluster_Routing_Mode = enum {
-    to_mc_minus_two,
-    to_mc,
-    to_mc_plus_one,
-    to_mc_minus_one,
-};
-
 const Cluster_Routing_Key = struct {
     mc: u8,
-    mode: Cluster_Routing_Mode,
+    mode: lc4k.Cluster_Routing,
 };
 const Cluster_Routing_Value = struct {
     jedec: JEDEC_Data,
@@ -86,7 +79,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
     defer glb_arena.deinit();
     const ga = glb_arena.allocator();
 
-    var default_values = std.EnumMap(Cluster_Routing_Mode, usize) {};
+    var default_values = std.EnumMap(lc4k.Cluster_Routing, usize) {};
 
     var glb: u8 = 0;
     while (glb < dev.num_glbs) : (glb += 1) {
@@ -111,7 +104,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
                     try helper.err("Expected cluster usage of {} but found {}", .{ pts / 5, cluster_usage.count() }, dev, .{ .glb = glb, .mc = mc });
                 }
 
-                for (std.enums.values(Cluster_Routing_Mode)) |mode| {
+                for (std.enums.values(lc4k.Cluster_Routing)) |mode| {
                     try check_routing_data(&routing_data, cluster_usage, results.jedec, mc, mode );
                 }
             }
@@ -124,8 +117,8 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
             const column = mc_columns.get(.{ .glb = glb, .mc = mc }).?.min.col;
 
             var rows = std.StaticBitSet(100).initEmpty();
-            var diff_base = routing_data.get(.{ .mc = mc, .mode = .to_mc }).?.jedec;
-            for (std.enums.values(Cluster_Routing_Mode)) |mode| {
+            var diff_base = routing_data.get(.{ .mc = mc, .mode = .self }).?.jedec;
+            for (std.enums.values(lc4k.Cluster_Routing)) |mode| {
                 if (routing_data.get(.{ .mc = mc, .mode = mode })) |data| {
                     var fuse_iter = mc_columns.get(.{ .glb = glb, .mc = mc }).?.iterator();
                     while (fuse_iter.next()) |fuse| {
@@ -140,7 +133,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
                 try helper.err("Expected 2 rows for cluster routing, but found {}!", .{ rows.count() }, dev, .{ .glb = glb, .mc = mc });
             }
 
-            var values = std.EnumMap(Cluster_Routing_Mode, usize) {};
+            var values = std.EnumMap(lc4k.Cluster_Routing, usize) {};
 
             var bit_value: usize = 1;
             var row_iter = rows.iterator(.{});
@@ -148,7 +141,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
                 const fuse = Fuse.init(@intCast(row), column);
                 try helper.write_fuse_opt_value(writer, fuse, bit_value);
 
-                for (std.enums.values(Cluster_Routing_Mode)) |mode| {
+                for (std.enums.values(lc4k.Cluster_Routing)) |mode| {
                     if (routing_data.get(.{ .mc = mc, .mode = mode })) |data| {
                         var val = values.get(mode) orelse 0;
                         val += data.jedec.get(fuse) * bit_value;
@@ -193,12 +186,12 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
     try writer.done();
 }
 
-fn check_routing_data(routing_data: *ClusterRoutingMap, cluster_usage: std.StaticBitSet(16), jed: JEDEC_Data, mc: i16, mode: Cluster_Routing_Mode) !void {
+fn check_routing_data(routing_data: *ClusterRoutingMap, cluster_usage: std.StaticBitSet(16), jed: JEDEC_Data, mc: i16, mode: lc4k.Cluster_Routing) !void {
     const cluster = switch (mode) {
-        .to_mc_minus_two => mc + 2,
-        .to_mc_minus_one => mc + 1,
-        .to_mc => mc,
-        .to_mc_plus_one => mc - 1,
+        .self_minus_two => mc + 2,
+        .self_minus_one => mc + 1,
+        .self => mc,
+        .self_plus_one => mc - 1,
     };
     if (cluster < 0 or cluster > 15) {
         return;
