@@ -622,9 +622,11 @@ Asynchronous Reset/clear
 In case you want to try to add other devices, or just want to reproduce the .sx files that are committed here, you can follow these build steps:
 
 1. Make sure ispLEVER Classic 2.1 is installed at `C:\ispLEVER_Classic2_1` and that you have a valid license.  In particular, `C:\ispLEVER_Classic2_1\ispcpld\bin\lpf4k.exe` needs to work, but nothing else is used.
-2. Make sure Zig is installed and run `zig build` from the `generate/` directory.
-3. (optional) Make sure LIMP is installed and run `limp -R .` from the root directory.  This will regenerate the ninja makefiles.
-4. Make sure ninja is installed and run `ninja` from the root of the repo.
+2. Make sure Zig is installed and run `zig build -Doptimize=ReleaseSafe` from the `generate/` directory.
+3. (optional) Make sure LIMP is installed and run `limp -R .` from the root of the repo.  This will regenerate the Ninja makefiles.
+4. Make sure Ninja is installed and run `ninja` from the root of the repo.
+
+Note: a large number of temporary files are created (and then deleted) in the `temp/` directory.  I found that adding a Windows Defender exclusion for the repo and the `ispLEVER_Classic2_1` directory significantly speeds up the process.
 
 # TODO
 * Refactor routing jobs to use common.ClusterRouting, common.WideRouting
