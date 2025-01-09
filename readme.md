@@ -629,7 +629,6 @@ In case you want to try to add other devices, or just want to reproduce the .sx 
 Note: a large number of temporary files are created (and then deleted) in the `temp/` directory.  I found that adding a Windows Defender exclusion for the repo and the `ispLEVER_Classic2_1` directory significantly speeds up the process.
 
 # TODO
-* Refactor routing jobs to use common.ClusterRouting, common.WideRouting
 * Hardware experiments
     * Why are there two fuses to enable the OSCTIMER? what happens if only one is enabled? (or none, but divider/outputs are enabled)
     * Do OSCTIMER outputs only replace the GRP feedback signals when enabled, or also the signal that goes to the ORM?
