@@ -4,7 +4,7 @@ pub fn build(b: *std.Build) void {
     const ctx = .{
         .target = b.standardTargetOptions(.{}),
         .optimize = b.standardOptimizeOption(.{}),
-        .LC4k = b.dependency("LC4k", .{}),
+        .lc4k = b.dependency("lc4k", .{}),
         .Temp_Allocator = b.dependency("Temp_Allocator", .{}),
         .sx = b.dependency("sx", .{}),
     };
@@ -49,7 +49,7 @@ fn make_exe(b: *std.Build, ctx: anytype, comptime name: []const u8) void {
         .target = ctx.target,
         .optimize = ctx.optimize,
     });
-    exe.root_module.addImport("lc4k", ctx.LC4k.module("lc4k"));
+    exe.root_module.addImport("lc4k", ctx.lc4k.module("lc4k"));
     exe.root_module.addImport("sx", ctx.sx.module("sx"));
     exe.root_module.addImport("Temp_Allocator", ctx.Temp_Allocator.module("Temp_Allocator"));
     b.installArtifact(exe);

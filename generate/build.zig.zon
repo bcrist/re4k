@@ -1,24 +1,25 @@
 .{
-    .name = "RE4k_gen",
+    .name = .re4k_gen,
+    .fingerprint = 0x4fa638cde794c99c,
     .version = "0.1.1",
-    .minimum_zig_version = "0.14.0-dev.3217+5b9b5e45c",
+    .minimum_zig_version = "0.14.0",
     .paths = .{""},
     .dependencies = .{
-        .LC4k = .{
-            .url = "git+https://github.com/bcrist/Zig-LC4k#f90f24489bad68e1a28052205da6a40a5506f547",
-            .hash = "12209e96f1fd5e618a06a5f3af294572a752c57c86f62bbb86105123abc8c0d62326",
+        .lc4k = .{
+            .url = "git+https://github.com/bcrist/Zig-LC4k#57534fd3cc27b068cb1d627e4b910879a3e84a6b",
+            .hash = "lc4k-0.1.0-5R47Qia7EQAg10lSN_jNlKPI2hlmYOsQT3uyv8CTANvu",
         },
         .Temp_Allocator = .{
-            .url = "git+https://github.com/bcrist/Zig-TempAllocator#058f6331d499e81df7b58858e7307543d5484404",
-            .hash = "1220701ccddd24087e96610b5d8251a1244e1d07c805e835f21780f231ea17b12f93",
+            .url = "git+https://github.com/bcrist/Zig-TempAllocator#40206beea0f2b3c05d2ed667bfd897b53ab0baa7",
+            .hash = "Temp_Allocator-1.0.3-tT3p3LUwAACybd3_SIxeKCzmwy2W0NsKwD4QuUd--FZp",
         },
         .sx = .{
-            .url = "git+https://github.com/bcrist/Zig-SX#f3a56e591afdd398f942d7f27c1cce65b679bd4e",
-            .hash = "12206047f1173bf0e02b12f2e9300eb999187e98de7a10a1a7f4b12da16692da4747",
+            .url = "git+https://github.com/bcrist/Zig-SX#1f5174abbc07cd7731613a6233fd0cfcebf134f9",
+            .hash = "sx-1.1.5-0vgbaovIAAB49cekKEQXb5Vl_Js5dmmCM9Il6YLOdzAv",
         },
-        .LIMP = .{
-            .url = "git+https://github.com/bcrist/limp#612b738e5302493098cc1f2136defc8c08e77876",
-            .hash = "12204fb0a6662064d46e4cf1a24f3dc7e3c7cb53985c1eda8427858ac8a30b2eddff",
+        .limp = .{
+            .url = "git+https://github.com/bcrist/limp#00416cf2cb4681c23533e0e804dc13c573a6eb28",
+            .hash = "limp-0.2.11-RgAsz7l1DwCs9TF_4CAtEdFGyugwd90u9EYN75E4KPor",
         },
     },
 }
