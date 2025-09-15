@@ -11,9 +11,7 @@ const JEDEC_Data = lc4k.JEDEC_Data;
 const Fuse = lc4k.Fuse;
 const MC_Ref = lc4k.MC_Ref;
 
-pub fn main() void {
-    helper.main();
-}
+pub const main = helper.main;
 
 fn get_max_pts_without_wide_routing(mc: usize) u8 {
     return switch (mc) {

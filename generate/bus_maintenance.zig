@@ -8,9 +8,7 @@ const JEDEC_Data = lc4k.JEDEC_Data;
 const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 
-pub fn main() void {
-    helper.main();
-}
+pub const main = helper.main;
 
 fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: lc4k.Pin_Info, pull: lc4k.Bus_Maintenance) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);

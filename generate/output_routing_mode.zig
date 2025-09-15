@@ -9,9 +9,7 @@ const Design = toolchain.Design;
 const JEDEC_Data = lc4k.JEDEC_Data;
 const MC_Ref = lc4k.MC_Ref;
 
-pub fn main() void {
-    helper.main();
-}
+pub const main = helper.main;
 
 const ORPMode = enum {
     fast_bypass,

@@ -10,9 +10,7 @@ const Design = toolchain.Design;
 const GLB_Input_Signal = toolchain.GLB_Input_Signal;
 const Fit_Results = toolchain.Fit_Results;
 
-pub fn main() void {
-    helper.main();
-}
+pub const main = helper.main;
 
 var report_number: usize = 0;
 fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: []const u8) !Fit_Results {
@@ -89,7 +87,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
     std.debug.assert(input_dev.num_glbs == dev.num_glbs);
     std.debug.assert(input_dev.jedec_dimensions.eql(dev.jedec_dimensions));
 
-    var renaming = try std.ArrayList(SignalRenaming).initCapacity(ta, fuse_to_pin_map.count());
+    var renaming = try std.array_list.Managed(SignalRenaming).initCapacity(ta, fuse_to_pin_map.count());
 
     var entry_iter = fuse_to_pin_map.iterator();
     while (entry_iter.next()) |entry| {

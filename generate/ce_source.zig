@@ -15,9 +15,7 @@ const CE_Source = enum {
     pt,
 };
 
-pub fn main() void {
-    helper.main();
-}
+pub const main = helper.main;
 
 fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, mcref: lc4k.MC_Ref, src: CE_Source) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);

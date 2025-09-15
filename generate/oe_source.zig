@@ -12,9 +12,7 @@ const Design = toolchain.Design;
 const Output_Iterator = helper.Output_Iterator;
 const MC_Ref = lc4k.MC_Ref;
 
-pub fn main() void {
-    helper.main();
-}
+pub const main = helper.main;
 
 fn run_toolchainOnOff(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: Pin_Info, off: bool) !toolchain.Fit_Results {
      var design = Design.init(ta, dev);

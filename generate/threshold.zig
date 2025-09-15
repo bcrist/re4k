@@ -11,9 +11,7 @@ const Design = toolchain.Design;
 const Logic_Levels = toolchain.Logic_Levels;
 const MC_Ref = lc4k.MC_Ref;
 
-pub fn main() void {
-    helper.main();
-}
+pub const main = helper.main;
 
 fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: lc4k.Pin_Info, iostd: Logic_Levels) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);

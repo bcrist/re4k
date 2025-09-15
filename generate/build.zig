@@ -45,12 +45,16 @@ pub fn build(b: *std.Build) void {
 fn make_exe(b: *std.Build, ctx: anytype, comptime name: []const u8) void {
     const exe = b.addExecutable(.{
         .name = name,
-        .root_source_file = b.path(name ++ ".zig"),
-        .target = ctx.target,
-        .optimize = ctx.optimize,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path(name ++ ".zig"),
+            .target = ctx.target,
+            .optimize = ctx.optimize,
+            .imports = &.{
+                .{ .name = "lc4k", .module = ctx.lc4k.module("lc4k") },
+                .{ .name = "sx", .module = ctx.sx.module("sx") },
+                .{ .name = "Temp_Allocator", .module = ctx.Temp_Allocator.module("Temp_Allocator") },
+            },
+        }),
     });
-    exe.root_module.addImport("lc4k", ctx.lc4k.module("lc4k"));
-    exe.root_module.addImport("sx", ctx.sx.module("sx"));
-    exe.root_module.addImport("Temp_Allocator", ctx.Temp_Allocator.module("Temp_Allocator"));
     b.installArtifact(exe);
 }

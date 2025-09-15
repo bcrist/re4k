@@ -2,6 +2,7 @@
     .name = .re4k,
     .fingerprint = 0xcf24f5e70c636e55,
     .version = "0.1.0",
+    .min_zig_version = "0.15.1",
     .paths = .{
         "LC4032",
         "LC4064",

@@ -160,7 +160,7 @@ pub const Design = struct {
 
         for (self.nodes.items) |existing| {
             if (std.mem.eql(u8, pa.signal, existing.signal)) {
-                try std.io.getStdOut().writer().print("Signal `{s}` already exists as a node; can't be redefined as a pin!\n", .{ pa.signal });
+                log.warn("Signal `{s}` already exists as a node; can't be redefined as a pin!", .{ pa.signal });
                 return;
             }
         }
@@ -206,7 +206,7 @@ pub const Design = struct {
 
         for (self.pins.items) |existing| {
             if (std.mem.eql(u8, na.signal, existing.signal)) {
-                try std.io.getStdOut().writer().print("Signal `{s}` already exists as a pin; can't be redefined as a node!\n", .{ na.signal });
+                log.warn("Signal `{s}` already exists as a pin; can't be redefined as a node!", .{ na.signal });
                 return;
             }
         }
@@ -257,7 +257,8 @@ pub const Design = struct {
     }
 
     pub fn add_pt(self: *Design, inputs: anytype, outputs: anytype) !void {
-        var pt_inputs = std.ArrayList([]const u8).init(self.alloc);
+        var pt_inputs: std.array_list.Managed([]const u8) = .init(self.alloc);
+        defer pt_inputs.deinit();
 
         const inputs_type_info = @typeInfo(@TypeOf(inputs));
         switch (inputs_type_info) {
@@ -361,7 +362,7 @@ pub const Design = struct {
         });
     }
 
-    pub fn write_lci(self: Design, writer: anytype) !void {
+    pub fn write_lci(self: Design, writer: *std.io.Writer) !void {
         const series_suffix: []const u8 = switch (self.dev.family) {
             .low_power => "v",
             .zero_power => "c",
@@ -651,7 +652,7 @@ pub const Design = struct {
         }
     }
 
-    pub fn writePla(self: Design, writer: anytype) !void {
+    pub fn writePla(self: Design, writer: *std.io.Writer) !void {
         try writer.writeAll("#$ MODULE x\n");
         try writer.print("#$ PINS {}", .{ self.pins.items.len });
         for (self.pins.items) |pin| {
@@ -692,7 +693,7 @@ pub const Design = struct {
             try writer.print(" {s}", .{ output });
         }
         try writer.writeAll("\n.phase ");
-        try writer.writeByteNTimes('1', self.outputs.items.len);
+        try writer.splatByteAll('1', self.outputs.items.len);
         try writer.print("\n.p {}\n", .{ self.pts.items.len });
         for (self.pts.items) |pt| {
             for (self.inputs.items) |input| {
@@ -934,25 +935,25 @@ pub const Fit_Results = struct {
         switch (self.term) {
             .Exited => |code| {
                 if (code != 0) {
-                    try std.io.getStdErr().writer().print("lpf4k returned code {}", .{ code });
+                    log.err("lpf4k returned code {}", .{ code });
                     return error.FitterError;
                 }
             },
             .Signal => |s| {
-                try std.io.getStdErr().writer().print("lpf4k signalled {}", .{ s });
+                log.err("lpf4k signalled {}", .{ s });
                 return error.FitterError;
             },
             .Stopped => |s| {
-                try std.io.getStdErr().writer().print("lpf4k stopped with {}", .{ s });
+                log.err("lpf4k stopped with {}", .{ s });
                 return error.FitterError;
             },
             .Unknown => |s| {
-                try std.io.getStdErr().writer().print("lpf4k terminated unexpectedly with {}", .{ s });
+                log.err("lpf4k terminated unexpectedly with {}", .{ s });
                 return error.FitterError;
             },
         }
         if (self.failed) {
-            try std.io.getStdErr().writer().writeAll("Fitter failed to generate a valid device configuration!\n");
+            log.err("Fitter failed to generate a valid device configuration!", .{});
             return error.FitterError;
         }
     }
@@ -1009,12 +1010,18 @@ pub const Toolchain = struct {
             {
                 var f = try std.fs.cwd().createFile(tt4_filename, .{});
                 defer f.close();
-                try design.writePla(f.writer());
+                var buf: [4096]u8 = undefined;
+                var writer = f.writer(&buf);
+                try design.writePla(&writer.interface);
+                try writer.interface.flush();
             }
             {
                 var f = try std.fs.cwd().createFile(lci_filename, .{});
                 defer f.close();
-                try design.write_lci(f.writer());
+                var buf: [4096]u8 = undefined;
+                var writer = f.writer(&buf);
+                try design.write_lci(&writer.interface);
+                try writer.interface.flush();
             }
 
             var child = std.process.Child.init(&.{
@@ -1043,9 +1050,9 @@ pub const Toolchain = struct {
         //var signals = try std.ArrayList(SignalFitData).initCapacity(self.alloc, 32);
 
         const log_filename = std.fmt.bufPrint(&filename_buf1, "test{}.log", .{ self.counter }) catch unreachable;
-        const log = try self.read_file(log_filename);
-        if (!failed and !std.mem.containsAtLeast(u8, log, 1, " was Fitted Successfully!")) {
-            std.debug.print("Unexpected fitter log:\n {s}\n", .{ log });
+        const log_contents = try self.read_file(log_filename);
+        if (!failed and !std.mem.containsAtLeast(u8, log_contents, 1, " was Fitted Successfully!")) {
+            std.debug.print("Unexpected fitter log:\n {s}\n", .{ log_contents });
             failed = true;
         }
 
@@ -1078,7 +1085,7 @@ pub const Toolchain = struct {
         if (timeout_ms > 0) {
             std.os.windows.WaitForSingleObjectEx(child.id, timeout_ms, false) catch {};
             std.os.windows.TerminateProcess(child.id, 1) catch |err| switch (err) {
-                error.PermissionDenied => {
+                error.AccessDenied => {
                     // Usually when TerminateProcess triggers a ACCESS_DENIED error, it
                     // indicates that the process has already exited, but there may be
                     // some rare edge cases where our process handle no longer has the
@@ -1188,3 +1195,5 @@ pub const Toolchain = struct {
     }
 
 };
+
+const log = std.log.scoped(.toolchain);

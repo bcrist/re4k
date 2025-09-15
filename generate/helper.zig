@@ -17,11 +17,23 @@ const Pin_Info = lc4k.Pin_Info;
 
 var temp_alloc = Temp_Allocator {};
 
-pub fn main() void {
-    run() catch unreachable; //catch |e| {
-    //     std.io.getStdErr().writer().print("{}\n", .{ e }) catch {};
-    //     std.os.exit(1);
-    // };
+pub var stdout: *std.io.Writer = undefined;
+pub var stderr: *std.io.Writer = undefined;
+
+pub fn main() !void {
+    var stdout_buf: [4096]u8 = undefined;
+    var stderr_buf: [64]u8 = undefined;
+
+    var stdout_writer = std.fs.File.stdout().writer(&stdout_buf);
+    var stderr_writer = std.fs.File.stdout().writer(&stderr_buf);
+
+    stdout = &stdout_writer.interface;
+    stderr = &stderr_writer.interface;
+
+    defer stdout.flush() catch {};
+    defer stderr.flush() catch {};
+
+    try run();
 }
 
 pub fn reset_temp() void {
@@ -94,11 +106,13 @@ fn run() !void {
         }
     }
 
-    var atf = try out_dir.atomicFile(out_filename, .{});
+    var buf: [4096]u8 = undefined;
+    var atf = try out_dir.atomicFile(out_filename, .{
+        .write_buffer = &buf,
+    });
     defer atf.deinit();
 
-    const writer = atf.file.writer();
-    var sx_writer = sx.writer(pa, writer.any());
+    var sx_writer = sx.writer(pa, &atf.file_writer.interface);
     defer sx_writer.deinit();
 
     var tc = try Toolchain.init(ta);
@@ -126,7 +140,8 @@ pub fn log_results(device_type: Device_Type, comptime name_fmt: []const u8, name
         var f = try dir.createFile(filename, .{});
         defer f.close();
 
-        try f.writer().writeAll(results.report);
+        var writer = f.writer(&.{});
+        try writer.interface.writeAll(results.report);
     }
     if (jed_dir) |dir| {
         const filename = try std.fmt.allocPrint(temp_alloc.allocator(), name_fmt ++ ".jed", name_args);
@@ -137,11 +152,16 @@ pub fn log_results(device_type: Device_Type, comptime name_fmt: []const u8, name
             .data = results.jedec,
         };
 
-        try jed.write(device_type, f.writer().any(), .{ .one_char = '.' });
+        var buf: [4096]u8 = undefined;
+        var writer = f.writer(&buf);
+
+        try jed.write(device_type, &writer.interface, .{ .one_char = '.' });
     }
     if (slow_mode) {
-        try std.io.getStdOut().writer().writeAll("Press enter to continue...\n");
-        while ('\n' != std.io.getStdIn().reader().readByte() catch '\n') {}
+        try stdout.writeAll("Press enter to continue...\n");
+        try stdout.flush();
+        var reader = std.fs.File.stdin().readerStreaming(&.{});
+        while ('\n' != reader.interface.takeByte() catch '\n') {}
     }
 }
 
@@ -152,8 +172,6 @@ pub const Error_Context = struct {
     pin: ?[]const u8 = null,
 };
 pub fn err(comptime fmt: []const u8, args: anytype, dev: *const Device_Info, context: Error_Context) !void {
-    const stderr = std.io.getStdErr().writer();
-
     if (context.mcref) |mcref| {
         try stderr.print("{s} glb{} ({s}) mc{}: ", .{ @tagName(dev.device), mcref.glb, get_glb_name(mcref.glb), mcref.mc });
     } else if (context.glb) |glb| {
@@ -395,15 +413,14 @@ pub fn parse_grp(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*Dev
         try pin_number_to_info.put(pin.id, pin);
     }
 
-    var stream = std.io.fixedBufferStream(input_file.contents);
-    const reader = stream.reader();
-    var parser = sx.reader(ta, reader.any());
+    var reader = std.io.Reader.fixed(input_file.contents);
+    var parser = sx.reader(ta, &reader);
     defer parser.deinit();
 
     parse_grp0(ta, &parser, &dev, &pin_number_to_info, &results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
             var ctx = try parser.token_context();
-            try ctx.print_for_string(input_file.contents, std.io.getStdErr().writer(), 120);
+            try ctx.print_for_string(input_file.contents, stderr, 120);
             return e;
         },
         else => return e,
@@ -426,7 +443,7 @@ fn parse_grp0(
     _ = try parser.require_any_expression(); // device name, we already know it
     try parser.require_expression("global_routing_pool");
 
-    var temp = std.ArrayList(u8).init(ta);
+    var temp = std.array_list.Managed(u8).init(ta);
 
     var glb: u8 = 0;
     while (glb < dev.num_glbs) : (glb += 1) {
@@ -447,7 +464,7 @@ fn parse_grp0(
                             .pin = pin.id,
                         });
                     } else {
-                        try std.io.getStdErr().writer().print("Failed to lookup pin number: {s}\n", .{ temp.items });
+                        try stderr.print("Failed to lookup pin number: {s}\n", .{ temp.items });
                     }
                     try parser.require_close(); // pin
                 } else if (try parse_glb(parser)) |fuse_glb| {
@@ -542,15 +559,14 @@ pub fn parse_fuses_for_output_pins(ta: std.mem.Allocator, pa: std.mem.Allocator,
 
     var results = std.AutoHashMap(MC_Ref, []const Fuse_And_Value).init(pa);
 
-    var stream = std.io.fixedBufferStream(input_file.contents);
-    const reader = stream.reader();
-    var parser = sx.reader(ta, reader.any());
+    var reader = std.io.Reader.fixed(input_file.contents);
+    var parser = sx.reader(ta, &reader);
     defer parser.deinit();
 
     parse_fuses_for_output_pins0(&parser, section_name, &results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
             var ctx = try parser.token_context();
-            try ctx.print_for_string(input_file.contents, std.io.getStdErr().writer(), 120);
+            try ctx.print_for_string(input_file.contents, stderr, 120);
             return e;
         },
         else => return e,
@@ -620,14 +636,14 @@ pub fn parse_fuses_for_macrocells(ta: std.mem.Allocator, pa: std.mem.Allocator, 
 
     var results = std.AutoHashMap(MC_Ref, []const Fuse_And_Value).init(pa);
 
-    var stream = std.io.fixedBufferStream(input_file.contents);
-    var parser = sx.reader(ta, stream.reader());
+    var reader = std.io.Reader.fixed(input_file.contents);
+    var parser = sx.reader(ta, &reader);
     defer parser.deinit();
 
     parse_fuses_for_macrocells0(&parser, section_name, &results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
             var ctx = try parser.token_context();
-            try ctx.print_for_string(input_file.contents, std.io.getStdErr().writer(), 120);
+            try ctx.print_for_string(input_file.contents, stderr, 120);
             return e;
         },
         else => return e,
@@ -673,15 +689,14 @@ pub fn parse_mc_options_columns(ta: std.mem.Allocator, pa: std.mem.Allocator, ou
     var results = std.AutoHashMap(MC_Ref, Fuse_Range).init(pa);
     try results.ensureTotalCapacity(@intCast(dev.num_mcs));
 
-    var stream = std.io.fixedBufferStream(input_file.contents);
-    const reader = stream.reader();
-    var parser = sx.reader(ta, reader.any());
+    var reader = std.io.Reader.fixed(input_file.contents);
+    var parser = sx.reader(ta, &reader);
     defer parser.deinit();
 
     parse_mc_options_columns0(&parser, &dev, &results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
             var ctx = try parser.token_context();
-            try ctx.print_for_string(input_file.contents, std.io.getStdErr().writer(), 120);
+            try ctx.print_for_string(input_file.contents, stderr, 120);
             return e;
         },
         else => return e,
@@ -735,15 +750,14 @@ pub fn parse_orm_rows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: 
 
     var results = try std.DynamicBitSet.initEmpty(pa, dev.jedec_dimensions.height());
 
-    var stream = std.io.fixedBufferStream(input_file.contents);
-    const reader = stream.reader();
-    var parser = sx.reader(ta, reader.any());
+    var reader = std.io.Reader.fixed(input_file.contents);
+    var parser = sx.reader(ta, &reader);
     defer parser.deinit();
 
     parse_orm_rows0(&parser, &results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
             var ctx = try parser.token_context();
-            try ctx.print_for_string(input_file.contents, std.io.getStdErr().writer(), 120);
+            try ctx.print_for_string(input_file.contents, stderr, 120);
             return e;
         },
         else => return e,
@@ -783,7 +797,7 @@ fn parse_orm_rows0(parser: *sx.Reader, results: *std.DynamicBitSet) !void {
     try parser.require_done();
 }
 
-pub fn parse_pin(parser: *sx.Reader, out: ?*std.ArrayList(u8)) !bool {
+pub fn parse_pin(parser: *sx.Reader, out: ?*std.array_list.Managed(u8)) !bool {
     if (try parser.expression("pin")) {
         const pin_id = try parser.require_any_string();
         if (out) |o| {
@@ -823,15 +837,14 @@ pub fn parse_shared_pt_clock_polarity_fuses(ta: std.mem.Allocator, pa: std.mem.A
 
     const results = try pa.alloc(Fuse, dev.num_glbs);
 
-    var stream = std.io.fixedBufferStream(input_file.contents);
-    const reader = stream.reader();
-    var parser = sx.reader(ta, reader.any());
+    var reader = std.io.Reader.fixed(input_file.contents);
+    var parser = sx.reader(ta, &reader);
     defer parser.deinit();
 
     parse_shared_pt_clock_polarity_fuses0(&parser, results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
             var ctx = try parser.token_context();
-            try ctx.print_for_string(input_file.contents, std.io.getStdErr().writer(), 120);
+            try ctx.print_for_string(input_file.contents, stderr, 120);
             return e;
         },
         else => return e,

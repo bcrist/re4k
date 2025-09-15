@@ -13,9 +13,7 @@ const Pin_Info = lc4k.Pin_Info;
 const Fuse = lc4k.Fuse;
 const Drive_Type = lc4k.Drive_Type;
 
-pub fn main() void {
-    helper.main();
-}
+pub const main = helper.main;
 
 fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: Pin_Info, drive: Drive_Type) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);

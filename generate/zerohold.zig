@@ -8,9 +8,7 @@ const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const JEDEC_Data = lc4k.JEDEC_Data;
 
-pub fn main() void {
-    helper.main();
-}
+pub const main = helper.main;
 
 pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     var design = Design.init(ta, dev);
@@ -37,12 +35,12 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
 
         try writer.done();
     } else {
-        try std.io.getStdErr().writer().print("Expected one zerohold fuse for device {} but found none!\n", .{ dev });
+        try helper.stderr.print("Expected one zerohold fuse for device {} but found none!\n", .{ dev });
         return error.Think;
     }
 
     if (diff_iter.next()) |_| {
-        try std.io.getStdErr().writer().print("Expected one zerohold fuse for device {} but found multiple!\n", .{ dev });
+        try helper.stderr.print("Expected one zerohold fuse for device {} but found multiple!\n", .{ dev });
         return error.Think;
     }
 

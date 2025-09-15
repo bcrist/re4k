@@ -9,9 +9,7 @@ const Design = toolchain.Design;
 const JEDEC_Data = lc4k.JEDEC_Data;
 const Fuse = lc4k.Fuse;
 
-pub fn main() void {
-    helper.main();
-}
+pub const main = helper.main;
 
 pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     const input_file = helper.get_input_file("bclk_polarity.sx") orelse return error.MissingInputFile;
@@ -19,15 +17,14 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
     std.debug.assert(input_dev.num_glbs == dev.num_glbs);
     std.debug.assert(input_dev.jedec_dimensions.eql(dev.jedec_dimensions));
 
-    var stream = std.io.fixedBufferStream(input_file.contents);
-    const reader = stream.reader();
-    var parser = sx.reader(ta, reader.any());
+    var reader = std.io.Reader.fixed(input_file.contents);
+    var parser = sx.reader(ta, &reader);
     defer parser.deinit();
 
     parseAndWrite(dev, &parser, writer) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
             var ctx = try parser.token_context();
-            try ctx.print_for_string(input_file.contents, std.io.getStdErr().writer(), 120);
+            try ctx.print_for_string(input_file.contents, helper.stderr, 120);
             return e;
         },
         else => return e,

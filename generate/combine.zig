@@ -2,6 +2,7 @@ const root = @import("root");
 const std = @import("std");
 const lc4k = @import("lc4k");
 const sx = @import("sx");
+const helper = @import("helper.zig");
 const toolchain = @import("toolchain.zig");
 const Device_Info = @import("Device_Info.zig");
 const Temp_Allocator = @import("Temp_Allocator");
@@ -12,12 +13,22 @@ const JEDEC_Data = lc4k.JEDEC_Data;
 const GLB_Input_Signal = toolchain.GLB_Input_Signal;
 const MC_Ref = lc4k.MC_Ref;
 
-pub fn main() void {
-    run() catch unreachable; //catch |e| {
-    //     std.io.getStdErr().writer().print("{}\n", .{ e }) catch {};
-    //     std.os.exit(1);
-    // };
+pub fn main() !void {
+    var stdout_buf: [4096]u8 = undefined;
+    var stderr_buf: [64]u8 = undefined;
+
+    var stdout_writer = std.fs.File.stdout().writer(&stdout_buf);
+    var stderr_writer = std.fs.File.stdout().writer(&stderr_buf);
+
+    helper.stdout = &stdout_writer.interface;
+    helper.stderr = &stderr_writer.interface;
+
+    defer helper.stdout.flush() catch {};
+    defer helper.stderr.flush() catch {};
+
+    try run();
 }
+
 
 fn run() !void {
     var perm_alloc = std.heap.ArenaAllocator.init(std.heap.page_allocator);
@@ -37,12 +48,13 @@ fn run() !void {
     var out_dir = try std.fs.cwd().makeOpenPath(out_dir_path, .{});
     defer out_dir.close();
 
-    var atf = try out_dir.atomicFile(out_filename, .{});
+    var sx_buf: [4096]u8 = undefined;
+    var atf = try out_dir.atomicFile(out_filename, .{
+        .write_buffer = &sx_buf,
+    });
     defer atf.deinit();
 
-    const writer = atf.file.writer();
-
-    var sx_writer = sx.writer(pa, writer.any());
+    var sx_writer = sx.writer(pa, &atf.file_writer.interface);
     defer sx_writer.deinit();
 
     try sx_writer.expression_expanded(@tagName(device_type));
@@ -58,9 +70,10 @@ fn run() !void {
         var f = try std.fs.cwd().openFile(in_path, .{});
         defer f.close();
 
-        const reader = f.reader();
+        var buf: [4096]u8 = undefined;
+        var reader = f.reader(&buf);
 
-        var parser = sx.reader(pa, reader.any());
+        var parser = sx.reader(pa, &reader.interface);
         defer parser.deinit();
 
         if (try parser.expression(@tagName(device_type))) {
@@ -78,8 +91,7 @@ fn run() !void {
                             const fuse = Fuse.init(row, col);
 
                             if (fuses.is_set(fuse)) {
-                                const stderr = std.io.getStdErr().writer();
-                                try stderr.print("Fuse {}:{} overbooked!\n", .{ row, col });
+                                try helper.stderr.print("Fuse {}:{} overbooked!\n", .{ row, col });
                             }
                             fuses.put(fuse, 1);
                         }

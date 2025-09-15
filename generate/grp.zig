@@ -18,9 +18,7 @@ const Input_Iterator = helper.Input_Iterator;
 
 const max_routed_signals = 33;
 
-pub fn main() void {
-    helper.main();
-}
+pub const main = helper.main;
 
 var report_number: usize = 0;
 fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, signals_to_test: GLB_Input_Set, all_signals: []const GLB_Input_Fit_Signal) !Fit_Results {

@@ -10,9 +10,7 @@ const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const Input_Iterator = helper.Input_Iterator;
 
-pub fn main() void {
-    helper.main();
-}
+pub const main = helper.main;
 
 fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: lc4k.Pin_Info, pg_enabled: bool) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);

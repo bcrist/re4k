@@ -177,7 +177,7 @@ pub fn get_part_number_suffix(self: Device_Info) []const u8 {
     };
 }
 
-pub fn write_part_number(self: Device_Info, writer: anytype, family_code: ?[]const u8, speed_code: ?[]const u8, temp_code: ?[]const u8) !void {
+pub fn write_part_number(self: Device_Info, writer: *std.io.Writer, family_code: ?[]const u8, speed_code: ?[]const u8, temp_code: ?[]const u8) !void {
     const family_suffix = family_code orelse self.get_part_number_suffix();
 
     const speed = speed_code orelse switch (self.family) {

@@ -8,9 +8,7 @@ const Toolchain = toolchain.Toolchain;
 const Design = toolchain.Design;
 const JEDEC_Data = lc4k.JEDEC_Data;
 
-pub fn main() void {
-    helper.main();
-}
+pub const main = helper.main;
 
 const BCLK_Mode = enum {
     both_non_inverted,
@@ -129,7 +127,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
 
             var jeds = std.EnumMap(BCLK_Mode, JEDEC_Data) {};
             for (std.enums.values(BCLK_Mode)) |mode| {
-                const results = try if (base_clk == 0) run_toolchain(ta, tc, dev, glb, mode, .both_non_inverted) else run_toolchain(ta, tc, dev, glb, .both_non_inverted, mode);
+                const results = switch (base_clk) {
+                    0 => try run_toolchain(ta, tc, dev, glb, mode, .both_non_inverted),
+                    2 => try run_toolchain(ta, tc, dev, glb, .both_non_inverted, mode),
+                    else => unreachable,
+                };
                 jeds.put(mode, results.jedec);
             }
 

@@ -9,9 +9,7 @@ const Design = toolchain.Design;
 const JEDEC_Data = lc4k.JEDEC_Data;
 const Fuse = lc4k.Fuse;
 
-pub fn main() void {
-    helper.main();
-}
+pub const main = helper.main;
 
 pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     const sptclk_polarity_fuses = try helper.parse_shared_pt_clock_polarity_fuses(ta, pa, dev);

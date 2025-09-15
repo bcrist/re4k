@@ -11,9 +11,7 @@ const Fuse = lc4k.Fuse;
 const Input_Iterator = helper.Input_Iterator;
 const Output_Iterator = helper.Output_Iterator;
 
-pub fn main() void {
-    helper.main();
-}
+pub const main = helper.main;
 
 const Polarity = enum {
     positive,

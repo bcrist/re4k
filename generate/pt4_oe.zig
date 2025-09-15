@@ -12,9 +12,7 @@ const Output_Iterator = helper.Output_Iterator;
 const MC_Ref = lc4k.MC_Ref;
 const Pin_Info = lc4k.Pin_Info;
 
-pub fn main() void {
-    helper.main();
-}
+pub const main = helper.main;
 
 fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, mcref: MC_Ref, pt4_oe: bool) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
@@ -193,15 +191,14 @@ fn parseOESourceRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?
 
     var results = try std.DynamicBitSet.initEmpty(pa, dev.jedec_dimensions.height());
 
-    var stream = std.io.fixedBufferStream(input_file.contents);
-    const reader = stream.reader();
-    var parser = sx.reader(ta, reader.any());
+    var reader = std.io.Reader.fixed(input_file.contents);
+    var parser = sx.reader(ta, &reader);
     defer parser.deinit();
 
     parseOESourceRows0(&parser, &results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
             var ctx = try parser.token_context();
-            try ctx.print_for_string(input_file.contents, std.io.getStdErr().writer(), 120);
+            try ctx.print_for_string(input_file.contents, helper.stderr, 120);
             return e;
         },
         else => return e,

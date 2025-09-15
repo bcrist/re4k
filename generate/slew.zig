@@ -9,9 +9,7 @@ const Design = toolchain.Design;
 const JEDEC_Data = lc4k.JEDEC_Data;
 const MC_Ref = lc4k.MC_Ref;
 
-pub fn main() void {
-    helper.main();
-}
+pub const main = helper.main;
 
 fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: lc4k.Pin_Info, slew: lc4k.Slew_Rate) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);

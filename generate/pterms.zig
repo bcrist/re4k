@@ -10,9 +10,7 @@ const Design = toolchain.Design;
 const Fuse = lc4k.Fuse;
 const GLB_Input_Signal = toolchain.GLB_Input_Signal;
 
-pub fn main() void {
-    helper.main();
-}
+pub const main = helper.main;
 
 fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, mcref: lc4k.MC_Ref) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
