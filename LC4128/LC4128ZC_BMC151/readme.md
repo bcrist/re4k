@@ -1,0 +1,1 @@
+This directory is not a true LC4128ZC package type, but rather just contains the pinout for an LC4128ZC_csBGA132 adapter board that I designed.
