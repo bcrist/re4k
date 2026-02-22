@@ -13,12 +13,12 @@ const JEDEC_Data = lc4k.JEDEC_Data;
 const GLB_Input_Signal = toolchain.GLB_Input_Signal;
 const MC_Ref = lc4k.MC_Ref;
 
-pub fn main() !void {
+pub fn main(init: std.process.Init) !void {
     var stdout_buf: [4096]u8 = undefined;
     var stderr_buf: [64]u8 = undefined;
 
-    var stdout_writer = std.fs.File.stdout().writer(&stdout_buf);
-    var stderr_writer = std.fs.File.stdout().writer(&stderr_buf);
+    var stdout_writer = std.Io.File.stdout().writer(init.io, &stdout_buf);
+    var stderr_writer = std.Io.File.stdout().writer(init.io, &stderr_buf);
 
     helper.stdout = &stdout_writer.interface;
     helper.stderr = &stderr_writer.interface;
@@ -26,52 +26,55 @@ pub fn main() !void {
     defer helper.stdout.flush() catch {};
     defer helper.stderr.flush() catch {};
 
-    try run();
+    try run(init.io, init.minimal.args);
 }
 
 
-fn run() !void {
+fn run(io: std.Io, args: std.process.Args) !void {
     var perm_alloc = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     defer perm_alloc.deinit();
 
     const pa = perm_alloc.allocator();
 
-    var args = try std.process.ArgIterator.initWithAllocator(pa);
-    _ = args.next() orelse std.process.exit(255);
+    var args_iter = try args.iterateAllocator(pa);
+    _ = args_iter.next() orelse std.process.exit(255);
 
-    const out_path = args.next() orelse return error.NeedOutputPath;
-    const out_dir_path = std.fs.path.dirname(out_path) orelse return error.InvalidOutputPath;
-    const out_filename = std.fs.path.basename(out_path);
-    const device_str = out_filename[0..out_filename.len - std.fs.path.extension(out_filename).len];
+    const out_path = args_iter.next() orelse return error.NeedOutputPath;
+    const out_dir_path = std.Io.Dir.path.dirname(out_path) orelse return error.InvalidOutputPath;
+    const out_filename = std.Io.Dir.path.basename(out_path);
+    const device_str = out_filename[0..out_filename.len - std.Io.Dir.path.extension(out_filename).len];
     const device_type = lc4k.Device_Type.parse(device_str) orelse return error.InvalidDevice;
 
-    var out_dir = try std.fs.cwd().makeOpenPath(out_dir_path, .{});
-    defer out_dir.close();
+    var out_dir = try std.Io.Dir.cwd().createDirPathOpen(io, out_dir_path, .{});
+    defer out_dir.close(io);
+
+    var atf = try out_dir.createFileAtomic(io, out_filename, .{
+        .make_path = true,
+        .replace = true,
+    });
+    defer atf.deinit(io);
 
     var sx_buf: [4096]u8 = undefined;
-    var atf = try out_dir.atomicFile(out_filename, .{
-        .write_buffer = &sx_buf,
-    });
-    defer atf.deinit();
+    var atf_writer = atf.file.writer(io, &sx_buf);
 
-    var sx_writer = sx.writer(pa, &atf.file_writer.interface);
+    var sx_writer = sx.writer(pa, &atf_writer.interface);
     defer sx_writer.deinit();
 
     try sx_writer.expression_expanded(@tagName(device_type));
 
     var fuses = try JEDEC_Data.init_empty(pa, Device_Info.init(device_type).jedec_dimensions);
 
-    while (args.next()) |in_path| {
-        const in_dir_path = std.fs.path.dirname(in_path) orelse return error.InvalidInputPath;
-        const in_device_str = std.fs.path.basename(in_dir_path);
+    while (args_iter.next()) |in_path| {
+        const in_dir_path = std.Io.Dir.path.dirname(in_path) orelse return error.InvalidInputPath;
+        const in_device_str = std.Io.Dir.path.basename(in_dir_path);
         const in_device_type = lc4k.Device_Type.parse(in_device_str) orelse return error.InvalidDevice;
         if (in_device_type != device_type) return error.WrongDevice;
 
-        var f = try std.fs.cwd().openFile(in_path, .{});
-        defer f.close();
+        var f = try std.Io.Dir.cwd().openFile(io, in_path, .{});
+        defer f.close(io);
 
         var buf: [4096]u8 = undefined;
-        var reader = f.reader(&buf);
+        var reader = f.reader(io, &buf);
 
         var parser = sx.reader(pa, &reader.interface);
         defer parser.deinit();
@@ -116,5 +119,6 @@ fn run() !void {
 
     try sx_writer.done();
 
-    try atf.finish();
+    try atf_writer.interface.flush();
+    try atf.replace(io);
 }

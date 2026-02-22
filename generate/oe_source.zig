@@ -14,7 +14,7 @@ const MC_Ref = lc4k.MC_Ref;
 
 pub const main = helper.main;
 
-fn run_toolchainOnOff(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: Pin_Info, off: bool) !toolchain.Fit_Results {
+fn run_toolchain_on_off(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: Pin_Info, off: bool) !toolchain.Fit_Results {
      var design = Design.init(ta, dev);
     try design.pin_assignment(.{
         .signal = "out",
@@ -26,17 +26,17 @@ fn run_toolchainOnOff(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_
         try design.add_output("out.OE");
     }
 
-    var results = try tc.run_toolchain(design);
+    var results = try tc.run_toolchain(io, design);
     if (off) {
-        try helper.log_results(dev.device, "off_{s}", .{ pin.id }, results);
+        try helper.log_results(io, dev.device, "off_{s}", .{ pin.id }, results);
     } else {
-        try helper.log_results(dev.device, "on_{s}", .{ pin.id }, results);
+        try helper.log_results(io, dev.device, "on_{s}", .{ pin.id }, results);
     }
     try results.check_term();
     return results;
 }
 
-fn getFirstNonOE(dev: *const Device_Info, exclude_glb: u8) !lc4k.Pin_Info {
+fn get_first_non_oe(dev: *const Device_Info, exclude_glb: u8) !lc4k.Pin_Info {
     var iter = Output_Iterator {
         .pins = dev.all_pins,
         .exclude_oes = true,
@@ -50,7 +50,7 @@ fn getFirstNonOE(dev: *const Device_Info, exclude_glb: u8) !lc4k.Pin_Info {
     }
 }
 
-fn getFirstInGLB(dev: *const Device_Info, glb: u8, exclude_mc: u8) !lc4k.Pin_Info {
+fn get_first_in_glb(dev: *const Device_Info, glb: u8, exclude_mc: u8) !lc4k.Pin_Info {
     var iter = Output_Iterator {
         .pins = dev.all_pins,
         .single_glb = glb,
@@ -70,7 +70,7 @@ fn getFirstInGLB(dev: *const Device_Info, glb: u8, exclude_mc: u8) !lc4k.Pin_Inf
     return error.NotFound;
 }
 
-fn run_toolchainGOE(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: Pin_Info, goe: bool) !toolchain.Fit_Results {
+fn run_toolchain_goe(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: Pin_Info, goe: bool) !toolchain.Fit_Results {
      var design = Design.init(ta, dev);
     try design.pin_assignment(.{
         .signal = "out",
@@ -83,11 +83,11 @@ fn run_toolchainGOE(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_In
 
     try design.pin_assignment(.{
         .signal = "oe",
-        .pin = (try getFirstNonOE(dev, glb)).id,
+        .pin = (try get_first_non_oe(dev, glb)).id,
     });
     try design.pin_assignment(.{
         .signal = "gout",
-        .pin = (try getFirstInGLB(dev, glb, mc)).id,
+        .pin = (try get_first_in_glb(dev, glb, mc)).id,
     });
 
     try design.add_pt(.{}, "gout");
@@ -97,17 +97,17 @@ fn run_toolchainGOE(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_In
         try design.add_pt("oe", "out.OE");
     }
 
-    var results = try tc.run_toolchain(design);
+    var results = try tc.run_toolchain(io, design);
     if (goe) {
-        try helper.log_results(dev.device, "goe.glb{}.mc{}", .{ glb, mc }, results);
+        try helper.log_results(io, dev.device, "goe.glb{}.mc{}", .{ glb, mc }, results);
     } else {
-        try helper.log_results(dev.device, "nogoe.glb{}.mc{}", .{ glb, mc }, results);
+        try helper.log_results(io, dev.device, "nogoe.glb{}.mc{}", .{ glb, mc }, results);
     }
     try results.check_term();
     return results;
 }
 
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: Pin_Info, mode: lc4k.OutputEnableMode) !toolchain.Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: Pin_Info, mode: lc4k.Output_Enable_Mode) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
     try design.pin_assignment(.{
         .signal = "out",
@@ -175,7 +175,7 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
         .goe0 => {
             try design.pin_assignment(.{
                 .signal = "goe0",
-                .pin_index = dev.getOEPin(0).pin_index,
+                .pin_index = dev.get_oe_pin(0).pin_index,
             });
             try design.add_pt("goe0", "out.OE");
         },
@@ -189,7 +189,7 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
         .goe2 => {
             try design.pin_assignment(.{
                 .signal = "goe2",
-                .pin_index = try getFirstNonOE(dev, glb),
+                .pin_index = try get_first_non_oe(dev, glb),
             });
             try design.add_pt("goe2", "out.OE");
         },
@@ -234,13 +234,13 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
         },
     }
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "{s}.glb{}.mc{}", .{ @tagName(mode), glb, mc }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "{s}.glb{}.mc{}", .{ @tagName(mode), glb, mc }, results);
     try results.check_term();
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     var maybe_fallback_fuses: ?std.AutoHashMap(MC_Ref, []const helper.Fuse_And_Value) = null;
     if (helper.get_input_file("oe_source.sx")) |_| {
         maybe_fallback_fuses = try helper.parse_fuses_for_output_pins(ta, pa, "oe_source.sx", "output_enable_source", null);
@@ -270,20 +270,20 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
             }
         }
 
-        try tc.clean_temp_dir();
+        try tc.clean_temp_dir(io);
         helper.reset_temp();
 
         // First we just check input-only and output-only configurations.
         // This should discover exactly one of the three OE mux configuration fuses for this pin.
         var diff = try JEDEC_Data.init_diff(ta, 
-            (try run_toolchainOnOff(ta, tc, dev, pin, false)).jedec,
-            (try run_toolchainOnOff(ta, tc, dev, pin, true)).jedec,
+            (try run_toolchain_on_off(io, ta, tc, dev, pin, false)).jedec,
+            (try run_toolchain_on_off(io, ta, tc, dev, pin, true)).jedec,
         );
 
         // Next check GOE2 vs output-only; this should find the other two OE mux fuses.
         diff.union_diff(
-            (try run_toolchainGOE(ta, tc, dev, pin, false)).jedec,
-            (try run_toolchainGOE(ta, tc, dev, pin, true)).jedec,
+            (try run_toolchain_goe(io, ta, tc, dev, pin, false)).jedec,
+            (try run_toolchain_goe(io, ta, tc, dev, pin, true)).jedec,
         );
 
         try helper.write_pin(writer, pin);

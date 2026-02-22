@@ -18,7 +18,7 @@ const ORPMode = enum {
     orm_bypass,
 };
 
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: lc4k.Pin_Info, bypass: ORPMode) !toolchain.Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: lc4k.Pin_Info, bypass: ORPMode) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
 
     try design.pin_assignment(.{
@@ -68,13 +68,13 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
     try design.add_pt("in3", out_signal);
     try design.add_pt("in4", out_signal);
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "bypass_{s}_{s}", .{ pin.id, @tagName(bypass) }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "bypass_{s}_{s}", .{ pin.id, @tagName(bypass) }, results);
     try results.check_term();
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     var maybe_fallback_fuses: ?std.AutoHashMap(MC_Ref, []const helper.Fuse_And_Value) = null;
     if (helper.get_input_file("output_routing_mode.sx")) |_| {
         maybe_fallback_fuses = try helper.parse_fuses_for_output_pins(ta, pa, "output_routing_mode.sx", "output_routing_mode", null);
@@ -106,12 +106,12 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
             }
         }
 
-        try tc.clean_temp_dir();
+        try tc.clean_temp_dir(io);
         helper.reset_temp();
 
         var jeds = std.EnumMap(ORPMode, JEDEC_Data) {};
         for (std.enums.values(ORPMode)) |mode| {
-            const results = try run_toolchain(ta, tc, dev, pin, mode);
+            const results = try run_toolchain(io, ta, tc, dev, pin, mode);
             jeds.put(mode, results.jedec);
         }
 

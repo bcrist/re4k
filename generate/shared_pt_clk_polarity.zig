@@ -15,7 +15,7 @@ const Polarity = enum {
     negative,
 };
 
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, glb: u8, polarity: Polarity) !toolchain.Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, glb: u8, polarity: Polarity) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
 
     var pin_iter = helper.Input_Iterator {
@@ -43,13 +43,13 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
         .negative => "out.C-",
     });
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "shared_pt_clk_polarity_glb{}_{s}", .{ glb, @tagName(polarity) }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "shared_pt_clk_polarity_glb{}_{s}", .{ glb, @tagName(polarity) }, results);
     try results.check_term();
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("shared_pt_clk_polarity");
 
@@ -59,8 +59,8 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
     while (glb < dev.num_glbs) : (glb += 1) {
         try helper.write_glb(writer, glb);
 
-        const positive_results = try run_toolchain(ta, tc, dev, glb, .positive);
-        const negative_results = try run_toolchain(ta, tc, dev, glb, .negative);
+        const positive_results = try run_toolchain(io, ta, tc, dev, glb, .positive);
+        const negative_results = try run_toolchain(io, ta, tc, dev, glb, .negative);
 
         const diff = try JEDEC_Data.init_diff(ta,
             positive_results.jedec,

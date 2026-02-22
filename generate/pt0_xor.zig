@@ -10,7 +10,7 @@ const JEDEC_Data = lc4k.JEDEC_Data;
 
 pub const main = helper.main;
 
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, mcref: lc4k.MC_Ref, xor: bool) !toolchain.Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, mcref: lc4k.MC_Ref, xor: bool) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
 
     try design.pin_assignment(.{
@@ -54,13 +54,13 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
         try design.add_pt("x1", "out.D");
     }
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "pt0_xor_glb{}_mc{}_{}", .{ mcref.glb, mcref.mc, xor }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "pt0_xor_glb{}_mc{}_{}", .{ mcref.glb, mcref.mc, xor }, results);
     try results.check_term();
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("pt0_xor");
 
@@ -69,11 +69,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
 
     var mc_iter = helper.Macrocell_Iterator { .dev = dev };
     while (mc_iter.next()) |mcref| {
-        try tc.clean_temp_dir();
+        try tc.clean_temp_dir(io);
         helper.reset_temp();
 
-        const results_disabled = try run_toolchain(ta, tc, dev, mcref, false);
-        const results_enabled = try run_toolchain(ta, tc, dev, mcref, true);
+        const results_disabled = try run_toolchain(io, ta, tc, dev, mcref, false);
+        const results_enabled = try run_toolchain(io, ta, tc, dev, mcref, true);
 
         var diff = try JEDEC_Data.init_diff(ta, results_disabled.jedec, results_enabled.jedec);
 

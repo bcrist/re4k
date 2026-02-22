@@ -11,7 +11,7 @@ const Design = toolchain.Design;
 
 pub const main = helper.main;
 
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, mcref: lc4k.MC_Ref, init_state: u1) !toolchain.Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, mcref: lc4k.MC_Ref, init_state: u1) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
     try design.node_assignment(.{
         .signal = "out",
@@ -21,8 +21,8 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
     });
     try design.add_pt("in", "out.D");
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "init_state_glb{}_mc{}_{}", .{ mcref.glb, mcref.mc, init_state }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "init_state_glb{}_mc{}_{}", .{ mcref.glb, mcref.mc, init_state }, results);
     try results.check_term();
     return results;
 }
@@ -30,17 +30,17 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
 var default_set: ?u1 = null;
 var default_reset: ?u1 = null;
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("init_state");
 
     var mc_iter = helper.Macrocell_Iterator { .dev = dev };
     while (mc_iter.next()) |mcref| {
-        try tc.clean_temp_dir();
+        try tc.clean_temp_dir(io);
         helper.reset_temp();
 
-        const results_reset = try run_toolchain(ta, tc, dev, mcref, 0);
-        const results_set = try run_toolchain(ta, tc, dev, mcref, 1);
+        const results_reset = try run_toolchain(io, ta, tc, dev, mcref, 0);
+        const results_set = try run_toolchain(io, ta, tc, dev, mcref, 1);
 
         const diff = try JEDEC_Data.init_diff(ta, results_reset.jedec, results_set.jedec);
 

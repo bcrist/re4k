@@ -53,7 +53,7 @@ pub fn get_package_name(self: Device_Info) []const u8 {
         .ucBGA64 => "64ucBGA",
         .TQFP100 => "100TQFP",
         .TQFP128 => "128TQFP",
-        .csBGA132 => "132csBGA",
+        .csBGA132, .BMC149 => "132csBGA",
         .ucBGA132 => "132ucBGA",
         .TQFP144 => "144TQFP",
         .csBGA144 => "144csBGA",
@@ -89,6 +89,7 @@ pub fn get_fitter_name(self: Device_Info) []const u8 {
         .LC4128ZE_TQFP144  => "M4E_128_96",
         .LC4128ZE_csBGA144 => "M4E_128_96S",
         .LC4128ZE_ucBGA132 => "M4E_128_96U",
+        .LC4128ZC_BMC149 => "M4Z_128_96S",
     };
 }
 
@@ -177,7 +178,7 @@ pub fn get_part_number_suffix(self: Device_Info) []const u8 {
     };
 }
 
-pub fn write_part_number(self: Device_Info, writer: *std.io.Writer, family_code: ?[]const u8, speed_code: ?[]const u8, temp_code: ?[]const u8) !void {
+pub fn write_part_number(self: Device_Info, writer: *std.Io.Writer, family_code: ?[]const u8, speed_code: ?[]const u8, temp_code: ?[]const u8) !void {
     const family_suffix = family_code orelse self.get_part_number_suffix();
 
     const speed = speed_code orelse switch (self.family) {
@@ -189,7 +190,7 @@ pub fn write_part_number(self: Device_Info, writer: *std.io.Writer, family_code:
 
     const package_code = switch (self.package) {
         .TQFP44, .TQFP48, .TQFP100, .TQFP128, .TQFP144 => "T",
-        .csBGA56, .csBGA64, .csBGA132, .csBGA144 => "M",
+        .csBGA56, .csBGA64, .csBGA132, .csBGA144, .BMC149 => "M",
         .ucBGA64, .ucBGA132 => "UM",
     };
 
@@ -217,6 +218,17 @@ pub fn get_io_pin(self: Device_Info, mcref: lc4k.MC_Ref) ?Pin_Info {
     for (self.all_pins) |pin| {
         switch (pin.func) {
             .io, .io_oe0, .io_oe1 => |mc| if (pin.glb.? == mcref.glb and mc == mcref.mc) return pin,
+            else => {}
+        }
+    }
+    return null;
+}
+
+pub fn get_oe_pin(self: Device_Info, index: usize) ?Pin_Info {
+    for (self.oe_pins) |pin| {
+        switch (pin.func) {
+            .io_oe0 => if (index == 0) return pin,
+            .io_oe1 => if (index == 1) return pin,
             else => {}
         }
     }

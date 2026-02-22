@@ -362,7 +362,7 @@ pub const Design = struct {
         });
     }
 
-    pub fn write_lci(self: Design, writer: *std.io.Writer) !void {
+    pub fn write_lci(self: Design, writer: *std.Io.Writer) !void {
         const series_suffix: []const u8 = switch (self.dev.family) {
             .low_power => "v",
             .zero_power => "c",
@@ -652,7 +652,7 @@ pub const Design = struct {
         }
     }
 
-    pub fn writePla(self: Design, writer: *std.io.Writer) !void {
+    pub fn writePla(self: Design, writer: *std.Io.Writer) !void {
         try writer.writeAll("#$ MODULE x\n");
         try writer.print("#$ PINS {}", .{ self.pins.items.len });
         for (self.pins.items) |pin| {
@@ -933,21 +933,21 @@ pub const Fit_Results = struct {
 
     pub fn check_term(self: Fit_Results) !void {
         switch (self.term) {
-            .Exited => |code| {
+            .exited => |code| {
                 if (code != 0) {
                     log.err("lpf4k returned code {}", .{ code });
                     return error.FitterError;
                 }
             },
-            .Signal => |s| {
+            .signal => |s| {
                 log.err("lpf4k signalled {}", .{ s });
                 return error.FitterError;
             },
-            .Stopped => |s| {
+            .stopped => |s| {
                 log.err("lpf4k stopped with {}", .{ s });
                 return error.FitterError;
             },
-            .Unknown => |s| {
+            .unknown => |s| {
                 log.err("lpf4k terminated unexpectedly with {}", .{ s });
                 return error.FitterError;
             },
@@ -962,20 +962,20 @@ pub const Fit_Results = struct {
 pub const Toolchain = struct {
 
     alloc: std.mem.Allocator,
-    dir: std.fs.Dir,
+    dir: std.Io.Dir,
     counter: i32,
 
-    pub fn init(allocator: std.mem.Allocator) !Toolchain {
-        var parent_dir = try std.fs.cwd().makeOpenPath("temp", .{});
-        try std.posix.chdir("temp");
+    pub fn init(io: std.Io, allocator: std.mem.Allocator) !Toolchain {
+        var parent_dir = try std.Io.Dir.cwd().createDirPathOpen(io, "temp", .{});
+        defer parent_dir.close(io);
 
         var random_bytes: [6]u8 = undefined;
-        std.crypto.random.bytes(&random_bytes);
+        std.Io.random(io, &random_bytes);
         var sub_path: [8]u8 = undefined;
-        _ = std.fs.base64_encoder.encode(&sub_path, &random_bytes);
+        _ = std.base64.url_safe.Encoder.encode(&sub_path, &random_bytes);
 
-        const dir = try parent_dir.makeOpenPath(&sub_path, .{ .iterate = true });
-        try std.posix.chdir(&sub_path);
+        const dir = try parent_dir.createDirPathOpen(io, &sub_path, .{ .open_options = .{ .iterate = true } });
+        try std.process.setCurrentDir(io, dir);
 
         return Toolchain {
             .alloc = allocator,
@@ -984,9 +984,9 @@ pub const Toolchain = struct {
         };
     }
 
-    pub fn deinit(self: *Toolchain, keep_files: bool) void {
+    pub fn deinit(self: *Toolchain, io: std.Io, keep_files: bool) void {
         if (!keep_files) {
-            self.clean_temp_dir() catch |err| {
+            self.clean_temp_dir(io) catch |err| {
                 std.debug.print("Failed to clean up toolchain temporary directory: {}\n", .{ err });
                 if (@errorReturnTrace()) |trace| {
                     std.debug.dumpStackTrace(trace.*);
@@ -994,37 +994,37 @@ pub const Toolchain = struct {
                 std.debug.dumpCurrentStackTrace(null);
             };
         }
-        self.dir.close();
+        self.dir.close(io);
     }
 
-    pub fn run_toolchain(self: *Toolchain, design: Design) !Fit_Results {
+    pub fn run_toolchain(self: *Toolchain, io: std.Io, design: Design) !Fit_Results {
         defer self.counter += 1;
 
         var filename_buf1: [100]u8 = undefined;
         var filename_buf2: [100]u8 = undefined;
 
-        const term = term: {
-            const tt4_filename = std.fmt.bufPrint(&filename_buf1, "test{}.tt4", .{ self.counter }) catch unreachable;
-            const lci_filename = std.fmt.bufPrint(&filename_buf2, "test{}.lci", .{ self.counter }) catch unreachable;
+        const tt4_filename = std.fmt.bufPrint(&filename_buf1, "test{}.tt4", .{ self.counter }) catch unreachable;
+        const lci_filename = std.fmt.bufPrint(&filename_buf2, "test{}.lci", .{ self.counter }) catch unreachable;
 
-            {
-                var f = try std.fs.cwd().createFile(tt4_filename, .{});
-                defer f.close();
-                var buf: [4096]u8 = undefined;
-                var writer = f.writer(&buf);
-                try design.writePla(&writer.interface);
-                try writer.interface.flush();
-            }
-            {
-                var f = try std.fs.cwd().createFile(lci_filename, .{});
-                defer f.close();
-                var buf: [4096]u8 = undefined;
-                var writer = f.writer(&buf);
-                try design.write_lci(&writer.interface);
-                try writer.interface.flush();
-            }
+        {
+            var f = try std.Io.Dir.cwd().createFile(io, tt4_filename, .{});
+            defer f.close(io);
+            var buf: [4096]u8 = undefined;
+            var writer = f.writer(io, &buf);
+            try design.writePla(&writer.interface);
+            try writer.interface.flush();
+        }
+        {
+            var f = try std.Io.Dir.cwd().createFile(io, lci_filename, .{});
+            defer f.close(io);
+            var buf: [4096]u8 = undefined;
+            var writer = f.writer(io, &buf);
+            try design.write_lci(&writer.interface);
+            try writer.interface.flush();
+        }
 
-            var child = std.process.Child.init(&.{
+        var child = try std.process.spawn(io, .{
+            .argv = &.{
                 "C:\\ispLEVER_Classic2_1\\ispcpld\\bin\\lpf4k.exe",
                 "-i", tt4_filename,
                 "-lci", lci_filename,
@@ -1036,21 +1036,19 @@ pub const Toolchain = struct {
                 //"-klfm",
                 //"-ppi_off",
                 "-v",
-            }, self.alloc);
-            child.stdin_behavior = .Ignore;
-            child.stdout_behavior = .Ignore;
-            child.stderr_behavior = .Ignore;
+            },
+            .stdin = .ignore,
+            .stdout = .ignore,
+            .stderr = .ignore,
+        });
 
-            try child.spawn();
-
-            break :term wait_for_child(&child, design.max_fit_time_ms) catch std.process.Child.Term { .Unknown = 0 };
-        };
-        var failed = !std.meta.eql(term, std.process.Child.Term { .Exited = 0 });
+        const term = try child.wait(io);
+        var failed = !std.meta.eql(term, std.process.Child.Term { .exited = 0 });
 
         //var signals = try std.ArrayList(SignalFitData).initCapacity(self.alloc, 32);
 
         const log_filename = std.fmt.bufPrint(&filename_buf1, "test{}.log", .{ self.counter }) catch unreachable;
-        const log_contents = try self.read_file(log_filename);
+        const log_contents = try self.read_file(io, log_filename);
         if (!failed and !std.mem.containsAtLeast(u8, log_contents, 1, " was Fitted Successfully!")) {
             std.debug.print("Unexpected fitter log:\n {s}\n", .{ log_contents });
             failed = true;
@@ -1065,8 +1063,8 @@ pub const Toolchain = struct {
         } else {
             const jed_filename = std.fmt.bufPrint(&filename_buf1, "test{}.jed", .{ self.counter }) catch unreachable;
             const rpt_filename = std.fmt.bufPrint(&filename_buf2, "test{}.rpt", .{ self.counter }) catch unreachable;
-            report = try self.read_file(rpt_filename);
-            jed = (try JEDEC_File.parse(self.alloc, jedec_size.width(), jedec_size.height(), try self.read_file(jed_filename))).data;
+            report = try self.read_file(io, rpt_filename);
+            jed = (try JEDEC_File.parse(self.alloc, jedec_size.width(), jedec_size.height(), try self.read_file(io, jed_filename))).data;
         }
 
         var results = Fit_Results {
@@ -1081,28 +1079,13 @@ pub const Toolchain = struct {
         return results;
     }
 
-    fn wait_for_child(child: *std.process.Child, timeout_ms: u32) !std.process.Child.Term {
-        if (timeout_ms > 0) {
-            std.os.windows.WaitForSingleObjectEx(child.id, timeout_ms, false) catch {};
-            std.os.windows.TerminateProcess(child.id, 1) catch |err| switch (err) {
-                error.AccessDenied => {
-                    // Usually when TerminateProcess triggers a ACCESS_DENIED error, it
-                    // indicates that the process has already exited, but there may be
-                    // some rare edge cases where our process handle no longer has the
-                    // PROCESS_TERMINATE access right, so let's do another check to make
-                    // sure the process is really no longer running:
-                    std.os.windows.WaitForSingleObjectEx(child.id, 0, false) catch return err;
-                },
-                else => return err,
-            };
-        }
-        return child.wait();
-    }
+    fn read_file(self: *Toolchain, io: std.Io, path: []const u8) ![]const u8 {
+        var f = try std.Io.Dir.cwd().openFile(io, path, .{});
+        defer f.close(io);
 
-    fn read_file(self: *Toolchain, path: []const u8) ![]const u8 {
-        var f = try std.fs.cwd().openFile(path, .{});
-        defer f.close();
-        return f.readToEndAlloc(self.alloc, 0x100000000);
+        var buf: [16384]u8 = undefined;
+        var reader = f.reader(io, &buf);
+        return try reader.interface.allocRemaining(self.alloc, .limited(0x100000000));
     }
 
     fn parse_glb_input_fit_signal(out: *GLB_Fit_Data, raw: []const u8, dev: *const Device_Info) !void {
@@ -1165,15 +1148,15 @@ pub const Toolchain = struct {
         }
     }
 
-    pub fn clean_temp_dir(self: *Toolchain) !void {
+    pub fn clean_temp_dir(self: *Toolchain, io: std.Io) !void {
         if (@import("builtin").mode != .Debug) {
             var n: u8 = 0;
             const max: u8 = 20;
             while (n <= max) : (n += 1) {
                 var retry = false;
                 var iter = self.dir.iterate();
-                while (try iter.next()) |entry| {
-                    self.dir.deleteFile(entry.name) catch |err| switch (err) {
+                while (try iter.next(io)) |entry| {
+                    self.dir.deleteFile(io, entry.name) catch |err| switch (err) {
                         error.FileBusy => {
                             if (n < max) {
                                 retry = true;
@@ -1186,7 +1169,7 @@ pub const Toolchain = struct {
                 }
 
                 if (retry) {
-                    std.time.sleep(10_000_000 * @as(u64, n));
+                    std.Io.sleep(io, .fromSeconds(n)) catch {};
                 } else {
                     break;
                 }

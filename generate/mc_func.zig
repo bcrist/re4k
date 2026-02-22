@@ -10,7 +10,7 @@ const Design = toolchain.Design;
 
 pub const main = helper.main;
 
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, mcref: lc4k.MC_Ref, func: lc4k.Macrocell_Function) !toolchain.Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, mcref: lc4k.MC_Ref, func: lc4k.Macrocell_Function) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
 
     try design.node_assignment(.{
@@ -37,26 +37,26 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
         },
     }
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "mc_func_glb{}_mc{}_{s}", .{ mcref.glb, mcref.mc, @tagName(func) }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "mc_func_glb{}_mc{}_{s}", .{ mcref.glb, mcref.mc, @tagName(func) }, results);
     try results.check_term();
     return results;
 }
 
 var defaults = std.EnumMap(lc4k.Macrocell_Function, usize) {};
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("macrocell_function");
 
     var mc_iter = helper.Macrocell_Iterator { .dev = dev };
     while (mc_iter.next()) |mcref| {
-        try tc.clean_temp_dir();
+        try tc.clean_temp_dir(io);
         helper.reset_temp();
 
         var data = std.EnumMap(lc4k.Macrocell_Function, JEDEC_Data) {};
         for (std.enums.values(lc4k.Macrocell_Function)) |reg_type| {
-            const results = try run_toolchain(ta, tc, dev, mcref, reg_type);
+            const results = try run_toolchain(io, ta, tc, dev, mcref, reg_type);
             data.put(reg_type, results.jedec);
         }
 

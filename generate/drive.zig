@@ -15,7 +15,7 @@ const Drive_Type = lc4k.Drive_Type;
 
 pub const main = helper.main;
 
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: Pin_Info, drive: Drive_Type) !toolchain.Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: Pin_Info, drive: Drive_Type) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
     try design.pin_assignment(.{
         .signal = "out",
@@ -24,13 +24,13 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
     });
     try design.add_pt("in", "out");
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "drive_pin_{s}", .{ pin.id }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "drive_pin_{s}", .{ pin.id }, results);
     try results.check_term();
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     var maybe_fallback_fuses: ?std.AutoHashMap(MC_Ref, []const helper.Fuse_And_Value) = null;
     if (helper.get_input_file("drive.sx")) |_| {
         maybe_fallback_fuses = try helper.parse_fuses_for_output_pins(ta, pa, "drive.sx", "drive_type", null);
@@ -63,11 +63,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
             }
         }
 
-        try tc.clean_temp_dir();
+        try tc.clean_temp_dir(io);
         helper.reset_temp();
 
-        const results_pp = try run_toolchain(ta, tc, dev, pin, .push_pull);
-        const results_od = try run_toolchain(ta, tc, dev, pin, .open_drain);
+        const results_pp = try run_toolchain(io, ta, tc, dev, pin, .push_pull);
+        const results_od = try run_toolchain(io, ta, tc, dev, pin, .open_drain);
 
         try helper.write_pin(writer, pin);
 

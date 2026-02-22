@@ -17,7 +17,7 @@ const BCLK_Mode = enum {
     both_inverted,
 };
 
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, glb: u8, mode01: BCLK_Mode, mode23: BCLK_Mode) !toolchain.Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, glb: u8, mode01: BCLK_Mode, mode23: BCLK_Mode) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
 
     const clocks = dev.clock_pins;
@@ -100,13 +100,13 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
         },
     }
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "bclk_polarity_glb{}_{s}_{s}", .{ glb, @tagName(mode01), @tagName(mode23) }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "bclk_polarity_glb{}_{s}_{s}", .{ glb, @tagName(mode01), @tagName(mode23) }, results);
     try results.check_term();
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("bclk_polarity");
 
@@ -122,14 +122,14 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
             try writer.int(base_clk, 10);
             try writer.int(base_clk + 1, 10);
 
-            try tc.clean_temp_dir();
+            try tc.clean_temp_dir(io);
             helper.reset_temp();
 
             var jeds = std.EnumMap(BCLK_Mode, JEDEC_Data) {};
             for (std.enums.values(BCLK_Mode)) |mode| {
                 const results = switch (base_clk) {
-                    0 => try run_toolchain(ta, tc, dev, glb, mode, .both_non_inverted),
-                    2 => try run_toolchain(ta, tc, dev, glb, .both_non_inverted, mode),
+                    0 => try run_toolchain(io, ta, tc, dev, glb, mode, .both_non_inverted),
+                    2 => try run_toolchain(io, ta, tc, dev, glb, .both_non_inverted, mode),
                     else => unreachable,
                 };
                 jeds.put(mode, results.jedec);

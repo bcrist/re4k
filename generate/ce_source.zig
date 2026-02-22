@@ -17,7 +17,7 @@ const CE_Source = enum {
 
 pub const main = helper.main;
 
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, mcref: lc4k.MC_Ref, src: CE_Source) !toolchain.Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, mcref: lc4k.MC_Ref, src: CE_Source) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
     const scratch_base: u8 = if (mcref.mc < 8) 8 else 1;
 
@@ -69,21 +69,21 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
         },
     }
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "ce_mux_glb{}_mc{}_{s}", .{ mcref.glb, mcref.mc, @tagName(src) }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "ce_mux_glb{}_mc{}_{s}", .{ mcref.glb, mcref.mc, @tagName(src) }, results);
     try results.check_term();
     return results;
 }
 
 var defaults = std.EnumMap(CE_Source, usize) {};
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("clock_enable_source");
 
     var mc_iter = helper.Macrocell_Iterator { .dev = dev };
     while (mc_iter.next()) |mcref| {
-        try tc.clean_temp_dir();
+        try tc.clean_temp_dir(io);
         helper.reset_temp();
 
         var data = std.EnumMap(CE_Source, JEDEC_Data) {};
@@ -92,7 +92,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         var diff = try JEDEC_Data.init_empty(ta, dev.jedec_dimensions);
 
         for (std.enums.values(CE_Source)) |src| {
-            const results = try run_toolchain(ta, tc, dev, mcref, src);
+            const results = try run_toolchain(io, ta, tc, dev, mcref, src);
             data.put(src, results.jedec);
 
             if (src != .always) {

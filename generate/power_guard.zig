@@ -12,7 +12,7 @@ const Input_Iterator = helper.Input_Iterator;
 
 pub const main = helper.main;
 
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: lc4k.Pin_Info, pg_enabled: bool) !toolchain.Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: lc4k.Pin_Info, pg_enabled: bool) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
 
     try design.node_assignment(.{
@@ -56,8 +56,8 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
         }
     }
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "power_guard_pin_{s}_{}", .{ pin.id, pg_enabled }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "power_guard_pin_{s}_{}", .{ pin.id, pg_enabled }, results);
     try results.check_term();
     return results;
 }
@@ -65,17 +65,17 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
 var default_enabled: ?u1 = null;
 var default_disabled: ?u1 = null;
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("power_guard");
 
     var pin_iter = Input_Iterator { .pins = dev.all_pins };
     while (pin_iter.next()) |pin| {
-        try tc.clean_temp_dir();
+        try tc.clean_temp_dir(io);
         helper.reset_temp();
 
-        const results_enabled = try run_toolchain(ta, tc, dev, pin, true);
-        const results_disabled = try run_toolchain(ta, tc, dev, pin, false);
+        const results_enabled = try run_toolchain(io, ta, tc, dev, pin, true);
+        const results_disabled = try run_toolchain(io, ta, tc, dev, pin, false);
 
         const diff = try JEDEC_Data.init_diff(ta, results_enabled.jedec, results_disabled.jedec);
 

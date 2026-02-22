@@ -11,7 +11,7 @@ const MC_Ref = lc4k.MC_Ref;
 
 pub const main = helper.main;
 
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: lc4k.Pin_Info, inreg: bool) !toolchain.Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: lc4k.Pin_Info, inreg: bool) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
 
     try design.pin_assignment(.{
@@ -57,13 +57,13 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
     });
     try design.add_pt("in", "out.D");
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "input_reg_pin_{s}_{}", .{ pin.id, inreg }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "input_reg_pin_{s}_{}", .{ pin.id, inreg }, results);
     try results.check_term();
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     var maybe_fallback_fuses: ?std.AutoHashMap(MC_Ref, []const helper.Fuse_And_Value) = null;
     if (helper.get_input_file("input_bypass.sx")) |_| {
         maybe_fallback_fuses = try helper.parse_fuses_for_output_pins(ta, pa, "input_bypass.sx", "macrocell_data", null);
@@ -93,11 +93,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
             }
         }
 
-        try tc.clean_temp_dir();
+        try tc.clean_temp_dir(io);
         helper.reset_temp();
 
-        const results_none = try run_toolchain(ta, tc, dev, pin, false);
-        const results_inreg = try run_toolchain(ta, tc, dev, pin, true);
+        const results_none = try run_toolchain(io, ta, tc, dev, pin, false);
+        const results_inreg = try run_toolchain(io, ta, tc, dev, pin, true);
 
         var diff = try JEDEC_Data.init_diff(ta, results_none.jedec, results_inreg.jedec);
 

@@ -11,7 +11,7 @@ const Fuse = lc4k.Fuse;
 
 pub const main = helper.main;
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     const sptclk_polarity_fuses = try helper.parse_shared_pt_clock_polarity_fuses(ta, pa, dev);
 
     try writer.expression_expanded(@tagName(dev.device));
@@ -55,4 +55,5 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
     try writer.done();
 
     _ = tc;
+    _ = io;
 }

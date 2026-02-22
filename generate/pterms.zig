@@ -12,7 +12,7 @@ const GLB_Input_Signal = toolchain.GLB_Input_Signal;
 
 pub const main = helper.main;
 
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, mcref: lc4k.MC_Ref) !toolchain.Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, mcref: lc4k.MC_Ref) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
 
     // Coercing the fitter to reliably place specific signals on the block init and block OE pterms is difficult.
@@ -72,8 +72,8 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
     try design.add_pt("pt1", "out.C");
     try design.add_pt("pt2", "out.CE");
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "pterms_glb{}_mc{}", .{ mcref.glb, mcref.mc }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "pterms_glb{}_mc{}", .{ mcref.glb, mcref.mc }, results);
     try results.check_term();
     return results;
 }
@@ -159,7 +159,7 @@ fn parseJedecColumn(jed: JEDEC_Data, column: u16, dev: *const Device_Info, glb: 
     return routing;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     const gi_routing = try helper.parse_grp(ta, pa, null);
 
     try writer.expression_expanded(@tagName(dev.device));
@@ -184,7 +184,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
 
     var mc_iter = helper.Macrocell_Iterator { .dev = dev };
     while (mc_iter.next()) |mcref| {
-        try tc.clean_temp_dir();
+        try tc.clean_temp_dir(io);
         helper.reset_temp();
 
         if (mcref.mc == 0) {
@@ -194,7 +194,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         try helper.write_mc(writer, mcref.mc);
         writer.set_compact(false);
 
-        var results = try run_toolchain(ta, tc, dev, mcref);
+        var results = try run_toolchain(io, ta, tc, dev, mcref);
 
         results.jedec.put_range(dev.get_options_range(), 1);
 

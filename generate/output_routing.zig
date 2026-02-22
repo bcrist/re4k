@@ -11,7 +11,7 @@ const MC_Ref = lc4k.MC_Ref;
 
 pub const main = helper.main;
 
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: lc4k.Pin_Info, offset: u3) !toolchain.Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: lc4k.Pin_Info, offset: u3) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
 
     try design.pin_assignment(.{
@@ -44,13 +44,13 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
         }
     }
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "orm_{s}_plus{}", .{ pin.id, offset }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "orm_{s}_plus{}", .{ pin.id, offset }, results);
     try results.check_term();
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     var maybe_fallback_fuses: ?std.AutoHashMap(MC_Ref, []const helper.Fuse_And_Value) = null;
     if (helper.get_input_file("output_routing.sx")) |_| {
         maybe_fallback_fuses = try helper.parse_fuses_for_output_pins(ta, pa, "output_routing.sx", "output_routing", null);
@@ -80,12 +80,12 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
             }
         }
 
-        try tc.clean_temp_dir();
+        try tc.clean_temp_dir(io);
         helper.reset_temp();
 
-        const results_1 = try run_toolchain(ta, tc, dev, pin, 1);
-        const results_2 = try run_toolchain(ta, tc, dev, pin, 2);
-        const results_4 = try run_toolchain(ta, tc, dev, pin, 4);
+        const results_1 = try run_toolchain(io, ta, tc, dev, pin, 1);
+        const results_2 = try run_toolchain(io, ta, tc, dev, pin, 2);
+        const results_4 = try run_toolchain(io, ta, tc, dev, pin, 4);
 
         var diff = try JEDEC_Data.init_diff(ta, results_1.jedec, results_2.jedec);
         diff.union_diff(results_1.jedec, results_4.jedec);

@@ -11,13 +11,13 @@ const Fuse = lc4k.Fuse;
 
 pub const main = helper.main;
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     const input_file = helper.get_input_file("bclk_polarity.sx") orelse return error.MissingInputFile;
     const input_dev = Device_Info.init(input_file.device_type);
     std.debug.assert(input_dev.num_glbs == dev.num_glbs);
     std.debug.assert(input_dev.jedec_dimensions.eql(dev.jedec_dimensions));
 
-    var reader = std.io.Reader.fixed(input_file.contents);
+    var reader = std.Io.Reader.fixed(input_file.contents);
     var parser = sx.reader(ta, &reader);
     defer parser.deinit();
 
@@ -32,6 +32,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
 
     _ = pa;
     _ = tc;
+    _ = io;
 }
 
 fn parseAndWrite(dev: *const Device_Info, parser: *sx.Reader, writer: *sx.Writer) !void {

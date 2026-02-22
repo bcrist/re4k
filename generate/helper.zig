@@ -17,15 +17,15 @@ const Pin_Info = lc4k.Pin_Info;
 
 var temp_alloc = Temp_Allocator {};
 
-pub var stdout: *std.io.Writer = undefined;
-pub var stderr: *std.io.Writer = undefined;
+pub var stdout: *std.Io.Writer = undefined;
+pub var stderr: *std.Io.Writer = undefined;
 
-pub fn main() !void {
+pub fn main(init: std.process.Init) !void {
     var stdout_buf: [4096]u8 = undefined;
     var stderr_buf: [64]u8 = undefined;
 
-    var stdout_writer = std.fs.File.stdout().writer(&stdout_buf);
-    var stderr_writer = std.fs.File.stdout().writer(&stderr_buf);
+    var stdout_writer = std.Io.File.stdout().writer(init.io, &stdout_buf);
+    var stderr_writer = std.Io.File.stdout().writer(init.io, &stderr_buf);
 
     stdout = &stdout_writer.interface;
     stderr = &stderr_writer.interface;
@@ -33,7 +33,7 @@ pub fn main() !void {
     defer stdout.flush() catch {};
     defer stderr.flush() catch {};
 
-    try run();
+    try run(init.io, init.minimal.args);
 }
 
 pub fn reset_temp() void {
@@ -59,7 +59,7 @@ pub fn get_input_file(filename: []const u8) ?Input_File_Data {
 
 var slow_mode = false;
 
-fn run() !void {
+fn run(io: std.Io, args: std.process.Args) !void {
     temp_alloc = try Temp_Allocator.init(0x1000_00000);
     defer temp_alloc.deinit();
 
@@ -69,20 +69,20 @@ fn run() !void {
     const ta = temp_alloc.allocator();
     const pa = perm_alloc.allocator();
 
-    var args = try std.process.ArgIterator.initWithAllocator(pa);
-    _ = args.next() orelse std.process.exit(255);
+    var args_iter = try args.iterateAllocator(pa);
+    _ = args_iter.next() orelse std.process.exit(255);
 
-    const out_path = args.next() orelse return error.NeedOutputPath;
-    const out_dir_path = std.fs.path.dirname(out_path) orelse return error.InvalidOutputPath;
-    const out_filename = std.fs.path.basename(out_path);
-    const device_str = std.fs.path.basename(out_dir_path);
+    const out_path = args_iter.next() orelse return error.NeedOutputPath;
+    const out_dir_path = std.Io.Dir.path.dirname(out_path) orelse return error.InvalidOutputPath;
+    const out_filename = std.Io.Dir.path.basename(out_path);
+    const device_str = std.Io.Dir.path.basename(out_dir_path);
     const device_type = Device_Type.parse(device_str) orelse return error.InvalidDevice;
 
-    var out_dir = try std.fs.cwd().makeOpenPath(out_dir_path, .{});
-    defer out_dir.close();
+    var out_dir = try std.Io.Dir.cwd().createDirPathOpen(io, out_dir_path, .{});
+    defer out_dir.close(io);
 
     var keep = false;
-    while (args.next()) |arg| {
+    while (args_iter.next()) |arg| {
         if (std.mem.eql(u8, arg, "--keep")) {
             keep = true;
         } else if (std.mem.eql(u8, arg, "--reports")) {
@@ -92,12 +92,12 @@ fn run() !void {
         } else if (std.mem.eql(u8, arg, "--slow")) {
             slow_mode = true;
         } else {
-            const in_dir_path = std.fs.path.dirname(arg) orelse return error.InvalidInputPath;
-            const in_filename = std.fs.path.basename(arg);
-            const in_device_str = std.fs.path.basename(in_dir_path);
+            const in_dir_path = std.Io.Dir.path.dirname(arg) orelse return error.InvalidInputPath;
+            const in_filename = std.Io.Dir.path.basename(arg);
+            const in_device_str = std.Io.Dir.path.basename(in_dir_path);
             const in_device_type = Device_Type.parse(in_device_str) orelse return error.InvalidDevice;
 
-            const contents = try std.fs.cwd().readFileAlloc(pa, arg, 100_000_000);
+            const contents = try std.Io.Dir.cwd().readFileAlloc(io, arg, pa, .limited(100_000_000));
             try input_files.put(pa, in_filename, .{
                 .contents = contents,
                 .filename = in_filename,
@@ -106,20 +106,23 @@ fn run() !void {
         }
     }
 
-    var buf: [4096]u8 = undefined;
-    var atf = try out_dir.atomicFile(out_filename, .{
-        .write_buffer = &buf,
+    var atf = try out_dir.createFileAtomic(io, out_filename, .{
+        .make_path = true,
+        .replace = true,
     });
-    defer atf.deinit();
+    defer atf.deinit(io);
 
-    var sx_writer = sx.writer(pa, &atf.file_writer.interface);
+    var buf: [4096]u8 = undefined;
+    var atf_writer = atf.file.writer(io, &buf);
+
+    var sx_writer = sx.writer(pa, &atf_writer.interface);
     defer sx_writer.deinit();
 
-    var tc = try Toolchain.init(ta);
-    defer tc.deinit(keep);
+    var tc = try Toolchain.init(io, ta);
+    defer tc.deinit(io, keep);
 
     const dev = Device_Info.init(device_type);
-    try root.run(ta, pa, &tc, &dev, &sx_writer);
+    try root.run(io, ta, pa, &tc, &dev, &sx_writer);
 
     var input_file_iter = input_files.iterator();
     while (input_file_iter.next()) |entry| {
@@ -128,39 +131,40 @@ fn run() !void {
         }
     }
 
-    try atf.finish();
+    try atf_writer.interface.flush();
+    try atf.replace(io);
 }
 
-var report_dir: ?*std.fs.Dir = null;
-var jed_dir: ?*std.fs.Dir = null;
+var report_dir: ?*std.Io.Dir = null;
+var jed_dir: ?*std.Io.Dir = null;
 
-pub fn log_results(device_type: Device_Type, comptime name_fmt: []const u8, name_args: anytype, results: toolchain.Fit_Results) !void {
+pub fn log_results(io: std.Io, device_type: Device_Type, comptime name_fmt: []const u8, name_args: anytype, results: toolchain.Fit_Results) !void {
     if (report_dir) |dir| {
         const filename = try std.fmt.allocPrint(temp_alloc.allocator(), name_fmt ++ ".rpt", name_args);
-        var f = try dir.createFile(filename, .{});
-        defer f.close();
+        var f = try dir.createFile(io, filename, .{});
+        defer f.close(io);
 
-        var writer = f.writer(&.{});
+        var writer = f.writer(io, &.{});
         try writer.interface.writeAll(results.report);
     }
     if (jed_dir) |dir| {
         const filename = try std.fmt.allocPrint(temp_alloc.allocator(), name_fmt ++ ".jed", name_args);
-        var f = try dir.createFile(filename, .{});
-        defer f.close();
+        var f = try dir.createFile(io, filename, .{});
+        defer f.close(io);
 
         const jed = lc4k.JEDEC_File {
             .data = results.jedec,
         };
 
         var buf: [4096]u8 = undefined;
-        var writer = f.writer(&buf);
+        var writer = f.writer(io, &buf);
 
         try jed.write(device_type, &writer.interface, .{ .one_char = '.' });
     }
     if (slow_mode) {
         try stdout.writeAll("Press enter to continue...\n");
         try stdout.flush();
-        var reader = std.fs.File.stdin().readerStreaming(&.{});
+        var reader = std.Io.File.stdin().readerStreaming(io, &.{});
         while ('\n' != reader.interface.takeByte() catch '\n') {}
     }
 }
@@ -413,7 +417,7 @@ pub fn parse_grp(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*Dev
         try pin_number_to_info.put(pin.id, pin);
     }
 
-    var reader = std.io.Reader.fixed(input_file.contents);
+    var reader = std.Io.Reader.fixed(input_file.contents);
     var parser = sx.reader(ta, &reader);
     defer parser.deinit();
 
@@ -559,7 +563,7 @@ pub fn parse_fuses_for_output_pins(ta: std.mem.Allocator, pa: std.mem.Allocator,
 
     var results = std.AutoHashMap(MC_Ref, []const Fuse_And_Value).init(pa);
 
-    var reader = std.io.Reader.fixed(input_file.contents);
+    var reader = std.Io.Reader.fixed(input_file.contents);
     var parser = sx.reader(ta, &reader);
     defer parser.deinit();
 
@@ -636,7 +640,7 @@ pub fn parse_fuses_for_macrocells(ta: std.mem.Allocator, pa: std.mem.Allocator, 
 
     var results = std.AutoHashMap(MC_Ref, []const Fuse_And_Value).init(pa);
 
-    var reader = std.io.Reader.fixed(input_file.contents);
+    var reader = std.Io.Reader.fixed(input_file.contents);
     var parser = sx.reader(ta, &reader);
     defer parser.deinit();
 
@@ -689,7 +693,7 @@ pub fn parse_mc_options_columns(ta: std.mem.Allocator, pa: std.mem.Allocator, ou
     var results = std.AutoHashMap(MC_Ref, Fuse_Range).init(pa);
     try results.ensureTotalCapacity(@intCast(dev.num_mcs));
 
-    var reader = std.io.Reader.fixed(input_file.contents);
+    var reader = std.Io.Reader.fixed(input_file.contents);
     var parser = sx.reader(ta, &reader);
     defer parser.deinit();
 
@@ -750,7 +754,7 @@ pub fn parse_orm_rows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: 
 
     var results = try std.DynamicBitSet.initEmpty(pa, dev.jedec_dimensions.height());
 
-    var reader = std.io.Reader.fixed(input_file.contents);
+    var reader = std.Io.Reader.fixed(input_file.contents);
     var parser = sx.reader(ta, &reader);
     defer parser.deinit();
 
@@ -837,7 +841,7 @@ pub fn parse_shared_pt_clock_polarity_fuses(ta: std.mem.Allocator, pa: std.mem.A
 
     const results = try pa.alloc(Fuse, dev.num_glbs);
 
-    var reader = std.io.Reader.fixed(input_file.contents);
+    var reader = std.Io.Reader.fixed(input_file.contents);
     var parser = sx.reader(ta, &reader);
     defer parser.deinit();
 

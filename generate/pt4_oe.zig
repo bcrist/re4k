@@ -14,7 +14,7 @@ const Pin_Info = lc4k.Pin_Info;
 
 pub const main = helper.main;
 
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, mcref: MC_Ref, pt4_oe: bool) !toolchain.Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, mcref: MC_Ref, pt4_oe: bool) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
 
     try design.node_assignment(.{ .signal = "node0" });
@@ -88,8 +88,8 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
         n += 1;
     }
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "pt4_oe_glb{}_mc{}_{}", .{ mcref.glb, mcref.mc, pt4_oe }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "pt4_oe_glb{}_mc{}_{}", .{ mcref.glb, mcref.mc, pt4_oe }, results);
     try results.check_term();
     return results;
 }
@@ -97,8 +97,8 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
 var default_off: ?usize = null;
 var default_on: ?usize = null;
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
-    var oe_src_rows = try parseOESourceRows(ta, pa, null);
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+    var oe_src_rows = try parse_oe_source_rows(ta, pa, null);
 
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("pt4_output_enable");
@@ -109,11 +109,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
             try helper.write_glb(writer, mcref.glb);
         }
 
-        try tc.clean_temp_dir();
+        try tc.clean_temp_dir(io);
         helper.reset_temp();
 
-        const results_off = try run_toolchain(ta, tc, dev, mcref, false);
-        const results_on = try run_toolchain(ta, tc, dev, mcref, true);
+        const results_off = try run_toolchain(io, ta, tc, dev, mcref, false);
+        const results_on = try run_toolchain(io, ta, tc, dev, mcref, true);
 
         var diff = try JEDEC_Data.init_diff(ta, results_off.jedec, results_on.jedec);
 
@@ -185,17 +185,17 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
 }
 
 
-fn parseOESourceRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*Device_Info) !std.DynamicBitSet {
+fn parse_oe_source_rows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*Device_Info) !std.DynamicBitSet {
     const input_file = helper.get_input_file("oe_source.sx") orelse return error.MissingOESourceInputFile;
     const dev = Device_Info.init(input_file.device_type);
 
     var results = try std.DynamicBitSet.initEmpty(pa, dev.jedec_dimensions.height());
 
-    var reader = std.io.Reader.fixed(input_file.contents);
+    var reader = std.Io.Reader.fixed(input_file.contents);
     var parser = sx.reader(ta, &reader);
     defer parser.deinit();
 
-    parseOESourceRows0(&parser, &results) catch |e| switch (e) {
+    parse_oe_source_rows_0(&parser, &results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
             var ctx = try parser.token_context();
             try ctx.print_for_string(input_file.contents, helper.stderr, 120);
@@ -211,7 +211,7 @@ fn parseOESourceRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?
     return results;
 }
 
-fn parseOESourceRows0(parser: *sx.Reader, results: *std.DynamicBitSet) !void {
+fn parse_oe_source_rows_0(parser: *sx.Reader, results: *std.DynamicBitSet) !void {
     _ = try parser.require_any_expression(); // device name, we already know it
     try parser.require_expression("output_enable_source");
 

@@ -21,7 +21,7 @@ const max_routed_signals = 33;
 pub const main = helper.main;
 
 var report_number: usize = 0;
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, signals_to_test: GLB_Input_Set, all_signals: []const GLB_Input_Fit_Signal) !Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, signals_to_test: GLB_Input_Set, all_signals: []const GLB_Input_Fit_Signal) !Fit_Results {
     var design = Design.init(ta, dev);
 
     var temp_signal_names_storage = [_][]const u8 { "" } ** 36;
@@ -62,8 +62,8 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
     design.parse_glb_inputs = true;
     design.max_fit_time_ms = 500;
 
-    const results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "grp_{}", .{ report_number }, results);
+    const results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "grp_{}", .{ report_number }, results);
     report_number += 1;
     //try results.check_term();
     return results;
@@ -156,6 +156,7 @@ const GLB_Data = struct {
 };
 
 const Test_Data = struct {
+    io: std.Io,
     ta: std.mem.Allocator,
     tc: *Toolchain,
     rng: std.Random.Xoshiro256,
@@ -165,16 +166,20 @@ const Test_Data = struct {
     tested_input_sets: std.AutoHashMap(GLB_Input_Set, void),
     dead_branches: usize = 0,
 
-    pub fn init(ta: std.mem.Allocator, pa: std.mem.Allocator, gpa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info) !Test_Data {
+    pub fn init(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, gpa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info) !Test_Data {
         const glbs = try pa.alloc(GLB_Data, dev.num_glbs);
         for (glbs, 0..) |*glb, i| {
             glb.* = try GLB_Data.init(gpa, dev, @intCast(i));
         }
 
+        var seed: [@sizeOf(u64)]u8 = undefined;
+        std.Io.random(io, &seed);
+
         return Test_Data {
+            .io = io,
             .ta = ta,
             .tc = tc,
-            .rng = std.Random.Xoshiro256.init(@bitCast(std.time.milliTimestamp())),
+            .rng = std.Random.Xoshiro256.init(@bitCast(seed)),
             .dev = dev,
             .all_signals = try get_all_signals(pa, dev),
             .glbs = glbs,
@@ -198,10 +203,10 @@ const Test_Data = struct {
 
         try self.tested_input_sets.put(signals_to_test, {});
 
-        try self.tc.clean_temp_dir();
+        try self.tc.clean_temp_dir(self.io);
         helper.reset_temp();
 
-        const results = try run_toolchain(self.ta, self.tc, self.dev, signals_to_test, self.all_signals);
+        const results = try run_toolchain(self.io, self.ta, self.tc, self.dev, signals_to_test, self.all_signals);
         var fuses_found: ?usize = null;
         for (self.glbs) |*glb| {
             const found = try glb.analyze_results(results);
@@ -336,13 +341,13 @@ const Test_Data = struct {
 };
 
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("global_routing_pool");
 
     var gpa = std.heap.GeneralPurposeAllocator(.{ .thread_safe = false }) {};
 
-    var test_data = try Test_Data.init(ta, pa, gpa.allocator(), tc, dev);
+    var test_data = try Test_Data.init(io, ta, pa, gpa.allocator(), tc, dev);
     const expected_fuses_per_glb = dev.get_gi_range(0, 0).count() * 36;
 
     // First we start off by simply randomly selecting signals to route.

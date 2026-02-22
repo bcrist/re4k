@@ -10,7 +10,7 @@ const Design = toolchain.Design;
 
 pub const main = helper.main;
 
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: lc4k.Pin_Info, pull: lc4k.Bus_Maintenance) !toolchain.Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: lc4k.Pin_Info, pull: lc4k.Bus_Maintenance) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
     try design.node_assignment(.{
         .signal = "out",
@@ -24,13 +24,13 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
     });
     try design.add_pt("in", "out");
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "bus_maintenance_pin{s}_{s}", .{ pin.id, @tagName(pull) }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "bus_maintenance_pin{s}_{s}", .{ pin.id, @tagName(pull) }, results);
     try results.check_term();
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("bus_maintenance");
 
@@ -55,13 +55,13 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
             },
         }
 
-        try tc.clean_temp_dir();
+        try tc.clean_temp_dir(io);
         helper.reset_temp();
 
-        const results_float = try run_toolchain(ta, tc, dev, pin, .float);
-        const results_pulldown = try run_toolchain(ta, tc, dev, pin, .pulldown);
-        const results_pullup = try run_toolchain(ta, tc, dev, pin, .pullup);
-        const results_keeper = try run_toolchain(ta, tc, dev, pin, .keeper);
+        const results_float = try run_toolchain(io, ta, tc, dev, pin, .float);
+        const results_pulldown = try run_toolchain(io, ta, tc, dev, pin, .pulldown);
+        const results_pullup = try run_toolchain(io, ta, tc, dev, pin, .pullup);
+        const results_keeper = try run_toolchain(io, ta, tc, dev, pin, .keeper);
 
         var diff = try JEDEC_Data.init_diff(ta, results_pullup.jedec, results_pulldown.jedec);
         diff.union_diff(results_keeper.jedec, results_pulldown.jedec);

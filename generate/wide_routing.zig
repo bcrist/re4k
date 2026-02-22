@@ -11,7 +11,7 @@ const Fuse = lc4k.Fuse;
 
 pub const main = helper.main;
 
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, mcref: lc4k.MC_Ref, pts: u8, report_mcref: lc4k.MC_Ref) !toolchain.Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, mcref: lc4k.MC_Ref, pts: u8, report_mcref: lc4k.MC_Ref) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
 
     try design.pin_assignment(.{ .signal = "x0" });
@@ -39,16 +39,16 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
         try design.add_pt(signals, "out.D-");
     }
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "wide_routing_glb{}_mc{}_pts{}", .{ report_mcref.glb, report_mcref.mc, pts }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "wide_routing_glb{}_mc{}_pts{}", .{ report_mcref.glb, report_mcref.mc, pts }, results);
     try results.check_term();
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     //var mc_columns = try helper.parseMCOptionsColumns(ta, pa, null);
     //var orm_rows = try helper.parseORMRows(ta, pa, null);
-    var cluster_routing = try parseClusterRoutingRows(ta, pa, null);
+    var cluster_routing = try parse_cluster_routing_rows(ta, pa, null);
 
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("wide_routing");
@@ -62,7 +62,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         // when enabled, we'll be using mcref.mc + 4 as the primary output.
         // when not enabled, we'll do 5 pts into mcref.mc, 5 into mcref.mc + 4, and the +1/+2/-1 mcs surrounding it, if they exist
 
-        try tc.clean_temp_dir();
+        try tc.clean_temp_dir(io);
         helper.reset_temp();
 
         if (mcref.mc == 0) {
@@ -79,8 +79,8 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         if (wide_mcref.mc < 14) narrow_pts += 5;
         if (wide_mcref.mc < 15) narrow_pts += 5;
 
-        const results_wide = try run_toolchain(ta, tc, dev, wide_mcref, 25, mcref);
-        const results_narrow = try run_toolchain(ta, tc, dev, wide_mcref, narrow_pts, mcref);
+        const results_wide = try run_toolchain(io, ta, tc, dev, wide_mcref, 25, mcref);
+        const results_narrow = try run_toolchain(io, ta, tc, dev, wide_mcref, narrow_pts, mcref);
 
         var diff = try JEDEC_Data.init_diff(ta, results_narrow.jedec, results_wide.jedec);
 
@@ -138,17 +138,17 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
 }
 
 
-fn parseClusterRoutingRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*Device_Info) !std.DynamicBitSet {
+fn parse_cluster_routing_rows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*Device_Info) !std.DynamicBitSet {
     const input_file = helper.get_input_file("cluster_routing.sx") orelse return error.MissingClusterRoutingInputFile;
     const dev = Device_Info.init(input_file.device_type);
 
     var results = try std.DynamicBitSet.initEmpty(pa, dev.jedec_dimensions.height());
 
-    var reader = std.io.Reader.fixed(input_file.contents);
+    var reader = std.Io.Reader.fixed(input_file.contents);
     var parser = sx.reader(ta, &reader);
     defer parser.deinit();
 
-    parseClusterRoutingRows0(&parser, &results) catch |e| switch (e) {
+    parse_cluster_routing_rows_0(&parser, &results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
             var ctx = try parser.token_context();
             try ctx.print_for_string(input_file.contents, helper.stderr, 120);
@@ -164,7 +164,7 @@ fn parseClusterRoutingRows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_dev
     return results;
 }
 
-fn parseClusterRoutingRows0(parser: *sx.Reader, results: *std.DynamicBitSet) !void {
+fn parse_cluster_routing_rows_0(parser: *sx.Reader, results: *std.DynamicBitSet) !void {
     _ = try parser.require_any_expression(); // device name, we already know it
     try parser.require_expression("cluster_routing");
 

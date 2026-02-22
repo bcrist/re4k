@@ -1,5 +1,3 @@
-const std = @import("std");
-
 pub fn build(b: *std.Build) void {
     const ctx = .{
         .target = b.standardTargetOptions(.{}),
@@ -58,3 +56,5 @@ fn make_exe(b: *std.Build, ctx: anytype, comptime name: []const u8) void {
     });
     b.installArtifact(exe);
 }
+
+const std = @import("std");

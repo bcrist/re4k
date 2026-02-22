@@ -21,7 +21,7 @@ const ClockSource = enum {
 
 pub const main = helper.main;
 
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, mcref: lc4k.MC_Ref, src: ClockSource) !toolchain.Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, mcref: lc4k.MC_Ref, src: ClockSource) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
 
     const clocks = dev.clock_pins;
@@ -122,21 +122,21 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
         },
     }
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "clk_mux_glb{}_mc{}_{s}", .{ mcref.glb, mcref.mc, @tagName(src) }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "clk_mux_glb{}_mc{}_{s}", .{ mcref.glb, mcref.mc, @tagName(src) }, results);
     try results.check_term();
     return results;
 }
 
 var defaults = std.EnumMap(ClockSource, usize) {};
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("clock_source");
 
     var mc_iter = helper.Macrocell_Iterator { .dev = dev };
     while (mc_iter.next()) |mcref| {
-        try tc.clean_temp_dir();
+        try tc.clean_temp_dir(io);
         helper.reset_temp();
 
         var data = std.EnumMap(ClockSource, JEDEC_Data) {};
@@ -145,7 +145,7 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         var diff = try JEDEC_Data.init_empty(ta, dev.jedec_dimensions);
 
         for (std.enums.values(ClockSource)) |src| {
-            const results = try run_toolchain(ta, tc, dev, mcref, src);
+            const results = try run_toolchain(io, ta, tc, dev, mcref, src);
             data.put(src, results.jedec);
         }
 

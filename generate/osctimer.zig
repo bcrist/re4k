@@ -16,7 +16,7 @@ const Polarity = enum {
     negative,
 };
 
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, osc_out: bool, timer_out: bool, disable: bool, reset: bool, div: lc4k.Timer_Divisor, glb: u8) !toolchain.Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, osc_out: bool, timer_out: bool, disable: bool, reset: bool, div: lc4k.Timer_Divisor, glb: u8) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
 
     if (osc_out or timer_out) {
@@ -68,27 +68,27 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
         _ = pin_iter.next();
     }
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "osctimer_{}_{}_{}_{}_{s}", .{ osc_out, timer_out, disable, reset, @tagName(div) }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "osctimer_{}_{}_{}_{}_{s}", .{ osc_out, timer_out, disable, reset, @tagName(div) }, results);
     try results.check_term();
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("osctimer");
 
 
     {
-        const results_none = try run_toolchain(ta, tc, dev, false, false, false, false, .div_1048576, 0);
-        const results_both = try run_toolchain(ta, tc, dev, true, true, false, false, .div_1048576, 0);
-        const results_osc = try run_toolchain(ta, tc, dev, true, false, false, false, .div_1048576, 0);
-        const results_timer = try run_toolchain(ta, tc, dev, false, true, false, false, .div_1048576, 0);
-        const results_timer1024 = try run_toolchain(ta, tc, dev, false, true, false, false, .div_1024, 0);
+        const results_none = try run_toolchain(io, ta, tc, dev, false, false, false, false, .div_1048576, 0);
+        const results_both = try run_toolchain(io, ta, tc, dev, true, true, false, false, .div_1048576, 0);
+        const results_osc = try run_toolchain(io, ta, tc, dev, true, false, false, false, .div_1048576, 0);
+        const results_timer = try run_toolchain(io, ta, tc, dev, false, true, false, false, .div_1048576, 0);
+        const results_timer1024 = try run_toolchain(io, ta, tc, dev, false, true, false, false, .div_1024, 0);
 
-        const results_1_both = try run_toolchain(ta, tc, dev, true, true, false, false, .div_1048576, 1);
-        const results_1_osc = try run_toolchain(ta, tc, dev, true, false, false, false, .div_1048576, 1);
-        const results_1_timer = try run_toolchain(ta, tc, dev, false, true, false, false, .div_1048576, 1);
+        const results_1_both = try run_toolchain(io, ta, tc, dev, true, true, false, false, .div_1048576, 1);
+        const results_1_osc = try run_toolchain(io, ta, tc, dev, true, false, false, false, .div_1048576, 1);
+        const results_1_timer = try run_toolchain(io, ta, tc, dev, false, true, false, false, .div_1048576, 1);
 
         var ignore = try JEDEC_Data.init_diff(ta, results_both.jedec, results_1_both.jedec);
         ignore.union_diff(results_osc.jedec, results_1_osc.jedec);
@@ -161,9 +161,9 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
     {
         try writer.expression_expanded("timer_div");
 
-        const results_div128 = try run_toolchain(ta, tc, dev, true, true, false, false, .div_128, 0);
-        const results_div1024 = try run_toolchain(ta, tc, dev, true, true, false, false, .div_1024, 0);
-        const results_div1048576 = try run_toolchain(ta, tc, dev, true, true, false, false, .div_1048576, 0);
+        const results_div128 = try run_toolchain(io, ta, tc, dev, true, true, false, false, .div_128, 0);
+        const results_div1024 = try run_toolchain(io, ta, tc, dev, true, true, false, false, .div_1024, 0);
+        const results_div1048576 = try run_toolchain(io, ta, tc, dev, true, true, false, false, .div_1048576, 0);
 
         var diff = try JEDEC_Data.init_diff(ta, results_div128.jedec, results_div1024.jedec);
         diff.union_diff(results_div128.jedec, results_div1048576.jedec);

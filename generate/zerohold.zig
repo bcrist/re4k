@@ -10,15 +10,15 @@ const JEDEC_Data = lc4k.JEDEC_Data;
 
 pub const main = helper.main;
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     var design = Design.init(ta, dev);
     try design.add_pt("in", "out");
-    const results_without_zero_hold = try tc.run_toolchain(design);
+    const results_without_zero_hold = try tc.run_toolchain(io, design);
     try results_without_zero_hold.check_term();
-    try tc.clean_temp_dir();
+    try tc.clean_temp_dir(io);
 
     design.zero_hold_time = true;
-    const results_with_zero_hold = try tc.run_toolchain(design);
+    const results_with_zero_hold = try tc.run_toolchain(io, design);
     try results_with_zero_hold.check_term();
 
     const diff = try JEDEC_Data.init_diff(ta, results_without_zero_hold.jedec, results_with_zero_hold.jedec);

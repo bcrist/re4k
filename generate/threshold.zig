@@ -13,7 +13,7 @@ const MC_Ref = lc4k.MC_Ref;
 
 pub const main = helper.main;
 
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: lc4k.Pin_Info, iostd: Logic_Levels) !toolchain.Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: lc4k.Pin_Info, iostd: Logic_Levels) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
     try design.pin_assignment(.{
         .signal = "in",
@@ -22,8 +22,8 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
     });
     try design.add_pt("in", "out");
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "threshold_pin_{s}", .{ pin.id }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "threshold_pin_{s}", .{ pin.id }, results);
     try results.check_term();
     return results;
 }
@@ -31,7 +31,7 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
 var default_high: ?u1 = null;
 var default_low: ?u1 = null;
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     var maybe_fallback_output_fuse_map: ?std.AutoHashMap(MC_Ref, []const helper.Fuse_And_Value) = null;
     var fallback_output_fuse_data = try JEDEC_Data.init_empty(pa, dev.jedec_dimensions);
     if (helper.get_input_file("threshold.sx")) |_| {
@@ -50,11 +50,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
 
     var pin_iter = helper.Input_Iterator { .pins = dev.all_pins };
     while (pin_iter.next()) |pin| {
-        try tc.clean_temp_dir();
+        try tc.clean_temp_dir(io);
         helper.reset_temp();
 
-        const results_high = try run_toolchain(ta, tc, dev, pin, .LVCMOS33);
-        const results_low = try run_toolchain(ta, tc, dev, pin, .LVCMOS15);
+        const results_high = try run_toolchain(io, ta, tc, dev, pin, .LVCMOS33);
+        const results_low = try run_toolchain(io, ta, tc, dev, pin, .LVCMOS15);
 
         const diff = try JEDEC_Data.init_diff(ta, results_high.jedec, results_low.jedec);
 

@@ -22,7 +22,7 @@ fn get_max_pts_without_wide_routing(mc: usize) u8 {
 }
 
 
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, mcref: MC_Ref, pts: u8) !toolchain.Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, mcref: MC_Ref, pts: u8) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
 
     try design.pin_assignment(.{ .signal = "x0" });
@@ -50,8 +50,8 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
         try design.add_pt(signals, "out.D-");
     }
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "cluster_routing_glb{}_mc{}_pts{}", .{ mcref.glb, mcref.mc, pts }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "cluster_routing_glb{}_mc{}_pts{}", .{ mcref.glb, mcref.mc, pts }, results);
     try results.check_term();
     return results;
 }
@@ -66,7 +66,7 @@ const Cluster_Routing_Value = struct {
 };
 const ClusterRoutingMap = std.AutoHashMap(Cluster_Routing_Key, Cluster_Routing_Value);
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     var mc_columns = try helper.parse_mc_options_columns(ta, pa, null);
     var orm_rows = try helper.parse_orm_rows(ta, pa, null);
 
@@ -92,10 +92,10 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
         while (mc < dev.num_mcs_per_glb) : (mc += 1) {
             var pts: u8 = 5;
             while (pts <= get_max_pts_without_wide_routing(mc)) : (pts += 5) {
-                try tc.clean_temp_dir();
+                try tc.clean_temp_dir(io);
                 helper.reset_temp();
 
-                const results = try run_toolchain(ta, tc, dev, .{ .glb = glb, .mc = mc }, pts);
+                const results = try run_toolchain(io, ta, tc, dev, .{ .glb = glb, .mc = mc }, pts);
 
                 var cluster_usage = try parse_cluster_usage(ta, glb, results.report, mc);
                 if (cluster_usage.count() != pts / 5) {

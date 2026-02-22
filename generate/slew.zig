@@ -11,7 +11,7 @@ const MC_Ref = lc4k.MC_Ref;
 
 pub const main = helper.main;
 
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: lc4k.Pin_Info, slew: lc4k.Slew_Rate) !toolchain.Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: lc4k.Pin_Info, slew: lc4k.Slew_Rate) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
     try design.pin_assignment(.{
         .signal = "out",
@@ -20,13 +20,13 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
     });
     try design.add_pt("in", "out");
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "slew_pin_{s}", .{ pin.id }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "slew_pin_{s}", .{ pin.id }, results);
     try results.check_term();
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     var maybe_fallback_fuses: ?std.AutoHashMap(MC_Ref, []const helper.Fuse_And_Value) = null;
     if (helper.get_input_file("slew.sx")) |_| {
         maybe_fallback_fuses = try helper.parse_fuses_for_output_pins(ta, pa, "slew.sx", "slew_rate", null);
@@ -59,11 +59,11 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
             }
         }
 
-        try tc.clean_temp_dir();
+        try tc.clean_temp_dir(io);
         helper.reset_temp();
 
-        const results_slow = try run_toolchain(ta, tc, dev, pin, .slow);
-        const results_fast = try run_toolchain(ta, tc, dev, pin, .fast);
+        const results_slow = try run_toolchain(io, ta, tc, dev, pin, .slow);
+        const results_fast = try run_toolchain(io, ta, tc, dev, pin, .fast);
 
         const diff = try JEDEC_Data.init_diff(ta, results_slow.jedec, results_fast.jedec);
 

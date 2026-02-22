@@ -13,7 +13,7 @@ const Fit_Results = toolchain.Fit_Results;
 pub const main = helper.main;
 
 var report_number: usize = 0;
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: []const u8) !Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: []const u8) !Fit_Results {
     var design = Design.init(ta, dev);
 
     try design.pin_assignment( .{
@@ -27,19 +27,19 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
     });
     try design.add_pt("in", "out");
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "convert_grp_{}", .{ report_number }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "convert_grp_{}", .{ report_number }, results);
     report_number += 1;
     try results.check_term();
     return results;
 }
 
-fn getFuseToPinMap(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info) !std.AutoHashMapUnmanaged(Fuse, []const u8) {
+fn getFuseToPinMap(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info) !std.AutoHashMapUnmanaged(Fuse, []const u8) {
     // Route input-only pins for this device type, since we can't know which signals in the reference device they correspond to.
     var fuse_to_pin_map = std.AutoHashMapUnmanaged(Fuse, []const u8) {};
 
     for (dev.input_pins) |pin| {
-        try tc.clean_temp_dir();
+        try tc.clean_temp_dir(io);
         helper.reset_temp();
 
         // We could try to run the toolchain with multiple/all input signals routed simultaneously to speed things up,
@@ -52,7 +52,7 @@ fn getFuseToPinMap(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain,
         //      So it seems the fitter is writing the I/O cell's ID in this case, rather than the actual pin number.
         // There's not that many input-only pins to test, so just doing them one at a time avoids these issues.
 
-        var results = try run_toolchain(ta, tc, dev, pin.id);
+        var results = try run_toolchain(io, ta, tc, dev, pin.id);
         var fuses_set: usize = 0;
         var gi: u8 = 0;
         while (gi < 36) : (gi += 1) {
@@ -77,9 +77,9 @@ const SignalRenaming = struct {
 };
 
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
-    var fuse_to_pin_map = try getFuseToPinMap(ta, pa, tc, dev);
-    try tc.clean_temp_dir();
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+    var fuse_to_pin_map = try getFuseToPinMap(io, ta, pa, tc, dev);
+    try tc.clean_temp_dir(io);
     helper.reset_temp();
 
     var input_dev: Device_Info = undefined;

@@ -18,7 +18,7 @@ const Polarity = enum {
     negative,
 };
 
-fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, oe0: Polarity, oe1: Polarity, use_goe_pins: bool) !toolchain.Fit_Results {
+fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, oe0: Polarity, oe1: Polarity, use_goe_pins: bool) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
 
     if (use_goe_pins) {
@@ -93,13 +93,13 @@ fn run_toolchain(ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info,
         };
     }
 
-    var results = try tc.run_toolchain(design);
-    try helper.log_results(dev.device, "goe_polarity_eoe0_{s}_eoe1_{s}", .{ @tagName(oe0), @tagName(oe1) }, results);
+    var results = try tc.run_toolchain(io, design);
+    try helper.log_results(io, dev.device, "goe_polarity_eoe0_{s}_eoe1_{s}", .{ @tagName(oe0), @tagName(oe1) }, results);
     try results.check_term();
     return results;
 }
 
-pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
+pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     const sptclk_polarity_fuses = try helper.parse_shared_pt_clock_polarity_fuses(ta, pa, dev);
 
     try writer.expression_expanded(@tagName(dev.device));
@@ -116,10 +116,10 @@ pub fn run(ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *c
     //    * For non-LC4032 devices, the GOE0/1 source fuses are always directly above the GOE polarity fuses, and 0 means "use external pin as GOE"
     //    * Shared PT OE routing fuses are in a single block, between the shared PT clock polarity and shared PT init polarity fuses (2 for LC4032, 4 for others)
 
-    const results_pos_pos = try run_toolchain(ta, tc, dev, .positive, .positive, true);
-    const results_pos_neg = try run_toolchain(ta, tc, dev, .positive, .negative, true);
-    const results_neg_pos = try run_toolchain(ta, tc, dev, .negative, .positive, true);
-    const results_neg_neg = try run_toolchain(ta, tc, dev, .negative, .negative, true);
+    const results_pos_pos = try run_toolchain(io, ta, tc, dev, .positive, .positive, true);
+    const results_pos_neg = try run_toolchain(io, ta, tc, dev, .positive, .negative, true);
+    const results_neg_pos = try run_toolchain(io, ta, tc, dev, .negative, .positive, true);
+    const results_neg_neg = try run_toolchain(io, ta, tc, dev, .negative, .negative, true);
 
     var combined_diff = try JEDEC_Data.init_diff(ta,
         results_pos_pos.jedec,
