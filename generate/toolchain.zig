@@ -37,8 +37,8 @@ pub const Node_Assignment = struct {
 };
 
 pub const Product_Term = struct {
-    inputs: std.ArrayListUnmanaged([]const u8),
-    outputs: std.ArrayListUnmanaged([]const u8),
+    inputs: std.ArrayList([]const u8),
+    outputs: std.ArrayList([]const u8),
 
     pub fn inputs_eql(self: *Product_Term, other_inputs: []const[]const u8) bool {
         if (self.inputs.items.len != other_inputs.len) {
@@ -105,11 +105,11 @@ fn string_sort(ctx: void, a: []const u8, b: []const u8) bool {
 pub const Design = struct {
     alloc: std.mem.Allocator,
     dev: *const Device_Info,
-    pins: std.ArrayListUnmanaged(Pin_Assignment),
-    nodes: std.ArrayListUnmanaged(Node_Assignment),
-    inputs: std.ArrayListUnmanaged([]const u8),
-    outputs: std.ArrayListUnmanaged([]const u8),
-    pts: std.ArrayListUnmanaged(Product_Term),
+    pins: std.ArrayList(Pin_Assignment),
+    nodes: std.ArrayList(Node_Assignment),
+    inputs: std.ArrayList([]const u8),
+    outputs: std.ArrayList([]const u8),
+    pts: std.ArrayList(Product_Term),
     zero_hold_time: bool,
     adjust_input_assignments: bool,
     parse_glb_inputs: bool,
@@ -121,11 +121,11 @@ pub const Design = struct {
         return .{
             .alloc = alloc,
             .dev = dev,
-            .pins = .{},
-            .nodes = .{},
-            .inputs = .{},
-            .outputs = .{},
-            .pts = .{},
+            .pins = .empty,
+            .nodes = .empty,
+            .inputs = .empty,
+            .outputs = .empty,
+            .pts = .empty,
             .zero_hold_time = false,
             .adjust_input_assignments = false,
             .parse_glb_inputs = false,
@@ -306,7 +306,7 @@ pub const Design = struct {
             const new_pt = try self.pts.addOne(self.alloc);
             new_pt.* = .{
                 .inputs = pt_inputs.moveToUnmanaged(),
-                .outputs = .{},
+                .outputs = .empty,
             };
             break :blk new_pt;
         };

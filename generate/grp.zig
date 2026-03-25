@@ -70,7 +70,7 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
 }
 
 fn get_all_signals(pa: std.mem.Allocator, dev: *const Device_Info) ![]const GLB_Input_Fit_Signal {
-    var all_signals = try std.ArrayListUnmanaged(GLB_Input_Fit_Signal).initCapacity(
+    var all_signals: std.ArrayList(GLB_Input_Fit_Signal) = try .initCapacity(
         pa, dev.num_mcs + dev.all_pins.len - 10 // there are always 4 JTAG and at least 6 power pins
     );
 
@@ -345,9 +345,9 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("global_routing_pool");
 
-    var gpa = std.heap.GeneralPurposeAllocator(.{ .thread_safe = false }) {};
+    const gpa = std.heap.smp_allocator;
 
-    var test_data = try Test_Data.init(io, ta, pa, gpa.allocator(), tc, dev);
+    var test_data = try Test_Data.init(io, ta, pa, gpa, tc, dev);
     const expected_fuses_per_glb = dev.get_gi_range(0, 0).count() * 36;
 
     // First we start off by simply randomly selecting signals to route.
