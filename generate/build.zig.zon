@@ -1,13 +1,13 @@
 .{
     .name = .re4k_gen,
     .fingerprint = 0x4fa638cde794c99c,
-    .version = "0.1.2",
+    .version = "0.1.3",
     .min_zig_version = "0.16.0-dev.2626+0e3c6514a",
     .paths = .{""},
     .dependencies = .{
         .lc4k = .{
-            .url = "git+https://github.com/bcrist/zig-lc4k?ref=zig-0.16#752af1455d519cae7adee11ca6d53925b747897e",
-            .hash = "lc4k-0.3.0-5R47QuSJFABiKi6n0SgWnbPxVlV-qSJkmvgl0RfRFJzT",
+            .url = "git+https://github.com/bcrist/zig-lc4k?ref=zig-0.16#2a76f0a1da4fcbee8b5378a94ac18d70a0692095",
+            .hash = "lc4k-0.3.1-5R47Qi2SFACM7zsHCTCz-NdXu2yeEh6wUDNXuAFMJqMB",
         },
         .Temp_Allocator = .{
             .url = "git+https://github.com/bcrist/zig-tempallocator?ref=zig-0.16#f1e148f769a78a2f9959ac8fdf0cb00a3496449c",
@@ -18,8 +18,8 @@
             .hash = "sx-1.2.0-0vgbarDXAAB63Jg635DdSzgUNvoAEqw3DZyyPJtaf_3d",
         },
         .limp = .{
-            .url = "git+https://github.com/bcrist/limp?ref=zig-0.16#d75a78138857d42ce096e5131f7bc6c875cda1a7",
-            .hash = "limp-0.2.14-RgAsz-qGDwDD0rH7XzrxaZbzA1MBzCT15pCP1AILYWA-",
+            .url = "git+https://github.com/bcrist/limp?ref=zig-0.16#4539788b01c9e54a1564082b578d8722f66fd4ae",
+            .hash = "limp-0.2.16-RgAsz00jDwDiHtoYw-NuRwyxZ6cjzwWK_uCjd48_9_4R",
         },
     },
 }
