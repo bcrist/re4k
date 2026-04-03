@@ -6,7 +6,8 @@ Data is provided in text files containing machine and human readable S-Expressio
 These are intended to be used to generate libraries so that CPLD configurations can be created using whatever programming language is desired.
 Existing libraries include:
 
-* [Zig-LC4k](https://github.com/bcrist/Zig-LC4k)
+* Zig: [Zig-LC4k](https://github.com/bcrist/Zig-LC4k)
+* VHDL: [LC4K Core](https://github.com/devsaurus/lc4k_core)
 
 If you build a library/bindings for another language, let me know so I can list it here!
 
