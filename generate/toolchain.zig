@@ -87,6 +87,15 @@ pub const Product_Term = struct {
         }
         return false;
     }
+
+    pub fn has_negated_output(self: Product_Term, signal: []const u8) bool {
+        for (self.outputs.items) |output| {
+            if (output[0] == '~' and std.mem.eql(u8, output[1..], signal)) {
+                return true;
+            }
+        }
+        return false;
+    }
 };
 
 fn strip_signal_suffix(signal: []const u8) []const u8 {
@@ -115,6 +124,8 @@ pub const Design = struct {
     parse_glb_inputs: bool,
     max_fit_time_ms: u32,
     uses_power_guard: bool,
+    dynoscdis: bool,
+    timerres: bool,
     osctimer_div: ?lc4k.Timer_Divisor,
 
     pub fn init(alloc: std.mem.Allocator, dev: *const Device_Info) Design {
@@ -131,6 +142,8 @@ pub const Design = struct {
             .parse_glb_inputs = false,
             .max_fit_time_ms = 0, // unlimited
             .uses_power_guard = false,
+            .dynoscdis = false,
+            .timerres = false,
             .osctimer_div = null,
         };
     }
@@ -246,26 +259,28 @@ pub const Design = struct {
     }
 
     pub fn add_output(self: *Design, signal: []const u8) !void {
+        const sig = if (signal[0] == '~') signal[1..] else signal;
+
         for (self.outputs.items) |output| {
-            if (std.mem.eql(u8, output, signal)) {
+            if (std.mem.eql(u8, output, sig)) {
                 return;
             }
         }
 
-        try self.outputs.append(self.alloc, signal);
-        try self.add_node_if_not_pin(strip_signal_suffix(signal));
+        try self.outputs.append(self.alloc, sig);
+        try self.add_node_if_not_pin(strip_signal_suffix(sig));
     }
 
     pub fn add_pt(self: *Design, inputs: anytype, outputs: anytype) !void {
-        var pt_inputs: std.array_list.Managed([]const u8) = .init(self.alloc);
-        defer pt_inputs.deinit();
+        var pt_inputs: std.ArrayList([]const u8) = .empty;
+        defer pt_inputs.deinit(self.alloc);
 
         const inputs_type_info = @typeInfo(@TypeOf(inputs));
         switch (inputs_type_info) {
             .@"struct" => {
                 // e.g. tuple containing strings
                 inline for (inputs) |input| {
-                    try pt_inputs.append(input);
+                    try pt_inputs.append(self.alloc, input);
                 }
             },
             .pointer => |info| {
@@ -274,12 +289,12 @@ pub const Design = struct {
                     .pointer => {
                         // e.g. slice of array containing strings
                         for (inputs) |input| {
-                            try pt_inputs.append(input);
+                            try pt_inputs.append(self.alloc, input);
                         }
                     },
                     else => {
                         // e.g. string
-                        try pt_inputs.append(inputs);
+                        try pt_inputs.append(self.alloc, inputs);
                     },
                 }
             },
@@ -298,16 +313,18 @@ pub const Design = struct {
         var pt: *Product_Term = blk: {
             for (self.pts.items) |*pt| {
                 if (pt.inputs_eql(pt_inputs.items)) {
-                    pt_inputs.deinit();
+                    pt_inputs.clearAndFree(self.alloc);
+
                     break :blk pt;
                 }
             }
 
             const new_pt = try self.pts.addOne(self.alloc);
             new_pt.* = .{
-                .inputs = pt_inputs.moveToUnmanaged(),
+                .inputs = pt_inputs,
                 .outputs = .empty,
             };
+            pt_inputs = .empty;
             break :blk new_pt;
         };
 
@@ -346,14 +363,29 @@ pub const Design = struct {
         }
     }
 
-    pub fn oscillator(self: *Design, div: lc4k.Timer_Divisor) !void {
+    pub fn oscillator(self: *Design, dynoscdis: bool, timerres: bool, div: lc4k.Timer_Divisor) !void {
         self.osctimer_div = div;
-        try self.node_assignment(.{
-            .signal = "OSC_disable",
-        });
-        try self.node_assignment(.{
-            .signal = "OSC_reset",
-        });
+        self.dynoscdis = dynoscdis;
+        self.timerres = timerres;
+
+        if (dynoscdis) {
+            try self.add_node_if_not_pin("OSC_disable");
+        } else {
+            try self.node_assignment(.{
+                .signal = "OSC_disable_gnd",
+            });
+            try self.add_pt(.{}, "~OSC_disable_gnd");
+        }
+
+        if (timerres) {
+            try self.add_node_if_not_pin("OSC_reset");
+        } else {
+            try self.node_assignment(.{
+                .signal = "OSC_reset_gnd",
+            });
+            try self.add_pt(.{}, "~OSC_reset_gnd");
+        }
+
         try self.node_assignment(.{
             .signal = "OSC_out",
         });
@@ -601,7 +633,11 @@ pub const Design = struct {
                 try writer.writeAll("\n[OSCTIMER Assignments]\n");
                 try writer.writeAll("layer = OFF;\n");
                 std.debug.assert(std.mem.startsWith(u8, @tagName(divisor), "div_"));
-                try writer.print("OSCTIMER = OSC_disable, OSC_reset, OSC_out, OSC_tout, {s};\n", .{ @tagName(divisor)[4..] });
+                try writer.print("OSCTIMER = {s}, {s}, OSC_out, OSC_tout, {s};\n", .{
+                    if (self.dynoscdis) "OSC_disable" else "-",
+                    if (self.timerres) "OSC_reset" else "-",
+                    @tagName(divisor)[4..]
+                });
             }
         } else {
             try writer.writeAll("\n[Fast Bypass]\n");
@@ -665,9 +701,23 @@ pub const Design = struct {
         try writer.writeAll("\n");
 
         if (self.osctimer_div) |divisor| {
-            try writer.print("#$ PROPERTY LATTICE OSCTIMER osc= OSC_disable, OSC_reset, OSC_out, OSC_tout, {s};\n", .{ @tagName(divisor)[3..] });
-            try writer.writeAll("#$ EXTERNAL OSCTIMER 4 DYNOSCDIS'i' TIMERRES'i' OSCOUT'o' TIMEROUT'o'\n");
-            try writer.writeAll("#$ INSTANCE osc OSCTIMER 4 OSC_disable OSC_reset OSC_out OSC_tout\n");
+            if (self.dynoscdis and self.timerres) {
+                try writer.print("#$ PROPERTY LATTICE OSCTIMER osc= OSC_disable, OSC_reset, OSC_out, OSC_tout, {s};\n", .{ @tagName(divisor)[3..] });
+                try writer.writeAll("#$ EXTERNAL OSCTIMER 4 DYNOSCDIS'i' TIMERRES'i' OSCOUT'o' TIMEROUT'o'\n");
+                try writer.writeAll("#$ INSTANCE osc OSCTIMER 4 OSC_disable OSC_reset OSC_out OSC_tout\n");
+            } else if (self.dynoscdis) {
+                try writer.print("#$ PROPERTY LATTICE OSCTIMER osc= OSC_disable, -, OSC_out, OSC_tout, {s};\n", .{ @tagName(divisor)[3..] });
+                try writer.writeAll("#$ EXTERNAL OSCTIMER 4 DYNOSCDIS'i' TIMERRES'i' OSCOUT'o' TIMEROUT'o'\n");
+                try writer.writeAll("#$ INSTANCE osc OSCTIMER 4 OSC_disable OSC_reset_gnd OSC_out OSC_tout\n");
+            } else if (self.timerres) {
+                try writer.print("#$ PROPERTY LATTICE OSCTIMER osc= -, OSC_reset, OSC_out, OSC_tout, {s};\n", .{ @tagName(divisor)[3..] });
+                try writer.writeAll("#$ EXTERNAL OSCTIMER 4 DYNOSCDIS'i' TIMERRES'i' OSCOUT'o' TIMEROUT'o'\n");
+                try writer.writeAll("#$ INSTANCE osc OSCTIMER 4 OSC_disable_gnd OSC_reset OSC_out OSC_tout\n");
+            } else { 
+                try writer.print("#$ PROPERTY LATTICE OSCTIMER osc= -, -, OSC_out, OSC_tout, {s};\n", .{ @tagName(divisor)[3..] });
+                try writer.writeAll("#$ EXTERNAL OSCTIMER 4 DYNOSCDIS'i' TIMERRES'i' OSCOUT'o' TIMEROUT'o'\n");
+                try writer.writeAll("#$ INSTANCE osc OSCTIMER 4 OSC_disable_gnd OSC_reset_gnd OSC_out OSC_tout\n");
+            }
         }
 
         if (self.uses_power_guard) {
@@ -707,7 +757,13 @@ pub const Design = struct {
             }
             try writer.writeByte(' ');
             for (self.outputs.items) |output| {
-                try writer.writeByte(if (pt.has_output(output)) '1' else '-');
+                if (pt.has_output(output)) {
+                    try writer.writeByte('1');
+                } else if (pt.has_negated_output(output)) {
+                    try writer.writeByte('0');
+                } else {
+                    try writer.writeByte('-');
+                }
             }
             try writer.writeByte('\n');
         }

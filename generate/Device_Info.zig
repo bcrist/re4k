@@ -122,6 +122,12 @@ pub fn get_column_range(self: Device_Info, min_col: usize, max_col: usize) Fuse_
     );
 }
 
+pub fn get_macrocell_range(self: Device_Info, mcref: lc4k.MC_Ref) Fuse_Range {
+    return switch (self.device) {
+        inline else => |d| lc4k.fuses.get_macrocell_range(d.get(), mcref),
+    };
+}
+
 // TODO move this to LC4k?
 pub fn get_gi_range(self: Device_Info, glb: usize, gi: usize) Fuse_Range {
     return switch (self.num_glbs) {
