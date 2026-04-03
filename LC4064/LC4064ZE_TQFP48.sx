@@ -2868,13 +2868,13 @@
    (osctimer
       (enable
          (fuse 92 351)
-         (value 0 enabled)
-         (value 1 disabled)
+         (value 1 always_on)
+         (value 0 dynamic_disable)
       )
-      (enable
+      (reset
          (fuse 92 352)
-         (value 0 enabled)
-         (value 1 disabled)
+         (value 1 free_run)
+         (value 0 resettable)
       )
       (timer_out
          (fuse 93 353)
