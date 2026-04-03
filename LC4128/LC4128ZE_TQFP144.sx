@@ -7780,13 +7780,13 @@
    (osctimer
       (enable
          (fuse 91 98)
-         (value 0 enabled)
-         (value 1 disabled)
+         (value 1 always_on)
+         (value 0 dynamic_disable)
       )
-      (enable
+      (reset
          (fuse 92 98)
-         (value 0 enabled)
-         (value 1 disabled)
+         (value 1 free_run)
+         (value 0 resettable)
       )
       (timer_out
          (fuse 93 99)
