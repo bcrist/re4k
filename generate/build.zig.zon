@@ -6,8 +6,8 @@
     .paths = .{""},
     .dependencies = .{
         .lc4k = .{
-            .url = "git+https://github.com/bcrist/zig-lc4k?ref=zig-0.16#2a76f0a1da4fcbee8b5378a94ac18d70a0692095",
-            .hash = "lc4k-0.3.1-5R47Qi2SFACM7zsHCTCz-NdXu2yeEh6wUDNXuAFMJqMB",
+            .url = "git+https://github.com/bcrist/zig-lc4k?ref=zig-0.16#f3fe63df87125bec820b9cb83f5c8ce70c49673b",
+            .hash = "lc4k-0.3.2-5R47QkaSFAD9qDDAGfn2SqTFAdRcV5Ic96oyWoIP8YiQ",
         },
         .Temp_Allocator = .{
             .url = "git+https://github.com/bcrist/zig-tempallocator?ref=zig-0.16#f1e148f769a78a2f9959ac8fdf0cb00a3496449c",
@@ -18,8 +18,8 @@
             .hash = "sx-1.2.0-0vgbarDXAAB63Jg635DdSzgUNvoAEqw3DZyyPJtaf_3d",
         },
         .limp = .{
-            .url = "git+https://github.com/bcrist/limp?ref=zig-0.16#4539788b01c9e54a1564082b578d8722f66fd4ae",
-            .hash = "limp-0.2.16-RgAsz00jDwDiHtoYw-NuRwyxZ6cjzwWK_uCjd48_9_4R",
+            .url = "git+https://github.com/bcrist/limp?ref=zig-0.16#618f00d51cc20e152062753adb6f3764fd53d04b",
+            .hash = "limp-0.2.16-RgAszzIjDwDxxNYO_jUXVnIV3MxFL9iCFxDgqAkVDGvY",
         },
     },
 }
