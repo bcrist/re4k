@@ -977,7 +977,7 @@ pub const GLB_Input_Set = struct {
 
 pub const GLB_Fit_Data = struct {
     glb: u8,
-    inputs: [36]?GLB_Input_Fit_Signal = .{ null } ** 36,
+    inputs: [36]?GLB_Input_Fit_Signal = @splat(null),
 };
 
 pub const Fit_Results = struct {

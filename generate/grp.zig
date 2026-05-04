@@ -24,7 +24,7 @@ var report_number: usize = 0;
 fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, signals_to_test: GLB_Input_Set, all_signals: []const GLB_Input_Fit_Signal) !Fit_Results {
     var design = Design.init(ta, dev);
 
-    var temp_signal_names_storage = [_][]const u8 { "" } ** 36;
+    var temp_signal_names_storage: [36][]const u8 = @splat("");
     var signal_names: [][]const u8 = &temp_signal_names_storage;
     signal_names.len = 0;
 
