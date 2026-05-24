@@ -8,7 +8,7 @@ const Device_Type = @import("common").Device_Type;
 const device = Device_Type.LC4032ZE_TQFP48;
 const width = device.get().jedec_dimensions.width();
 const height = device.get().jedec_dimensions.height();
-const RowDataType = std.meta.Int(.unsigned, width);
+const RowDataType = @Int(.unsigned, width);
 
 pub const clocks = microbe.ClockConfig {
     .hsi_enabled = true,
@@ -127,7 +127,7 @@ fn readChip() !void {
         return error.BadIDCode;
     }
 
-    _ = doCommand(.SAMPLE_PRELOAD, std.meta.Int(.unsigned, svf_file.getBoundaryScanLength(device.get())), 0);
+    _ = doCommand(.SAMPLE_PRELOAD, @Int(.unsigned, svf_file.getBoundaryScanLength(device.get())), 0);
     doCommand(.ISC_ENABLE, void, {});
 
     try writer.writeByte(0x2);
@@ -308,7 +308,7 @@ fn writeChip() !void {
         return error.BadIDCode;
     }
 
-    _ = doCommand(.SAMPLE_PRELOAD, std.meta.Int(.unsigned, svf_file.getBoundaryScanLength(device.get())), 0);
+    _ = doCommand(.SAMPLE_PRELOAD, @Int(.unsigned, svf_file.getBoundaryScanLength(device.get())), 0);
     doCommand(.ISC_ENABLE, void, {});
     doCommand(.ISC_ERASE, void, {});
     doCommand(.ISC_DISCHARGE, void, {});

@@ -114,7 +114,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
 
             const column = mc_columns.get(.{ .glb = glb, .mc = mc }).?.min.col;
 
-            var rows = std.StaticBitSet(100).initEmpty();
+            var rows: std.StaticBitSet(100) = .empty;
             var diff_base = routing_data.get(.{ .mc = mc, .mode = .self }).?.jedec;
             for (std.enums.values(lc4k.Cluster_Routing)) |mode| {
                 if (routing_data.get(.{ .mc = mc, .mode = mode })) |data| {
@@ -212,7 +212,7 @@ fn check_routing_data(routing_data: *ClusterRoutingMap, cluster_usage: std.Stati
 }
 
 fn parse_cluster_usage(ta: std.mem.Allocator, glb: u8, report: []const u8, mc: u8) !std.StaticBitSet(16) {
-    var cluster_usage = std.StaticBitSet(16).initEmpty();
+    var cluster_usage: std.StaticBitSet(16) = .empty;
     const header = try std.fmt.allocPrint(ta, "GLB_{s}_CLUSTER_TABLE", .{ helper.get_glb_name(glb) });
     if (helper.extract(report, header, "<Note>")) |raw| {
         var line_iter = std.mem.tokenizeAny(u8, raw, "\r\n");

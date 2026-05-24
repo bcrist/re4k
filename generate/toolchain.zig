@@ -816,23 +816,17 @@ pub const GI_Set = struct {
     raw: std.StaticBitSet(36),
 
     pub fn init_single(gi: usize) GI_Set {
-        var self = GI_Set {
-            .raw = std.StaticBitSet(36).initEmpty(),
-        };
+        var self: GI_Set = .{ .raw = .empty };
         self.raw.set(gi);
         return self;
     }
 
     pub fn init_empty() GI_Set {
-        return .{
-            .raw = std.StaticBitSet(36).initEmpty(),
-        };
+        return .{ .raw = .empty };
     }
 
     pub fn init_full() GI_Set {
-        return .{
-            .raw = std.StaticBitSet(36).initFull(),
-        };
+        return .{ .raw = .full };
     }
 
     pub fn add(self: *GI_Set, gi: usize) void {
@@ -871,15 +865,11 @@ pub const GLB_Input_Set = struct {
     raw: BitSet,
 
     pub fn init_empty() GLB_Input_Set {
-        return .{
-            .raw = BitSet.initEmpty(),
-        };
+        return .{ .raw = .empty };
     }
 
     pub fn init_full(signals: []const GLB_Input_Fit_Signal) GLB_Input_Set {
-        var self = GLB_Input_Set {
-            .raw = BitSet.initEmpty(),
-        };
+        var self: GLB_Input_Set = .{ .raw = .empty };
         self.raw.setRangeValue(.{ .start = 0, .end = signals.len }, true);
         return self;
     }
