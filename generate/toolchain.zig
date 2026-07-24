@@ -1195,7 +1195,7 @@ pub const Toolchain = struct {
     }
 
     pub fn clean_temp_dir(self: *Toolchain, io: std.Io) !void {
-        if (@import("builtin").mode != .Debug) {
+        if (@import("builtin").mode != .debug) {
             var n: u8 = 0;
             const max: u8 = 20;
             while (n <= max) : (n += 1) {
