@@ -2,24 +2,24 @@
     .name = .re4k_gen,
     .fingerprint = 0x4fa638cde794c99c,
     .version = "0.2.0",
-    .min_zig_version = "0.17.0-dev.260+a79428757",
+    .min_zig_version = "0.17.0",
     .paths = .{""},
     .dependencies = .{
         .lc4k = .{
-            .url = "git+https://codeberg.org/bcrist/zig-lc4k?ref=zig-master#a2b8c341b5b188caa3a5f55299bff98add078cc9",
-            .hash = "lc4k-0.4.2-5R47Ql2SFABcg8CNZqzwJshDOoUyo7dMula4gn07C1rm",
+            .url = "git+https://codeberg.org/bcrist/zig-lc4k#3d7179b6f40ec1132684f9c4b67ea54dddd69c45",
+            .hash = "lc4k-0.4.2-5R47QnaSFAAbZBpUnoukbZUggEjWmej5MUAHQ6vwvqW9",
         },
         .Temp_Allocator = .{
-            .url = "git+https://codeberg.org/bcrist/zig-tempallocator#2992f0dbf356ca9341ad595ab9390ad2a7aed3d8",
-            .hash = "Temp_Allocator-1.1.0-tT3p3Cg7AACYwqsy6Y64tEhmJbfkZPGd_PlCuKVWjc9S",
+            .url = "git+https://codeberg.org/bcrist/zig-tempallocator#75f67724a8a79ff57f93606385f280ee260c0f88",
+            .hash = "Temp_Allocator-1.2.1-tT3p3FNPAADSDF24Ply7XloHNoGgB4e9UyC4wc188yul",
         },
         .sx = .{
-            .url = "git+https://codeberg.org/bcrist/zig-sx#1fd3d1d2e79ff04d866191fd5021f0187b9426fc",
-            .hash = "sx-1.2.1-0vgbanLYAAB7fetrpL29eq7qwrZrDMHgLdP4qqThJvJa",
+            .url = "git+https://codeberg.org/bcrist/zig-sx#0987bcd46249f062da4d3c1cb15f4002440ca0f4",
+            .hash = "sx-1.2.2-0vgbahfZAACq6faou7x-sBjX4ykRVPxPKB0Am9p2JC_L",
         },
         .limp = .{
-            .url = "git+https://codeberg.org/bcrist/limp?ref=zig-master#d88c5420ffde141f1726bf703d698333214302ce",
-            .hash = "limp-0.2.19-RgAsz7kjDwC38i_PkhQpn-tEd2-FzkcP2bapLnbskX1T",
+            .url = "git+https://codeberg.org/bcrist/limp#0a4ce9cca37795b56859c31a48ebed5b39a18fdd",
+            .hash = "limp-0.2.19-RgAsz6YjDwA-e32gTSFZ-BPoGBccUGEE-neiW3jceFY-",
         },
     },
 }
