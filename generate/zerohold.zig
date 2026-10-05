@@ -35,12 +35,12 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
 
         try writer.done();
     } else {
-        try helper.stderr.print("Expected one zerohold fuse for device {} but found none!\n", .{ dev });
+        try helper.stderr.print("Expected one zerohold fuse for device {} but found none!\n", .{dev});
         return error.Think;
     }
 
     if (diff_iter.next()) |_| {
-        try helper.stderr.print("Expected one zerohold fuse for device {} but found multiple!\n", .{ dev });
+        try helper.stderr.print("Expected one zerohold fuse for device {} but found multiple!\n", .{dev});
         return error.Think;
     }
 

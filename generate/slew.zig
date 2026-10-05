@@ -21,7 +21,7 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
     try design.add_pt("in", "out");
 
     var results = try tc.run_toolchain(io, design);
-    try helper.log_results(io, dev.device, "slew_pin_{s}", .{ pin.id }, results);
+    try helper.log_results(io, dev.device, "slew_pin_{s}", .{pin.id}, results);
     try results.check_term();
     return results;
 }
@@ -38,7 +38,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
     var default_slow: ?u1 = null;
     var default_fast: ?u1 = null;
 
-    var pin_iter = helper.Output_Iterator { .pins = dev.all_pins };
+    var pin_iter = helper.Output_Iterator{ .pins = dev.all_pins };
     while (pin_iter.next()) |pin| {
         if (maybe_fallback_fuses) |fallback_fuses| {
             if (std.mem.eql(u8, pin.id, "F8") or std.mem.eql(u8, pin.id, "E3")) {
@@ -90,7 +90,6 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
             } else {
                 default_fast = fast_value;
             }
-
         } else {
             try helper.err("Expected one slew fuse but found none!", .{}, dev, .{ .pin = pin.id });
             return error.Think;

@@ -18,7 +18,7 @@ const Polarity = enum {
 fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, glb: u8, polarity: Polarity) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
 
-    var pin_iter = helper.Input_Iterator {
+    var pin_iter = helper.Input_Iterator{
         .pins = dev.all_pins,
         .exclude_glb = glb,
         .exclude_clocks = true,
@@ -53,7 +53,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("shared_pt_clk_polarity");
 
-    var defaults = std.EnumMap(Polarity, usize) {};
+    var defaults = std.EnumMap(Polarity, usize){};
 
     var glb: u8 = 0;
     while (glb < dev.num_glbs) : (glb += 1) {
@@ -62,12 +62,13 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
         const positive_results = try run_toolchain(io, ta, tc, dev, glb, .positive);
         const negative_results = try run_toolchain(io, ta, tc, dev, glb, .negative);
 
-        const diff = try JEDEC_Data.init_diff(ta,
+        const diff = try JEDEC_Data.init_diff(
+            ta,
             positive_results.jedec,
             negative_results.jedec,
         );
 
-        var values = std.EnumMap(Polarity, usize) {};
+        var values = std.EnumMap(Polarity, usize){};
 
         var bit_value: usize = 1;
         var diff_iter = diff.iterator(.{});
@@ -90,7 +91,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
         }
 
         if (diff.count_set() != 1) {
-            try helper.err("Expected one shared PT clock polarity fuses, but found {}!", .{ diff.count_set() }, dev, .{ .glb = glb });
+            try helper.err("Expected one shared PT clock polarity fuses, but found {}!", .{diff.count_set()}, dev, .{ .glb = glb });
         }
 
         for (std.enums.values(Polarity)) |mode| {

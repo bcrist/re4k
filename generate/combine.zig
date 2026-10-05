@@ -29,7 +29,6 @@ pub fn main(init: std.process.Init) !void {
     try run(init.io, init.minimal.args);
 }
 
-
 fn run(io: std.Io, args: std.process.Args) !void {
     var perm_alloc = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     defer perm_alloc.deinit();
@@ -42,7 +41,7 @@ fn run(io: std.Io, args: std.process.Args) !void {
     const out_path = args_iter.next() orelse return error.NeedOutputPath;
     const out_dir_path = std.Io.Dir.path.dirname(out_path) orelse return error.InvalidOutputPath;
     const out_filename = std.Io.Dir.path.basename(out_path);
-    const device_str = out_filename[0..out_filename.len - std.Io.Dir.path.extension(out_filename).len];
+    const device_str = out_filename[0 .. out_filename.len - std.Io.Dir.path.extension(out_filename).len];
     const device_type = lc4k.Device_Type.parse(device_str) orelse return error.InvalidDevice;
 
     var out_dir = try std.Io.Dir.cwd().createDirPathOpen(io, out_dir_path, .{});

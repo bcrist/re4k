@@ -32,7 +32,7 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
 
     var mc: u8 = 0;
     while (mc < pin.mc().?.mc) : (mc += 1) {
-        const signal_name = try std.fmt.allocPrint(ta, "dum{}", .{ mc });
+        const signal_name = try std.fmt.allocPrint(ta, "dum{}", .{mc});
         try design.node_assignment(.{
             .signal = signal_name,
             .glb = pin.glb.?,
@@ -72,7 +72,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("macrocell_data");
 
-    var pin_iter = helper.Output_Iterator { .pins = dev.all_pins };
+    var pin_iter = helper.Output_Iterator{ .pins = dev.all_pins };
     while (pin_iter.next()) |pin| {
         if (maybe_fallback_fuses) |fallback_fuses| {
             if (std.mem.eql(u8, pin.id, "F8") or std.mem.eql(u8, pin.id, "E3")) {
@@ -116,7 +116,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
         }
 
         if (n_fuses != 1) {
-            try helper.err("Expected one input register fuse but found {}!", .{ n_fuses }, dev, .{ .pin = pin.id });
+            try helper.err("Expected one input register fuse but found {}!", .{n_fuses}, dev, .{ .pin = pin.id });
         }
 
         try writer.close();

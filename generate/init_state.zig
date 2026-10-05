@@ -34,7 +34,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("init_state");
 
-    var mc_iter = helper.Macrocell_Iterator { .dev = dev };
+    var mc_iter = helper.Macrocell_Iterator{ .dev = dev };
     while (mc_iter.next()) |mcref| {
         try tc.clean_temp_dir(io);
         helper.reset_temp();

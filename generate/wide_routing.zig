@@ -30,10 +30,10 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
 
     var i: u8 = 0;
     while (i < pts) : (i += 1) {
-        signals[0] = if ((i & 1) == 0)  "~x0" else "x0";
-        signals[1] = if ((i & 2) == 0)  "~x1" else "x1";
-        signals[2] = if ((i & 4) == 0)  "~x2" else "x2";
-        signals[3] = if ((i & 8) == 0)  "~x3" else "x3";
+        signals[0] = if ((i & 1) == 0) "~x0" else "x0";
+        signals[1] = if ((i & 2) == 0) "~x1" else "x1";
+        signals[2] = if ((i & 4) == 0) "~x2" else "x2";
+        signals[3] = if ((i & 8) == 0) "~x3" else "x3";
         signals[4] = if ((i & 16) == 0) "~x4" else "x4";
 
         try design.add_pt(signals, "out.D-");
@@ -56,7 +56,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
     var default_narrow: ?u1 = null;
     var default_wide: ?u1 = null;
 
-    var mc_iter = helper.Macrocell_Iterator { .dev = dev };
+    var mc_iter = helper.Macrocell_Iterator{ .dev = dev };
     while (mc_iter.next()) |mcref| {
         // note mcref is the macrocell that contains the wide routing switch we're testing.
         // when enabled, we'll be using mcref.mc + 4 as the primary output.
@@ -116,7 +116,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
         }
 
         if (fuse_count != 1) {
-            try helper.err("Expected one fuse for wide routing, but found {}!", .{ fuse_count }, dev, .{ .mcref = mcref });
+            try helper.err("Expected one fuse for wide routing, but found {}!", .{fuse_count}, dev, .{ .mcref = mcref });
         }
 
         try writer.close(); // mc
@@ -136,7 +136,6 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
 
     try writer.done();
 }
-
 
 fn parse_cluster_routing_rows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*Device_Info) !std.DynamicBitSet {
     const input_file = helper.get_input_file("cluster_routing.sx") orelse return error.MissingClusterRoutingInputFile;

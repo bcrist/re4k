@@ -38,7 +38,7 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
 
     var mc: u8 = 0;
     while (mc < pin_mc) : (mc += 1) {
-        const signal_name = try std.fmt.allocPrint(ta, "dum{}", .{ mc });
+        const signal_name = try std.fmt.allocPrint(ta, "dum{}", .{mc});
         try design.node_assignment(.{
             .signal = signal_name,
             .glb = pin.glb.?,
@@ -83,9 +83,9 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("output_routing_mode");
 
-    var defaults = std.EnumMap(ORPMode, usize) {};
+    var defaults = std.EnumMap(ORPMode, usize){};
 
-    var pin_iter = helper.Output_Iterator { .pins = dev.all_pins };
+    var pin_iter = helper.Output_Iterator{ .pins = dev.all_pins };
     while (pin_iter.next()) |pin| {
         if (maybe_fallback_fuses) |fallback_fuses| {
             if (std.mem.eql(u8, pin.id, "F8") or std.mem.eql(u8, pin.id, "E3")) {
@@ -109,7 +109,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
         try tc.clean_temp_dir(io);
         helper.reset_temp();
 
-        var jeds = std.EnumMap(ORPMode, JEDEC_Data) {};
+        var jeds = std.EnumMap(ORPMode, JEDEC_Data){};
         for (std.enums.values(ORPMode)) |mode| {
             const results = try run_toolchain(io, ta, tc, dev, pin, mode);
             jeds.put(mode, results.jedec);
@@ -122,7 +122,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
 
         try helper.write_pin(writer, pin);
 
-        var values = std.EnumMap(ORPMode, usize) {};
+        var values = std.EnumMap(ORPMode, usize){};
 
         var bit_value: usize = 1;
         var diff_iter = diff.iterator(.{});
@@ -143,16 +143,14 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
         for (std.enums.values(ORPMode)) |mode| {
             const val = values.get(mode) orelse 0;
             if (defaults.get(mode)) |def| {
-                if (def != val) {
-
-                }
+                if (def != val) {}
             } else {
                 defaults.put(mode, val);
             }
         }
 
         if (diff.count_set() != 2) {
-            try helper.err("Expected two bypass fuses but found {}!", .{ diff.count_set() }, dev, .{ .pin = pin.id });
+            try helper.err("Expected two bypass fuses but found {}!", .{diff.count_set()}, dev, .{ .pin = pin.id });
         }
 
         try writer.close();

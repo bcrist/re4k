@@ -15,7 +15,7 @@ const MC_Ref = lc4k.MC_Ref;
 const MC_Index = lc4k.MC_Index;
 const Pin_Info = lc4k.Pin_Info;
 
-var temp_alloc = Temp_Allocator {};
+var temp_alloc = Temp_Allocator{};
 
 pub var stdout: *std.Io.Writer = undefined;
 pub var stderr: *std.Io.Writer = undefined;
@@ -127,7 +127,7 @@ fn run(io: std.Io, args: std.process.Args) !void {
     var input_file_iter = input_files.iterator();
     while (input_file_iter.next()) |entry| {
         if (!entry.value_ptr.accessed) {
-            try err("Unnecessary input file: {s}", .{ entry.key_ptr.* }, &dev, .{});
+            try err("Unnecessary input file: {s}", .{entry.key_ptr.*}, &dev, .{});
         }
     }
 
@@ -152,7 +152,7 @@ pub fn log_results(io: std.Io, device_type: Device_Type, comptime name_fmt: []co
         var f = try dir.createFile(io, filename, .{});
         defer f.close(io);
 
-        const jed = lc4k.JEDEC_File {
+        const jed = lc4k.JEDEC_File{
             .data = results.jedec,
         };
 
@@ -187,7 +187,7 @@ pub fn err(comptime fmt: []const u8, args: anytype, dev: *const Device_Info, con
     } else if (context.pin) |id| {
         try stderr.print("{s} pin {s}: ", .{ @tagName(dev.device), id });
     } else {
-        try stderr.print("{s}: ", .{ @tagName(dev.device) });
+        try stderr.print("{s}: ", .{@tagName(dev.device)});
     }
 
     try stderr.print(fmt ++ "\n", args);
@@ -210,7 +210,7 @@ pub const Macrocell_Iterator = struct {
                 return null;
             }
         } else {
-            const ref = MC_Ref {
+            const ref = MC_Ref{
                 .glb = 0,
                 .mc = 0,
             };
@@ -296,7 +296,7 @@ pub const Output_Iterator = struct {
 
 pub fn extract(src: []const u8, prefix: []const u8, suffix: []const u8) ?[]const u8 {
     if (std.mem.indexOf(u8, src, prefix)) |prefix_start| {
-        const remaining = src[prefix_start + prefix.len..];
+        const remaining = src[prefix_start + prefix.len ..];
         if (std.mem.indexOf(u8, remaining, suffix)) |suffix_start| {
             return remaining[0..suffix_start];
         }
@@ -437,13 +437,7 @@ pub fn parse_grp(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*Dev
     return results;
 }
 
-fn parse_grp0(
-    ta: std.mem.Allocator,
-    parser: *sx.Reader,
-    dev: *const Device_Info,
-    pin_number_to_info: *const std.StringHashMap(Pin_Info),
-    results: *std.AutoHashMap(Fuse, GLB_Input_Signal)
-) !void {
+fn parse_grp0(ta: std.mem.Allocator, parser: *sx.Reader, dev: *const Device_Info, pin_number_to_info: *const std.StringHashMap(Pin_Info), results: *std.AutoHashMap(Fuse, GLB_Input_Signal)) !void {
     _ = try parser.require_any_expression(); // device name, we already know it
     try parser.require_expression("global_routing_pool");
 
@@ -468,7 +462,7 @@ fn parse_grp0(
                             .pin = pin.id,
                         });
                     } else {
-                        try stderr.print("Failed to lookup pin number: {s}\n", .{ temp.items });
+                        try stderr.print("Failed to lookup pin number: {s}\n", .{temp.items});
                     }
                     try parser.require_close(); // pin
                 } else if (try parse_glb(parser)) |fuse_glb| {

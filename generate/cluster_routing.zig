@@ -21,7 +21,6 @@ fn get_max_pts_without_wide_routing(mc: usize) u8 {
     };
 }
 
-
 fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, mcref: MC_Ref, pts: u8) !toolchain.Fit_Results {
     var design = Design.init(ta, dev);
 
@@ -41,10 +40,10 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
 
     var i: u8 = 0;
     while (i < pts) : (i += 1) {
-        signals[0] = if ((i & 1) == 0)  "~x0" else "x0";
-        signals[1] = if ((i & 2) == 0)  "~x1" else "x1";
-        signals[2] = if ((i & 4) == 0)  "~x2" else "x2";
-        signals[3] = if ((i & 8) == 0)  "~x3" else "x3";
+        signals[0] = if ((i & 1) == 0) "~x0" else "x0";
+        signals[1] = if ((i & 2) == 0) "~x1" else "x1";
+        signals[2] = if ((i & 4) == 0) "~x2" else "x2";
+        signals[3] = if ((i & 8) == 0) "~x3" else "x3";
         signals[4] = if ((i & 16) == 0) "~x4" else "x4";
 
         try design.add_pt(signals, "out.D-");
@@ -77,7 +76,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
     defer glb_arena.deinit();
     const ga = glb_arena.allocator();
 
-    var default_values = std.EnumMap(lc4k.Cluster_Routing, usize) {};
+    var default_values = std.EnumMap(lc4k.Cluster_Routing, usize){};
 
     var glb: u8 = 0;
     while (glb < dev.num_glbs) : (glb += 1) {
@@ -103,7 +102,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
                 }
 
                 for (std.enums.values(lc4k.Cluster_Routing)) |mode| {
-                    try check_routing_data(&routing_data, cluster_usage, results.jedec, mc, mode );
+                    try check_routing_data(&routing_data, cluster_usage, results.jedec, mc, mode);
                 }
             }
         }
@@ -128,10 +127,10 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
             }
 
             if (rows.count() != 2) {
-                try helper.err("Expected 2 rows for cluster routing, but found {}!", .{ rows.count() }, dev, .{ .glb = glb, .mc = mc });
+                try helper.err("Expected 2 rows for cluster routing, but found {}!", .{rows.count()}, dev, .{ .glb = glb, .mc = mc });
             }
 
-            var values = std.EnumMap(lc4k.Cluster_Routing, usize) {};
+            var values = std.EnumMap(lc4k.Cluster_Routing, usize){};
 
             var bit_value: usize = 1;
             var row_iter = rows.iterator(.{});
@@ -194,7 +193,7 @@ fn check_routing_data(routing_data: *ClusterRoutingMap, cluster_usage: std.Stati
     if (cluster < 0 or cluster > 15) {
         return;
     }
-    const key = Cluster_Routing_Key {
+    const key = Cluster_Routing_Key{
         .mc = @intCast(cluster),
         .mode = mode,
     };
@@ -213,7 +212,7 @@ fn check_routing_data(routing_data: *ClusterRoutingMap, cluster_usage: std.Stati
 
 fn parse_cluster_usage(ta: std.mem.Allocator, glb: u8, report: []const u8, mc: u8) !std.StaticBitSet(16) {
     var cluster_usage: std.StaticBitSet(16) = .empty;
-    const header = try std.fmt.allocPrint(ta, "GLB_{s}_CLUSTER_TABLE", .{ helper.get_glb_name(glb) });
+    const header = try std.fmt.allocPrint(ta, "GLB_{s}_CLUSTER_TABLE", .{helper.get_glb_name(glb)});
     if (helper.extract(report, header, "<Note>")) |raw| {
         var line_iter = std.mem.tokenizeAny(u8, raw, "\r\n");
         while (line_iter.next()) |line| {
@@ -223,16 +222,16 @@ fn parse_cluster_usage(ta: std.mem.Allocator, glb: u8, report: []const u8, mc: u
 
             const line_mc = try std.fmt.parseInt(u8, line[1..3], 10);
             if (line_mc == mc) {
-                cluster_usage.setValue(0,  is_cluster_used(line[4]));
-                cluster_usage.setValue(1,  is_cluster_used(line[5]));
-                cluster_usage.setValue(2,  is_cluster_used(line[6]));
-                cluster_usage.setValue(3,  is_cluster_used(line[7]));
-                cluster_usage.setValue(4,  is_cluster_used(line[9]));
-                cluster_usage.setValue(5,  is_cluster_used(line[10]));
-                cluster_usage.setValue(6,  is_cluster_used(line[11]));
-                cluster_usage.setValue(7,  is_cluster_used(line[12]));
-                cluster_usage.setValue(8,  is_cluster_used(line[14]));
-                cluster_usage.setValue(9,  is_cluster_used(line[15]));
+                cluster_usage.setValue(0, is_cluster_used(line[4]));
+                cluster_usage.setValue(1, is_cluster_used(line[5]));
+                cluster_usage.setValue(2, is_cluster_used(line[6]));
+                cluster_usage.setValue(3, is_cluster_used(line[7]));
+                cluster_usage.setValue(4, is_cluster_used(line[9]));
+                cluster_usage.setValue(5, is_cluster_used(line[10]));
+                cluster_usage.setValue(6, is_cluster_used(line[11]));
+                cluster_usage.setValue(7, is_cluster_used(line[12]));
+                cluster_usage.setValue(8, is_cluster_used(line[14]));
+                cluster_usage.setValue(9, is_cluster_used(line[15]));
                 cluster_usage.setValue(10, is_cluster_used(line[16]));
                 cluster_usage.setValue(11, is_cluster_used(line[17]));
                 cluster_usage.setValue(12, is_cluster_used(line[19]));

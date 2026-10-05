@@ -31,7 +31,7 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
             .pin = dev.oe_pins[1].id,
         });
     } else {
-        var pin_iter = Input_Iterator {
+        var pin_iter = Input_Iterator{
             .pins = dev.all_pins,
             .exclude_glb = 0,
             .exclude_oes = true,
@@ -46,7 +46,7 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
         });
     }
 
-    var pin_iter = Output_Iterator {
+    var pin_iter = Output_Iterator{
         .pins = dev.all_pins,
         .single_glb = 0,
         .exclude_oes = true,
@@ -59,8 +59,8 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
             if (std.mem.eql(u8, pin.id, "E3")) continue;
         }
 
-        var oe_signal_name = try std.fmt.allocPrint(ta, "out{s}.OE", .{ pin.id });
-        const signal_name = oe_signal_name[0..oe_signal_name.len-3];
+        var oe_signal_name = try std.fmt.allocPrint(ta, "out{s}.OE", .{pin.id});
+        const signal_name = oe_signal_name[0 .. oe_signal_name.len - 3];
 
         try design.pin_assignment(.{
             .signal = signal_name,
@@ -121,7 +121,8 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
     const results_neg_pos = try run_toolchain(io, ta, tc, dev, .negative, .positive, true);
     const results_neg_neg = try run_toolchain(io, ta, tc, dev, .negative, .negative, true);
 
-    var combined_diff = try JEDEC_Data.init_diff(ta,
+    var combined_diff = try JEDEC_Data.init_diff(
+        ta,
         results_pos_pos.jedec,
         results_neg_neg.jedec,
     );
@@ -130,17 +131,17 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
     combined_diff.union_diff(results_pos_pos.jedec, results_neg_pos.jedec);
 
     if (combined_diff.count_set() != 2) {
-        try helper.err("Expected two fuses for GOE2/3 polarity shared PT clock polarity fuses, but found {}!", .{ combined_diff.count_set() }, dev, .{});
+        try helper.err("Expected two fuses for GOE2/3 polarity shared PT clock polarity fuses, but found {}!", .{combined_diff.count_set()}, dev, .{});
         return error.Unexpected;
     }
     var oe0_diff = try JEDEC_Data.init_diff(ta, results_pos_pos.jedec, results_neg_pos.jedec);
     if (oe0_diff.count_set() != 1) {
-        try helper.err("Expected one fuse for GOE2 polarity shared PT clock polarity fuses, but found {}!", .{ oe0_diff.count_set() }, dev, .{});
+        try helper.err("Expected one fuse for GOE2 polarity shared PT clock polarity fuses, but found {}!", .{oe0_diff.count_set()}, dev, .{});
         return error.Unexpected;
     }
     var oe1_diff = try JEDEC_Data.init_diff(ta, results_pos_pos.jedec, results_pos_neg.jedec);
     if (oe1_diff.count_set() != 1) {
-        try helper.err("Expected one fuse for GOE3 polarity shared PT clock polarity fuses, but found {}!", .{ oe1_diff.count_set() }, dev, .{});
+        try helper.err("Expected one fuse for GOE3 polarity shared PT clock polarity fuses, but found {}!", .{oe1_diff.count_set()}, dev, .{});
         return error.Unexpected;
     }
 
@@ -193,7 +194,6 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
 
     try writer.close(); // goe_polarity
 
-
     if (dev.num_glbs >= 4) {
         try writer.expression_expanded("goe_source");
 
@@ -232,7 +232,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
         var n: u8 = 0;
         while (n < bus_size) : (n += 1) {
             try writer.open();
-            try writer.print_value("goe{}", .{ n });
+            try writer.print_value("goe{}", .{n});
             try helper.write_fuse(writer, Fuse.init(sptclk_fuse.row + 1 + n, sptclk_fuse.col));
             try writer.close();
         }

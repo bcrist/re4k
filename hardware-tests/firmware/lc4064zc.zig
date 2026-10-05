@@ -10,13 +10,13 @@ const width = device.get().jedec_dimensions.width();
 const height = device.get().jedec_dimensions.height();
 const RowDataType = @Int(.unsigned, width);
 
-pub const clocks = microbe.ClockConfig {
+pub const clocks = microbe.ClockConfig{
     .hsi_enabled = true,
     .pll = .{
         .source = .hsi,
         .r_frequency_hz = 64_000_000,
     },
-    .sys_source = .{ .pll_r = {}},
+    .sys_source = .{ .pll_r = {} },
     .tick = .{ .period_ns = 1_000_000 },
 };
 
@@ -33,7 +33,7 @@ pub const interrupts = struct {
 };
 
 // ~8 Hz clock; connects to pin 12 on the LC4064 (dedicated input)
-const SlowClock = microbe.Bus("SlowClock", .{ .PB0 }, .{ .mode = .output });
+const SlowClock = microbe.Bus("SlowClock", .{.PB0}, .{ .mode = .output });
 
 var uart: microbe.Uart(.{
     .baud_rate = 128000,
@@ -49,14 +49,14 @@ var jtag: microbe.jtag.Adapter(.{
     .tdi = .PA6,
     .tdo = .PA5,
     .max_frequency_hz = 1_000_000,
-    .chain = &.{ LC4kCommand },
+    .chain = &.{LC4kCommand},
 }) = undefined;
 
 // Connects to serial adapter's CTS.
 // We manage the state manually rather than relying on the UART's RTS logic, because that
 // only asserts once the fifo is completely full, but most USB serial adapters don't
 // respond to CTS instantly on the next byte.
-const RTS = microbe.Bus("RTS", .{ .PA12 }, .{ .mode = .output });
+const RTS = microbe.Bus("RTS", .{.PA12}, .{ .mode = .output });
 
 pub fn log(comptime message_level: std.log.Level, comptime scope: @Type(.enum_literal), comptime format: []const u8, args: anytype) void {
     const rts = RTS.get();
@@ -127,7 +127,7 @@ fn process() !void {
 fn readIdCode() !void {
     RTS.modifyInline(1);
     const idcode = doCommand(.IDCODE, u32, 0xFFFF_FFFF);
-    try uart.writer().print("IDCODE: {X:0>8}\r\n", .{ idcode });
+    try uart.writer().print("IDCODE: {X:0>8}\r\n", .{idcode});
 }
 
 fn readChip() !void {
@@ -146,13 +146,13 @@ fn readChip() !void {
     try writer.writeByte(0x2);
     try writer.writeAll("*\r\n");
     try writer.writeAll("QP100*\r\n");
-    try writer.print("QF{}*\r\n", .{ comptime (width * height) });
+    try writer.print("QF{}*\r\n", .{comptime (width * height)});
     try writer.writeAll("F0*\r\n");
 
     try verifyInternal();
 
     const usercode = doCommand(.READ_USERCODE, u32, 0xFFFFFFFF);
-    try writer.print("U{b:0>32}*\r\n", .{ usercode });
+    try writer.print("U{b:0>32}*\r\n", .{usercode});
     try writer.writeByte(0x3); // ETX
 
     reset();
@@ -170,7 +170,7 @@ fn verifyInternal() !void {
         idleForCommand(.ISC_READ);
         var data = jtag.tap(0).data(RowDataType, 0, .idle);
 
-        try writer.print("L{:0>6} ", .{ base_fuse });
+        try writer.print("L{:0>6} ", .{base_fuse});
 
         var bits_remaining: u16 = width;
         while (bits_remaining > 0) : (bits_remaining -= 1) {
@@ -182,7 +182,6 @@ fn verifyInternal() !void {
         try writer.writeAll("*\r\n");
         base_fuse += width;
     }
-
 }
 
 const JedecParseData = struct {
@@ -271,7 +270,7 @@ fn parseJedec(data: *JedecParseData) !void {
                 }
 
                 RTS.modifyInline(1);
-                try uart.writer().print("Reading data for location {}\r\n", .{ fuse_index });
+                try uart.writer().print("Reading data for location {}\r\n", .{fuse_index});
                 RTS.modifyInline(0);
 
                 data.in_l_data = true;
@@ -312,7 +311,7 @@ fn prepWriteChip() !void {
 }
 
 fn writeChip() !void {
-    var data = JedecParseData {};
+    var data = JedecParseData{};
     try parseJedec(&data);
     RTS.modifyInline(1);
 

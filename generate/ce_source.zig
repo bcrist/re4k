@@ -75,19 +75,19 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
     return results;
 }
 
-var defaults = std.EnumMap(CE_Source, usize) {};
+var defaults = std.EnumMap(CE_Source, usize){};
 
 pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("clock_enable_source");
 
-    var mc_iter = helper.Macrocell_Iterator { .dev = dev };
+    var mc_iter = helper.Macrocell_Iterator{ .dev = dev };
     while (mc_iter.next()) |mcref| {
         try tc.clean_temp_dir(io);
         helper.reset_temp();
 
-        var data = std.EnumMap(CE_Source, JEDEC_Data) {};
-        var values = std.EnumMap(CE_Source, usize) {};
+        var data = std.EnumMap(CE_Source, JEDEC_Data){};
+        var values = std.EnumMap(CE_Source, usize){};
 
         var diff = try JEDEC_Data.init_empty(ta, dev.jedec_dimensions);
 
@@ -124,7 +124,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
         }
 
         if (diff.count_set() != 2) {
-            try helper.err("Expected two clock_enable_source fuses but found {}!", .{ diff.count_set() }, dev, .{ .mcref = mcref });
+            try helper.err("Expected two clock_enable_source fuses but found {}!", .{diff.count_set()}, dev, .{ .mcref = mcref });
         }
 
         for (std.enums.values(CE_Source)) |src| {

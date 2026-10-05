@@ -35,13 +35,13 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
 
     var glb: u8 = 0;
     while (glb < dev.num_glbs) : (glb += 1) {
-        var iter = Input_Iterator {
+        var iter = Input_Iterator{
             .pins = dev.all_pins,
             .single_glb = glb,
             .exclude_pin = pin.id,
         };
 
-        const signal_name = try std.fmt.allocPrint(ta, "temp{}", .{ glb });
+        const signal_name = try std.fmt.allocPrint(ta, "temp{}", .{glb});
         try design.pin_assignment(.{
             .signal = signal_name,
             .pin = iter.next().?.id,
@@ -69,7 +69,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("power_guard");
 
-    var pin_iter = Input_Iterator { .pins = dev.all_pins };
+    var pin_iter = Input_Iterator{ .pins = dev.all_pins };
     while (pin_iter.next()) |pin| {
         try tc.clean_temp_dir(io);
         helper.reset_temp();

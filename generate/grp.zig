@@ -35,8 +35,8 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
         std.debug.assert(signal_names.len <= temp_signal_names_storage.len);
         signal_names[signal_names.len - 1] = signal.name;
         switch (signal.source) {
-            .fb  =>      try design.node_assignment(.{ .signal = signal.name }),
-            .pin => |id| try design.pin_assignment( .{ .signal = signal.name, .pin = id }),
+            .fb => try design.node_assignment(.{ .signal = signal.name }),
+            .pin => |id| try design.pin_assignment(.{ .signal = signal.name, .pin = id }),
         }
     }
 
@@ -63,32 +63,28 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
     design.max_fit_time_ms = 500;
 
     const results = try tc.run_toolchain(io, design);
-    try helper.log_results(io, dev.device, "grp_{}", .{ report_number }, results);
+    try helper.log_results(io, dev.device, "grp_{}", .{report_number}, results);
     report_number += 1;
     //try results.check_term();
     return results;
 }
 
 fn get_all_signals(pa: std.mem.Allocator, dev: *const Device_Info) ![]const GLB_Input_Fit_Signal {
-    var all_signals: std.ArrayList(GLB_Input_Fit_Signal) = try .initCapacity(
-        pa, dev.num_mcs + dev.all_pins.len - 10 // there are always 4 JTAG and at least 6 power pins
+    var all_signals: std.ArrayList(GLB_Input_Fit_Signal) = try .initCapacity(pa, dev.num_mcs + dev.all_pins.len - 10 // there are always 4 JTAG and at least 6 power pins
     );
 
-    var mc_iter = Macrocell_Iterator { .dev = dev };
+    var mc_iter = Macrocell_Iterator{ .dev = dev };
     while (mc_iter.next()) |mcref| {
         const signal_name = try std.fmt.allocPrint(pa, "fb_{s}{}", .{ helper.get_glb_name(mcref.glb), mcref.mc });
         all_signals.appendAssumeCapacity(.{
             .name = signal_name,
-            .source = .{ .fb = .{
-                .glb = mcref.glb,
-                .mc = mcref.mc
-            }},
+            .source = .{ .fb = .{ .glb = mcref.glb, .mc = mcref.mc } },
         });
     }
 
-    var pin_iter = Input_Iterator { .pins = dev.all_pins };
+    var pin_iter = Input_Iterator{ .pins = dev.all_pins };
     while (pin_iter.next()) |pin| {
-        const signal_name = try std.fmt.allocPrint(pa, "pin_{s}", .{ pin.id });
+        const signal_name = try std.fmt.allocPrint(pa, "pin_{s}", .{pin.id});
         all_signals.appendAssumeCapacity(.{
             .name = signal_name,
             .source = .{ .pin = pin.id },
@@ -152,7 +148,6 @@ const GLB_Data = struct {
 
         return new_fuses;
     }
-
 };
 
 const Test_Data = struct {
@@ -175,7 +170,7 @@ const Test_Data = struct {
         var seed: [@sizeOf(u64)]u8 = undefined;
         std.Io.random(io, &seed);
 
-        return Test_Data {
+        return Test_Data{
             .io = io,
             .ta = ta,
             .tc = tc,
@@ -337,9 +332,7 @@ const Test_Data = struct {
 
         return false;
     }
-
 };
-
 
 pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     try writer.expression_expanded(@tagName(dev.device));
@@ -389,8 +382,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
 
     for (test_data.glbs) |glb_data| {
         if (glb_data.fuse_map.count() != expected_fuses_per_glb) {
-            try helper.err("Expected {} glb input mux fuses but found {}!",
-                .{ expected_fuses_per_glb, glb_data.fuse_map.count() }, dev, .{ .glb = glb_data.glb });
+            try helper.err("Expected {} glb input mux fuses but found {}!", .{ expected_fuses_per_glb, glb_data.fuse_map.count() }, dev, .{ .glb = glb_data.glb });
         }
 
         try helper.write_glb(writer, glb_data.glb);

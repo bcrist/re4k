@@ -16,11 +16,11 @@ var report_number: usize = 0;
 fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, pin: []const u8) !Fit_Results {
     var design = Design.init(ta, dev);
 
-    try design.pin_assignment( .{
+    try design.pin_assignment(.{
         .signal = "in",
         .pin = pin,
     });
-    try design.node_assignment( .{
+    try design.node_assignment(.{
         .signal = "out",
         .glb = 0,
         .mc = 6,
@@ -28,7 +28,7 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
     try design.add_pt("in", "out");
 
     var results = try tc.run_toolchain(io, design);
-    try helper.log_results(io, dev.device, "convert_grp_{}", .{ report_number }, results);
+    try helper.log_results(io, dev.device, "convert_grp_{}", .{report_number}, results);
     report_number += 1;
     try results.check_term();
     return results;
@@ -36,7 +36,7 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
 
 fn getFuseToPinMap(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info) !std.AutoHashMapUnmanaged(Fuse, []const u8) {
     // Route input-only pins for this device type, since we can't know which signals in the reference device they correspond to.
-    var fuse_to_pin_map = std.AutoHashMapUnmanaged(Fuse, []const u8) {};
+    var fuse_to_pin_map = std.AutoHashMapUnmanaged(Fuse, []const u8){};
 
     for (dev.input_pins) |pin| {
         try tc.clean_temp_dir(io);
@@ -75,7 +75,6 @@ const SignalRenaming = struct {
     old: GLB_Input_Signal,
     new: []const u8,
 };
-
 
 pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     var fuse_to_pin_map = try getFuseToPinMap(io, ta, pa, tc, dev);

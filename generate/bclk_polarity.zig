@@ -110,7 +110,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("bclk_polarity");
 
-    var defaults = std.EnumMap(BCLK_Mode, usize) {};
+    var defaults = std.EnumMap(BCLK_Mode, usize){};
 
     var glb: u8 = 0;
     while (glb < dev.num_glbs) : (glb += 1) {
@@ -125,7 +125,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
             try tc.clean_temp_dir(io);
             helper.reset_temp();
 
-            var jeds = std.EnumMap(BCLK_Mode, JEDEC_Data) {};
+            var jeds = std.EnumMap(BCLK_Mode, JEDEC_Data){};
             for (std.enums.values(BCLK_Mode)) |mode| {
                 const results = switch (base_clk) {
                     0 => try run_toolchain(io, ta, tc, dev, glb, mode, .both_non_inverted),
@@ -137,7 +137,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
 
             const diff = try JEDEC_Data.init_diff(ta, jeds.get(.both_non_inverted).?, jeds.get(.both_inverted).?);
 
-            var values = std.EnumMap(BCLK_Mode, usize) {};
+            var values = std.EnumMap(BCLK_Mode, usize){};
 
             var bit_value: usize = 1;
             var diff_iter = diff.iterator(.{});
@@ -158,7 +158,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
             }
 
             if (diff.count_set() != 2) {
-                try helper.err("Expected two bclk polarity fuses, but found {}!", .{ diff.count_set() }, dev, .{ .glb = glb });
+                try helper.err("Expected two bclk polarity fuses, but found {}!", .{diff.count_set()}, dev, .{ .glb = glb });
             }
 
             for (std.enums.values(BCLK_Mode)) |mode| {

@@ -23,7 +23,7 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
         try design.oscillator(dynamic_disable, dynamic_reset, div);
     }
 
-    var pin_iter = helper.Output_Iterator {
+    var pin_iter = helper.Output_Iterator{
         .pins = dev.all_pins,
         .single_glb = glb,
     };
@@ -222,7 +222,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
         }
 
         if (diff.count_set() != 2) {
-            try helper.err("Expected 2 fuses for timer_div options, but found {}!\n", .{ diff.count_set() }, dev, .{});
+            try helper.err("Expected 2 fuses for timer_div options, but found {}!\n", .{diff.count_set()}, dev, .{});
         }
 
         try helper.write_value(writer, val128, "div128");

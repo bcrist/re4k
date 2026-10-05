@@ -31,7 +31,7 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
 
     var mc: u8 = 0;
     while (mc < mcref.mc) : (mc += 1) {
-        const signal_name = try std.fmt.allocPrint(ta, "dum{}", .{ mc });
+        const signal_name = try std.fmt.allocPrint(ta, "dum{}", .{mc});
         try design.node_assignment(.{
             .signal = signal_name,
             .glb = mcref.glb,
@@ -67,7 +67,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
     var default_disabled: ?u1 = null;
     var default_enabled: ?u1 = null;
 
-    var mc_iter = helper.Macrocell_Iterator { .dev = dev };
+    var mc_iter = helper.Macrocell_Iterator{ .dev = dev };
     while (mc_iter.next()) |mcref| {
         try tc.clean_temp_dir(io);
         helper.reset_temp();
@@ -106,7 +106,6 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
             } else {
                 default_enabled = enabled_value;
             }
-
         } else {
             try helper.err("Expected one pt0_xor fuse but found none!", .{}, dev, .{ .mcref = mcref });
         }

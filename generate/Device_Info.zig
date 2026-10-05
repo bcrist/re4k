@@ -31,7 +31,7 @@ pub fn init(device: Device_Type) Device_Info {
                 .clock_pins = pin_infos(D.clock_pins),
                 .input_pins = pin_infos(D.input_pins),
             };
-        }
+        },
     }
 }
 
@@ -62,31 +62,31 @@ pub fn get_package_name(self: Device_Info) []const u8 {
 
 pub fn get_fitter_name(self: Device_Info) []const u8 {
     return switch (self.device) {
-        .LC4032x_TQFP44    => "M4S_32_30",
-        .LC4032x_TQFP48    => "M4S_32_32",
-        .LC4032ZC_TQFP48   => "M4Z_32_32",
-        .LC4032ZC_csBGA56  => "M4Z_32_32S",
-        .LC4032ZE_TQFP48   => "M4E_32_32",
-        .LC4032ZE_csBGA64  => "M4E_32_32S",
-        .LC4064x_TQFP44    => "M4S_64_30",
-        .LC4064x_TQFP48    => "M4S_64_32",
-        .LC4064ZC_TQFP48   => "M4Z_64_32",
-        .LC4064ZE_TQFP48   => "M4E_64_32",
-        .LC4064ZC_csBGA56  => "M4Z_64_32S",
-        .LC4064ZE_csBGA64  => "M4E_64_48S",
-        .LC4064ZE_ucBGA64  => "M4E_64_48U",
-        .LC4064x_TQFP100   => "M4S_64_64",
-        .LC4064ZC_TQFP100  => "M4Z_64_64",
-        .LC4064ZE_TQFP100  => "M4E_64_64",
+        .LC4032x_TQFP44 => "M4S_32_30",
+        .LC4032x_TQFP48 => "M4S_32_32",
+        .LC4032ZC_TQFP48 => "M4Z_32_32",
+        .LC4032ZC_csBGA56 => "M4Z_32_32S",
+        .LC4032ZE_TQFP48 => "M4E_32_32",
+        .LC4032ZE_csBGA64 => "M4E_32_32S",
+        .LC4064x_TQFP44 => "M4S_64_30",
+        .LC4064x_TQFP48 => "M4S_64_32",
+        .LC4064ZC_TQFP48 => "M4Z_64_32",
+        .LC4064ZE_TQFP48 => "M4E_64_32",
+        .LC4064ZC_csBGA56 => "M4Z_64_32S",
+        .LC4064ZE_csBGA64 => "M4E_64_48S",
+        .LC4064ZE_ucBGA64 => "M4E_64_48U",
+        .LC4064x_TQFP100 => "M4S_64_64",
+        .LC4064ZC_TQFP100 => "M4Z_64_64",
+        .LC4064ZE_TQFP100 => "M4E_64_64",
         .LC4064ZC_csBGA132 => "M4Z_64_64S",
         .LC4064ZE_csBGA144 => "M4E_64_64S",
-        .LC4128x_TQFP100   => "M4S_128_64",
-        .LC4128ZC_TQFP100  => "M4Z_128_64",
-        .LC4128ZE_TQFP100  => "M4E_128_64",
-        .LC4128x_TQFP128   => "M4S_128_92",
-        .LC4128V_TQFP144   => "M4S_128_96",
+        .LC4128x_TQFP100 => "M4S_128_64",
+        .LC4128ZC_TQFP100 => "M4Z_128_64",
+        .LC4128ZE_TQFP100 => "M4E_128_64",
+        .LC4128x_TQFP128 => "M4S_128_92",
+        .LC4128V_TQFP144 => "M4S_128_96",
         .LC4128ZC_csBGA132 => "M4Z_128_96S",
-        .LC4128ZE_TQFP144  => "M4E_128_96",
+        .LC4128ZE_TQFP144 => "M4E_128_96",
         .LC4128ZE_csBGA144 => "M4E_128_96S",
         .LC4128ZE_ucBGA132 => "M4E_128_96U",
         .LC4128ZC_BMC149 => "M4Z_128_96S",
@@ -132,35 +132,35 @@ pub fn get_macrocell_range(self: Device_Info, mcref: lc4k.MC_Ref) Fuse_Range {
 pub fn get_gi_range(self: Device_Info, glb: usize, gi: usize) Fuse_Range {
     return switch (self.num_glbs) {
         2 => switch (glb) {
-            0 => Fuse_Range.between(Fuse.init(gi*2, 86), Fuse.init(gi*2 + 1, 88)),
-            1 => Fuse_Range.between(Fuse.init(gi*2,  0), Fuse.init(gi*2 + 1,  2)),
+            0 => Fuse_Range.between(Fuse.init(gi * 2, 86), Fuse.init(gi * 2 + 1, 88)),
+            1 => Fuse_Range.between(Fuse.init(gi * 2, 0), Fuse.init(gi * 2 + 1, 2)),
             else => unreachable,
         },
         4 => switch (self.device) {
             .LC4064x_TQFP44, .LC4064x_TQFP48 => switch (glb) {
-                0 => Fuse_Range.between(Fuse.init(gi*2, 264), Fuse.init(gi*2 + 1, 268)),
-                1 => Fuse_Range.between(Fuse.init(gi*2, 176), Fuse.init(gi*2 + 1, 180)),
-                2 => Fuse_Range.between(Fuse.init(gi*2,  88), Fuse.init(gi*2 + 1,  92)),
-                3 => Fuse_Range.between(Fuse.init(gi*2,   0), Fuse.init(gi*2 + 1,   4)),
+                0 => Fuse_Range.between(Fuse.init(gi * 2, 264), Fuse.init(gi * 2 + 1, 268)),
+                1 => Fuse_Range.between(Fuse.init(gi * 2, 176), Fuse.init(gi * 2 + 1, 180)),
+                2 => Fuse_Range.between(Fuse.init(gi * 2, 88), Fuse.init(gi * 2 + 1, 92)),
+                3 => Fuse_Range.between(Fuse.init(gi * 2, 0), Fuse.init(gi * 2 + 1, 4)),
                 else => unreachable,
             },
             else => switch (glb) {
-                0 => Fuse_Range.between(Fuse.init(gi*2, 267), Fuse.init(gi*2 + 1, 272)),
-                1 => Fuse_Range.between(Fuse.init(gi*2, 178), Fuse.init(gi*2 + 1, 183)),
-                2 => Fuse_Range.between(Fuse.init(gi*2,  89), Fuse.init(gi*2 + 1,  94)),
-                3 => Fuse_Range.between(Fuse.init(gi*2,   0), Fuse.init(gi*2 + 1,   5)),
+                0 => Fuse_Range.between(Fuse.init(gi * 2, 267), Fuse.init(gi * 2 + 1, 272)),
+                1 => Fuse_Range.between(Fuse.init(gi * 2, 178), Fuse.init(gi * 2 + 1, 183)),
+                2 => Fuse_Range.between(Fuse.init(gi * 2, 89), Fuse.init(gi * 2 + 1, 94)),
+                3 => Fuse_Range.between(Fuse.init(gi * 2, 0), Fuse.init(gi * 2 + 1, 5)),
                 else => unreachable,
             },
         },
         8 => switch (glb) {
-            0 => Fuse_Range.between(Fuse.init(gi*2,   555), Fuse.init(gi*2,   573)),
-            1 => Fuse_Range.between(Fuse.init(gi*2+1, 555), Fuse.init(gi*2+1, 573)),
-            2 => Fuse_Range.between(Fuse.init(gi*2+1, 370), Fuse.init(gi*2+1, 388)),
-            3 => Fuse_Range.between(Fuse.init(gi*2,   370), Fuse.init(gi*2,   388)),
-            4 => Fuse_Range.between(Fuse.init(gi*2,   185), Fuse.init(gi*2,   203)),
-            5 => Fuse_Range.between(Fuse.init(gi*2+1, 185), Fuse.init(gi*2+1, 203)),
-            6 => Fuse_Range.between(Fuse.init(gi*2+1,   0), Fuse.init(gi*2+1,  18)),
-            7 => Fuse_Range.between(Fuse.init(gi*2,     0), Fuse.init(gi*2,    18)),
+            0 => Fuse_Range.between(Fuse.init(gi * 2, 555), Fuse.init(gi * 2, 573)),
+            1 => Fuse_Range.between(Fuse.init(gi * 2 + 1, 555), Fuse.init(gi * 2 + 1, 573)),
+            2 => Fuse_Range.between(Fuse.init(gi * 2 + 1, 370), Fuse.init(gi * 2 + 1, 388)),
+            3 => Fuse_Range.between(Fuse.init(gi * 2, 370), Fuse.init(gi * 2, 388)),
+            4 => Fuse_Range.between(Fuse.init(gi * 2, 185), Fuse.init(gi * 2, 203)),
+            5 => Fuse_Range.between(Fuse.init(gi * 2 + 1, 185), Fuse.init(gi * 2 + 1, 203)),
+            6 => Fuse_Range.between(Fuse.init(gi * 2 + 1, 0), Fuse.init(gi * 2 + 1, 18)),
+            7 => Fuse_Range.between(Fuse.init(gi * 2, 0), Fuse.init(gi * 2, 18)),
             else => unreachable,
         },
         else => unreachable,
@@ -206,7 +206,7 @@ pub fn write_part_number(self: Device_Info, writer: *std.Io.Writer, family_code:
         try writer.writeByte('N');
     }
 
-    try writer.print("{}", .{ self.all_pins.len });
+    try writer.print("{}", .{self.all_pins.len});
 
     try writer.writeAll(temp);
 }
@@ -224,7 +224,7 @@ pub fn get_io_pin(self: Device_Info, mcref: lc4k.MC_Ref) ?Pin_Info {
     for (self.all_pins) |pin| {
         switch (pin.func) {
             .io, .io_oe0, .io_oe1 => |mc| if (pin.glb.? == mcref.glb and mc == mcref.mc) return pin,
-            else => {}
+            else => {},
         }
     }
     return null;
@@ -235,7 +235,7 @@ pub fn get_oe_pin(self: Device_Info, index: usize) ?Pin_Info {
         switch (pin.func) {
             .io_oe0 => if (index == 0) return pin,
             .io_oe1 => if (index == 1) return pin,
-            else => {}
+            else => {},
         }
     }
     return null;
@@ -245,7 +245,7 @@ pub fn get_clock_pin(self: Device_Info, clk_index: lc4k.Clock_Index) ?Pin_Info {
     for (self.clock_pins) |pin| {
         switch (pin.func) {
             .clock => |i| if (clk_index == i) return pin,
-            else => {}
+            else => {},
         }
     }
     return null;

@@ -49,7 +49,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("async_source");
 
-    var mc_iter = helper.Macrocell_Iterator { .dev = dev };
+    var mc_iter = helper.Macrocell_Iterator{ .dev = dev };
     while (mc_iter.next()) |mcref| {
         try tc.clean_temp_dir(io);
         helper.reset_temp();
@@ -87,7 +87,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
         }
 
         if (diff.count_set() != 1) {
-            try helper.err("Expected one async_source fuses but found {}!", .{ diff.count_set() }, dev, .{ .mcref = mcref });
+            try helper.err("Expected one async_source fuses but found {}!", .{diff.count_set()}, dev, .{ .mcref = mcref });
         }
 
         if (default_off) |def| {

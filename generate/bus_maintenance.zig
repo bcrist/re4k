@@ -111,7 +111,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
         }
 
         if (diff.count_set() != 2) {
-            try helper.err("Expected 2 fuses to define bus maintenance options, but found {}!\n", .{ diff.count_set() }, dev, .{ .pin = pin.id });
+            try helper.err("Expected 2 fuses to define bus maintenance options, but found {}!\n", .{diff.count_set()}, dev, .{ .pin = pin.id });
         }
 
         if (default_val_float) |val| {

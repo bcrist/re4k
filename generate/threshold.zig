@@ -23,7 +23,7 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
     try design.add_pt("in", "out");
 
     var results = try tc.run_toolchain(io, design);
-    try helper.log_results(io, dev.device, "threshold_pin_{s}", .{ pin.id }, results);
+    try helper.log_results(io, dev.device, "threshold_pin_{s}", .{pin.id}, results);
     try results.check_term();
     return results;
 }
@@ -48,7 +48,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("input_threshold");
 
-    var pin_iter = helper.Input_Iterator { .pins = dev.all_pins };
+    var pin_iter = helper.Input_Iterator{ .pins = dev.all_pins };
     while (pin_iter.next()) |pin| {
         try tc.clean_temp_dir(io);
         helper.reset_temp();

@@ -48,10 +48,10 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
 
     var n: u8 = 0;
     while (n < 4) : (n += 1) {
-        const signal_name = try std.fmt.allocPrint(ta, "dum{}", .{ n });
-        const d_name = try std.fmt.allocPrint(ta, "dum{}.D", .{ n });
-        const c_name = try std.fmt.allocPrint(ta, "dum{}.C", .{ n });
-        const ar_name = try std.fmt.allocPrint(ta, "dum{}.AR", .{ n });
+        const signal_name = try std.fmt.allocPrint(ta, "dum{}", .{n});
+        const d_name = try std.fmt.allocPrint(ta, "dum{}.D", .{n});
+        const c_name = try std.fmt.allocPrint(ta, "dum{}.C", .{n});
+        const ar_name = try std.fmt.allocPrint(ta, "dum{}.AR", .{n});
         try design.node_assignment(.{
             .signal = signal_name,
             .glb = mcref.glb,
@@ -136,7 +136,7 @@ fn parseJedecColumn(jed: JEDEC_Data, column: u16, dev: *const Device_Info, glb: 
                         },
                         else => {
                             routing = .unknown;
-                        }
+                        },
                     },
                     else => {
                         routing = switch (routing) {
@@ -182,7 +182,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
         try writer.close(); // gi
     }
 
-    var mc_iter = helper.Macrocell_Iterator { .dev = dev };
+    var mc_iter = helper.Macrocell_Iterator{ .dev = dev };
     while (mc_iter.next()) |mcref| {
         try tc.clean_temp_dir(io);
         helper.reset_temp();
@@ -215,7 +215,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
             }
         }
 
-        var column_routing = std.EnumMap(RoutingType, u16) {};
+        var column_routing = std.EnumMap(RoutingType, u16){};
 
         var col_iter = columns.iterator(.{});
         while (col_iter.next()) |column| {
@@ -235,27 +235,27 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
         const pt4: u16 = @intCast(pt3 + dc);
 
         if (assigned_columns.isSet(pt0)) {
-            try helper.err("Column {} assigned to multiple functions!", .{ pt0 }, dev, .{ .mcref = mcref });
+            try helper.err("Column {} assigned to multiple functions!", .{pt0}, dev, .{ .mcref = mcref });
         } else {
             assigned_columns.set(pt0);
         }
         if (assigned_columns.isSet(pt1)) {
-            try helper.err("Column {} assigned to multiple functions!", .{ pt1 }, dev, .{ .mcref = mcref });
+            try helper.err("Column {} assigned to multiple functions!", .{pt1}, dev, .{ .mcref = mcref });
         } else {
             assigned_columns.set(pt1);
         }
         if (assigned_columns.isSet(pt2)) {
-            try helper.err("Column {} assigned to multiple functions!", .{ pt2 }, dev, .{ .mcref = mcref });
+            try helper.err("Column {} assigned to multiple functions!", .{pt2}, dev, .{ .mcref = mcref });
         } else {
             assigned_columns.set(pt2);
         }
         if (assigned_columns.isSet(pt3)) {
-            try helper.err("Column {} assigned to multiple functions!", .{ pt3 }, dev, .{ .mcref = mcref });
+            try helper.err("Column {} assigned to multiple functions!", .{pt3}, dev, .{ .mcref = mcref });
         } else {
             assigned_columns.set(pt3);
         }
         if (assigned_columns.isSet(pt4)) {
-            try helper.err("Column {} assigned to multiple functions!", .{ pt4 }, dev, .{ .mcref = mcref });
+            try helper.err("Column {} assigned to multiple functions!", .{pt4}, dev, .{ .mcref = mcref });
         } else {
             assigned_columns.set(pt4);
         }
@@ -309,17 +309,17 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
             try writer.close();
 
             if (assigned_columns.isSet(binit)) {
-                try helper.err("Column {} assigned to multiple functions!", .{ binit }, dev, .{ .glb = mcref.glb });
+                try helper.err("Column {} assigned to multiple functions!", .{binit}, dev, .{ .glb = mcref.glb });
             } else {
                 assigned_columns.set(binit);
             }
             if (assigned_columns.isSet(bclk)) {
-                try helper.err("Column {} assigned to multiple functions!", .{ bclk }, dev, .{ .glb = mcref.glb });
+                try helper.err("Column {} assigned to multiple functions!", .{bclk}, dev, .{ .glb = mcref.glb });
             } else {
                 assigned_columns.set(bclk);
             }
             if (assigned_columns.isSet(boe)) {
-                try helper.err("Column {} assigned to multiple functions!", .{ boe }, dev, .{ .glb = mcref.glb });
+                try helper.err("Column {} assigned to multiple functions!", .{boe}, dev, .{ .glb = mcref.glb });
             } else {
                 assigned_columns.set(boe);
             }
@@ -327,7 +327,6 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
             try writer.close();
         }
     }
-
 
     try writer.done();
 }

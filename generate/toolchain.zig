@@ -40,7 +40,7 @@ pub const Product_Term = struct {
     inputs: std.ArrayList([]const u8),
     outputs: std.ArrayList([]const u8),
 
-    pub fn inputs_eql(self: *Product_Term, other_inputs: []const[]const u8) bool {
+    pub fn inputs_eql(self: *Product_Term, other_inputs: []const []const u8) bool {
         if (self.inputs.items.len != other_inputs.len) {
             return false;
         }
@@ -162,7 +162,7 @@ pub const Design = struct {
                     existing.power_guard_signal = pg_enable;
                     try self.add_pin_if_not_node(pg_enable);
                     try self.node_assignment(.{
-                        .signal = try std.fmt.allocPrint(self.alloc, "{s}_PG", .{ pa.signal }),
+                        .signal = try std.fmt.allocPrint(self.alloc, "{s}_PG", .{pa.signal}),
                     });
                 }
                 if (pa.orm_bypass) |bypass| existing.orm_bypass = bypass;
@@ -173,7 +173,7 @@ pub const Design = struct {
 
         for (self.nodes.items) |existing| {
             if (std.mem.eql(u8, pa.signal, existing.signal)) {
-                log.warn("Signal `{s}` already exists as a node; can't be redefined as a pin!", .{ pa.signal });
+                log.warn("Signal `{s}` already exists as a node; can't be redefined as a pin!", .{pa.signal});
                 return;
             }
         }
@@ -183,7 +183,7 @@ pub const Design = struct {
             self.uses_power_guard = true;
             try self.add_pin_if_not_node(pg_enable);
             try self.node_assignment(.{
-                .signal = try std.fmt.allocPrint(self.alloc, "{s}_PG", .{ pa.signal }),
+                .signal = try std.fmt.allocPrint(self.alloc, "{s}_PG", .{pa.signal}),
             });
         }
     }
@@ -219,7 +219,7 @@ pub const Design = struct {
 
         for (self.pins.items) |existing| {
             if (std.mem.eql(u8, na.signal, existing.signal)) {
-                log.warn("Signal `{s}` already exists as a pin; can't be redefined as a node!", .{ na.signal });
+                log.warn("Signal `{s}` already exists as a pin; can't be redefined as a node!", .{na.signal});
                 return;
             }
         }
@@ -333,7 +333,7 @@ pub const Design = struct {
             .@"struct" => {
                 // e.g. tuple containing strings
                 inline for (outputs) |output| {
-                    if(try pt.add_output(self.alloc, output)) {
+                    if (try pt.add_output(self.alloc, output)) {
                         try self.add_output(output);
                     }
                 }
@@ -344,7 +344,7 @@ pub const Design = struct {
                     .pointer => {
                         // e.g. slice of array containing strings
                         for (outputs) |output| {
-                            if(try pt.add_output(self.alloc, output)) {
+                            if (try pt.add_output(self.alloc, output)) {
                                 try self.add_output(output);
                             }
                         }
@@ -415,7 +415,7 @@ pub const Design = struct {
         try writer.writeAll("PartNumber = ");
         try self.dev.write_part_number(writer, null, null, null);
         try writer.writeAll(";\n");
-        try writer.print("Package = {s};\n", .{ self.dev.get_package_name() });
+        try writer.print("Package = {s};\n", .{self.dev.get_package_name()});
         try writer.print("PartType = {s}{s};\n", .{ self.dev.get_base_part_number(), self.dev.get_part_number_suffix() });
         try writer.writeAll("Speed = -7.5;\n");
         try writer.writeAll("Operating_condition = COM;\n");
@@ -427,10 +427,10 @@ pub const Design = struct {
         try writer.writeAll("Routing_Attempts=2;\n");
 
         const zerohold = if (self.zero_hold_time) "yes" else "no";
-        try writer.print("Zero_hold_time={s};\n", .{ zerohold });
+        try writer.print("Zero_hold_time={s};\n", .{zerohold});
 
         const adjust_inputs = if (self.adjust_input_assignments) "on" else "off";
-        try writer.print("Adjust_input_assignments={s};\n", .{ adjust_inputs });
+        try writer.print("Adjust_input_assignments={s};\n", .{adjust_inputs});
 
         try writer.writeAll("\n[Location Assignments]\n");
         for (self.pins.items) |pa| {
@@ -499,14 +499,14 @@ pub const Design = struct {
 
         if (self.dev.family == .zero_power_enhanced) {
             try writer.writeAll("Default=down;\n");
-            for ([_]lc4k.Bus_Maintenance { .float, .pulldown, .pullup, .keeper }) |pull| {
+            for ([_]lc4k.Bus_Maintenance{ .float, .pulldown, .pullup, .keeper }) |pull| {
                 const tag = switch (pull) {
                     .float => "OFF",
                     .pulldown => "DOWN",
                     .pullup => "UP",
                     .keeper => "HOLD",
                 };
-                try writer.print("{s}=", .{ tag });
+                try writer.print("{s}=", .{tag});
                 var first = true;
                 for (self.pins.items) |pa| {
                     if (pa.bus_maintenance) |pin_pull| {
@@ -543,7 +543,7 @@ pub const Design = struct {
                     .pullup => "UP",
                     .keeper => "HOLD",
                 };
-                try writer.print("Default={s};\n", .{ tag });
+                try writer.print("Default={s};\n", .{tag});
             } else {
                 try writer.writeAll("Default=down;\n");
             }
@@ -552,8 +552,8 @@ pub const Design = struct {
         try writer.writeAll("\n[Slewrate]\n");
         try writer.writeAll("Default=fast;\n");
 
-        for ([_]lc4k.Slew_Rate { .slow, .fast }) |slew| {
-            try writer.print("{s}=", .{ @tagName(slew) });
+        for ([_]lc4k.Slew_Rate{ .slow, .fast }) |slew| {
+            try writer.print("{s}=", .{@tagName(slew)});
             var first = true;
             for (self.pins.items) |pa| {
                 if (pa.slew_rate) |pin_slew| {
@@ -571,12 +571,12 @@ pub const Design = struct {
         }
 
         try writer.writeAll("\n[Register Powerup]\n");
-        for ([_]u1 { 0, 1 }) |state| {
+        for ([_]u1{ 0, 1 }) |state| {
             const name = switch (state) {
                 0 => "RESET",
                 1 => "SET",
             };
-            try writer.print("{s}=", .{ name });
+            try writer.print("{s}=", .{name});
             var first = true;
             for (self.pins.items) |pa| {
                 if (pa.init_state) |mc_state| {
@@ -606,12 +606,12 @@ pub const Design = struct {
         }
 
         try writer.writeAll("\n[Input Registers]\n");
-        for ([_]bool { false, true }) |state| {
+        for ([_]bool{ false, true }) |state| {
             const name = switch (state) {
                 false => "NONE",
                 true => "INREG",
             };
-            try writer.print("{s}=", .{ name });
+            try writer.print("{s}=", .{name});
             var first = true;
             for (self.nodes.items) |na| {
                 if (na.input_register) |inreg| {
@@ -633,20 +633,16 @@ pub const Design = struct {
                 try writer.writeAll("\n[OSCTIMER Assignments]\n");
                 try writer.writeAll("layer = OFF;\n");
                 std.debug.assert(std.mem.startsWith(u8, @tagName(divisor), "div_"));
-                try writer.print("OSCTIMER = {s}, {s}, OSC_out, OSC_tout, {s};\n", .{
-                    if (self.dynoscdis) "OSC_disable" else "-",
-                    if (self.timerres) "OSC_reset" else "-",
-                    @tagName(divisor)[4..]
-                });
+                try writer.print("OSCTIMER = {s}, {s}, OSC_out, OSC_tout, {s};\n", .{ if (self.dynoscdis) "OSC_disable" else "-", if (self.timerres) "OSC_reset" else "-", @tagName(divisor)[4..] });
             }
         } else {
             try writer.writeAll("\n[Fast Bypass]\n");
-            for ([_]bool { false, true }) |state| {
+            for ([_]bool{ false, true }) |state| {
                 const name = switch (state) {
                     false => "NONE",
                     true => "FORCED",
                 };
-                try writer.print("{s}=", .{ name });
+                try writer.print("{s}=", .{name});
                 var first = true;
                 for (self.pins.items) |pa| {
                     if (pa.fast_bypass) |bypass| {
@@ -664,12 +660,12 @@ pub const Design = struct {
             }
 
             try writer.writeAll("\n[ORP Bypass]\n");
-            for ([_]bool { false, true }) |state| {
+            for ([_]bool{ false, true }) |state| {
                 const name = switch (state) {
                     false => "NONE",
                     true => "BYPASS",
                 };
-                try writer.print("{s}=", .{ name });
+                try writer.print("{s}=", .{name});
                 var first = true;
                 for (self.pins.items) |pa| {
                     if (pa.orm_bypass) |bypass| {
@@ -690,31 +686,31 @@ pub const Design = struct {
 
     pub fn writePla(self: Design, writer: *std.Io.Writer) !void {
         try writer.writeAll("#$ MODULE x\n");
-        try writer.print("#$ PINS {}", .{ self.pins.items.len });
+        try writer.print("#$ PINS {}", .{self.pins.items.len});
         for (self.pins.items) |pin| {
-            try writer.print(" {s}", .{ pin.signal });
+            try writer.print(" {s}", .{pin.signal});
         }
-        try writer.print("\n#$ NODES {}", .{ self.nodes.items.len });
+        try writer.print("\n#$ NODES {}", .{self.nodes.items.len});
         for (self.nodes.items) |node| {
-            try writer.print(" {s}", .{ node.signal });
+            try writer.print(" {s}", .{node.signal});
         }
         try writer.writeAll("\n");
 
         if (self.osctimer_div) |divisor| {
             if (self.dynoscdis and self.timerres) {
-                try writer.print("#$ PROPERTY LATTICE OSCTIMER osc= OSC_disable, OSC_reset, OSC_out, OSC_tout, {s};\n", .{ @tagName(divisor)[3..] });
+                try writer.print("#$ PROPERTY LATTICE OSCTIMER osc= OSC_disable, OSC_reset, OSC_out, OSC_tout, {s};\n", .{@tagName(divisor)[3..]});
                 try writer.writeAll("#$ EXTERNAL OSCTIMER 4 DYNOSCDIS'i' TIMERRES'i' OSCOUT'o' TIMEROUT'o'\n");
                 try writer.writeAll("#$ INSTANCE osc OSCTIMER 4 OSC_disable OSC_reset OSC_out OSC_tout\n");
             } else if (self.dynoscdis) {
-                try writer.print("#$ PROPERTY LATTICE OSCTIMER osc= OSC_disable, -, OSC_out, OSC_tout, {s};\n", .{ @tagName(divisor)[3..] });
+                try writer.print("#$ PROPERTY LATTICE OSCTIMER osc= OSC_disable, -, OSC_out, OSC_tout, {s};\n", .{@tagName(divisor)[3..]});
                 try writer.writeAll("#$ EXTERNAL OSCTIMER 4 DYNOSCDIS'i' TIMERRES'i' OSCOUT'o' TIMEROUT'o'\n");
                 try writer.writeAll("#$ INSTANCE osc OSCTIMER 4 OSC_disable OSC_reset_gnd OSC_out OSC_tout\n");
             } else if (self.timerres) {
-                try writer.print("#$ PROPERTY LATTICE OSCTIMER osc= -, OSC_reset, OSC_out, OSC_tout, {s};\n", .{ @tagName(divisor)[3..] });
+                try writer.print("#$ PROPERTY LATTICE OSCTIMER osc= -, OSC_reset, OSC_out, OSC_tout, {s};\n", .{@tagName(divisor)[3..]});
                 try writer.writeAll("#$ EXTERNAL OSCTIMER 4 DYNOSCDIS'i' TIMERRES'i' OSCOUT'o' TIMEROUT'o'\n");
                 try writer.writeAll("#$ INSTANCE osc OSCTIMER 4 OSC_disable_gnd OSC_reset OSC_out OSC_tout\n");
-            } else { 
-                try writer.print("#$ PROPERTY LATTICE OSCTIMER osc= -, -, OSC_out, OSC_tout, {s};\n", .{ @tagName(divisor)[3..] });
+            } else {
+                try writer.print("#$ PROPERTY LATTICE OSCTIMER osc= -, -, OSC_out, OSC_tout, {s};\n", .{@tagName(divisor)[3..]});
                 try writer.writeAll("#$ EXTERNAL OSCTIMER 4 DYNOSCDIS'i' TIMERRES'i' OSCOUT'o' TIMEROUT'o'\n");
                 try writer.writeAll("#$ INSTANCE osc OSCTIMER 4 OSC_disable_gnd OSC_reset_gnd OSC_out OSC_tout\n");
             }
@@ -732,19 +728,19 @@ pub const Design = struct {
         }
 
         try writer.writeAll(".type f\n");
-        try writer.print(".i {}\n", .{ self.inputs.items.len });
-        try writer.print(".o {}\n", .{ self.outputs.items.len });
+        try writer.print(".i {}\n", .{self.inputs.items.len});
+        try writer.print(".o {}\n", .{self.outputs.items.len});
         try writer.writeAll(".ilb");
         for (self.inputs.items) |input| {
-            try writer.print(" {s}", .{ input });
+            try writer.print(" {s}", .{input});
         }
         try writer.writeAll("\n.ob");
         for (self.outputs.items) |output| {
-            try writer.print(" {s}", .{ output });
+            try writer.print(" {s}", .{output});
         }
         try writer.writeAll("\n.phase ");
         try writer.splatByteAll('1', self.outputs.items.len);
-        try writer.print("\n.p {}\n", .{ self.pts.items.len });
+        try writer.print("\n.p {}\n", .{self.pts.items.len});
         for (self.pts.items) |pt| {
             for (self.inputs.items) |input| {
                 if (pt.has_input(input)) {
@@ -769,14 +765,13 @@ pub const Design = struct {
         }
         try writer.writeAll(".end\n");
     }
-
 };
 
 pub const GLB_Input_Signal = union(enum) {
     fb: lc4k.MC_Ref,
     pin: []const u8,
 
-    pub fn eql (a: GLB_Input_Signal, b: GLB_Input_Signal) bool {
+    pub fn eql(a: GLB_Input_Signal, b: GLB_Input_Signal) bool {
         return switch (a) {
             .fb => |afb| switch (b) {
                 .fb => |bfb| std.meta.eql(afb, bfb),
@@ -810,7 +805,6 @@ pub const GLB_Input_Fit_Signal = struct {
     name: []const u8,
     source: GLB_Input_Signal,
 };
-
 
 pub const GI_Set = struct {
     raw: std.StaticBitSet(36),
@@ -860,7 +854,7 @@ pub const GI_Set = struct {
 };
 
 pub const GLB_Input_Set = struct {
-    const BitSet = std.StaticBitSet(16*16*2+10);
+    const BitSet = std.StaticBitSet(16 * 16 * 2 + 10);
 
     raw: BitSet,
 
@@ -880,8 +874,8 @@ pub const GLB_Input_Set = struct {
         } else {
             var buf: [1024]u8 = undefined;
             const msg = switch (s) {
-                .fb => |mcref| std.fmt.bufPrint(&buf, "Can't add feedback signal {any}", .{ mcref }),
-                .pin => |id| std.fmt.bufPrint(&buf, "Can't add pin signal {s}", .{ id }),
+                .fb => |mcref| std.fmt.bufPrint(&buf, "Can't add feedback signal {any}", .{mcref}),
+                .pin => |id| std.fmt.bufPrint(&buf, "Can't add pin signal {s}", .{id}),
             } catch unreachable;
             @panic(msg);
         }
@@ -981,20 +975,20 @@ pub const Fit_Results = struct {
         switch (self.term) {
             .exited => |code| {
                 if (code != 0) {
-                    log.err("lpf4k returned code {}", .{ code });
+                    log.err("lpf4k returned code {}", .{code});
                     return error.FitterError;
                 }
             },
             .signal => |s| {
-                log.err("lpf4k signalled {}", .{ s });
+                log.err("lpf4k signalled {}", .{s});
                 return error.FitterError;
             },
             .stopped => |s| {
-                log.err("lpf4k stopped with {}", .{ s });
+                log.err("lpf4k stopped with {}", .{s});
                 return error.FitterError;
             },
             .unknown => |s| {
-                log.err("lpf4k terminated unexpectedly with {}", .{ s });
+                log.err("lpf4k terminated unexpectedly with {}", .{s});
                 return error.FitterError;
             },
         }
@@ -1006,7 +1000,6 @@ pub const Fit_Results = struct {
 };
 
 pub const Toolchain = struct {
-
     alloc: std.mem.Allocator,
     dir: std.Io.Dir,
     counter: i32,
@@ -1023,7 +1016,7 @@ pub const Toolchain = struct {
         const dir = try parent_dir.createDirPathOpen(io, &sub_path, .{ .open_options = .{ .iterate = true } });
         try std.process.setCurrentDir(io, dir);
 
-        return Toolchain {
+        return Toolchain{
             .alloc = allocator,
             .dir = dir,
             .counter = 0,
@@ -1033,7 +1026,7 @@ pub const Toolchain = struct {
     pub fn deinit(self: *Toolchain, io: std.Io, keep_files: bool) void {
         if (!keep_files) {
             self.clean_temp_dir(io) catch |err| {
-                std.debug.print("Failed to clean up toolchain temporary directory: {}\n", .{ err });
+                std.debug.print("Failed to clean up toolchain temporary directory: {}\n", .{err});
                 if (@errorReturnTrace()) |trace| {
                     std.debug.dumpStackTrace(trace.*);
                 }
@@ -1049,8 +1042,8 @@ pub const Toolchain = struct {
         var filename_buf1: [100]u8 = undefined;
         var filename_buf2: [100]u8 = undefined;
 
-        const tt4_filename = std.fmt.bufPrint(&filename_buf1, "test{}.tt4", .{ self.counter }) catch unreachable;
-        const lci_filename = std.fmt.bufPrint(&filename_buf2, "test{}.lci", .{ self.counter }) catch unreachable;
+        const tt4_filename = std.fmt.bufPrint(&filename_buf1, "test{}.tt4", .{self.counter}) catch unreachable;
+        const lci_filename = std.fmt.bufPrint(&filename_buf2, "test{}.lci", .{self.counter}) catch unreachable;
 
         {
             var f = try std.Io.Dir.cwd().createFile(io, tt4_filename, .{});
@@ -1072,10 +1065,14 @@ pub const Toolchain = struct {
         var child = try std.process.spawn(io, .{
             .argv = &.{
                 "C:\\ispLEVER_Classic2_1\\ispcpld\\bin\\lpf4k.exe",
-                "-i", tt4_filename,
-                "-lci", lci_filename,
-                "-d", design.dev.get_fitter_name(),
-                "-fmt", "PLA",
+                "-i",
+                tt4_filename,
+                "-lci",
+                lci_filename,
+                "-d",
+                design.dev.get_fitter_name(),
+                "-fmt",
+                "PLA",
                 //"-lca",
                 //"-lca_mfb",
                 //"-lca_ifb",
@@ -1089,14 +1086,14 @@ pub const Toolchain = struct {
         });
 
         const term = try child.wait(io);
-        var failed = !std.meta.eql(term, std.process.Child.Term { .exited = 0 });
+        var failed = !std.meta.eql(term, std.process.Child.Term{ .exited = 0 });
 
         //var signals = try std.ArrayList(SignalFitData).initCapacity(self.alloc, 32);
 
-        const log_filename = std.fmt.bufPrint(&filename_buf1, "test{}.log", .{ self.counter }) catch unreachable;
+        const log_filename = std.fmt.bufPrint(&filename_buf1, "test{}.log", .{self.counter}) catch unreachable;
         const log_contents = try self.read_file(io, log_filename);
         if (!failed and !std.mem.containsAtLeast(u8, log_contents, 1, " was Fitted Successfully!")) {
-            std.debug.print("Unexpected fitter log:\n {s}\n", .{ log_contents });
+            std.debug.print("Unexpected fitter log:\n {s}\n", .{log_contents});
             failed = true;
         }
 
@@ -1107,13 +1104,13 @@ pub const Toolchain = struct {
         if (failed) {
             jed = try JEDEC_Data.init_full(self.alloc, jedec_size);
         } else {
-            const jed_filename = std.fmt.bufPrint(&filename_buf1, "test{}.jed", .{ self.counter }) catch unreachable;
-            const rpt_filename = std.fmt.bufPrint(&filename_buf2, "test{}.rpt", .{ self.counter }) catch unreachable;
+            const jed_filename = std.fmt.bufPrint(&filename_buf1, "test{}.jed", .{self.counter}) catch unreachable;
+            const rpt_filename = std.fmt.bufPrint(&filename_buf2, "test{}.rpt", .{self.counter}) catch unreachable;
             report = try self.read_file(io, rpt_filename);
             jed = (try JEDEC_File.parse(self.alloc, jedec_size.width(), jedec_size.height(), try self.read_file(io, jed_filename))).data;
         }
 
-        var results = Fit_Results {
+        var results = Fit_Results{
             .term = term,
             .failed = failed,
             .report = report,
@@ -1155,10 +1152,10 @@ pub const Toolchain = struct {
                 source = .{ .fb = .{
                     .glb = glb,
                     .mc = mc,
-                }};
+                } };
             }
 
-            out.inputs[gi] = GLB_Input_Fit_Signal {
+            out.inputs[gi] = GLB_Input_Fit_Signal{
                 .name = signal,
                 .source = source,
             };
@@ -1169,9 +1166,9 @@ pub const Toolchain = struct {
         if (design.parse_glb_inputs) {
             var glb: u8 = 0;
             while (glb < design.dev.num_glbs) : (glb += 1) {
-                const header = try std.fmt.allocPrint(self.alloc, "GLB_{s}_LOGIC_ARRAY_FANIN", .{ helper.get_glb_name(glb) });
+                const header = try std.fmt.allocPrint(self.alloc, "GLB_{s}_LOGIC_ARRAY_FANIN", .{helper.get_glb_name(glb)});
                 if (helper.extract(results.report, header, "------------------------------------------")) |raw| {
-                    var fit_data = GLB_Fit_Data {
+                    var fit_data = GLB_Fit_Data{
                         .glb = glb,
                     };
 
@@ -1222,7 +1219,6 @@ pub const Toolchain = struct {
             }
         }
     }
-
 };
 
 const log = std.log.scoped(.toolchain);

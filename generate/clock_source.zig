@@ -128,19 +128,19 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
     return results;
 }
 
-var defaults = std.EnumMap(ClockSource, usize) {};
+var defaults = std.EnumMap(ClockSource, usize){};
 
 pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("clock_source");
 
-    var mc_iter = helper.Macrocell_Iterator { .dev = dev };
+    var mc_iter = helper.Macrocell_Iterator{ .dev = dev };
     while (mc_iter.next()) |mcref| {
         try tc.clean_temp_dir(io);
         helper.reset_temp();
 
-        var data = std.EnumMap(ClockSource, JEDEC_Data) {};
-        var values = std.EnumMap(ClockSource, usize) {};
+        var data = std.EnumMap(ClockSource, JEDEC_Data){};
+        var values = std.EnumMap(ClockSource, usize){};
 
         var diff = try JEDEC_Data.init_empty(ta, dev.jedec_dimensions);
 
@@ -149,7 +149,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
             data.put(src, results.jedec);
         }
 
-        for (&[_]ClockSource { .bclk0, .bclk2, .shared_pt }) |src| {
+        for (&[_]ClockSource{ .bclk0, .bclk2, .shared_pt }) |src| {
             diff.union_diff(data.get(src).?, data.get(.gnd).?);
         }
 
@@ -177,7 +177,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
         }
 
         if (diff.count_set() != 3) {
-            try helper.err("Expected three clock_source fuses but found {}!", .{ diff.count_set() }, dev, .{ .mcref = mcref });
+            try helper.err("Expected three clock_source fuses but found {}!", .{diff.count_set()}, dev, .{ .mcref = mcref });
         }
 
         for (std.enums.values(ClockSource)) |src| {

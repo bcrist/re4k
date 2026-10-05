@@ -23,12 +23,12 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
     try design.node_assignment(.{ .signal = "node3" });
     try design.node_assignment(.{ .signal = "node4" });
 
-    var mc_iter = helper.Macrocell_Iterator { .dev = dev };
+    var mc_iter = helper.Macrocell_Iterator{ .dev = dev };
     var n: usize = 0;
     while (mc_iter.next()) |other_mcref| {
         if (other_mcref.glb == mcref.glb and other_mcref.mc != mcref.mc) {
-            var data_name = try std.fmt.allocPrint(ta, "node{}.D", .{ n });
-            const signal_name = data_name[0..data_name.len - 2];
+            var data_name = try std.fmt.allocPrint(ta, "node{}.D", .{n});
+            const signal_name = data_name[0 .. data_name.len - 2];
             try design.node_assignment(.{
                 .signal = signal_name,
                 .glb = other_mcref.glb,
@@ -56,7 +56,7 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
         try design.add_pt(.{ "node0.Q", "node1.Q", "node2.Q" }, "out");
     }
 
-    var iter = Output_Iterator {
+    var iter = Output_Iterator{
         .pins = dev.all_pins,
         .exclude_glb = mcref.glb,
     };
@@ -67,8 +67,8 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
             if (std.mem.eql(u8, oe_pin.id, "F8")) continue;
             if (std.mem.eql(u8, oe_pin.id, "E3")) continue;
         }
-        var oe_signal_name = try std.fmt.allocPrint(ta, "temp_{}.OE", .{ n });
-        const signal_name = oe_signal_name[0..oe_signal_name.len-3];
+        var oe_signal_name = try std.fmt.allocPrint(ta, "temp_{}.OE", .{n});
+        const signal_name = oe_signal_name[0 .. oe_signal_name.len - 3];
         try design.pin_assignment(.{
             .signal = signal_name,
             .pin = oe_pin.id,
@@ -103,7 +103,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("pt4_output_enable");
 
-    var mc_iter = helper.Macrocell_Iterator { .dev = dev };
+    var mc_iter = helper.Macrocell_Iterator{ .dev = dev };
     while (mc_iter.next()) |mcref| {
         if (mcref.mc == 0) {
             try helper.write_glb(writer, mcref.glb);
@@ -147,7 +147,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
         }
 
         if (diff.count_set() != 1) {
-            try helper.err("Expected one pt4_oe fuse but found {}!", .{ diff.count_set() }, dev, .{ .mcref = mcref });
+            try helper.err("Expected one pt4_oe fuse but found {}!", .{diff.count_set()}, dev, .{ .mcref = mcref });
         }
 
         if (default_off) |def| {
@@ -183,7 +183,6 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
 
     try writer.done();
 }
-
 
 fn parse_oe_source_rows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*Device_Info) !std.DynamicBitSet {
     const input_file = helper.get_input_file("oe_source.sx") orelse return error.MissingOESourceInputFile;

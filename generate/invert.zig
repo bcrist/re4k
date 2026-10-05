@@ -40,7 +40,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
     var default_normal: ?u1 = null;
     var default_invert: ?u1 = null;
 
-    var mc_iter = helper.Macrocell_Iterator { .dev = dev };
+    var mc_iter = helper.Macrocell_Iterator{ .dev = dev };
     while (mc_iter.next()) |mcref| {
         try tc.clean_temp_dir(io);
         helper.reset_temp();
@@ -77,7 +77,6 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
             } else {
                 default_invert = invert_value;
             }
-
         } else {
             try helper.err("Expected one invert fuse but found none!", .{}, dev, .{ .mcref = mcref });
             return error.Think;

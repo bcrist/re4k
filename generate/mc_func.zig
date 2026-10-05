@@ -43,25 +43,25 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
     return results;
 }
 
-var defaults = std.EnumMap(lc4k.Macrocell_Function, usize) {};
+var defaults = std.EnumMap(lc4k.Macrocell_Function, usize){};
 
 pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolchain, dev: *const Device_Info, writer: *sx.Writer) !void {
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("macrocell_function");
 
-    var mc_iter = helper.Macrocell_Iterator { .dev = dev };
+    var mc_iter = helper.Macrocell_Iterator{ .dev = dev };
     while (mc_iter.next()) |mcref| {
         try tc.clean_temp_dir(io);
         helper.reset_temp();
 
-        var data = std.EnumMap(lc4k.Macrocell_Function, JEDEC_Data) {};
+        var data = std.EnumMap(lc4k.Macrocell_Function, JEDEC_Data){};
         for (std.enums.values(lc4k.Macrocell_Function)) |reg_type| {
             const results = try run_toolchain(io, ta, tc, dev, mcref, reg_type);
             data.put(reg_type, results.jedec);
         }
 
         var diff = try JEDEC_Data.init_empty(ta, dev.jedec_dimensions);
-        for (&[_]lc4k.Macrocell_Function { .d_ff, .t_ff }) |reg_type| {
+        for (&[_]lc4k.Macrocell_Function{ .d_ff, .t_ff }) |reg_type| {
             diff.union_diff(data.get(reg_type).?, data.get(.latch).?);
         }
 
@@ -74,7 +74,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
 
         try helper.write_mc(writer, mcref.mc);
 
-        var values = std.EnumMap(lc4k.Macrocell_Function, usize) {};
+        var values = std.EnumMap(lc4k.Macrocell_Function, usize){};
         var bit_value: usize = 1;
         var diff_iter = diff.iterator(.{});
         while (diff_iter.next()) |fuse| {
@@ -90,7 +90,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
         }
 
         if (diff.count_set() != 2) {
-            try helper.err("Expected two macrocell function fuses but found {}!", .{ diff.count_set() }, dev, .{ .mcref = mcref });
+            try helper.err("Expected two macrocell function fuses but found {}!", .{diff.count_set()}, dev, .{ .mcref = mcref });
         }
 
         for (std.enums.values(lc4k.Macrocell_Function)) |reg_type| {
