@@ -86,12 +86,12 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
     std.debug.assert(input_dev.num_glbs == dev.num_glbs);
     std.debug.assert(input_dev.jedec_dimensions.eql(dev.jedec_dimensions));
 
-    var renaming = try std.array_list.Managed(SignalRenaming).initCapacity(ta, fuse_to_pin_map.count());
+    var renaming: std.ArrayList(SignalRenaming) = try .initCapacity(ta, fuse_to_pin_map.count());
 
     var entry_iter = fuse_to_pin_map.iterator();
     while (entry_iter.next()) |entry| {
         if (fuse_to_signal_map.get(entry.key_ptr.*)) |old| {
-            try renaming.append(.{
+            try renaming.append(ta, .{
                 .old = old,
                 .new = entry.value_ptr.*,
             });

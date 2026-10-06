@@ -31,7 +31,7 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
 
     var mc: u8 = 0;
     while (mc < mcref.mc) : (mc += 1) {
-        const signal_name = try std.fmt.allocPrint(ta, "dum{}", .{mc});
+        const signal_name = try ta.print("dum{}", .{mc});
         try design.node_assignment(.{
             .signal = signal_name,
             .glb = mcref.glb,

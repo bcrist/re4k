@@ -41,7 +41,7 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
             .exclude_pin = pin.id,
         };
 
-        const signal_name = try std.fmt.allocPrint(ta, "temp{}", .{glb});
+        const signal_name = try ta.print("temp{}", .{glb});
         try design.pin_assignment(.{
             .signal = signal_name,
             .pin = iter.next().?.id,

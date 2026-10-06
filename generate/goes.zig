@@ -59,7 +59,7 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
             if (std.mem.eql(u8, pin.id, "E3")) continue;
         }
 
-        var oe_signal_name = try std.fmt.allocPrint(ta, "out{s}.OE", .{pin.id});
+        var oe_signal_name = try ta.print("out{s}.OE", .{pin.id});
         const signal_name = oe_signal_name[0 .. oe_signal_name.len - 3];
 
         try design.pin_assignment(.{

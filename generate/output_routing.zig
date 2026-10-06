@@ -33,7 +33,7 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
     var mc: u8 = 0;
     while (mc < 16) : (mc += 1) {
         if (mc != out_mc) {
-            const signal_d = try std.fmt.allocPrint(ta, "node{}.D", .{mc});
+            const signal_d = try ta.print("node{}.D", .{mc});
             const signal = signal_d[0 .. signal_d.len - 2];
             try design.node_assignment(.{
                 .signal = signal,

@@ -157,7 +157,7 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
             };
             while (iter.next()) |info| {
                 if (info.mc != mc) {
-                    const oe_signal = try std.fmt.allocPrint(ta, "dum{}.OE", .{info.mc});
+                    const oe_signal = try ta.print("dum{}.OE", .{info.mc});
                     const signal = oe_signal[0 .. oe_signal.len - 3];
                     try design.pin_assignment(.{
                         .signal = signal,
@@ -221,7 +221,7 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
             };
             while (iter.next()) |info| {
                 if (info.mc != mc) {
-                    const oe_signal = try std.fmt.allocPrint(ta, "dum{}.OE", .{info.mc});
+                    const oe_signal = try ta.print("dum{}.OE", .{info.mc});
                     const signal = oe_signal[0 .. oe_signal.len - 3];
                     try design.pin_assignment(.{
                         .signal = signal,

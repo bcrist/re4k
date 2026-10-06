@@ -140,7 +140,7 @@ var jed_dir: ?*std.Io.Dir = null;
 
 pub fn log_results(io: std.Io, device_type: Device_Type, comptime name_fmt: []const u8, name_args: anytype, results: toolchain.Fit_Results) !void {
     if (report_dir) |dir| {
-        const filename = try std.fmt.allocPrint(temp_alloc.allocator(), name_fmt ++ ".rpt", name_args);
+        const filename = try temp_alloc.allocator().print(name_fmt ++ ".rpt", name_args);
         var f = try dir.createFile(io, filename, .{});
         defer f.close(io);
 
@@ -148,7 +148,7 @@ pub fn log_results(io: std.Io, device_type: Device_Type, comptime name_fmt: []co
         try writer.interface.writeAll(results.report);
     }
     if (jed_dir) |dir| {
-        const filename = try std.fmt.allocPrint(temp_alloc.allocator(), name_fmt ++ ".jed", name_args);
+        const filename = try temp_alloc.allocator().print(name_fmt ++ ".jed", name_args);
         var f = try dir.createFile(io, filename, .{});
         defer f.close(io);
 
@@ -441,7 +441,8 @@ fn parse_grp0(ta: std.mem.Allocator, parser: *sx.Reader, dev: *const Device_Info
     _ = try parser.require_any_expression(); // device name, we already know it
     try parser.require_expression("global_routing_pool");
 
-    var temp = std.array_list.Managed(u8).init(ta);
+    var temp: std.ArrayList(u8) = .empty;
+    defer temp.deinit(ta);
 
     var glb: u8 = 0;
     while (glb < dev.num_glbs) : (glb += 1) {
@@ -456,7 +457,7 @@ fn parse_grp0(ta: std.mem.Allocator, parser: *sx.Reader, dev: *const Device_Info
                 const col = try parser.require_any_int(u16, 10);
                 const fuse = Fuse.init(row, col);
 
-                if (try parse_pin(parser, &temp)) {
+                if (try parse_pin(parser, ta, &temp)) {
                     if (pin_number_to_info.get(temp.items)) |pin| {
                         try results.put(fuse, .{
                             .pin = pin.id,
@@ -742,17 +743,18 @@ fn parse_mc_options_columns0(parser: *sx.Reader, dev: *const Device_Info, result
     try parser.require_done();
 }
 
-pub fn parse_orm_rows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*Device_Info) !std.DynamicBitSet {
+pub fn parse_orm_rows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*Device_Info) !std.bit_set.Dynamic {
     const input_file = get_input_file("output_routing.sx") orelse return error.MissingORMInputFile;
     const dev = Device_Info.init(input_file.device_type);
 
-    var results = try std.DynamicBitSet.initEmpty(pa, dev.jedec_dimensions.height());
+    var results: std.bit_set.Dynamic = try .initEmpty(pa, dev.jedec_dimensions.height());
+    errdefer results.deinit(pa);
 
     var reader = std.Io.Reader.fixed(input_file.contents);
     var parser = sx.reader(ta, &reader);
     defer parser.deinit();
 
-    parse_orm_rows0(&parser, &results) catch |e| switch (e) {
+    parse_orm_rows0(&parser, ta, &results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
             var ctx = try parser.token_context();
             try ctx.print_for_string(input_file.contents, stderr, 120);
@@ -768,11 +770,11 @@ pub fn parse_orm_rows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: 
     return results;
 }
 
-fn parse_orm_rows0(parser: *sx.Reader, results: *std.DynamicBitSet) !void {
+fn parse_orm_rows0(parser: *sx.Reader, ta: std.mem.Allocator, results: *std.bit_set.Dynamic) !void {
     _ = try parser.require_any_expression(); // device name, we already know it
     try parser.require_expression("output_routing");
 
-    while (try parse_pin(parser, null)) {
+    while (try parse_pin(parser, ta, null)) {
         while (try parser.expression("fuse")) {
             const row = try parser.require_any_int(u16, 10);
             _ = try parser.require_any_int(u16, 10);
@@ -795,12 +797,12 @@ fn parse_orm_rows0(parser: *sx.Reader, results: *std.DynamicBitSet) !void {
     try parser.require_done();
 }
 
-pub fn parse_pin(parser: *sx.Reader, out: ?*std.array_list.Managed(u8)) !bool {
+pub fn parse_pin(parser: *sx.Reader, ta: std.mem.Allocator, out: ?*std.ArrayList(u8)) !bool {
     if (try parser.expression("pin")) {
         const pin_id = try parser.require_any_string();
         if (out) |o| {
             o.clearRetainingCapacity();
-            try o.appendSlice(pin_id);
+            try o.appendSlice(ta, pin_id);
         }
 
         if (try parser.expression("info")) {

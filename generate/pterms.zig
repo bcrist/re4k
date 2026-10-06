@@ -48,10 +48,10 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
 
     var n: u8 = 0;
     while (n < 4) : (n += 1) {
-        const signal_name = try std.fmt.allocPrint(ta, "dum{}", .{n});
-        const d_name = try std.fmt.allocPrint(ta, "dum{}.D", .{n});
-        const c_name = try std.fmt.allocPrint(ta, "dum{}.C", .{n});
-        const ar_name = try std.fmt.allocPrint(ta, "dum{}.AR", .{n});
+        const signal_name = try ta.print("dum{}", .{n});
+        const d_name = try ta.print("dum{}.D", .{n});
+        const c_name = try ta.print("dum{}.C", .{n});
+        const ar_name = try ta.print("dum{}.AR", .{n});
         try design.node_assignment(.{
             .signal = signal_name,
             .glb = mcref.glb,
@@ -165,7 +165,7 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
     try writer.expression_expanded(@tagName(dev.device));
     try writer.expression_expanded("product_terms");
 
-    var assigned_columns = try std.DynamicBitSet.initEmpty(pa, dev.jedec_dimensions.width());
+    var assigned_columns: std.bit_set.Dynamic = try .initEmpty(pa, dev.jedec_dimensions.width());
 
     var gi: u8 = 0;
     while (gi < 36) : (gi += 1) {
@@ -198,7 +198,8 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
 
         results.jedec.put_range(dev.get_options_range(), 1);
 
-        var columns = try std.DynamicBitSet.initEmpty(ta, dev.jedec_dimensions.width());
+        var columns: std.bit_set.Dynamic = try .initEmpty(ta, dev.jedec_dimensions.width());
+        defer columns.deinit(ta);
 
         var fuse_iter = results.jedec.iterator(.{ .kind = .unset });
         while (fuse_iter.next()) |fuse| {

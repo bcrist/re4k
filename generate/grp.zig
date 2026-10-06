@@ -75,7 +75,7 @@ fn get_all_signals(pa: std.mem.Allocator, dev: *const Device_Info) ![]const GLB_
 
     var mc_iter = Macrocell_Iterator{ .dev = dev };
     while (mc_iter.next()) |mcref| {
-        const signal_name = try std.fmt.allocPrint(pa, "fb_{s}{}", .{ helper.get_glb_name(mcref.glb), mcref.mc });
+        const signal_name = try pa.print("fb_{s}{}", .{ helper.get_glb_name(mcref.glb), mcref.mc });
         all_signals.appendAssumeCapacity(.{
             .name = signal_name,
             .source = .{ .fb = .{ .glb = mcref.glb, .mc = mcref.mc } },
@@ -84,7 +84,7 @@ fn get_all_signals(pa: std.mem.Allocator, dev: *const Device_Info) ![]const GLB_
 
     var pin_iter = Input_Iterator{ .pins = dev.all_pins };
     while (pin_iter.next()) |pin| {
-        const signal_name = try std.fmt.allocPrint(pa, "pin_{s}", .{pin.id});
+        const signal_name = try pa.print("pin_{s}", .{pin.id});
         all_signals.appendAssumeCapacity(.{
             .name = signal_name,
             .source = .{ .pin = pin.id },

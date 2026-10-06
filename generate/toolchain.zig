@@ -162,7 +162,7 @@ pub const Design = struct {
                     existing.power_guard_signal = pg_enable;
                     try self.add_pin_if_not_node(pg_enable);
                     try self.node_assignment(.{
-                        .signal = try std.fmt.allocPrint(self.alloc, "{s}_PG", .{pa.signal}),
+                        .signal = try self.alloc.print("{s}_PG", .{pa.signal}),
                     });
                 }
                 if (pa.orm_bypass) |bypass| existing.orm_bypass = bypass;
@@ -183,7 +183,7 @@ pub const Design = struct {
             self.uses_power_guard = true;
             try self.add_pin_if_not_node(pg_enable);
             try self.node_assignment(.{
-                .signal = try std.fmt.allocPrint(self.alloc, "{s}_PG", .{pa.signal}),
+                .signal = try self.alloc.print("{s}_PG", .{pa.signal}),
             });
         }
     }
@@ -807,7 +807,7 @@ pub const GLB_Input_Fit_Signal = struct {
 };
 
 pub const GI_Set = struct {
-    raw: std.StaticBitSet(36),
+    raw: std.bit_set.Static(36),
 
     pub fn init_single(gi: usize) GI_Set {
         var self: GI_Set = .{ .raw = .empty };
@@ -850,11 +850,11 @@ pub const GI_Set = struct {
         return self.raw.iterator(.{});
     }
 
-    const Iterator = std.StaticBitSet(36).Iterator(.{});
+    const Iterator = std.bit_set.Static(36).Iterator(.{});
 };
 
 pub const GLB_Input_Set = struct {
-    const BitSet = std.StaticBitSet(16 * 16 * 2 + 10);
+    const BitSet = std.bit_set.Static(16 * 16 * 2 + 10);
 
     raw: BitSet,
 
@@ -1166,7 +1166,7 @@ pub const Toolchain = struct {
         if (design.parse_glb_inputs) {
             var glb: u8 = 0;
             while (glb < design.dev.num_glbs) : (glb += 1) {
-                const header = try std.fmt.allocPrint(self.alloc, "GLB_{s}_LOGIC_ARRAY_FANIN", .{helper.get_glb_name(glb)});
+                const header = try self.alloc.print("GLB_{s}_LOGIC_ARRAY_FANIN", .{helper.get_glb_name(glb)});
                 if (helper.extract(results.report, header, "------------------------------------------")) |raw| {
                     var fit_data = GLB_Fit_Data{
                         .glb = glb,

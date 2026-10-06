@@ -27,7 +27,7 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
     var n: usize = 0;
     while (mc_iter.next()) |other_mcref| {
         if (other_mcref.glb == mcref.glb and other_mcref.mc != mcref.mc) {
-            var data_name = try std.fmt.allocPrint(ta, "node{}.D", .{n});
+            var data_name = try ta.print("node{}.D", .{n});
             const signal_name = data_name[0 .. data_name.len - 2];
             try design.node_assignment(.{
                 .signal = signal_name,
@@ -67,7 +67,7 @@ fn run_toolchain(io: std.Io, ta: std.mem.Allocator, tc: *Toolchain, dev: *const 
             if (std.mem.eql(u8, oe_pin.id, "F8")) continue;
             if (std.mem.eql(u8, oe_pin.id, "E3")) continue;
         }
-        var oe_signal_name = try std.fmt.allocPrint(ta, "temp_{}.OE", .{n});
+        var oe_signal_name = try ta.print("temp_{}.OE", .{n});
         const signal_name = oe_signal_name[0 .. oe_signal_name.len - 3];
         try design.pin_assignment(.{
             .signal = signal_name,
@@ -184,17 +184,18 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
     try writer.done();
 }
 
-fn parse_oe_source_rows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*Device_Info) !std.DynamicBitSet {
+fn parse_oe_source_rows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*Device_Info) !std.bit_set.Dynamic {
     const input_file = helper.get_input_file("oe_source.sx") orelse return error.MissingOESourceInputFile;
     const dev = Device_Info.init(input_file.device_type);
 
-    var results = try std.DynamicBitSet.initEmpty(pa, dev.jedec_dimensions.height());
+    var results: std.bit_set.Dynamic = try .initEmpty(pa, dev.jedec_dimensions.height());
+    errdefer results.deinit(pa);
 
     var reader = std.Io.Reader.fixed(input_file.contents);
     var parser = sx.reader(ta, &reader);
     defer parser.deinit();
 
-    parse_oe_source_rows_0(&parser, &results) catch |e| switch (e) {
+    parse_oe_source_rows_0(&parser, ta, &results) catch |e| switch (e) {
         error.SExpressionSyntaxError => {
             var ctx = try parser.token_context();
             try ctx.print_for_string(input_file.contents, helper.stderr, 120);
@@ -210,11 +211,11 @@ fn parse_oe_source_rows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device
     return results;
 }
 
-fn parse_oe_source_rows_0(parser: *sx.Reader, results: *std.DynamicBitSet) !void {
+fn parse_oe_source_rows_0(parser: *sx.Reader, ta: std.mem.Allocator, results: *std.bit_set.Dynamic) !void {
     _ = try parser.require_any_expression(); // device name, we already know it
     try parser.require_expression("output_enable_source");
 
-    while (try helper.parse_pin(parser, null)) {
+    while (try helper.parse_pin(parser, ta, null)) {
         while (try parser.expression("fuse")) {
             const row = try parser.require_any_int(u16, 10);
             _ = try parser.require_any_int(u16, 10);

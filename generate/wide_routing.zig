@@ -137,11 +137,12 @@ pub fn run(io: std.Io, ta: std.mem.Allocator, pa: std.mem.Allocator, tc: *Toolch
     try writer.done();
 }
 
-fn parse_cluster_routing_rows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*Device_Info) !std.DynamicBitSet {
+fn parse_cluster_routing_rows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_device: ?*Device_Info) !std.bit_set.Dynamic {
     const input_file = helper.get_input_file("cluster_routing.sx") orelse return error.MissingClusterRoutingInputFile;
     const dev = Device_Info.init(input_file.device_type);
 
-    var results = try std.DynamicBitSet.initEmpty(pa, dev.jedec_dimensions.height());
+    var results: std.bit_set.Dynamic = try .initEmpty(pa, dev.jedec_dimensions.height());
+    errdefer results.deinit(pa);
 
     var reader = std.Io.Reader.fixed(input_file.contents);
     var parser = sx.reader(ta, &reader);
@@ -163,7 +164,7 @@ fn parse_cluster_routing_rows(ta: std.mem.Allocator, pa: std.mem.Allocator, out_
     return results;
 }
 
-fn parse_cluster_routing_rows_0(parser: *sx.Reader, results: *std.DynamicBitSet) !void {
+fn parse_cluster_routing_rows_0(parser: *sx.Reader, results: *std.bit_set.Dynamic) !void {
     _ = try parser.require_any_expression(); // device name, we already know it
     try parser.require_expression("cluster_routing");
 
