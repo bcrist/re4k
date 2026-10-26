@@ -1,13 +1,13 @@
 .{
     .name = .re4k_gen,
     .fingerprint = 0x4fa638cde794c99c,
-    .version = "0.2.0",
+    .version = "0.2.1",
     .min_zig_version = "0.17.0",
     .paths = .{""},
     .dependencies = .{
         .lc4k = .{
-            .url = "git+https://codeberg.org/bcrist/zig-lc4k#3d7179b6f40ec1132684f9c4b67ea54dddd69c45",
-            .hash = "lc4k-0.4.2-5R47QnaSFAAbZBpUnoukbZUggEjWmej5MUAHQ6vwvqW9",
+            .url = "git+https://codeberg.org/bcrist/zig-lc4k#1e32e187ec9946e7dd012370211fd5bce6d30c5b",
+            .hash = "lc4k-0.4.4-5R47Qjt0FADvJN9bhOCkqoUk5sX0NUzcTFX4t2Xj0kVF",
         },
         .Temp_Allocator = .{
             .url = "git+https://codeberg.org/bcrist/zig-tempallocator#75f67724a8a79ff57f93606385f280ee260c0f88",

@@ -165,7 +165,7 @@ pub fn log_results(io: std.Io, device_type: Device_Type, comptime name_fmt: []co
         try stdout.writeAll("Press enter to continue...\n");
         try stdout.flush();
         var reader = std.Io.File.stdin().readerStreaming(io, &.{});
-        while ('\n' != reader.interface.takeByte() catch '\n') {}
+        while ('\n' != (reader.interface.takeByte() catch '\n')) {}
     }
 }
 
